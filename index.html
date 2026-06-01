@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="VedNetra">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>VedNetra</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <section class="workspace">
+      <aside class="input-panel">
+        <div class="brand-row">
+          <img class="app-logo" src="icon.svg" alt="" aria-hidden="true">
+          <div>
+            <h1 class="brand-title">VedNetra</h1>
+          </div>
+          <span class="status-pill">Advanced v84</span>
+        </div>
+
+        <form id="birthForm" autocomplete="off">
+          <fieldset id="chartStartSection" class="chart-start-section">
+            <legend>Chart Setup</legend>
+            <div class="chart-mode-actions">
+              <button type="button" id="newChartModeBtn" class="primary-action">Create new chart</button>
+              <button type="button" id="existingChartModeBtn">Select existing chart</button>
+            </div>
+            <div id="existingChartPanel" class="chart-mode-panel hidden">
+              <label>
+                Saved chart
+                <select id="savedChartSelect" name="savedChartSelect">
+                  <option value="">No saved charts</option>
+                </select>
+              </label>
+              <div class="actions compact-actions">
+                <button type="button" id="loadChartBtn">Load</button>
+                <button type="button" id="deleteChartBtn">Delete</button>
+                <button type="button" id="exportChartsBtn">Export library</button>
+                <button type="button" id="importChartsBtn">Import library</button>
+                <input id="importChartsFile" type="file" accept="application/json,.json" class="hidden">
+              </div>
+            </div>
+            <p id="chartStartStatus" class="fine-print">Start a fresh chart or load a saved chart library entry.</p>
+            <p id="savedChartStatus" class="fine-print">Saved chart records will appear here.</p>
+          </fieldset>
+
+          <fieldset id="nativeSection" tabindex="-1">
+            <legend>Native</legend>
+            <div class="grid-2">
+              <label>
+                Name
+                <input id="nativeName" name="nativeName" value="PRASHNA CHART">
+              </label>
+              <label>
+                Chart number
+                <input id="chartNumber" name="chartNumber" value="1" readonly aria-readonly="true">
+              </label>
+            </div>
+            <label>
+              Gender context
+              <select id="gender" name="gender">
+                <option value="unspecified">Unspecified</option>
+                <option value="male">Male chart</option>
+                <option value="female">Female chart</option>
+              </select>
+            </label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Birth Details</legend>
+            <label>
+              Ayanamsha
+              <select id="ayanamsha" name="ayanamsha">
+                <option value="lahiri">Lahiri</option>
+                <option value="raman" selected>Raman</option>
+                <option value="krishnamurti">Krishnamurti</option>
+                <option value="krishnamurtiNew">Krishnamurti (New)</option>
+                <option value="khullar">Khullar (KCIL)</option>
+              </select>
+            </label>
+            <div class="grid-2">
+              <label>
+                Date
+                <input id="birthDate" name="birthDate" type="date" required>
+              </label>
+              <label>
+                Time (HH:MM:SS)
+                <input id="birthTime" name="birthTime" type="text" inputmode="numeric" pattern="[0-9]{2}:[0-9]{2}:[0-9]{2}" placeholder="HH:MM:SS" required>
+              </label>
+            </div>
+            <label>
+              Place of birth
+              <input id="birthPlace" name="birthPlace" list="cityOptions" placeholder="Example: Chandigarh, India">
+              <datalist id="cityOptions"></datalist>
+            </label>
+            <label class="button-label default-location-action">Default location
+              <button type="button" id="setDefaultLocationBtn">Make current place default</button>
+            </label>
+            <div class="grid-3">
+              <label>
+                Timezone
+                <input id="timezone" name="timezone" type="number" step="0.25" value="5.5" required>
+              </label>
+              <label>
+                Latitude
+                <input id="latitude" name="latitude" value="28.36.50" placeholder="DD.MM.SS" required>
+              </label>
+              <label>
+                Lat direction
+                <select id="latitudeDirection" name="latitudeDirection">
+                  <option value="N">N</option>
+                  <option value="S">S</option>
+                </select>
+              </label>
+            </div>
+            <div class="grid-2">
+              <label>
+                Longitude
+                <input id="longitude" name="longitude" value="77.12.32" placeholder="DD.MM.SS" required>
+              </label>
+              <label>
+                Long direction
+                <select id="longitudeDirection" name="longitudeDirection">
+                  <option value="E">E</option>
+                  <option value="W">W</option>
+                </select>
+              </label>
+            </div>
+            <label>
+              D1 Asc degree override
+              <input id="ascOverrideDegree" name="ascOverrideDegree" placeholder="Optional: 03.32.00 or 3.5333">
+            </label>
+            <p class="fine-print">Use this only when you want a manual/PL9 D-1 lagna degree to override the computed ascendant degree. VedNetra keeps the computed D-1 sign and applies this degree to all lagna-based houses, vargas and reports.</p>
+            <p id="defaultLocationStatus" class="fine-print">Default location is used for new Prashna charts.</p>
+          </fieldset>
+
+          <input id="topic" name="topic" type="hidden" value="general">
+          <input id="question" name="question" type="hidden" value="">
+
+          <input id="asOfDate" name="asOfDate" type="hidden">
+          <input id="asOfTime" name="asOfTime" type="hidden">
+          <input id="horizon" name="horizon" type="hidden" value="10">
+          <input id="externalChartData" name="externalChartData" type="hidden" value="">
+          <input id="partnerName" name="partnerName" type="hidden" value="">
+          <input id="partnerGender" name="partnerGender" type="hidden" value="unspecified">
+          <input id="partnerBirthDate" name="partnerBirthDate" type="hidden" value="">
+          <input id="partnerBirthTime" name="partnerBirthTime" type="hidden" value="">
+          <input id="partnerBirthPlace" name="partnerBirthPlace" type="hidden" value="">
+          <input id="partnerTimezone" name="partnerTimezone" type="hidden" value="5.5">
+          <input id="partnerLatitude" name="partnerLatitude" type="hidden" value="">
+          <input id="partnerLatitudeDirection" name="partnerLatitudeDirection" type="hidden" value="N">
+          <input id="partnerLongitude" name="partnerLongitude" type="hidden" value="">
+          <input id="partnerLongitudeDirection" name="partnerLongitudeDirection" type="hidden" value="E">
+
+          <div class="actions">
+            <button type="submit" class="primary-action">Generate report</button>
+            <button type="button" id="saveChartBtn">Save chart</button>
+            <button type="button" id="saveChartAsNewBtn">Save as new</button>
+            <button type="button" id="timeToolOpenBtn">Time Tool</button>
+            <button type="button" id="printBtn">Print</button>
+            <button type="button" id="copyBtn">Copy report</button>
+          </div>
+
+          <div class="report-download-panel">
+            <div class="report-download-head">Report Download</div>
+            <div class="report-download-grid">
+              <label>
+                Report
+                <select id="reportDownloadType">
+                  <option value="vednetra" selected>VedNetra Report</option>
+                  <option value="detailed">Detailed Report</option>
+                  <option value="summary">Summary Report</option>
+                </select>
+              </label>
+              <label>
+                Format
+                <select id="reportDownloadFormat">
+                  <option value="txt">TXT</option>
+                  <option value="csv">CSV</option>
+                  <option value="pdf">PDF</option>
+                  <option value="xls">Excel</option>
+                </select>
+              </label>
+              <label class="button-label">
+                Download
+                <button type="button" id="downloadReportBtn" class="primary-action">Download report</button>
+              </label>
+            </div>
+          </div>
+
+          <fieldset>
+            <legend>iPhone / iPad Access</legend>
+            <div id="mobileAccessStatus" class="device-access fine-print">Checking local access URLs...</div>
+          </fieldset>
+        </form>
+      </aside>
+
+      <button type="button" id="chartInputResizeHandle" class="chart-input-resize-handle" aria-label="Drag to resize input section" title="Drag to resize input section"></button>
+      <section class="output-panel" aria-live="polite">
+        <div id="chartDataNavRibbon" class="chart-data-nav hidden" aria-label="View A sections">
+          <div class="nav-category nav-category-open">
+            <button type="button" class="nav-category-title" data-nav-category-toggle aria-expanded="true">Workspace</button>
+            <div class="nav-category-actions">
+              <button type="button" data-view-a-target="viewA-output-library">Library</button>
+              <button type="button" data-view-a-target="viewA-worksheets">Worksheets</button>
+              <button type="button" data-view-a-target="viewA-summary">Summary</button>
+            </div>
+          </div>
+          <div class="nav-category">
+            <button type="button" class="nav-category-title" data-nav-category-toggle aria-expanded="false">Birth Foundations</button>
+            <div class="nav-category-actions">
+              <button type="button" data-view-a-target="viewA-panchang">Birth Panchang</button>
+              <button type="button" data-view-a-target="viewA-current-panchang">Current Panchang</button>
+              <button type="button" data-view-a-target="viewA-d1-details">D-1 Details</button>
+              <button type="button" data-view-a-target="viewA-yogas">Yogas</button>
+              <button type="button" data-view-a-target="viewA-vargas">Vargas</button>
+            </div>
+          </div>
+          <div class="nav-category">
+            <button type="button" class="nav-category-title" data-nav-category-toggle aria-expanded="false">Timing</button>
+            <div class="nav-category-actions">
+              <button type="button" data-view-a-target="viewA-varshfal">Varshfal</button>
+              <button type="button" data-view-a-target="viewA-transit">Transit</button>
+              <button type="button" data-view-a-target="viewA-ephemeris">Ephemeris</button>
+              <button type="button" data-view-a-target="viewA-dasha">Dasha</button>
+            </div>
+          </div>
+          <div class="nav-category">
+            <button type="button" class="nav-category-title" data-nav-category-toggle aria-expanded="false">Strengths &amp; Systems</button>
+            <div class="nav-category-actions">
+              <button type="button" data-view-a-target="viewA-references">Tables</button>
+              <button type="button" data-view-a-target="viewA-shadbala">Shadbala</button>
+              <button type="button" data-view-a-target="viewA-jaimini">Jaimini</button>
+              <button type="button" data-view-a-target="viewA-chakras">Chakras</button>
+              <button type="button" data-view-a-target="viewA-sav">Ashtakavarga</button>
+              <button type="button" data-view-a-target="viewA-bav">Bhinnashtaka</button>
+              <button type="button" data-view-a-target="viewA-kp">KP</button>
+            </div>
+          </div>
+          <div class="nav-category">
+            <button type="button" class="nav-category-title" data-nav-category-toggle aria-expanded="false">Relationship &amp; Prediction</button>
+            <div class="nav-category-actions">
+              <button type="button" data-view-a-target="viewA-compatibility">Compatibility</button>
+              <button type="button" data-view-a-target="viewA-faq-pillars">Query Pillars</button>
+              <button type="button" data-view-a-target="viewA-predictive">Predictive</button>
+            </div>
+          </div>
+          <label class="mobile-drilldown-label">Section
+            <select id="chartDataNavSelect" class="mobile-drilldown-select" aria-label="Select View A section">
+              <optgroup label="Workspace">
+                <option value="viewA-output-library">Library</option>
+                <option value="viewA-worksheets">Worksheets</option>
+                <option value="viewA-summary">Summary</option>
+              </optgroup>
+              <optgroup label="Birth Foundations">
+                <option value="viewA-panchang">Birth Panchang</option>
+                <option value="viewA-current-panchang">Current Panchang</option>
+                <option value="viewA-d1-details">D-1 Details</option>
+                <option value="viewA-yogas">Yogas</option>
+                <option value="viewA-vargas">Vargas</option>
+              </optgroup>
+              <optgroup label="Timing">
+                <option value="viewA-varshfal">Varshfal</option>
+                <option value="viewA-transit">Transit</option>
+                <option value="viewA-ephemeris">Ephemeris</option>
+                <option value="viewA-dasha">Dasha</option>
+              </optgroup>
+              <optgroup label="Strengths &amp; Systems">
+                <option value="viewA-references">Tables</option>
+                <option value="viewA-shadbala">Shadbala</option>
+                <option value="viewA-jaimini">Jaimini</option>
+                <option value="viewA-chakras">Chakras</option>
+                <option value="viewA-sav">Ashtakavarga</option>
+                <option value="viewA-bav">Bhinnashtaka</option>
+                <option value="viewA-kp">KP</option>
+              </optgroup>
+              <optgroup label="Relationship &amp; Prediction">
+                <option value="viewA-compatibility">Compatibility</option>
+                <option value="viewA-faq-pillars">Query Pillars</option>
+                <option value="viewA-predictive">Predictive</option>
+              </optgroup>
+            </select>
+          </label>
+        </div>
+        <div id="chartInputLayoutBar" class="chart-input-layout-bar hidden">
+          <button type="button" class="input-toggle-btn" data-chart-input-toggle aria-pressed="false">Hide input</button>
+          <button type="button" class="input-toggle-btn time-tool-layout-btn" data-time-tool-open>Time Tool</button>
+        </div>
+        <div id="emptyState" class="empty-state">
+          <h2>Ready for chart analysis</h2>
+          <p>Enter birth data. The report will show chart preparation, planetary details, vargas, transit chart, and Vimshottari timing data.</p>
+        </div>
+        <article id="report" class="report hidden"></article>
+      </section>
+    </section>
+    <div id="focusModeRail" class="focus-mode-rail" aria-label="Full screen tools">
+      <button type="button" class="focus-rail-tab" aria-label="Open full screen tools">Focus</button>
+      <div class="focus-rail-panel">
+        <button type="button" id="enterFocusModeBtn">Full screen</button>
+        <button type="button" id="railGenerateReportBtn">Generate report</button>
+        <div class="focus-reference-options">
+          <label>Chart focus
+            <select id="railChartFocusSelect">
+              <option value="">Generate report first</option>
+            </select>
+          </label>
+          <div class="focus-reference-actions">
+            <button type="button" id="railRefreshFocusTargetsBtn">Refresh</button>
+          <button type="button" id="railOpenChartFocusBtn">Open chart</button>
+        </div>
+        <button type="button" id="railOpenD1DetailsFocusBtn">Open D-1 details</button>
+        <button type="button" id="railOpenDashaFocusBtn">Open Vimshottari dasha</button>
+      </div>
+        <div class="focus-download-options">
+          <label>Report
+            <select id="railReportDownloadType">
+              <option value="vednetra" selected>VedNetra Report</option>
+              <option value="detailed">Detailed Report</option>
+              <option value="summary">Summary Report</option>
+            </select>
+          </label>
+          <label>Format
+            <select id="railReportDownloadFormat">
+              <option value="txt">TXT</option>
+              <option value="csv">CSV</option>
+              <option value="pdf">PDF</option>
+              <option value="xls">Excel</option>
+            </select>
+          </label>
+          <button type="button" id="railDownloadReportBtn">Download</button>
+        </div>
+        <button type="button" id="exitFocusModeBtn">Exit full screen</button>
+      </div>
+    </div>
+
+    <div id="timeToolPopup" class="time-tool-popup hidden" role="dialog" aria-modal="false" aria-labelledby="timeToolTitle">
+      <div class="time-tool-panel">
+        <div class="time-tool-head">
+          <strong id="timeToolTitle">Time Changing Tool</strong>
+          <button type="button" id="timeToolCloseBtn" aria-label="Close time changing tool">Close</button>
+        </div>
+        <label class="time-tool-target-label">
+          <span class="sr-only">Chart target</span>
+          <select id="timeToolTarget">
+            <option value="birth">Birth Chart</option>
+            <option value="transit">Transits</option>
+          </select>
+        </label>
+        <div class="time-tool-steps" aria-label="Time change increments">
+          <div class="time-tool-row"><span>10 Years</span><button type="button" data-time-tool-step="ten-years" data-time-tool-direction="-1">-</button><button type="button" data-time-tool-step="ten-years" data-time-tool-direction="1">+</button></div>
+          <div class="time-tool-row"><span>Year</span><button type="button" data-time-tool-step="year" data-time-tool-direction="-1">-</button><button type="button" data-time-tool-step="year" data-time-tool-direction="1">+</button></div>
+          <div class="time-tool-row"><span>Month</span><button type="button" data-time-tool-step="month" data-time-tool-direction="-1">-</button><button type="button" data-time-tool-step="month" data-time-tool-direction="1">+</button></div>
+          <div class="time-tool-row"><span>Week</span><button type="button" data-time-tool-step="week" data-time-tool-direction="-1">-</button><button type="button" data-time-tool-step="week" data-time-tool-direction="1">+</button></div>
+          <div class="time-tool-row"><span>Day</span><button type="button" data-time-tool-step="day" data-time-tool-direction="-1">-</button><button type="button" data-time-tool-step="day" data-time-tool-direction="1">+</button></div>
+          <div class="time-tool-row"><span>Ascendant</span><button type="button" data-time-tool-step="ascendant" data-time-tool-direction="-1">-</button><button type="button" data-time-tool-step="ascendant" data-time-tool-direction="1">+</button></div>
+          <div class="time-tool-row"><span>Navamsha</span><button type="button" data-time-tool-step="navamsha" data-time-tool-direction="-1">-</button><button type="button" data-time-tool-step="navamsha" data-time-tool-direction="1">+</button></div>
+          <div class="time-tool-row"><span>Hours</span><button type="button" data-time-tool-step="hour" data-time-tool-direction="-1">-</button><button type="button" data-time-tool-step="hour" data-time-tool-direction="1">+</button></div>
+          <div class="time-tool-row"><span>10 Minutes</span><button type="button" data-time-tool-step="ten-minutes" data-time-tool-direction="-1">-</button><button type="button" data-time-tool-step="ten-minutes" data-time-tool-direction="1">+</button></div>
+          <div class="time-tool-row"><span>Minutes</span><button type="button" data-time-tool-step="minute" data-time-tool-direction="-1">-</button><button type="button" data-time-tool-step="minute" data-time-tool-direction="1">+</button></div>
+          <div class="time-tool-row"><span>10 Seconds</span><button type="button" data-time-tool-step="ten-seconds" data-time-tool-direction="-1">-</button><button type="button" data-time-tool-step="ten-seconds" data-time-tool-direction="1">+</button></div>
+          <div class="time-tool-row"><span>Seconds</span><button type="button" data-time-tool-step="second" data-time-tool-direction="-1">-</button><button type="button" data-time-tool-step="second" data-time-tool-direction="1">+</button></div>
+        </div>
+        <div class="time-tool-mode" role="radiogroup" aria-label="Time changing mode">
+          <label><input type="radio" name="timeToolMode" value="manual" checked> Stop (Manual)</label>
+          <label><input type="radio" name="timeToolMode" value="realtime"> Realtime</label>
+          <label><input type="radio" name="timeToolMode" value="animate"> Animate</label>
+        </div>
+        <label class="time-tool-edit-label">
+          <span class="sr-only">Edit action</span>
+          <select id="timeToolEditMode">
+            <option value="date">Edit Date</option>
+            <option value="now">Set Current Time</option>
+          </select>
+        </label>
+        <div id="timeToolCurrentDisplay" class="time-tool-current">-</div>
+        <button type="button" id="timeToolAddPickBtn">Add to pick list</button>
+        <button type="button" id="timeToolRemovePickBtn">Remove from Picklist</button>
+        <button type="button" id="timeToolHelpBtn">Help</button>
+        <p id="timeToolStatus" class="fine-print">Manual mode. Use +/- to change time and refresh charts.</p>
+      </div>
+    </div>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
