@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="VedNetra Vedic Eye Orbit logo">
+  <defs>
+    <radialGradient id="paper" cx="47%" cy="36%" r="78%">
+      <stop offset="0" stop-color="#5d78ad"/>
+      <stop offset="0.5" stop-color="#263b6d"/>
+      <stop offset="1" stop-color="#101936"/>
+    </radialGradient>
+    <linearGradient id="tealStroke" x1="68" y1="205" x2="444" y2="308" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#052e32"/>
+      <stop offset="0.5" stop-color="#0d5f61"/>
+      <stop offset="1" stop-color="#062f34"/>
+    </linearGradient>
+    <radialGradient id="wheel" cx="44%" cy="34%" r="70%">
+      <stop offset="0" stop-color="#1d8f8d"/>
+      <stop offset="0.52" stop-color="#075f63"/>
+      <stop offset="1" stop-color="#06343c"/>
+    </radialGradient>
+    <radialGradient id="gold" cx="42%" cy="30%" r="72%">
+      <stop offset="0" stop-color="#fff5c4"/>
+      <stop offset="0.58" stop-color="#d99a32"/>
+      <stop offset="1" stop-color="#8c4f14"/>
+    </radialGradient>
+    <radialGradient id="sun" cx="48%" cy="35%" r="68%">
+      <stop offset="0" stop-color="#fff8cf"/>
+      <stop offset="0.72" stop-color="#e0a33d"/>
+      <stop offset="1" stop-color="#a6601b"/>
+    </radialGradient>
+    <filter id="shadow" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#092f34" flood-opacity=".22"/>
+    </filter>
+    <style>
+      .orbit {
+        transform-origin: 256px 244px;
+        animation: vednetra-orbit 26s linear infinite;
+      }
+      .zodiac-wheel {
+        transform-origin: 256px 244px;
+        animation: vednetra-wheel 38s linear infinite reverse;
+      }
+      .blink-lid {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: vednetra-blink-lid 5.8s ease-in-out infinite;
+      }
+      .blink-line {
+        animation: vednetra-blink-line 5.8s ease-in-out infinite;
+      }
+      .center-bindu {
+        transform-origin: 256px 244px;
+        animation: vednetra-pulse 3.6s ease-in-out infinite;
+      }
+      @keyframes vednetra-orbit {
+        to { transform: rotate(360deg); }
+      }
+      @keyframes vednetra-wheel {
+        to { transform: rotate(360deg); }
+      }
+      @keyframes vednetra-pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.08); }
+      }
+      @keyframes vednetra-blink-lid {
+        0%, 88%, 100% { transform: scaleY(0); opacity: 0; }
+        91%, 94% { transform: scaleY(1); opacity: 1; }
+        96% { transform: scaleY(.16); opacity: .48; }
+      }
+      @keyframes vednetra-blink-line {
+        0%, 88%, 100% { opacity: 0; }
+        91%, 94% { opacity: .9; }
+        96% { opacity: .35; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .orbit, .zodiac-wheel, .blink-lid, .blink-line, .center-bindu { animation: none; }
+      }
+    </style>
+  </defs>
+
+  <rect width="512" height="512" rx="96" fill="url(#paper)"/>
+  <g class="space-stars" fill="#fff8d8" opacity=".92">
+    <circle cx="76" cy="82" r="3"/>
+    <circle cx="132" cy="54" r="2"/>
+    <circle cx="212" cy="96" r="2.5"/>
+    <circle cx="319" cy="62" r="2"/>
+    <circle cx="418" cy="105" r="3"/>
+    <circle cx="468" cy="194" r="2"/>
+    <circle cx="58" cy="207" r="2"/>
+    <circle cx="104" cy="397" r="2.5"/>
+    <circle cx="214" cy="443" r="2"/>
+    <circle cx="368" cy="426" r="2.5"/>
+    <circle cx="452" cy="362" r="2"/>
+  </g>
+  <g fill="none" stroke="#f4d27d" stroke-linecap="round" opacity=".55">
+    <path d="M101 121h18M110 112v18"/>
+    <path d="M399 70h16M407 62v16"/>
+    <path d="M438 257h12M444 251v12"/>
+    <path d="M151 458h14M158 451v14"/>
+  </g>
+  <path d="M77 250c54-58 113-87 179-87s125 29 179 87c-54 58-113 87-179 87S131 308 77 250Z" fill="#fff9e9" stroke="#073b40" stroke-width="10" stroke-linejoin="round" filter="url(#shadow)"/>
+  <path d="M73 249c55-78 115-117 183-117s128 39 183 117c-48-35-109-53-183-53S121 214 73 249Z" fill="none" stroke="url(#tealStroke)" stroke-width="17" stroke-linecap="round"/>
+  <path d="M73 251c55 78 115 117 183 117s128-39 183-117c-48 35-109 53-183 53S121 286 73 251Z" fill="none" stroke="url(#tealStroke)" stroke-width="17" stroke-linecap="round"/>
+  <path d="M98 248c48-43 101-64 158-64s110 21 158 64" fill="none" stroke="#c48a2b" stroke-width="4" stroke-linecap="round" opacity=".9"/>
+  <path d="M98 252c48 43 101 64 158 64s110-21 158-64" fill="none" stroke="#c48a2b" stroke-width="4" stroke-linecap="round" opacity=".9"/>
+
+  <g class="orbit" fill="none" stroke-linecap="round">
+    <ellipse cx="256" cy="244" rx="188" ry="145" stroke="#c48222" stroke-width="3" stroke-dasharray="6 9" opacity=".88"/>
+    <g stroke="#6f4113" stroke-width="3">
+      <circle cx="256" cy="99" r="20" fill="url(#gold)"/>
+      <circle cx="352" cy="135" r="15" fill="#55a875"/>
+      <circle cx="419" cy="202" r="14" fill="#bc5630"/>
+      <circle cx="414" cy="292" r="13" fill="#236da3"/>
+      <circle cx="335" cy="378" r="15" fill="#8a5728"/>
+      <circle cx="256" cy="389" r="17" fill="#e4b83e"/>
+      <circle cx="177" cy="378" r="14" fill="#ad751e"/>
+      <circle cx="98" cy="292" r="14" fill="#1e5f8c"/>
+      <circle cx="93" cy="202" r="14" fill="#9f601b"/>
+    </g>
+  </g>
+
+  <g class="zodiac-wheel">
+    <circle cx="256" cy="244" r="92" fill="url(#wheel)" stroke="#d6a64b" stroke-width="8"/>
+    <circle cx="256" cy="244" r="67" fill="none" stroke="#f0cb70" stroke-width="3"/>
+    <circle cx="256" cy="244" r="48" fill="#fff3c6" stroke="#ba781f" stroke-width="3"/>
+    <path d="M256 186 268 226 309 214 280 244 309 274 268 262 256 302 244 262 203 274 232 244 203 214 244 226Z" fill="url(#sun)" stroke="#a35e19" stroke-width="3"/>
+    <g fill="#f4cb73" font-family="Georgia, 'Times New Roman', serif" font-size="20" font-weight="700" text-anchor="middle">
+      <text x="256" y="171">♈</text>
+      <text x="294" y="181">♉</text>
+      <text x="324" y="211">♊</text>
+      <text x="334" y="250">♋</text>
+      <text x="319" y="288">♌</text>
+      <text x="290" y="315">♍</text>
+      <text x="256" y="323">♎</text>
+      <text x="221" y="315">♏</text>
+      <text x="193" y="288">♐</text>
+      <text x="181" y="250">♑</text>
+      <text x="191" y="211">♒</text>
+      <text x="220" y="181">♓</text>
+    </g>
+  </g>
+
+  <circle class="center-bindu" cx="256" cy="244" r="20" fill="#06343c" stroke="#f8dd91" stroke-width="5"/>
+  <circle cx="249" cy="236" r="6" fill="#fff8d4"/>
+
+  <g>
+    <path class="blink-lid" d="M77 250c54-58 113-87 179-87s125 29 179 87H77Z" fill="#fff5de"/>
+    <path class="blink-lid" d="M77 250c54 58 113 87 179 87s125-29 179-87H77Z" fill="#fff5de"/>
+    <path class="blink-line" d="M91 250c48-9 101-14 165-14s117 5 165 14" fill="none" stroke="#073b40" stroke-width="12" stroke-linecap="round" opacity="0"/>
+  </g>
+</svg>

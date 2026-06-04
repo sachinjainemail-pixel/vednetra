@@ -1,0 +1,12721 @@
+﻿(function () {
+  "use strict";
+
+  var DEG = Math.PI / 180;
+  var RAD = 180 / Math.PI;
+  var DAY_MS = 86400000;
+  var NAK_SIZE = 13 + 20 / 60;
+  // Keeps the compact Lahiri polynomial aligned at arc-second scale for fine vargas such as D-60.
+  var LAHIRI_CHITRAPAKSHA_OFFSET = 0.0051784474;
+  // KP 2 is isolated from the Lahiri engine; adjust this one offset if matching a specific KP software table.
+  var KP2_LAHIRI_OFFSET_DEG = -0.1;
+  var MAX_FOCUS_SECTIONS = 5;
+  var pinnedFocusSections = [];
+  var activeChartDataSectionId = "viewA-output-library";
+  var AYANAMSHA_OPTIONS = {
+    lahiri: { label: "Lahiri", offset: 0 },
+    raman: { label: "Raman", offset: -1.45 },
+    krishnamurti: { label: "Krishnamurti", offset: -0.1 },
+    krishnamurtiNew: { label: "Krishnamurti (New)", offset: -0.1013889 },
+    khullar: { label: "Khullar (KCIL)", offset: -0.85 }
+  };
+
+  var SIGNS = [
+    { name: "Aries", sanskrit: "Mesha", lord: "Mars", modality: "Movable", element: "Fire", gender: "Male" },
+    { name: "Taurus", sanskrit: "Vrishabha", lord: "Venus", modality: "Fixed", element: "Earth", gender: "Female" },
+    { name: "Gemini", sanskrit: "Mithuna", lord: "Mercury", modality: "Common", element: "Air", gender: "Male" },
+    { name: "Cancer", sanskrit: "Karka", lord: "Moon", modality: "Movable", element: "Water", gender: "Female" },
+    { name: "Leo", sanskrit: "Simha", lord: "Sun", modality: "Fixed", element: "Fire", gender: "Male" },
+    { name: "Virgo", sanskrit: "Kanya", lord: "Mercury", modality: "Common", element: "Earth", gender: "Female" },
+    { name: "Libra", sanskrit: "Tula", lord: "Venus", modality: "Movable", element: "Air", gender: "Male" },
+    { name: "Scorpio", sanskrit: "Vrischika", lord: "Mars", modality: "Fixed", element: "Water", gender: "Female" },
+    { name: "Sagittarius", sanskrit: "Dhanu", lord: "Jupiter", modality: "Common", element: "Fire", gender: "Male" },
+    { name: "Capricorn", sanskrit: "Makara", lord: "Saturn", modality: "Movable", element: "Earth", gender: "Female" },
+    { name: "Aquarius", sanskrit: "Kumbha", lord: "Saturn", modality: "Fixed", element: "Air", gender: "Male" },
+    { name: "Pisces", sanskrit: "Meena", lord: "Jupiter", modality: "Common", element: "Water", gender: "Female" }
+  ];
+
+  var PLANETS = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+  var CLASSICAL_PLANETS = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
+  var DASHA_SEQUENCE = ["Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"];
+  var HORA_SEQUENCE = ["Sun", "Venus", "Mercury", "Moon", "Saturn", "Jupiter", "Mars"];
+  var WEEKDAY_LORDS = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
+  var DASHA_YEARS = { Ketu: 7, Venus: 20, Sun: 6, Moon: 10, Mars: 7, Rahu: 18, Jupiter: 16, Saturn: 19, Mercury: 17 };
+  var NAKSHATRAS = [
+    "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra", "Punarvasu", "Pushya", "Ashlesha",
+    "Magha", "Purva Phalguni", "Uttara Phalguni", "Hasta", "Chitra", "Swati", "Vishakha", "Anuradha", "Jyeshtha",
+    "Mula", "Purva Ashadha", "Uttara Ashadha", "Shravana", "Dhanishta", "Shatabhisha", "Purva Bhadrapada", "Uttara Bhadrapada", "Revati"
+  ];
+  var NAK_LORDS = NAKSHATRAS.map(function (_, i) { return DASHA_SEQUENCE[i % DASHA_SEQUENCE.length]; });
+  var TITHIS = [
+    "Pratipada", "Dwitiya", "Tritiya", "Chaturthi", "Panchami", "Shashthi", "Saptami", "Ashtami", "Navami", "Dashami",
+    "Ekadashi", "Dwadashi", "Trayodashi", "Chaturdashi", "Purnima",
+    "Pratipada", "Dwitiya", "Tritiya", "Chaturthi", "Panchami", "Shashthi", "Saptami", "Ashtami", "Navami", "Dashami",
+    "Ekadashi", "Dwadashi", "Trayodashi", "Chaturdashi", "Amavasya"
+  ];
+  var YOGAS = [
+    "Vishkambha", "Priti", "Ayushman", "Saubhagya", "Shobhana", "Atiganda", "Sukarma", "Dhriti", "Shula",
+    "Ganda", "Vriddhi", "Dhruva", "Vyaghata", "Harshana", "Vajra", "Siddhi", "Vyatipata", "Variyana",
+    "Parigha", "Shiva", "Siddha", "Sadhya", "Shubha", "Shukla", "Brahma", "Indra", "Vaidhriti"
+  ];
+  var VARAS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  var KARANA_REPEAT = ["Bava", "Balava", "Kaulava", "Taitila", "Gara", "Vanija", "Vishti"];
+
+  var EXALTATION = { Sun: 0, Moon: 1, Mars: 9, Mercury: 5, Jupiter: 3, Venus: 11, Saturn: 6, Rahu: 2, Ketu: 8 };
+  var DEBILITATION = { Sun: 6, Moon: 7, Mars: 3, Mercury: 11, Jupiter: 9, Venus: 5, Saturn: 0, Rahu: 8, Ketu: 2 };
+  var FRIENDS = {
+    Sun: { friend: ["Moon", "Mars", "Jupiter"], neutral: ["Mercury"], enemy: ["Venus", "Saturn"] },
+    Moon: { friend: ["Sun", "Mercury"], neutral: ["Mars", "Jupiter", "Venus", "Saturn"], enemy: [] },
+    Mars: { friend: ["Sun", "Moon", "Jupiter"], neutral: ["Venus", "Saturn"], enemy: ["Mercury"] },
+    Mercury: { friend: ["Sun", "Venus"], neutral: ["Mars", "Jupiter", "Saturn"], enemy: ["Moon"] },
+    Jupiter: { friend: ["Sun", "Moon", "Mars"], neutral: ["Saturn"], enemy: ["Mercury", "Venus"] },
+    Venus: { friend: ["Mercury", "Saturn"], neutral: ["Mars", "Jupiter"], enemy: ["Sun", "Moon"] },
+    Saturn: { friend: ["Mercury", "Venus"], neutral: ["Jupiter"], enemy: ["Sun", "Moon", "Mars"] },
+    Rahu: { friend: ["Mercury", "Venus", "Saturn"], neutral: ["Jupiter"], enemy: ["Sun", "Moon", "Mars"] },
+    Ketu: { friend: ["Mars", "Jupiter", "Venus"], neutral: ["Mercury", "Saturn"], enemy: ["Sun", "Moon"] }
+  };
+  var COMBUST_ORB = { Moon: 12, Mars: 17, Mercury: 14, Jupiter: 11, Venus: 10, Saturn: 15 };
+  var GOOD_TRANSIT_FROM_MOON = {
+    Sun: [3, 6, 10, 11],
+    Moon: [1, 3, 6, 7, 10, 11],
+    Mars: [3, 6, 11],
+    Mercury: [2, 4, 6, 8, 10, 11],
+    Jupiter: [2, 5, 7, 9, 11],
+    Venus: [1, 2, 3, 4, 5, 8, 9, 11, 12],
+    Saturn: [3, 6, 11],
+    Rahu: [3, 6, 10, 11],
+    Ketu: [3, 6, 10, 11]
+  };
+  var KARAKAS = {
+    1: ["Sun"],
+    2: ["Jupiter"],
+    3: ["Mars"],
+    4: ["Moon", "Mercury", "Venus"],
+    5: ["Jupiter"],
+    6: ["Saturn"],
+    7: ["Venus", "Jupiter"],
+    8: ["Saturn"],
+    9: ["Sun", "Jupiter"],
+    10: ["Sun", "Mercury", "Saturn"],
+    11: ["Jupiter"],
+    12: ["Saturn", "Ketu"]
+  };
+  var PROFESSION_KEYWORDS = {
+    Sun: ["government", "administration", "medicine", "banking", "politics", "authority roles"],
+    Moon: ["travel", "hospitality", "nursing", "public contact", "journalism", "liquids or dairy"],
+    Mars: ["engineering", "police or military", "surgery", "land", "machinery", "law enforcement"],
+    Mercury: ["accounting", "teaching", "writing", "analytics", "sales", "astrology or advisory work"],
+    Jupiter: ["law", "finance", "teaching", "research", "counselling", "religious or academic roles"],
+    Venus: ["arts", "design", "fashion", "media", "hospitality", "luxury goods"],
+    Saturn: ["operations", "industry", "mining or metals", "government service", "agriculture", "compliance"],
+    Rahu: ["technology", "aviation", "research", "medicine", "telecom", "unconventional fields"],
+    Ketu: ["secret services", "occult", "spiritual work", "medical support", "investigation"]
+  };
+
+  var EVENT_CONFIGS = {
+    general: {
+      label: "General life reading",
+      houses: [1, 2, 4, 5, 9, 10, 11],
+      primaryHouses: [1, 9, 10],
+      karakas: ["Sun", "Moon", "Jupiter", "Saturn"],
+      dchart: 9,
+      timingKarakas: ["Sun", "Moon", "Jupiter", "Saturn"]
+    },
+    marriage: {
+      label: "Marriage and married life",
+      houses: [2, 4, 5, 7, 8, 12],
+      primaryHouses: [7],
+      karakas: ["Venus", "Jupiter", "Mars"],
+      dchart: 9,
+      timingKarakas: ["Venus", "Jupiter", "Moon"]
+    },
+    children: {
+      label: "Children and progeny",
+      houses: [2, 5, 7, 9, 11, 12],
+      primaryHouses: [5, 9],
+      karakas: ["Jupiter", "Sun", "Venus", "Moon", "Mars"],
+      dchart: 7,
+      timingKarakas: ["Jupiter", "Moon"]
+    },
+    profession: {
+      label: "Profession and career",
+      houses: [1, 2, 6, 10, 11],
+      primaryHouses: [10, 6],
+      karakas: ["Sun", "Mercury", "Saturn", "Mars"],
+      dchart: 10,
+      timingKarakas: ["Sun", "Mercury", "Saturn"]
+    },
+    wealth: {
+      label: "Wealth and finance",
+      houses: [2, 5, 9, 11],
+      primaryHouses: [2, 11],
+      karakas: ["Jupiter", "Venus", "Mercury"],
+      dchart: 2,
+      timingKarakas: ["Jupiter", "Venus", "Mercury"]
+    },
+    education: {
+      label: "Education and learning",
+      houses: [2, 4, 5, 9],
+      primaryHouses: [4, 5],
+      karakas: ["Mercury", "Jupiter"],
+      dchart: 24,
+      timingKarakas: ["Mercury", "Jupiter"]
+    },
+    foreign: {
+      label: "Foreign travel or residence",
+      houses: [3, 7, 8, 9, 12],
+      primaryHouses: [9, 12],
+      karakas: ["Saturn", "Rahu", "Moon"],
+      dchart: 9,
+      timingKarakas: ["Rahu", "Saturn", "Moon"]
+    },
+    property: {
+      label: "Property and vehicles",
+      houses: [4, 10, 11, 12],
+      primaryHouses: [4],
+      karakas: ["Moon", "Venus", "Mars", "Jupiter"],
+      dchart: 16,
+      timingKarakas: ["Moon", "Venus", "Mars", "Jupiter"]
+    },
+    health: {
+      label: "Health tendency",
+      houses: [1, 6, 8, 12],
+      primaryHouses: [1, 6],
+      karakas: ["Sun", "Moon", "Saturn", "Mars"],
+      dchart: 6,
+      timingKarakas: ["Sun", "Moon", "Saturn", "Mars"]
+    },
+    longevity: {
+      label: "Longevity class",
+      houses: [1, 3, 8, 10, 12],
+      primaryHouses: [1, 8],
+      karakas: ["Saturn", "Sun", "Moon"],
+      dchart: 8,
+      timingKarakas: ["Saturn", "Sun", "Moon"]
+    }
+  };
+
+  var FREQUENT_QUERY_PILLARS = [
+    { key: "birth_childhood", label: "Birth And Childhood", houses: [1, 4, 8], primaryHouses: [1, 4], karakas: ["Sun", "Moon"], dchart: 12, timingKarakas: ["Sun", "Moon"], topicKey: "general", keyHouse: 1, nthHouse: 1 },
+    { key: "basic_education", label: "Basic Education", houses: [2, 4, 5], primaryHouses: [4, 5], karakas: ["Mercury", "Jupiter"], dchart: 24, timingKarakas: ["Mercury", "Jupiter"], topicKey: "education", keyHouse: 4, nthHouse: 4 },
+    { key: "higher_education", label: "Higher Education", houses: [2, 5, 9], primaryHouses: [5, 9], karakas: ["Mercury", "Jupiter"], dchart: 24, timingKarakas: ["Mercury", "Jupiter"], topicKey: "education", keyHouse: 9, nthHouse: 9 },
+    { key: "profession_job", label: "Profession- Job", houses: [1, 6, 10, 11], primaryHouses: [6, 10], karakas: ["Sun", "Mercury", "Saturn"], dchart: 10, timingKarakas: ["Sun", "Mercury", "Saturn"], topicKey: "profession", keyHouse: 10, nthHouse: 10 },
+    { key: "profession_business", label: "Profession- Business", houses: [2, 7, 10, 11], primaryHouses: [7, 10], karakas: ["Mercury", "Venus", "Mars"], dchart: 10, timingKarakas: ["Mercury", "Venus", "Mars"], topicKey: "profession", keyHouse: 10, nthHouse: 10 },
+    { key: "marriage", label: "Marriage", houses: [2, 5, 7, 8, 12], primaryHouses: [7], karakas: ["Venus", "Jupiter", "Mars"], dchart: 9, timingKarakas: ["Venus", "Jupiter", "Moon"], topicKey: "marriage", keyHouse: 7, nthHouse: 7 },
+    { key: "parents", label: "Parents", houses: [4, 9, 10], primaryHouses: [4, 9], karakas: ["Moon", "Sun"], dchart: 12, timingKarakas: ["Moon", "Sun", "Jupiter"], topicKey: "general", keyHouse: 4, nthHouse: 4 },
+    { key: "diseases", label: "Diseases", houses: [1, 6, 8, 12], primaryHouses: [6, 8], karakas: ["Sun", "Moon", "Saturn", "Mars"], dchart: 30, timingKarakas: ["Sun", "Moon", "Saturn", "Mars"], topicKey: "health", keyHouse: 6, nthHouse: 6, sensitive: true },
+    { key: "longevity", label: "Longivity", houses: [1, 3, 8, 10, 12], primaryHouses: [1, 8], karakas: ["Saturn", "Sun", "Moon"], dchart: 8, timingKarakas: ["Saturn", "Sun", "Moon"], topicKey: "longevity", keyHouse: 8, nthHouse: 8, sensitive: true },
+    { key: "foreign_travel", label: "Foreign Travel", houses: [3, 7, 9, 12], primaryHouses: [9, 12], karakas: ["Rahu", "Saturn", "Moon"], dchart: 9, timingKarakas: ["Rahu", "Saturn", "Moon"], topicKey: "foreign", keyHouse: 12, nthHouse: 12 },
+    { key: "income_wealth", label: "Income And Wealth", houses: [2, 5, 9, 11], primaryHouses: [2, 11], karakas: ["Jupiter", "Venus", "Mercury"], dchart: 2, timingKarakas: ["Jupiter", "Venus", "Mercury"], topicKey: "wealth", keyHouse: 11, nthHouse: 11 },
+    { key: "love_affairs", label: "Love Affairs", houses: [5, 7, 11], primaryHouses: [5, 7], karakas: ["Venus", "Mars", "Rahu"], dchart: 9, timingKarakas: ["Venus", "Mars", "Rahu"], topicKey: "marriage", keyHouse: 5, nthHouse: 5 },
+    { key: "siblings", label: "Siblings", houses: [3, 11], primaryHouses: [3, 11], karakas: ["Mars", "Jupiter"], dchart: 3, timingKarakas: ["Mars", "Jupiter"], topicKey: "general", keyHouse: 3, nthHouse: 3 },
+    { key: "children", label: "Children", houses: [2, 5, 9, 11], primaryHouses: [5, 9], karakas: ["Jupiter", "Sun", "Venus", "Moon", "Mars"], dchart: 7, timingKarakas: ["Jupiter", "Moon"], topicKey: "children", keyHouse: 5, nthHouse: 5 },
+    { key: "luck_religion", label: "Luck And Religiousness", houses: [1, 5, 9], primaryHouses: [9], karakas: ["Jupiter", "Sun", "Ketu"], dchart: 20, timingKarakas: ["Jupiter", "Sun", "Ketu"], topicKey: "general", keyHouse: 9, nthHouse: 9 },
+    { key: "reputation", label: "Reputation", houses: [1, 9, 10, 11], primaryHouses: [10, 11], karakas: ["Sun", "Jupiter", "Saturn"], dchart: 10, timingKarakas: ["Sun", "Jupiter", "Saturn"], topicKey: "profession", keyHouse: 10, nthHouse: 10 },
+    { key: "friend_circle", label: "Friend Circle", houses: [3, 7, 11], primaryHouses: [11], karakas: ["Jupiter", "Venus", "Mercury"], dchart: 9, timingKarakas: ["Jupiter", "Venus", "Mercury"], topicKey: "general", keyHouse: 11, nthHouse: 11 },
+    { key: "enemies_court", label: "Enemies And Court Cases", houses: [6, 7, 8, 10], primaryHouses: [6], karakas: ["Mars", "Saturn", "Rahu"], dchart: 30, timingKarakas: ["Mars", "Saturn", "Rahu"], topicKey: "health", keyHouse: 6, nthHouse: 6, sensitive: true },
+    { key: "loss_hospital", label: "Losses And Hospitalization", houses: [6, 8, 12], primaryHouses: [12, 8], karakas: ["Saturn", "Ketu", "Moon"], dchart: 30, timingKarakas: ["Saturn", "Ketu", "Moon"], topicKey: "health", keyHouse: 12, nthHouse: 12, sensitive: true },
+    { key: "fooding_habits", label: "Fooding Habits", houses: [1, 2, 4, 6], primaryHouses: [2], karakas: ["Moon", "Venus", "Jupiter"], dchart: 2, timingKarakas: ["Moon", "Venus", "Jupiter"], topicKey: "general", keyHouse: 2, nthHouse: 2 }
+  ];
+
+  var SOUTH_GRID = [11, 0, 1, 2, 10, null, null, 3, 9, null, null, 4, 8, 7, 6, 5];
+  var NORTH_CHART_POSITIONS = {
+    1: { x: 200, y: 78 },
+    2: { x: 112, y: 58 },
+    3: { x: 58, y: 116 },
+    4: { x: 92, y: 205 },
+    5: { x: 58, y: 292 },
+    6: { x: 112, y: 344 },
+    7: { x: 200, y: 322 },
+    8: { x: 288, y: 344 },
+    9: { x: 342, y: 292 },
+    10: { x: 308, y: 205 },
+    11: { x: 342, y: 116 },
+    12: { x: 288, y: 58 }
+  };
+
+  var METHODOLOGY_LIMITS = [
+    "The attached methodology mentions several full source tables without listing their row data: full functional-benefic table, complete ashtakavarga bindu tables, several event-specific combination tables, and detailed varga lookup tables.",
+    "This app checks the rules explicitly present in the supplied methodology and flags source-table gaps instead of treating them as checked.",
+    "The embedded ephemeris is a low-precision offline implementation. For production-grade certification, replace it with Swiss Ephemeris or a comparable high-precision ephemeris using Lahiri ayanamsa and mean nodes."
+  ];
+  var CITY_LOOKUP = [
+    city("Agra, India", 27.1767, 78.0081, 5.5),
+    city("Ahmedabad, India", 23.0225, 72.5714, 5.5),
+    city("Ajmer, India", 26.4499, 74.6399, 5.5),
+    city("Aligarh, India", 27.8974, 78.0880, 5.5),
+    city("Ambala, India", 30.3782, 76.7767, 5.5),
+    city("Amritsar, India", 31.6340, 74.8723, 5.5),
+    city("Asansol, India", 23.6739, 86.9524, 5.5),
+    city("Aurangabad, India", 19.8762, 75.3433, 5.5),
+    city("Bareilly, India", 28.3670, 79.4304, 5.5),
+    city("Bengaluru, India", 12.9716, 77.5946, 5.5),
+    city("Belagavi, India", 15.8497, 74.4977, 5.5),
+    city("Bhagalpur, India", 25.2425, 86.9842, 5.5),
+    city("Bhilai, India", 21.1938, 81.3509, 5.5),
+    city("Bilaspur, India", 22.0797, 82.1409, 5.5),
+    city("Bhopal, India", 23.2599, 77.4126, 5.5),
+    city("Bhubaneswar, India", 20.2961, 85.8245, 5.5),
+    city("Bikaner, India", 28.0229, 73.3119, 5.5),
+    city("Chandigarh, India", 30.7333, 76.7833, 5.5),
+    city("Chennai, India", 13.0827, 80.2707, 5.5),
+    city("Coimbatore, India", 11.0168, 76.9558, 5.5),
+    city("Cuttack, India", 20.4625, 85.8830, 5.5),
+    city("Dehradun, India", 30.3165, 78.0322, 5.5),
+    city("Delhi, India", 28.6139, 77.2090, 5.5),
+    city("Dhanbad, India", 23.7957, 86.4304, 5.5),
+    city("Durgapur, India", 23.5204, 87.3119, 5.5),
+    city("Faridabad, India", 28.4089, 77.3178, 5.5),
+    city("Firozabad, India", 27.1592, 78.3957, 5.5),
+    city("Gaya, India", 24.7914, 85.0002, 5.5),
+    city("Ghaziabad, India", 28.6692, 77.4538, 5.5),
+    city("Gorakhpur, India", 26.7606, 83.3732, 5.5),
+    city("Guntur, India", 16.3067, 80.4365, 5.5),
+    city("Gurugram, India", 28.4595, 77.0266, 5.5),
+    city("Guwahati, India", 26.1445, 91.7362, 5.5),
+    city("Gwalior, India", 26.2183, 78.1828, 5.5),
+    city("Hisar, India", 29.1492, 75.7217, 5.5),
+    city("Hyderabad, India", 17.3850, 78.4867, 5.5),
+    city("Indore, India", 22.7196, 75.8577, 5.5),
+    city("Jabalpur, India", 23.1815, 79.9864, 5.5),
+    city("Jaipur, India", 26.9124, 75.7873, 5.5),
+    city("Jalandhar, India", 31.3260, 75.5762, 5.5),
+    city("Jamnagar, India", 22.4707, 70.0577, 5.5),
+    city("Jammu, India", 32.7266, 74.8570, 5.5),
+    city("Jhansi, India", 25.4484, 78.5685, 5.5),
+    city("Jodhpur, India", 26.2389, 73.0243, 5.5),
+    city("Kakinada, India", 16.9891, 82.2475, 5.5),
+    city("Kanpur, India", 26.4499, 80.3319, 5.5),
+    city("Kochi, India", 9.9312, 76.2673, 5.5),
+    city("Kolhapur, India", 16.7050, 74.2433, 5.5),
+    city("Kolkata, India", 22.5726, 88.3639, 5.5),
+    city("Kota, India", 25.2138, 75.8648, 5.5),
+    city("Kozhikode, India", 11.2588, 75.7804, 5.5),
+    city("Kurnool, India", 15.8281, 78.0373, 5.5),
+    city("Lucknow, India", 26.8467, 80.9462, 5.5),
+    city("Ludhiana, India", 30.9010, 75.8573, 5.5),
+    city("Madurai, India", 9.9252, 78.1198, 5.5),
+    city("Mangaluru, India", 12.9141, 74.8560, 5.5),
+    city("Meerut, India", 28.9845, 77.7064, 5.5),
+    city("Moradabad, India", 28.8386, 78.7733, 5.5),
+    city("Mumbai, India", 19.0760, 72.8777, 5.5),
+    city("Muzaffarpur, India", 26.1209, 85.3647, 5.5),
+    city("Mysuru, India", 12.2958, 76.6394, 5.5),
+    city("Nagpur, India", 21.1458, 79.0882, 5.5),
+    city("Nashik, India", 19.9975, 73.7898, 5.5),
+    city("Nellore, India", 14.4426, 79.9865, 5.5),
+    city("Noida, India", 28.5355, 77.3910, 5.5),
+    city("Panaji, India", 15.4909, 73.8278, 5.5),
+    city("Patna, India", 25.5941, 85.1376, 5.5),
+    city("Prayagraj, India", 25.4358, 81.8463, 5.5),
+    city("Pune, India", 18.5204, 73.8567, 5.5),
+    city("Raipur, India", 21.2514, 81.6296, 5.5),
+    city("Rajkot, India", 22.3039, 70.8022, 5.5),
+    city("Ranchi, India", 23.3441, 85.3096, 5.5),
+    city("Rohtak, India", 28.8955, 76.6066, 5.5),
+    city("Saharanpur, India", 29.9671, 77.5510, 5.5),
+    city("Salem, India", 11.6643, 78.1460, 5.5),
+    city("Siliguri, India", 26.7271, 88.3953, 5.5),
+    city("Solapur, India", 17.6599, 75.9064, 5.5),
+    city("Srinagar, India", 34.0837, 74.7973, 5.5),
+    city("Surat, India", 21.1702, 72.8311, 5.5),
+    city("Thiruvananthapuram, India", 8.5241, 76.9366, 5.5),
+    city("Tiruchirappalli, India", 10.7905, 78.7047, 5.5),
+    city("Tirupati, India", 13.6288, 79.4192, 5.5),
+    city("Udaipur, India", 24.5854, 73.7125, 5.5),
+    city("Ujjain, India", 23.1765, 75.7885, 5.5),
+    city("Vadodara, India", 22.3072, 73.1812, 5.5),
+    city("Varanasi, India", 25.3176, 82.9739, 5.5),
+    city("Vellore, India", 12.9165, 79.1325, 5.5),
+    city("Vijayawada, India", 16.5062, 80.6480, 5.5),
+    city("Visakhapatnam, India", 17.6868, 83.2185, 5.5),
+    city("Warangal, India", 17.9689, 79.5941, 5.5),
+    city("Abohar, India", 30.1453, 74.1993, 5.5),
+    city("Adilabad, India", 19.6641, 78.5320, 5.5),
+    city("Alappuzha, India", 9.4981, 76.3388, 5.5),
+    city("Alwar, India", 27.5530, 76.6346, 5.5),
+    city("Anand, India", 22.5645, 72.9289, 5.5),
+    city("Anantapur, India", 14.6819, 77.6006, 5.5),
+    city("Anantnag, India", 33.7311, 75.1487, 5.5),
+    city("Arrah, India", 25.5560, 84.6603, 5.5),
+    city("Bahadurgarh, India", 28.6924, 76.9239, 5.5),
+    city("Bahraich, India", 27.5743, 81.5959, 5.5),
+    city("Ballia, India", 25.7584, 84.1487, 5.5),
+    city("Balasore, India", 21.4934, 86.9135, 5.5),
+    city("Banswara, India", 23.5461, 74.4340, 5.5),
+    city("Baramati, India", 18.1517, 74.5777, 5.5),
+    city("Baran, India", 25.1011, 76.5132, 5.5),
+    city("Barmer, India", 25.7521, 71.3967, 5.5),
+    city("Barnala, India", 30.3819, 75.5468, 5.5),
+    city("Barpeta, India", 26.3229, 91.0063, 5.5),
+    city("Batala, India", 31.8186, 75.2028, 5.5),
+    city("Bathinda, India", 30.2110, 74.9455, 5.5),
+    city("Beawar, India", 26.1012, 74.3203, 5.5),
+    city("Begusarai, India", 25.4182, 86.1272, 5.5),
+    city("Bettiah, India", 26.8028, 84.5160, 5.5),
+    city("Bharatpur, India", 27.2152, 77.5030, 5.5),
+    city("Bhilwara, India", 25.3463, 74.6364, 5.5),
+    city("Bhiwani, India", 28.7975, 76.1322, 5.5),
+    city("Bhiwandi, India", 19.2813, 73.0483, 5.5),
+    city("Bongaigaon, India", 26.4782, 90.5579, 5.5),
+    city("Bundi, India", 25.4305, 75.6499, 5.5),
+    city("Buxar, India", 25.5647, 83.9777, 5.5),
+    city("Chandrapur, India", 19.9615, 79.2961, 5.5),
+    city("Charkhi Dadri, India", 28.5921, 76.2653, 5.5),
+    city("Chhindwara, India", 22.0574, 78.9382, 5.5),
+    city("Chikkamagaluru, India", 13.3161, 75.7720, 5.5),
+    city("Chitradurga, India", 14.2251, 76.3980, 5.5),
+    city("Churu, India", 28.2920, 74.9618, 5.5),
+    city("Darbhanga, India", 26.1542, 85.8918, 5.5),
+    city("Dausa, India", 26.8945, 76.3375, 5.5),
+    city("Dewas, India", 22.9676, 76.0534, 5.5),
+    city("Dhar, India", 22.6013, 75.3025, 5.5),
+    city("Dharmapuri, India", 12.1277, 78.1570, 5.5),
+    city("Dibrugarh, India", 27.4728, 94.9120, 5.5),
+    city("Dimapur, India", 25.9091, 93.7266, 5.5),
+    city("Dindigul, India", 10.3673, 77.9803, 5.5),
+    city("Etah, India", 27.5588, 78.6626, 5.5),
+    city("Etawah, India", 26.7769, 79.0217, 5.5),
+    city("Faizabad, India", 26.7730, 82.1458, 5.5),
+    city("Farrukhabad, India", 27.3826, 79.5840, 5.5),
+    city("Fatehabad, India", 29.5153, 75.4555, 5.5),
+    city("Fatehgarh Sahib, India", 30.6435, 76.3970, 5.5),
+    city("Fazilka, India", 30.4021, 74.0284, 5.5),
+    city("Gandhidham, India", 23.0753, 70.1337, 5.5),
+    city("Gandhinagar, India", 23.2156, 72.6369, 5.5),
+    city("Gangapur City, India", 26.4725, 76.7174, 5.5),
+    city("Ghazipur, India", 25.5878, 83.5783, 5.5),
+    city("Godhra, India", 22.7788, 73.6143, 5.5),
+    city("Gopalganj, India", 26.4685, 84.4434, 5.5),
+    city("Hajipur, India", 25.6925, 85.2084, 5.5),
+    city("Haldwani, India", 29.2183, 79.5130, 5.5),
+    city("Hanumangarh, India", 29.5815, 74.3294, 5.5),
+    city("Hapur, India", 28.7306, 77.7759, 5.5),
+    city("Hazaribagh, India", 23.9924, 85.3616, 5.5),
+    city("Hoshiarpur, India", 31.5143, 75.9115, 5.5),
+    city("Hosur, India", 12.7409, 77.8253, 5.5),
+    city("Ichalkaranji, India", 16.7090, 74.4561, 5.5),
+    city("Jaisalmer, India", 26.9157, 70.9083, 5.5),
+    city("Jalore, India", 25.3456, 72.6156, 5.5),
+    city("Jalpaiguri, India", 26.5435, 88.7196, 5.5),
+    city("Jind, India", 29.3162, 76.3144, 5.5),
+    city("Junagadh, India", 21.5222, 70.4579, 5.5),
+    city("Kaithal, India", 29.8015, 76.3998, 5.5),
+    city("Kanchipuram, India", 12.8342, 79.7036, 5.5),
+    city("Karnal, India", 29.6857, 76.9905, 5.5),
+    city("Karur, India", 10.9601, 78.0766, 5.5),
+    city("Kasganj, India", 27.8088, 78.6458, 5.5),
+    city("Katihar, India", 25.5541, 87.5591, 5.5),
+    city("Khanna, India", 30.7046, 76.2231, 5.5),
+    city("Khandwa, India", 21.8257, 76.3526, 5.5),
+    city("Khargone, India", 21.8257, 75.6135, 5.5),
+    city("Kishanganj, India", 26.1020, 87.9550, 5.5),
+    city("Kolar, India", 13.1367, 78.1290, 5.5),
+    city("Korba, India", 22.3595, 82.7501, 5.5),
+    city("Krishnagiri, India", 12.5186, 78.2137, 5.5),
+    city("Kurukshetra, India", 29.9695, 76.8783, 5.5),
+    city("Latur, India", 18.4088, 76.5604, 5.5),
+    city("Madanapalle, India", 13.5503, 78.5029, 5.5),
+    city("Mahbubnagar, India", 16.7375, 78.0081, 5.5),
+    city("Mandsaur, India", 24.0718, 75.0693, 5.5),
+    city("Mansa, India", 29.9882, 75.4017, 5.5),
+    city("Mathura, India", 27.4924, 77.6737, 5.5),
+    city("Moga, India", 30.8165, 75.1717, 5.5),
+    city("Motihari, India", 26.6469, 84.9089, 5.5),
+    city("Muktsar, India", 30.4762, 74.5155, 5.5),
+    city("Nadiad, India", 22.6916, 72.8634, 5.5),
+    city("Nagercoil, India", 8.1833, 77.4119, 5.5),
+    city("Nanded, India", 19.1383, 77.3210, 5.5),
+    city("Narnaul, India", 28.0444, 76.1083, 5.5),
+    city("Navsari, India", 20.9467, 72.9520, 5.5),
+    city("Neemuch, India", 24.4764, 74.8624, 5.5),
+    city("Orai, India", 25.9907, 79.4532, 5.5),
+    city("Palakkad, India", 10.7867, 76.6548, 5.5),
+    city("Palwal, India", 28.1487, 77.3320, 5.5),
+    city("Panipat, India", 29.3909, 76.9635, 5.5),
+    city("Pathankot, India", 32.2643, 75.6421, 5.5),
+    city("Patiala, India", 30.3398, 76.3869, 5.5),
+    city("Phagwara, India", 31.2240, 75.7708, 5.5),
+    city("Pilibhit, India", 28.6266, 79.8044, 5.5),
+    city("Pithoragarh, India", 29.5829, 80.2182, 5.5),
+    city("Porbandar, India", 21.6417, 69.6293, 5.5),
+    city("Puducherry, India", 11.9416, 79.8083, 5.5),
+    city("Purnia, India", 25.7771, 87.4753, 5.5),
+    city("Raebareli, India", 26.2345, 81.2409, 5.5),
+    city("Rajahmundry, India", 17.0005, 81.8040, 5.5),
+    city("Rajpura, India", 30.4786, 76.5927, 5.5),
+    city("Ratlam, India", 23.3315, 75.0367, 5.5),
+    city("Rewa, India", 24.5362, 81.3037, 5.5),
+    city("Rewari, India", 28.1928, 76.6239, 5.5),
+    city("Roorkee, India", 29.8543, 77.8880, 5.5),
+    city("Rudrapur, India", 28.9875, 79.4141, 5.5),
+    city("Sagar, India", 23.8388, 78.7378, 5.5),
+    city("Saharsa, India", 25.8835, 86.6006, 5.5),
+    city("Samastipur, India", 25.8629, 85.7811, 5.5),
+    city("Sambalpur, India", 21.4669, 83.9812, 5.5),
+    city("Sangrur, India", 30.2458, 75.8421, 5.5),
+    city("Satara, India", 17.6805, 74.0183, 5.5),
+    city("Satna, India", 24.6005, 80.8322, 5.5),
+    city("Sehore, India", 23.2036, 77.0844, 5.5),
+    city("Shimla, India", 31.1048, 77.1734, 5.5),
+    city("Shivpuri, India", 25.4320, 77.6644, 5.5),
+    city("Sikar, India", 27.6094, 75.1399, 5.5),
+    city("Sirsa, India", 29.5336, 75.0177, 5.5),
+    city("Sitapur, India", 27.5667, 80.6833, 5.5),
+    city("Siwan, India", 26.2196, 84.3567, 5.5),
+    city("Sonipat, India", 28.9931, 77.0151, 5.5),
+    city("Sri Ganganagar, India", 29.9038, 73.8772, 5.5),
+    city("Sri Muktsar Sahib, India", 30.4762, 74.5155, 5.5),
+    city("Sultanpur, India", 26.2648, 82.0727, 5.5),
+    city("Tezpur, India", 26.6528, 92.7926, 5.5),
+    city("Thoothukudi, India", 8.7642, 78.1348, 5.5),
+    city("Thrissur, India", 10.5276, 76.2144, 5.5),
+    city("Tonk, India", 26.1664, 75.7882, 5.5),
+    city("Tumakuru, India", 13.3422, 77.1010, 5.5),
+    city("Yamunanagar, India", 30.1290, 77.2674, 5.5),
+    city("Yavatmal, India", 20.3899, 78.1307, 5.5),
+    city("Dubai, UAE", 25.2048, 55.2708, 4),
+    city("Kathmandu, Nepal", 27.7172, 85.3240, 5.75),
+    city("Singapore", 1.3521, 103.8198, 8)
+  ];
+
+  var lastPlainReport = "";
+  var lastPlainReports = { chartData: "", predictive: "" };
+  var lastReportInput = null;
+  var currentReportView = "chartData";
+  var lastChatGptPrompt = "";
+  var lastServerChart = null;
+  var lastReportChart = null;
+  var lastReportAnalysis = null;
+  var timeToolTimer = null;
+  var timeToolPickList = [];
+  var SAVED_CHARTS_STORAGE_KEY = "vedicPredictiveWorkbench.savedCharts.v1";
+  var CUSTOM_LOCATIONS_STORAGE_KEY = "vedicPredictiveWorkbench.customLocations.v1";
+  var DEFAULT_LOCATION_STORAGE_KEY = "vedicPredictiveWorkbench.defaultLocation.v1";
+  var savedCharts = [];
+  var customCities = [];
+  var savedChartsMode = "browser";
+
+  // ===========================================================================
+  // PERFORMANCE: memoization caches for hot pure functions.
+  // Cleared at the start of each generate() so memory stays bounded.
+  // ===========================================================================
+  var _memoVargaSign = new Map();
+  var _memoNakshatra = new Map();
+  var _memoKpLord = new Map();
+  var _memoPlanetTrop = new Map();
+  var _memoMoonTrop = new Map();
+  function _qkey(value) { return Math.round(value * 1e9) / 1e9; }
+  function clearMemoCaches() {
+    _memoVargaSign.clear();
+    _memoNakshatra.clear();
+    _memoKpLord.clear();
+    _memoPlanetTrop.clear();
+    _memoMoonTrop.clear();
+  }
+
+  // ===========================================================================
+  // PERFORMANCE: lazy section rendering pipeline.
+  // pendingSectionRenders holds { id -> { render, wire, label, navAliases } }.
+  // Sections render in idle slots so first paint happens quickly.
+  // ===========================================================================
+  var pendingSectionRenders = new Map();
+  var navAliasToPendingId = new Map();
+
+  if (typeof document !== "undefined") {
+    document.addEventListener("DOMContentLoaded", function () {
+      setDefaultDates();
+      document.getElementById("birthForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+        generate({ preserveActiveSection: false, refreshFocusPopups: true });
+      });
+      document.getElementById("printBtn").addEventListener("click", function () { window.print(); });
+      document.getElementById("copyBtn").addEventListener("click", copyReport);
+      document.getElementById("downloadReportBtn").addEventListener("click", downloadSelectedReport);
+      wireBirthTimeControls();
+      wireBirthPlaceControls();
+      wireSavedChartControls();
+      wireChartStartControls();
+      wireChartDataNavControls();
+      wireChartInputToggle();
+      wireTimeToolControls();
+      wireHouseContextMenuControls();
+      wireFocusModeControls();
+      wirePartAFullScreenControl();
+      updatePartAIdentityStrip();
+      wireButtonInteractionPolish();
+      wireMobileAccessInfo();
+      registerServiceWorker();
+    });
+  }
+
+  function setDefaultDates() {
+    var now = new Date();
+    var defaultLocation = readDefaultLocation();
+    var tz = Number(defaultLocation.timezone || 5.5);
+    var chartNumber = document.getElementById("chartNumber");
+    if (chartNumber && !chartNumber.value) assignNextChartNumber(true);
+    setFieldValue("nativeName", "PRASHNA CHART");
+    setFieldValue("ayanamsha", "raman");
+    setFieldValue("birthDate", dateInputValue(now, tz));
+    setBirthTimeFields(timeInputValue(now, tz));
+    applyDefaultLocationToBirthDetails(defaultLocation);
+    document.getElementById("asOfDate").value = dateInputValue(now, tz);
+    document.getElementById("asOfTime").value = timeInputValue(now, tz);
+    updateDefaultLocationStatus();
+  }
+
+  function showReportView(view) {
+    currentReportView = "chartData";
+    syncReportBodyClasses();
+    var chartDataNav = document.getElementById("chartDataNavRibbon");
+    var inputLayoutBar = document.getElementById("chartInputLayoutBar");
+    var chartDataView = document.getElementById("chartDataReportView");
+    if (chartDataNav) chartDataNav.classList.remove("hidden");
+    if (inputLayoutBar) inputLayoutBar.classList.remove("hidden");
+    if (chartDataView) chartDataView.classList.remove("hidden");
+    lastPlainReport = lastPlainReports.chartData || lastPlainReport;
+    updatePartAIdentityStrip();
+  }
+
+  function syncReportBodyClasses() {
+    if (typeof document === "undefined" || !document.body || !document.body.classList) return;
+    document.body.classList.add("report-active");
+    document.body.classList.add("report-view-chartData");
+    syncChartInputToggleState();
+  }
+
+  function wireChartInputToggle() {
+    if (typeof document === "undefined" || !document.body || !document.body.classList || !document.querySelectorAll) return;
+    applyStoredChartInputWidth();
+    Array.prototype.slice.call(document.querySelectorAll("[data-chart-input-toggle]")).forEach(function (button) {
+      if (button._chartInputToggleWired) return;
+      button.addEventListener("click", function () {
+        toggleInputPanel();
+      });
+      button._chartInputToggleWired = true;
+    });
+    wireChartInputResizeHandle();
+    syncChartInputToggleState();
+  }
+
+  function syncChartInputToggleState() {
+    if (typeof document === "undefined" || !document.body || !document.body.classList || !document.querySelectorAll) return;
+    var collapsed = document.body.classList.contains("chart-input-collapsed");
+    Array.prototype.slice.call(document.querySelectorAll("[data-chart-input-toggle]")).forEach(function (button) {
+      button.textContent = collapsed ? "Show input" : "Hide input";
+      button.setAttribute("aria-pressed", collapsed ? "true" : "false");
+      button.setAttribute("title", collapsed ? "Show chart input section" : "Hide chart input section");
+    });
+  }
+
+  function applyStoredChartInputWidth() {
+    var width = "";
+    try { width = localStorage.getItem("vednetraChartInputWidthPx") || ""; } catch (_err) {}
+    var numericWidth = Number(width);
+    // The Hide/Show-input buttons have been removed from the UI. If the user
+    // previously collapsed the panel, we MUST restore it on load — otherwise
+    // there's no way back to enter birth data.
+    if (numericWidth <= 140 || !Number.isFinite(numericWidth)) {
+      var last = 0;
+      try { last = Number(localStorage.getItem("vednetraChartInputWidthLastPx")) || 0; } catch (_e) {}
+      numericWidth = last > 140 ? last : 380;
+    }
+    setChartInputWidth(numericWidth);
+    // Make absolutely sure the body class is also cleared on every load
+    document.body.classList.remove("chart-input-collapsed");
+  }
+
+  function adjustChartInputWidth(direction) {
+    var workspace = document.querySelector(".workspace");
+    var inputPanel = document.querySelector(".input-panel");
+    var current = inputPanel ? inputPanel.getBoundingClientRect().width : 360;
+    var next = current + (direction === "smaller" ? -40 : 40);
+    setChartInputWidth(clampChartInputWidth(next, workspace));
+  }
+
+  function chartInputWidthMode() {
+    return "custom";
+  }
+
+  function setChartInputWidth(width) {
+    var workspace = document.querySelector(".workspace");
+    if (!workspace || !workspace.style) return;
+    var clamped = clampChartInputWidth(Number(width), workspace);
+    if (clamped > 140) {
+      try { localStorage.setItem("vednetraChartInputWidthLastPx", String(Math.round(clamped))); } catch (_errLast) {}
+    }
+    var widthPx = Math.round(clamped) + "px";
+    workspace.style.setProperty("--chart-input-width", widthPx);
+    // Also propagate to the root so body::before (backdrop bar) can read it
+    if (document.documentElement && document.documentElement.style) {
+      document.documentElement.style.setProperty("--chart-input-width", widthPx);
+    }
+    try { localStorage.setItem("vednetraChartInputWidthPx", String(Math.round(clamped))); } catch (_err) {}
+    document.body.classList.toggle("chart-input-collapsed", clamped <= 0);
+    syncChartInputRestoreHandle();
+    syncChartInputToggleState();
+  }
+
+  // Single source of truth for showing / hiding the input panel.
+  // Used by BOTH the original "Hide/Show input" button and the worksheet topbar button.
+  function toggleInputPanel() {
+    var isCollapsing = !document.body.classList.contains("chart-input-collapsed");
+    if (isCollapsing) {
+      var ws = document.querySelector(".workspace");
+      if (ws) {
+        var cur = parseFloat(getComputedStyle(ws).getPropertyValue("--chart-input-width"));
+        if (cur > 140) {
+          try { localStorage.setItem("vednetraChartInputWidthLastPx", String(Math.round(cur))); } catch (_e) {}
+        }
+      }
+      setChartInputWidth(0);
+    } else {
+      var last = 0;
+      try { last = Number(localStorage.getItem("vednetraChartInputWidthLastPx")) || 0; } catch (_e) {}
+      setChartInputWidth(last > 140 ? last : 380);
+    }
+  }
+
+  function clampChartInputWidth(width, workspace) {
+    var rect = workspace && workspace.getBoundingClientRect ? workspace.getBoundingClientRect() : { width: window.innerWidth || 1200 };
+    var total = Number(rect.width) || (window.innerWidth || 1200);
+    var min = 0;
+    var max = Math.max(160, Math.min(total - 360, total * 0.78));
+    if (total < 720) max = total;
+    var next = Math.min(Math.max(Number(width) || 0, min), max);
+    return next < 140 ? 0 : next;
+  }
+
+  function wireChartInputResizeHandle() {
+    var handle = document.getElementById("chartInputResizeHandle");
+    var workspace = document.querySelector(".workspace");
+    if (!handle || !workspace || handle._chartInputResizeWired) return;
+    handle._chartInputResizeWired = true;
+    handle.addEventListener("click", function (event) {
+      if (!document.body.classList.contains("chart-input-collapsed")) return;
+      event.preventDefault();
+      restoreChartInputPanel();
+    });
+    handle.addEventListener("pointerdown", function (event) {
+      if ((event.button || 0) !== 0) return;
+      var collapsedAtStart = document.body.classList.contains("chart-input-collapsed");
+      var rect = workspace.getBoundingClientRect();
+      document.body.classList.add("chart-input-resizing");
+      if (handle.setPointerCapture && event.pointerId !== undefined) {
+        try { handle.setPointerCapture(event.pointerId); } catch (_err) {}
+      }
+      function move(moveEvent) {
+        setChartInputWidth(moveEvent.clientX - rect.left);
+      }
+      function done() {
+        document.body.classList.remove("chart-input-resizing");
+        document.removeEventListener("pointermove", move);
+        document.removeEventListener("pointerup", done);
+        document.removeEventListener("pointercancel", done);
+      }
+      event.preventDefault();
+      if (!collapsedAtStart) move(event);
+      document.addEventListener("pointermove", move);
+      document.addEventListener("pointerup", done);
+      document.addEventListener("pointercancel", done);
+    });
+    syncChartInputRestoreHandle();
+  }
+
+  function restoreChartInputPanel() {
+    var last = 0;
+    try { last = Number(localStorage.getItem("vednetraChartInputWidthLastPx")) || 0; } catch (_e) {}
+    setChartInputWidth(last > 140 ? last : 380);
+    document.body.classList.remove("chart-input-collapsed");
+    syncChartInputRestoreHandle();
+  }
+
+  function syncChartInputRestoreHandle() {
+    var handle = document.getElementById("chartInputResizeHandle");
+    if (!handle || !document.body || !document.body.classList) return;
+    var collapsed = document.body.classList.contains("chart-input-collapsed");
+    handle.classList.toggle("is-restore-tab", collapsed);
+    handle.setAttribute("aria-label", collapsed ? "Show input section" : "Drag to resize input section");
+    handle.setAttribute("title", collapsed ? "Show input section" : "Drag to resize input section");
+  }
+
+  function wireTimeToolControls() {
+    var openButtons = Array.prototype.slice.call(document.querySelectorAll("#timeToolOpenBtn, [data-time-tool-open]"));
+    var close = document.getElementById("timeToolCloseBtn");
+    var popup = document.getElementById("timeToolPopup");
+    var target = document.getElementById("timeToolTarget");
+    var edit = document.getElementById("timeToolEditMode");
+    if (!popup) return;
+    makeFloatingPanelDraggable(popup, ".time-tool-head");
+    openButtons.forEach(function (open) {
+      open.addEventListener("click", function () {
+      popup.classList.remove("hidden");
+      positionFloatingPanelInViewport(popup);
+      syncTimeToolDisplay();
+    });
+    });
+    if (close) close.addEventListener("click", function () {
+      stopTimeToolTimer();
+      popup.classList.add("hidden");
+    });
+    popup.addEventListener("click", function (event) {
+      if (event.target === popup) popup.classList.add("hidden");
+      var button = event.target && event.target.closest ? event.target.closest("[data-time-tool-step]") : null;
+      if (!button) return;
+      stopTimeToolTimer(true);
+      applyTimeToolStep(button.getAttribute("data-time-tool-step"), Number(button.getAttribute("data-time-tool-direction") || 1));
+    });
+    if (target) target.addEventListener("change", syncTimeToolDisplay);
+    if (edit) {
+      edit.addEventListener("change", function () {
+        if (edit.value === "now") {
+          setTimeToolCurrentToNow();
+          edit.value = "date";
+        }
+      });
+    }
+    Array.prototype.slice.call(document.querySelectorAll("input[name='timeToolMode']")).forEach(function (radio) {
+      radio.addEventListener("change", function () {
+        if (!radio.checked) return;
+        if (radio.value === "manual") stopTimeToolTimer();
+        if (radio.value === "realtime") {
+          stopTimeToolTimer();
+          setTimeToolCurrentToNow();
+          setTimeToolStatus("Realtime mode: reset to current time.");
+        }
+        if (radio.value === "animate") startTimeToolTimer("second", 1, 650);
+      });
+    });
+    var add = document.getElementById("timeToolAddPickBtn");
+    var remove = document.getElementById("timeToolRemovePickBtn");
+    var help = document.getElementById("timeToolHelpBtn");
+    if (add) add.addEventListener("click", addTimeToolPick);
+    if (remove) remove.addEventListener("click", removeTimeToolPick);
+    if (help) help.addEventListener("click", showTimeToolHelp);
+    syncTimeToolDisplay();
+  }
+
+  function timeToolStepConfig(step) {
+    return {
+      "ten-years": { unit: "year", amount: 10 },
+      year: { unit: "year", amount: 1 },
+      month: { unit: "month", amount: 1 },
+      week: { unit: "day", amount: 7 },
+      day: { unit: "day", amount: 1 },
+      ascendant: { unit: "ascendant", amount: 1 },
+      navamsha: { unit: "second", amount: 800 },
+      hour: { unit: "hour", amount: 1 },
+      "ten-minutes": { unit: "minute", amount: 10 },
+      minute: { unit: "minute", amount: 1 },
+      "ten-seconds": { unit: "second", amount: 10 },
+      second: { unit: "second", amount: 1 }
+    }[step] || { unit: "second", amount: 1 };
+  }
+
+  function applyTimeToolStep(step, direction) {
+    var cfg = timeToolStepConfig(step);
+    var fields = timeToolFields();
+    if (!fields || !fields.dateField || !fields.timeField) {
+      alertUser("Time Changing Tool could not find the selected date/time fields.");
+      return;
+    }
+    var date = timeToolReadDate(fields.dateField, fields.timeField);
+    if (cfg.unit === "ascendant") date = timeToolAscendantShift(fields, direction || 1);
+    else timeToolShiftDate(date, cfg.unit, cfg.amount * (direction || 1));
+    timeToolWriteDate(fields.dateField, fields.timeField, date);
+    refreshTimeToolTarget(fields);
+    syncTimeToolDisplay();
+  }
+
+  function timeToolFields() {
+    var target = fieldValue("timeToolTarget") || "birth";
+    if (target === "transit") {
+      var transitDate = document.getElementById("transitDate");
+      var transitTime = document.getElementById("transitTime");
+      if (transitDate && transitTime) {
+        return { type: "transit-controls", dateField: transitDate, timeField: transitTime };
+      }
+      return { type: "as-of", dateField: document.getElementById("asOfDate"), timeField: document.getElementById("asOfTime") };
+    }
+    return { type: "birth", dateField: document.getElementById("birthDate"), timeField: document.getElementById("birthTime") };
+  }
+
+  function timeToolReadDate(dateField, timeField) {
+    if (!dateField || !timeField || !dateField.value || !timeField.value) throw new Error("Date and time are required.");
+    var d = dateField.value.split("-").map(Number);
+    var t = normalizeTimeInput(timeField.value).split(":").map(Number);
+    return new Date(d[0], d[1] - 1, d[2], t[0] || 0, t[1] || 0, t[2] || 0);
+  }
+
+  function timeToolWriteDate(dateField, timeField, date) {
+    dateField.value = date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate());
+    timeField.value = pad(date.getHours()) + ":" + pad(date.getMinutes()) + ":" + pad(date.getSeconds());
+  }
+
+  function timeToolShiftDate(date, unit, amount) {
+    if (unit === "year") date.setFullYear(date.getFullYear() + amount);
+    if (unit === "month") date.setMonth(date.getMonth() + amount);
+    if (unit === "day") date.setDate(date.getDate() + amount);
+    if (unit === "hour") date.setHours(date.getHours() + amount);
+    if (unit === "minute") date.setMinutes(date.getMinutes() + amount);
+    if (unit === "second") date.setSeconds(date.getSeconds() + amount);
+  }
+
+  function timeToolAscendantShift(fields, direction) {
+    var context = timeToolChartContext(fields);
+    var start = timeToolReadDate(fields.dateField, fields.timeField);
+    var startLon = timeToolAscendantLongitude(start, context);
+    var targetLon = normalize(startLon + 30 * (direction >= 0 ? 1 : -1));
+    var best = null;
+    var bestScore = Infinity;
+    for (var minute = 1; minute <= 600; minute += 1) {
+      var candidate = new Date(start.getTime() + direction * minute * 60000);
+      var score = angularSeparation(timeToolAscendantLongitude(candidate, context), targetLon);
+      if (score < bestScore) {
+        bestScore = score;
+        best = candidate;
+      }
+      if (score < 0.03) break;
+    }
+    if (!best) return new Date(start.getTime() + direction * 120 * 60000);
+    var left = new Date(best.getTime() - direction * 90000);
+    var right = new Date(best.getTime() + direction * 90000);
+    var low = Math.min(left.getTime(), right.getTime());
+    var high = Math.max(left.getTime(), right.getTime());
+    for (var i = 0; i < 28; i += 1) {
+      var m1 = low + (high - low) / 3;
+      var m2 = high - (high - low) / 3;
+      var s1 = angularSeparation(timeToolAscendantLongitude(new Date(m1), context), targetLon);
+      var s2 = angularSeparation(timeToolAscendantLongitude(new Date(m2), context), targetLon);
+      if (s1 < s2) high = m2;
+      else low = m1;
+    }
+    return new Date((low + high) / 2);
+  }
+
+  function timeToolChartContext(fields) {
+    if (fields.type === "transit-controls") {
+      return {
+        timezone: Number(fieldValue("transitTimezone") || fieldValue("timezone") || 5.5),
+        latitude: signedCoordinate(fieldValue("transitLatitude") || fieldValue("latitude"), fieldValue("transitLatitudeDirection") || fieldValue("latitudeDirection") || "N", "S"),
+        longitude: signedCoordinate(fieldValue("transitLongitude") || fieldValue("longitude"), fieldValue("transitLongitudeDirection") || fieldValue("longitudeDirection") || "E", "W"),
+        ayanamshaKey: normalizeAyanamshaKey(fieldValue("ayanamsha") || "raman")
+      };
+    }
+    return {
+      timezone: Number(fieldValue("timezone") || 5.5),
+      latitude: signedCoordinate(fieldValue("latitude"), fieldValue("latitudeDirection") || "N", "S"),
+      longitude: signedCoordinate(fieldValue("longitude"), fieldValue("longitudeDirection") || "E", "W"),
+      ayanamshaKey: normalizeAyanamshaKey(fieldValue("ayanamsha") || "raman")
+    };
+  }
+
+  function timeToolAscendantLongitude(localDate, context) {
+    var utc = new Date(Date.UTC(localDate.getFullYear(), localDate.getMonth(), localDate.getDate(), localDate.getHours(), localDate.getMinutes(), localDate.getSeconds()) - context.timezone * 3600000);
+    return buildChart(utc, context.latitude, context.longitude, context.timezone, { ayanamshaKey: context.ayanamshaKey }).ascendant.lon;
+  }
+
+  function refreshTimeToolTarget(fields) {
+    if (fields.type === "transit-controls" || fields.type === "as-of") {
+      var asOfDate = document.getElementById("asOfDate");
+      var asOfTime = document.getElementById("asOfTime");
+      if (asOfDate) asOfDate.value = fields.dateField.value;
+      if (asOfTime) asOfTime.value = normalizeTimeInput(fields.timeField.value);
+      // ── KEY FIX: also push the new date/time directly into the worksheet
+      // transit fields BEFORE generate() reads them via collectWorksheetInteractiveState.
+      // This ensures the worksheet transit chart re-renders with the Time Tool's date.
+      var wsDate = document.getElementById("worksheetTransitDate");
+      var wsTime = document.getElementById("worksheetTransitTime");
+      if (wsDate && fields.dateField.value) wsDate.value = fields.dateField.value;
+      if (wsTime && fields.timeField.value) wsTime.value = normalizeTimeInput(fields.timeField.value);
+      generate({ preserveActiveSection: true, refreshFocusPopups: true, preserveInteractiveState: true, timeToolSyncTarget: "transit" });
+      setTimeToolStatus("Transit/as-of time refreshed across charts, dashas, worksheet and focus panels.");
+      return;
+    }
+    generate({ preserveActiveSection: true, refreshFocusPopups: true, preserveInteractiveState: true, timeToolSyncTarget: fields.type === "as-of" ? "transit" : "birth" });
+    setTimeToolStatus((fields.type === "birth" ? "Birth chart" : "Transit/as-of chart") + " refreshed across charts, dashas and focus panels.");
+  }
+
+  function syncTimeToolDisplay() {
+    var display = document.getElementById("timeToolCurrentDisplay");
+    if (!display) return;
+    try {
+      var fields = timeToolFields();
+      var date = timeToolReadDate(fields.dateField, fields.timeField);
+      display.textContent = timeToolDateLabel(date);
+    } catch (error) {
+      display.textContent = "-";
+    }
+  }
+
+  function timeToolDateLabel(date) {
+    var days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return days[date.getDay()] + " " + date.getDate() + " " + months[date.getMonth()] + " " + date.getFullYear() + "  " + pad(date.getHours()) + ":" + pad(date.getMinutes()) + ":" + pad(date.getSeconds());
+  }
+
+  function setTimeToolCurrentToNow() {
+    var fields = timeToolFields();
+    var context = timeToolChartContext(fields);
+    var now = new Date();
+    fields.dateField.value = dateInputValue(now, context.timezone);
+    fields.timeField.value = timeInputValue(now, context.timezone);
+    refreshTimeToolTarget(fields);
+    syncTimeToolDisplay();
+  }
+
+  function startTimeToolTimer(step, direction, interval) {
+    stopTimeToolTimer(false);
+    timeToolTimer = window.setInterval(function () {
+      applyTimeToolStep(step, direction);
+    }, interval);
+    setTimeToolStatus("Animate mode: advancing one second at a time.");
+  }
+
+  function stopTimeToolTimer(setManual) {
+    if (timeToolTimer) {
+      window.clearInterval(timeToolTimer);
+      timeToolTimer = null;
+    }
+    if (setManual) {
+      var manual = document.querySelector("input[name='timeToolMode'][value='manual']");
+      if (manual) manual.checked = true;
+    }
+  }
+
+  function addTimeToolPick() {
+    var fields = timeToolFields();
+    var key = (fieldValue("timeToolTarget") || "birth") + "|" + fields.dateField.value + "|" + normalizeTimeInput(fields.timeField.value);
+    if (timeToolPickList.indexOf(key) < 0) timeToolPickList.push(key);
+    setTimeToolStatus("Added to pick list. Picks in this session: " + timeToolPickList.length + ".");
+  }
+
+  function removeTimeToolPick() {
+    var fields = timeToolFields();
+    var key = (fieldValue("timeToolTarget") || "birth") + "|" + fields.dateField.value + "|" + normalizeTimeInput(fields.timeField.value);
+    timeToolPickList = timeToolPickList.filter(function (item) { return item !== key; });
+    setTimeToolStatus("Removed current time from pick list. Picks in this session: " + timeToolPickList.length + ".");
+  }
+
+  function showTimeToolHelp() {
+    alertUser("Time Changing Tool: choose Birth Chart or Transits, then use +/- rows to move the selected date/time. Ascendant uses an approximate 2-hour step; Navamsha uses 13 minutes 20 seconds. Realtime advances by seconds; Animate advances by 10-second steps.");
+  }
+
+  function setTimeToolStatus(text) {
+    var status = document.getElementById("timeToolStatus");
+    if (status) status.textContent = text;
+  }
+
+  // Returns the minimum Y position floating panels are allowed to occupy.
+  // When a report is active the top of the page is covered by the fixed
+  // header stack (nav + layout bar + worksheet topbar = ~176px). Floating
+  // panels must stay below that so their drag handle is always reachable.
+  function floatingPanelMinTop() {
+    if (typeof document === "undefined" || !document.body) return 4;
+    return document.body.classList.contains("report-active") ? 180 : 4;
+  }
+
+  function makeFloatingPanelDraggable(container, handleSelector) {
+    if (!container || container._floatingDragWired) return;
+    var handle = container.querySelector(handleSelector);
+    var panel = floatingPanelElement(container);
+    if (!handle || !panel) return;
+    handle.addEventListener("pointerdown", function (event) {
+      if (event.target && event.target.closest && event.target.closest("button, select, input, textarea")) return;
+      var rect = panel.getBoundingClientRect();
+      container.classList.add("is-floating");
+      panel.style.left = rect.left + "px";
+      panel.style.top = rect.top + "px";
+      panel.style.right = "auto";
+      panel.style.bottom = "auto";
+      var startX = event.clientX;
+      var startY = event.clientY;
+      var startLeft = rect.left;
+      var startTop = rect.top;
+      var minTop = floatingPanelMinTop();
+      handle.setPointerCapture(event.pointerId);
+      function move(moveEvent) {
+        var nextLeft = clamp(startLeft + moveEvent.clientX - startX, 4, Math.max(4, window.innerWidth - panel.offsetWidth - 4));
+        var nextTop = clamp(startTop + moveEvent.clientY - startY, minTop, Math.max(minTop, window.innerHeight - panel.offsetHeight - 4));
+        panel.style.left = nextLeft + "px";
+        panel.style.top = nextTop + "px";
+      }
+      function done(doneEvent) {
+        handle.releasePointerCapture(doneEvent.pointerId);
+        handle.removeEventListener("pointermove", move);
+        handle.removeEventListener("pointerup", done);
+        handle.removeEventListener("pointercancel", done);
+      }
+      handle.addEventListener("pointermove", move);
+      handle.addEventListener("pointerup", done);
+      handle.addEventListener("pointercancel", done);
+    });
+    container._floatingDragWired = true;
+  }
+
+  function floatingPanelElement(container) {
+    return container.querySelector(".time-tool-panel, .house-result-panel, .house-context-menu");
+  }
+
+  function positionFloatingPanelInViewport(container, x, y) {
+    var panel = floatingPanelElement(container);
+    if (!panel) return;
+    if (container.classList.contains("is-floating") && panel.style.left && x === undefined) return;
+    var rect = panel.getBoundingClientRect();
+    var minTop = floatingPanelMinTop();
+    var left = x === undefined ? window.innerWidth - rect.width - 18 : x;
+    var top = y === undefined ? minTop : y;
+    container.classList.add("is-floating");
+    panel.style.left = clamp(left, 4, Math.max(4, window.innerWidth - rect.width - 4)) + "px";
+    panel.style.top = clamp(top, minTop, Math.max(minTop, window.innerHeight - rect.height - 4)) + "px";
+    panel.style.right = "auto";
+    panel.style.bottom = "auto";
+  }
+
+  function wireHouseContextMenuControls() {
+    if (typeof document === "undefined") return;
+    document.addEventListener("contextmenu", function (event) {
+      var target = event.target && event.target.closest ? event.target.closest(".north-house-hit, .north-house-label") : null;
+      if (!target) return;
+      var hit = target;
+      if (!hit) return;
+      event.preventDefault();
+      openHouseContextMenu(hit, event.clientX, event.clientY);
+    });
+    document.addEventListener("click", function (event) {
+      var menu = document.getElementById("houseContextMenu");
+      if (menu && !menu.classList.contains("hidden") && !(event.target && event.target.closest && event.target.closest("#houseContextMenu"))) {
+        menu.classList.add("hidden");
+      }
+    });
+  }
+
+  function openHouseContextMenu(hit, x, y) {
+    var menu = ensureHouseContextMenu();
+    var info = houseHitInfo(hit);
+    var houseLabel = ordinal(info.house);
+    menu.innerHTML = '<div class="house-context-menu" role="menu">' +
+      houseMenuButton("rotate-house", "Rotate chart to this house") +
+      houseMenuButton("house-description", "House description") +
+      houseMenuButton("house-significations", "house significations") +
+      houseMenuButton("lordship", "Lordship placement") +
+      houseMenuButton("bhava-bala", "Bhava Bala") +
+      houseMenuButton("yogas", "Search Yogas involving " + houseLabel + " house") +
+      houseMenuButton("aspects", "Aspects to and from " + houseLabel + " house") +
+      '<div class="house-context-separator"></div>' +
+      houseMenuButton("rotate-sign", "Rotate chart to this sign") +
+      houseMenuButton("sign-description", "Sign description") +
+      houseMenuButton("sign-significations", "sign significations") +
+      houseMenuButton("cancel", "Cancel") +
+      "</div>";
+    menu.classList.remove("hidden");
+    positionFloatingPanelInViewport(menu, x, y);
+    menu.onclick = function (event) {
+      var action = event.target && event.target.closest ? event.target.closest("[data-house-action]") : null;
+      if (!action) return;
+      var key = action.getAttribute("data-house-action");
+      menu.classList.add("hidden");
+      if (key === "cancel") return;
+      openHouseActionPopup(key, info, x + 18, y + 18);
+    };
+  }
+
+  function ensureHouseContextMenu() {
+    var menu = document.getElementById("houseContextMenu");
+    if (menu) return menu;
+    menu = document.createElement("div");
+    menu.id = "houseContextMenu";
+    menu.className = "house-context-layer hidden";
+    document.body.appendChild(menu);
+    makeFloatingPanelDraggable(menu, ".house-context-menu");
+    return menu;
+  }
+
+  function houseMenuButton(action, label) {
+    return '<button type="button" data-house-action="' + escapeHtml(action) + '">' + escapeHtml(label) + "</button>";
+  }
+
+  function houseHitInfo(hit) {
+    var svg = hit.closest("svg");
+    return {
+      house: Number(hit.getAttribute("data-house") || 1),
+      sign: Number(hit.getAttribute("data-sign") || 0),
+      ascSign: Number((svg && svg.getAttribute("data-asc-sign")) || hit.getAttribute("data-asc-sign") || 0),
+      chartTitle: (svg && svg.getAttribute("data-chart-title")) || "Chart",
+      planets: parseHouseChartPlanets(svg && svg.getAttribute("data-chart-planets"))
+    };
+  }
+
+  function parseHouseChartPlanets(raw) {
+    try {
+      var parsed = JSON.parse(raw || "[]");
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function openHouseActionPopup(action, info, x, y) {
+    var popup = document.createElement("div");
+    popup.className = "house-result-layer";
+    popup.innerHTML = '<div class="house-result-panel"><div class="house-result-head"><strong>' + escapeHtml(houseActionTitle(action, info)) + '</strong><button type="button" data-house-result-close>Close</button></div><div class="house-result-body">' + houseActionHtml(action, info) + "</div></div>";
+    document.body.appendChild(popup);
+    makeFloatingPanelDraggable(popup, ".house-result-head");
+    positionFloatingPanelInViewport(popup, x, y);
+    var close = popup.querySelector("[data-house-result-close]");
+    if (close) close.addEventListener("click", function () { popup.remove(); });
+  }
+
+  function houseActionTitle(action, info) {
+    if (action === "rotate-house") return "Rotated To House " + info.house;
+    if (action === "rotate-sign") return "Rotated To " + SIGNS[info.sign].name;
+    if (action === "sign-description" || action === "sign-significations") return SIGNS[info.sign].name;
+    return "House " + info.house + " - " + SIGNS[info.sign].name;
+  }
+
+  function houseActionHtml(action, info) {
+    if (action === "rotate-house" || action === "rotate-sign") return rotatedHouseChartHtml(info, action === "rotate-house" ? info.sign : info.sign);
+    if (action === "house-description") return houseDescriptionHtml(info);
+    if (action === "house-significations") return houseSignificationsHtml(info.house);
+    if (action === "lordship") return lordshipPlacementHtml(info);
+    if (action === "bhava-bala") return bhavaBalaPopupHtml(info);
+    if (action === "yogas") return houseYogasHtml(info);
+    if (action === "aspects") return houseAspectsHtml(info);
+    if (action === "sign-description") return signDescriptionHtml(info.sign);
+    if (action === "sign-significations") return signSignificationsHtml(info.sign);
+    return "";
+  }
+
+  function rotatedHouseChartHtml(info, newAscSign) {
+    var rotated = info.planets.map(function (planet) {
+      var clone = Object.assign({}, planet);
+      clone.house = houseFromSign(newAscSign, Number(planet.sign));
+      return clone;
+    });
+    return chartBox("Rotated " + info.chartTitle, newAscSign, rotated, { division: 1 }) +
+      '<p class="fine-print">This popup rotates the displayed chart reference to the selected house/sign. Original chart data is not changed.</p>';
+  }
+
+  function houseDescriptionHtml(info) {
+    var tenants = info.planets.filter(function (p) { return Number(p.house) === info.house; }).map(function (p) { return p.name; });
+    return '<div class="metric-row"><strong>House</strong><span>H' + info.house + " in " + escapeHtml(SIGNS[info.sign].name) + '</span></div>' +
+      '<div class="metric-row"><strong>Lord</strong><span>' + escapeHtml(SIGNS[info.sign].lord) + '</span></div>' +
+      '<div class="metric-row"><strong>Tenants</strong><span>' + escapeHtml(tenants.join(", ") || "None") + '</span></div>' +
+      '<p>' + escapeHtml(houseDescriptionText(info.house)) + "</p>";
+  }
+
+  function houseSignificationsHtml(house) {
+    return '<ul class="popup-list">' + houseSignifications(house).map(function (item) { return "<li>" + escapeHtml(item) + "</li>"; }).join("") + "</ul>";
+  }
+
+  function lordshipPlacementHtml(info) {
+    var lord = SIGNS[info.sign].lord;
+    var lordPlanet = info.planets.find(function (p) { return p.name === lord; });
+    var text = lordPlanet ? lord + " is placed in H" + lordPlanet.house + ", " + SIGNS[lordPlanet.sign].name + "." : lord + " placement is not available in this displayed chart.";
+    return '<div class="metric-row"><strong>House lord</strong><span>' + escapeHtml(lord) + '</span></div><p>' + escapeHtml(text) + '</p>';
+  }
+
+  function bhavaBalaPopupHtml(info) {
+    var tenants = info.planets.filter(function (p) { return Number(p.house) === info.house; }).length;
+    var benefics = info.planets.filter(function (p) { return Number(p.house) === info.house && ["Jupiter", "Venus", "Mercury", "Moon"].indexOf(p.name) >= 0; }).length;
+    var malefics = info.planets.filter(function (p) { return Number(p.house) === info.house && ["Sun", "Mars", "Saturn", "Rahu", "Ketu"].indexOf(p.name) >= 0; }).length;
+    var score = clamp(45 + benefics * 10 - malefics * 8 + tenants * 3, 0, 100);
+    return '<div class="scorebar"><span style="width:' + score + '%"></span></div><p><strong>' + score + '/100</strong> quick popup strength from tenants and natural benefic/malefic mix.</p><p class="fine-print">For full judgement, use the main House Judgement and Shadbala sections.</p>';
+  }
+
+  function houseYogasHtml(info) {
+    var hits = scanYogas(lastReportChart || { planets: [], planetsByName: {}, ascendant: { sign: info.ascSign } }).filter(function (yoga) {
+      var text = JSON.stringify(yoga).toLowerCase();
+      return text.indexOf("h" + info.house) >= 0 || text.indexOf(ordinal(info.house).toLowerCase()) >= 0;
+    });
+    if (!hits.length) return '<p>No implemented yoga popup hit was found for H' + info.house + '. Check the full Yoga section for broader combinations.</p>';
+    return '<ul class="popup-list">' + hits.slice(0, 10).map(function (yoga) { return "<li><strong>" + escapeHtml(yoga.name) + "</strong>: " + escapeHtml(yoga.effect || yoga.evidence || "") + "</li>"; }).join("") + "</ul>";
+  }
+
+  function houseAspectsHtml(info) {
+    var toHouse = [];
+    var fromHouse = [];
+    info.planets.forEach(function (p) {
+      houseAspectTargets(Number(p.house), p.name).forEach(function (h) {
+        if (h === info.house) toHouse.push(p.name + " from H" + p.house);
+      });
+      if (Number(p.house) === info.house) {
+        fromHouse.push(p.name + " aspects H" + houseAspectTargets(Number(p.house), p.name).join(", H"));
+      }
+    });
+    return '<div class="metric-row"><strong>Aspects to H' + info.house + '</strong><span>' + escapeHtml(toHouse.join("; ") || "None in simplified popup check") + '</span></div>' +
+      '<div class="metric-row"><strong>Aspects from H' + info.house + '</strong><span>' + escapeHtml(fromHouse.join("; ") || "No tenants aspecting from this house") + '</span></div>';
+  }
+
+  function signDescriptionHtml(sign) {
+    var s = SIGNS[sign];
+    return '<div class="metric-row"><strong>Sign</strong><span>' + escapeHtml(s.name + " / " + s.sanskrit) + '</span></div>' +
+      '<div class="metric-row"><strong>Lord</strong><span>' + escapeHtml(s.lord) + '</span></div>' +
+      '<div class="metric-row"><strong>Nature</strong><span>' + escapeHtml(s.modality + ", " + s.element + ", " + s.gender) + '</span></div>';
+  }
+
+  function signSignificationsHtml(sign) {
+    var s = SIGNS[sign];
+    return '<ul class="popup-list"><li>' + escapeHtml(s.modality + " sign: shows how the matter moves or stabilizes.") + '</li><li>' + escapeHtml(s.element + " element: colors temperament and expression.") + '</li><li>Lord ' + escapeHtml(s.lord) + ' becomes the operational planet for this sign.</li></ul>';
+  }
+
+  function houseAspectTargets(house, planetName) {
+    var targets = [wrapHouse(house + 6)];
+    if (planetName === "Mars") targets = targets.concat([wrapHouse(house + 3), wrapHouse(house + 7)]);
+    if (planetName === "Jupiter" || planetName === "Rahu" || planetName === "Ketu") targets = targets.concat([wrapHouse(house + 4), wrapHouse(house + 8)]);
+    if (planetName === "Saturn") targets = targets.concat([wrapHouse(house + 2), wrapHouse(house + 9)]);
+    return Array.from(new Set(targets)).sort(function (a, b) { return a - b; });
+  }
+
+  function ordinal(n) {
+    var suffix = n === 1 ? "st" : n === 2 ? "nd" : n === 3 ? "rd" : "th";
+    return n + suffix;
+  }
+
+  function houseDescriptionText(house) {
+    return {
+      1: "Self, body, temperament, vitality and the way life begins.",
+      2: "Family, speech, food, stored wealth and values.",
+      3: "Courage, effort, siblings, communication and short movement.",
+      4: "Mother, home, property, vehicles, education foundation and inner contentment.",
+      5: "Intelligence, mantra, children, creativity, romance and purva punya.",
+      6: "Disease, debt, enemies, service, competition and disputes.",
+      7: "Marriage, partnership, public dealings, trade and agreements.",
+      8: "Longevity, hidden matters, inheritance, vulnerability and transformation.",
+      9: "Dharma, fortune, father/guru, higher learning and blessings.",
+      10: "Profession, karma, authority, status and visible action.",
+      11: "Gains, fulfilment of desire, networks and elder siblings.",
+      12: "Loss, expenditure, sleep, isolation, foreign places and moksha."
+    }[house] || "House meaning reference.";
+  }
+
+  function houseSignifications(house) {
+    return (houseDescriptionText(house) || "").split(", ").concat(["Judge lord, tenants, aspects, karaka and relevant varga before final conclusion."]);
+  }
+
+  function wireFocusModeControls() {
+    var rail = document.getElementById("focusModeRail");
+    var tab = rail ? rail.querySelector(".focus-rail-tab") : null;
+    var generateButton = document.getElementById("railGenerateReportBtn");
+    var downloadButton = document.getElementById("railDownloadReportBtn");
+    var refreshTargetsButton = document.getElementById("railRefreshFocusTargetsBtn");
+    var openChartButton = document.getElementById("railOpenChartFocusBtn");
+    var openD1DetailsButton = document.getElementById("railOpenD1DetailsFocusBtn");
+    var openDashaButton = document.getElementById("railOpenDashaFocusBtn");
+    var sectionSelect = document.getElementById("railSectionFocusSelect");
+    var addSectionButton = document.getElementById("railAddSectionFocusBtn");
+    var pinnedSections = document.getElementById("railPinnedSections");
+    if (tab && rail) {
+      tab.setAttribute("aria-expanded", "false");
+      tab.addEventListener("click", function () {
+        var open = !rail.classList.contains("is-open");
+        rail.classList.toggle("is-open", open);
+        tab.setAttribute("aria-expanded", open ? "true" : "false");
+        if (open) refreshRailFocusTargets(false);
+      });
+    }
+    if (generateButton) generateButton.addEventListener("click", function () {
+      if (rail) rail.classList.add("is-open", "show-download-options");
+      generate();
+      setTimeout(function () { refreshRailFocusTargets(false); }, 0);
+    });
+    if (downloadButton) downloadButton.addEventListener("click", function () {
+      var reportType = document.getElementById("railReportDownloadType");
+      var format = document.getElementById("railReportDownloadFormat");
+      downloadCurrentReport(format ? format.value : "pdf", reportType ? reportType.value : "vednetra");
+    });
+    if (refreshTargetsButton) refreshTargetsButton.addEventListener("click", function () { refreshRailFocusTargets(true); });
+    if (openChartButton) openChartButton.addEventListener("click", openSelectedRailChartFocus);
+    if (openD1DetailsButton) openD1DetailsButton.addEventListener("click", openRailD1DetailsFocus);
+    if (openDashaButton) openDashaButton.addEventListener("click", openRailDashaFocus);
+    if (addSectionButton) addSectionButton.addEventListener("click", addSelectedRailSectionFocus);
+    if (pinnedSections) {
+      pinnedSections.addEventListener("click", function (event) {
+        var open = event.target && event.target.closest ? event.target.closest("[data-focus-section-open]") : null;
+        var remove = event.target && event.target.closest ? event.target.closest("[data-focus-section-remove]") : null;
+        if (open) openRailSectionFocus(open.getAttribute("data-focus-section-open"));
+        if (remove) removeRailSectionFocus(remove.getAttribute("data-focus-section-remove"));
+      });
+    }
+    if (sectionSelect) refreshRailFocusTargets(false);
+    document.addEventListener("fullscreenchange", function () {
+      if (!document.fullscreenElement) document.body.classList.remove("focus-mode");
+      syncPartAFullScreenButton();
+    });
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && document.body.classList.contains("focus-mode")) exitFocusMode();
+    });
+  }
+
+  function wirePartAFullScreenControl() {
+    var button = document.getElementById("partAFullScreenBtn");
+    if (!button || button.dataset.fullScreenWired === "1") return;
+    button.dataset.fullScreenWired = "1";
+    button.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (document.body.classList.contains("focus-mode") || document.fullscreenElement) {
+        exitFocusMode();
+      } else {
+        openViewAInFullScreen();
+      }
+      syncPartAFullScreenButton();
+    });
+    syncPartAFullScreenButton();
+  }
+
+  function syncPartAFullScreenButton() {
+    var button = document.getElementById("partAFullScreenBtn");
+    if (!button) return;
+    var active = document.body.classList.contains("focus-mode") || Boolean(document.fullscreenElement);
+    button.textContent = active ? "Exit Full Screen" : "Full Screen";
+    button.setAttribute("aria-pressed", active ? "true" : "false");
+    button.classList.toggle("active", active);
+    updatePartAIdentityStrip();
+  }
+
+  function updatePartAIdentityStrip(inputOverride) {
+    var strip = document.getElementById("partAIdentityStrip");
+    if (!strip) return;
+    var summary = strip.querySelector(".part-a-native-summary");
+    var input = inputOverride || lastReportInput || readLooseInputSummary();
+    if (summary) summary.innerHTML = partAIdentitySummaryHtml(input);
+  }
+
+  function readLooseInputSummary() {
+    return {
+      name: fieldValue("nativeName") || "Native",
+      chartNumber: fieldValue("chartNumber") || "",
+      birthDate: fieldValue("birthDate") || "",
+      birthTime: normalizeTimeInput(fieldValue("birthTime") || ""),
+      birthPlace: fieldValue("birthPlace") || "",
+      ayanamshaKey: fieldValue("ayanamsha") || ""
+    };
+  }
+
+  function partAIdentitySummaryHtml(input) {
+    input = input || {};
+    var name = input.name || "Native";
+    var chartNumber = input.chartNumber ? "Chart " + input.chartNumber : "Chart";
+    var ayanamsha = input.ayanamshaKey ? ayanamshaLabel(input.ayanamshaKey) : "";
+    var birth = [input.birthDate || "-", input.birthTime || "-"].filter(Boolean).join(" ");
+    var place = input.birthPlace || "Place not set";
+    return '<span><strong>' + escapeHtml(chartNumber) + ' - ' + escapeHtml(name) + '</strong></span>' +
+      '<span>Birth: ' + escapeHtml(birth) + '</span>' +
+      '<span>Place: ' + escapeHtml(place) + '</span>' +
+      (ayanamsha ? '<span>Ayanamsha: ' + escapeHtml(ayanamsha) + '</span>' : "");
+  }
+
+  function enterFocusMode() {
+    var report = document.getElementById("report");
+    if (!report || report.classList.contains("hidden")) {
+      alertUser("Generate or load a chart first, then use full screen.");
+      return;
+    }
+    document.body.classList.add("focus-mode");
+    syncPartAFullScreenButton();
+    if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(function () {});
+    }
+  }
+
+  function wireButtonInteractionPolish() {
+    if (document.body.dataset.buttonPolishWired === "1") return;
+    document.body.dataset.buttonPolishWired = "1";
+    function nearestButton(event) {
+      return event.target && event.target.closest ? event.target.closest("button") : null;
+    }
+    document.addEventListener("pointerdown", function (event) {
+      var button = nearestButton(event);
+      if (!button || button.disabled) return;
+      button.classList.add("button-pressed");
+    });
+    ["pointerup", "pointercancel", "pointerleave", "blur"].forEach(function (eventName) {
+      document.addEventListener(eventName, function (event) {
+        var button = nearestButton(event);
+        if (button) button.classList.remove("button-pressed");
+      }, true);
+    });
+    document.addEventListener("click", function (event) {
+      var button = nearestButton(event);
+      if (!button || button.disabled) return;
+      button.classList.remove("button-pressed");
+      button.classList.add("button-clicked");
+      window.setTimeout(function () { button.classList.remove("button-clicked"); }, 220);
+    }, true);
+  }
+
+  function openViewAInFullScreen() {
+    showReportView("chartData");
+    enterFocusMode();
+    setTimeout(function () {
+      refreshRailFocusTargets(false);
+    }, 0);
+  }
+
+  function exitFocusMode() {
+    document.body.classList.remove("focus-mode");
+    syncPartAFullScreenButton();
+    if (document.exitFullscreen && document.fullscreenElement) {
+      document.exitFullscreen().catch(function () {});
+    }
+  }
+
+  function railChartPanels() {
+    var report = document.getElementById("report");
+    return report && report.querySelectorAll ? Array.prototype.slice.call(report.querySelectorAll(".chart-panel")) : [];
+  }
+
+  function refreshRailFocusTargets(forceMaterialize) {
+    if (forceMaterialize) {
+      ["viewA-vargas", "viewA-varshfal", "viewA-transit", "viewA-compatibility", "viewA-kp"].forEach(function (targetId) {
+        expediteSectionForNavTarget(targetId);
+      });
+    }
+    var select = document.getElementById("railChartFocusSelect");
+    var sectionSelect = document.getElementById("railSectionFocusSelect");
+    var previous = select ? select.value : "";
+    var panels = railChartPanels();
+    if (select) {
+      select.innerHTML = panels.length ? panels.map(function (panel, index) {
+        var title = panelFocusTitle(panel, "chart");
+        return '<option value="' + index + '">' + escapeHtml(title || ("Chart " + (index + 1))) + '</option>';
+      }).join("") : '<option value="">No chart loaded yet</option>';
+      if (previous && Number(previous) < panels.length) select.value = previous;
+    }
+    if (sectionSelect) refreshRailSectionFocusOptions();
+    renderPinnedRailSections();
+  }
+
+  function openSelectedRailChartFocus() {
+    refreshRailFocusTargets(false);
+    var select = document.getElementById("railChartFocusSelect");
+    var panels = railChartPanels();
+    var index = select ? Number(select.value) : 0;
+    if (!panels.length || !Number.isFinite(index) || !panels[index]) {
+      alertUser("No chart is ready yet. Generate the report, or click Refresh after the chart sections finish loading.");
+      return;
+    }
+    openPanelFocusPopupFromSource(panels[index], "chart");
+  }
+
+  function openRailDashaFocus() {
+    expediteSectionForNavTarget("viewA-dasha");
+    var report = document.getElementById("report");
+    var panel = report && report.querySelector ? report.querySelector("#viewA-dasha .dasha-panel") : null;
+    if (!panel) {
+      alertUser("Vimshottari Dasha is not ready yet. Generate the report first, then try again.");
+      return;
+    }
+    openPanelFocusPopupFromSource(panel, "dasha");
+  }
+
+  function openRailD1DetailsFocus() {
+    expediteSectionForNavTarget("viewA-d1-details");
+    var report = document.getElementById("report");
+    var panel = report && report.querySelector ? report.querySelector("#viewA-d1-details .d1-details-table-panel") : null;
+    if (!panel) {
+      alertUser("D-1 Ascendant and Planet Details are not ready yet. Generate the report first, then try again.");
+      return;
+    }
+    openPanelFocusPopupFromSource(panel, "table");
+  }
+
+  function availableRailSections() {
+    var select = document.getElementById("chartDataNavSelect");
+    if (!select) return [];
+    return Array.prototype.slice.call(select.options).filter(function (option) {
+      return option.value && option.value !== "viewA-output-library";
+    }).map(function (option) {
+      return { id: option.value, label: option.textContent.trim() };
+    });
+  }
+
+  function refreshRailSectionFocusOptions() {
+    var select = document.getElementById("railSectionFocusSelect");
+    if (!select) return;
+    var sections = availableRailSections();
+    var previous = select.value;
+    select.innerHTML = sections.length ? sections.map(function (section) {
+      return '<option value="' + escapeHtml(section.id) + '">' + escapeHtml(section.label) + "</option>";
+    }).join("") : '<option value="">Generate report first</option>';
+    if (previous && sections.some(function (section) { return section.id === previous; })) select.value = previous;
+  }
+
+  function addSelectedRailSectionFocus() {
+    refreshRailSectionFocusOptions();
+    var select = document.getElementById("railSectionFocusSelect");
+    var id = select ? select.value : "";
+    if (!id) {
+      alertUser("Generate a report first, then select a section to add.");
+      return;
+    }
+    if (pinnedFocusSections.indexOf(id) >= 0) {
+      alertUser("This section is already in the focus bar.");
+      return;
+    }
+    if (pinnedFocusSections.length >= MAX_FOCUS_SECTIONS) {
+      alertUser("Maximum 5 focus sections can be added at a time. Remove one section first.");
+      return;
+    }
+    pinnedFocusSections.push(id);
+    renderPinnedRailSections();
+  }
+
+  function removeRailSectionFocus(id) {
+    pinnedFocusSections = pinnedFocusSections.filter(function (item) { return item !== id; });
+    renderPinnedRailSections();
+  }
+
+  function renderPinnedRailSections() {
+    var mount = document.getElementById("railPinnedSections");
+    if (!mount) return;
+    var sections = availableRailSections();
+    var labels = {};
+    sections.forEach(function (section) { labels[section.id] = section.label; });
+    pinnedFocusSections = pinnedFocusSections.filter(function (id) { return labels[id]; }).slice(0, MAX_FOCUS_SECTIONS);
+    if (!pinnedFocusSections.length) {
+      mount.innerHTML = '<p class="fine-print">Add up to 5 sections.</p>';
+      return;
+    }
+    mount.innerHTML = pinnedFocusSections.map(function (id) {
+      return '<div class="focus-pinned-section"><span>' + escapeHtml(labels[id] || id) + '</span><button type="button" data-focus-section-open="' + escapeHtml(id) + '">Open</button><button type="button" data-focus-section-remove="' + escapeHtml(id) + '">Remove</button></div>';
+    }).join("");
+  }
+
+  function openRailSectionFocus(targetId) {
+    if (!targetId) return;
+    expediteSectionForNavTarget(targetId);
+    var source = document.getElementById(targetId);
+    if (!source) {
+      alertUser("That section is not ready yet. Generate the report first, then try again.");
+      return;
+    }
+    openPanelFocusPopupFromSource(source, sectionFocusKind(source));
+  }
+
+  function sectionFocusKind(source) {
+    if (!source) return "section";
+    if (source.querySelector && source.querySelector(".dasha-panel")) return "dasha";
+    if (source.querySelector && source.querySelector(".d1-details-table-panel")) return "table";
+    return "section";
+  }
+
+  function wireChartDataNavControls() {
+    var ribbon = document.getElementById("chartDataNavRibbon");
+    if (!ribbon) return;
+    ribbon.addEventListener("click", function (event) {
+      var categoryButton = event.target && event.target.closest ? event.target.closest("[data-nav-category-toggle]") : null;
+      if (categoryButton && ribbon.contains(categoryButton)) {
+        toggleChartDataNavCategory(categoryButton);
+        return;
+      }
+      var button = event.target && event.target.closest ? event.target.closest("[data-view-a-target]") : null;
+      if (!button) return;
+      var targetId = button.getAttribute("data-view-a-target");
+      showSingleChartDataSection(targetId);
+    });
+    var select = document.getElementById("chartDataNavSelect");
+    if (select) {
+      select.addEventListener("change", function () {
+        showSingleChartDataSection(select.value);
+      });
+    }
+  }
+
+  function setChartDataNavActive(activeButton, targetId) {
+    var ribbon = document.getElementById("chartDataNavRibbon");
+    if (!ribbon || !ribbon.querySelectorAll) return;
+    Array.prototype.slice.call(ribbon.querySelectorAll("[data-view-a-target]")).forEach(function (button) {
+      var active = activeButton ? button === activeButton : button.getAttribute("data-view-a-target") === targetId;
+      button.classList.toggle("active", active);
+    });
+    var select = document.getElementById("chartDataNavSelect");
+    if (select && (targetId || activeButton)) select.value = targetId || activeButton.getAttribute("data-view-a-target");
+    openChartDataCategoryForTarget(targetId || (activeButton && activeButton.getAttribute("data-view-a-target")));
+  }
+
+  function toggleChartDataNavCategory(categoryButton) {
+    var category = categoryButton && categoryButton.closest ? categoryButton.closest(".nav-category") : null;
+    if (!category) return;
+    var shouldOpen = !category.classList.contains("nav-category-open");
+    setChartDataNavCategoryOpen(category, shouldOpen);
+  }
+
+  function openChartDataCategoryForTarget(targetId) {
+    var ribbon = document.getElementById("chartDataNavRibbon");
+    if (!ribbon || !targetId) return;
+    var targetButton = null;
+    Array.prototype.slice.call(ribbon.querySelectorAll("[data-view-a-target]")).some(function (button) {
+      if (button.getAttribute("data-view-a-target") !== targetId) return false;
+      targetButton = button;
+      return true;
+    });
+    var category = targetButton && targetButton.closest ? targetButton.closest(".nav-category") : null;
+    if (category) setChartDataNavCategoryOpen(category, true);
+  }
+
+  function setChartDataNavCategoryOpen(category, open) {
+    var ribbon = category && category.closest ? category.closest("#chartDataNavRibbon") : null;
+    if (!ribbon || !ribbon.querySelectorAll) return;
+    Array.prototype.slice.call(ribbon.querySelectorAll(".nav-category")).forEach(function (item) {
+      var active = open && item === category;
+      item.classList.toggle("nav-category-open", active);
+      var toggle = item.querySelector("[data-nav-category-toggle]");
+      if (toggle) toggle.setAttribute("aria-expanded", active ? "true" : "false");
+    });
+  }
+
+  function showSingleChartDataSection(targetId, options) {
+    if (!targetId) return;
+    var opts = options || {};
+    activeChartDataSectionId = targetId;
+    expediteSectionForNavTarget(targetId);
+    syncSingleChartDataSectionVisibility();
+    var primary = primaryChartDataSectionForTarget(targetId);
+    if (primary) {
+      expandReportSection(primary);
+      if (!opts.skipScroll && primary.scrollIntoView) {
+        scrollChartDataSectionIntoView(primary);
+      }
+    }
+    setChartDataNavActive(null, targetId);
+    refreshRailFocusTargets(false);
+  }
+
+  function syncSingleChartDataSectionVisibility() {
+    var root = document.getElementById("chartDataReportView");
+    if (!root || !root.querySelectorAll) return;
+    var visibleIds = chartDataVisibleSectionIds(activeChartDataSectionId);
+    root.classList.add("single-section-mode");
+    Array.prototype.slice.call(root.querySelectorAll(":scope > section")).forEach(function (section) {
+      var visible = visibleIds.indexOf(section.id) >= 0;
+      section.classList.toggle("view-section-hidden", !visible);
+      section.setAttribute("aria-hidden", visible ? "false" : "true");
+    });
+  }
+
+  function primaryChartDataSectionForTarget(targetId) {
+    var visibleIds = chartDataVisibleSectionIds(targetId);
+    for (var i = 0; i < visibleIds.length; i += 1) {
+      var node = document.getElementById(visibleIds[i]);
+      if (node) return node;
+    }
+    return null;
+  }
+
+  function chartDataVisibleSectionIds(targetId) {
+    if (targetId === "viewA-predictive") return ["viewA-predictive"];
+    if (targetId === "viewA-faq-pillars") return ["viewA-faq-pillars"];
+    return [targetId || "viewA-output-library"];
+  }
+
+  function setupCollapsibleReportSections() {
+    var root = document.getElementById("chartDataReportView");
+    if (!root) return;
+    if (root.dataset.collapseWired !== "1") {
+      root.dataset.collapseWired = "1";
+      root.addEventListener("click", function (event) {
+        var header = event.target && event.target.closest ? event.target.closest(".section-head") : null;
+        if (!header || !root.contains(header)) return;
+        if (event.target && event.target.closest && event.target.closest("button:not(.section-collapse-toggle), select, input, textarea, a, .small-pill")) return;
+        var section = header.closest("section");
+        if (!section || !section.classList.contains("section-collapsible")) return;
+        var collapsed = !section.classList.contains("section-collapsed");
+        section.classList.toggle("section-collapsed", collapsed);
+        section.dataset.userCollapse = "1";
+        var toggle = header.querySelector(".section-collapse-toggle");
+        if (toggle) toggle.textContent = collapsed ? "+" : "-";
+      });
+    }
+    syncCollapsibleReportSections(root);
+  }
+
+  function syncCollapsibleReportSections(root) {
+    var defaultOpen = { "viewA-output-library": true, "viewA-worksheets": true, "viewA-d1-d9-top": true };
+    Array.prototype.slice.call(root.querySelectorAll(":scope > section[id]")).forEach(function (section) {
+      var head = section.querySelector(":scope > .section-head");
+      if (!head) return;
+      section.classList.add("section-collapsible");
+      if (!head.querySelector(".section-collapse-toggle")) {
+        var toggle = document.createElement("button");
+        toggle.type = "button";
+        toggle.className = "section-collapse-toggle";
+        toggle.setAttribute("aria-label", "Toggle section");
+        head.appendChild(toggle);
+      }
+      if (section.dataset.userCollapse !== "1") {
+        section.classList.toggle("section-collapsed", !defaultOpen[section.id]);
+      }
+      var button = head.querySelector(".section-collapse-toggle");
+      if (button) button.textContent = section.classList.contains("section-collapsed") ? "+" : "-";
+    });
+  }
+
+  function expandReportSection(section) {
+    if (!section) return;
+    section.classList.remove("section-collapsed");
+    section.dataset.userCollapse = "1";
+    var toggle = section.querySelector(":scope > .section-head .section-collapse-toggle");
+    if (toggle) toggle.textContent = "-";
+  }
+
+  function wireSavedChartControls() {
+    var select = document.getElementById("savedChartSelect");
+    if (!select) return;
+    var save = document.getElementById("saveChartBtn");
+    var saveAsNew = document.getElementById("saveChartAsNewBtn");
+    var load = document.getElementById("loadChartBtn");
+    var remove = document.getElementById("deleteChartBtn");
+    var exportButton = document.getElementById("exportChartsBtn");
+    var importButton = document.getElementById("importChartsBtn");
+    var importFile = document.getElementById("importChartsFile");
+    if (save) save.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      saveCurrentChart(false);
+    });
+    if (saveAsNew) saveAsNew.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (document.body.classList.contains("focus-mode")) exitFocusMode();
+      saveCurrentChart(true);
+    });
+    if (load) load.addEventListener("click", loadSelectedChart);
+    if (remove) remove.addEventListener("click", deleteSelectedChart);
+    if (exportButton) exportButton.addEventListener("click", exportSavedChartLibrary);
+    if (importButton && importFile) importButton.addEventListener("click", function () { importFile.click(); });
+    if (importFile) importFile.addEventListener("change", importSavedChartLibrary);
+    refreshSavedCharts();
+  }
+
+  function wireChartStartControls() {
+    var newButton = document.getElementById("newChartModeBtn");
+    var existingButton = document.getElementById("existingChartModeBtn");
+    var existingPanel = document.getElementById("existingChartPanel");
+    if (newButton) newButton.addEventListener("click", function () {
+      setChartStartMode("new");
+      prepareNewChartEntry();
+    });
+    if (existingButton) existingButton.addEventListener("click", function () {
+      setChartStartMode("existing");
+      var select = document.getElementById("savedChartSelect");
+      if (select && select.focus) select.focus();
+      setChartStartStatus("Select a saved chart, then click Load. Use Import library first if this is a new iPhone/iPad install.");
+    });
+    if (existingPanel) existingPanel.classList.add("hidden");
+  }
+
+  function setChartStartMode(mode) {
+    var newButton = document.getElementById("newChartModeBtn");
+    var existingButton = document.getElementById("existingChartModeBtn");
+    var existingPanel = document.getElementById("existingChartPanel");
+    if (newButton) newButton.classList.toggle("active", mode === "new");
+    if (existingButton) existingButton.classList.toggle("active", mode === "existing");
+    if (existingPanel) existingPanel.classList.toggle("hidden", mode !== "existing");
+  }
+
+  function prepareNewChartEntry() {
+    assignNextChartNumber(true);
+    var defaultLocation = readDefaultLocation();
+    var tz = Number(defaultLocation.timezone || fieldValue("timezone") || 5.5);
+    var now = new Date();
+    setFieldValue("nativeName", "PRASHNA CHART");
+    setFieldValue("gender", "unspecified");
+    setFieldValue("ayanamsha", "raman");
+    setFieldValue("birthDate", dateInputValue(now, tz));
+    setBirthTimeFields(timeInputValue(now, tz));
+    applyDefaultLocationToBirthDetails(defaultLocation);
+    setFieldValue("ascOverrideDegree", "");
+    setFieldValue("partnerName", "");
+    setFieldValue("partnerGender", "unspecified");
+    setFieldValue("partnerBirthDate", "");
+    setFieldValue("partnerBirthTime", "");
+    setFieldValue("partnerBirthPlace", "");
+    setFieldValue("partnerTimezone", "5.5");
+    setFieldValue("partnerLatitude", "");
+    setFieldValue("partnerLatitudeDirection", "N");
+    setFieldValue("partnerLongitude", "");
+    setFieldValue("partnerLongitudeDirection", "E");
+    setFieldValue("topic", "general");
+    setFieldValue("question", "");
+    setFieldValue("externalChartData", "");
+    setFieldValue("asOfDate", dateInputValue(now, tz));
+    setFieldValue("asOfTime", timeInputValue(now, tz));
+    setFieldValue("horizon", "10");
+    var nativeSection = document.getElementById("nativeSection");
+    var nameField = document.getElementById("nativeName");
+    if (nativeSection && nativeSection.scrollIntoView) nativeSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (nameField && nameField.focus) nameField.focus();
+    setChartStartStatus("New chart ready. Fill the native details below, then enter birth details and generate the report.");
+  }
+
+  function setChartStartStatus(message) {
+    var status = document.getElementById("chartStartStatus");
+    if (status) status.textContent = message || "";
+  }
+
+  async function refreshSavedCharts(selectedId) {
+    try {
+      savedCharts = await fetchSavedCharts();
+      renderSavedCharts(selectedId);
+      if (!selectedId) assignNextChartNumber(true);
+    } catch (error) {
+      savedCharts = readLocalSavedCharts();
+      savedChartsMode = "browser";
+      renderSavedCharts(selectedId);
+      if (!selectedId) assignNextChartNumber(true);
+      setSavedChartStatus("Using browser storage. " + (error.message || "Server storage unavailable."), "warning");
+    }
+  }
+
+  async function fetchSavedCharts() {
+    if (serverApisAvailable()) {
+      var response = await fetch("/api/saved-charts");
+      if (response.ok) {
+        var data = await response.json();
+        savedChartsMode = "server";
+        return Array.isArray(data.charts) ? data.charts : [];
+      }
+    }
+    savedChartsMode = "browser";
+    return readLocalSavedCharts();
+  }
+
+  async function saveCurrentChart(forceNew) {
+    try {
+      if (forceNew) assignNextChartNumber(true);
+      var input = readInput();
+      var select = document.getElementById("savedChartSelect");
+      var selectedId = select && !forceNew ? select.value : "";
+      var existing = selectedId ? savedCharts.find(function (item) { return item.id === selectedId; }) : null;
+      if (existing && !confirmChartUpdate(existing)) return;
+      var chartRecord = savedChartFromInput(input, existing);
+      if (forceNew || !existing) chartRecord.id = makeSavedChartId();
+      if (forceNew) {
+        generate();
+        showReportView("chartData");
+        refreshRailFocusTargets(false);
+      }
+      await persistSavedChart(chartRecord);
+      await refreshSavedCharts(chartRecord.id);
+      setSavedChartStatus("Saved " + chartRecord.title + ".", "good");
+      // Use non-blocking toast so it never interrupts or exits fullscreen
+      showToast("✓ Chart saved: " + chartRecord.title);
+    } catch (error) {
+      setSavedChartStatus(error.message || "Could not save chart.", "warning");
+    }
+  }
+
+  function confirmChartUpdate(existing) {
+    if (typeof window === "undefined" || typeof window.confirm !== "function") return true;
+    var title = existing && existing.title ? existing.title : "this saved chart";
+    return window.confirm("Are you sure you want to update the chart: " + title + "?");
+  }
+
+  function assignNextChartNumber(force) {
+    var field = document.getElementById("chartNumber");
+    if (!field) return;
+    if (!force && field.value) return;
+    field.value = String(nextChartNumber());
+  }
+
+  function nextChartNumber() {
+    var max = 0;
+    savedCharts.forEach(function (item) {
+      max = Math.max(max, numericChartNumber(item && (item.chartNumber || (item.input && item.input.chartNumber))));
+    });
+    return max + 1;
+  }
+
+  function numericChartNumber(value) {
+    var match = String(value || "").match(/\d+/);
+    return match ? Number(match[0]) : 0;
+  }
+
+  async function persistSavedChart(chartRecord) {
+    if (serverApisAvailable()) {
+      try {
+        var response = await fetch("/api/saved-charts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(chartRecord)
+        });
+        if (response.ok) return;
+      } catch (error) {
+        savedChartsMode = "browser";
+      }
+    }
+    var list = readLocalSavedCharts();
+    var index = list.findIndex(function (item) { return item.id === chartRecord.id; });
+    if (index >= 0) list[index] = chartRecord;
+    else list.unshift(chartRecord);
+    writeLocalSavedCharts(list);
+  }
+
+  function savedChartFromInput(input, existing) {
+    var now = new Date().toISOString();
+    var title = savedChartTitle(input);
+    return {
+      id: existing && existing.id ? existing.id : makeSavedChartId(),
+      title: title,
+      nativeName: input.name,
+      chartNumber: input.chartNumber,
+      question: input.question,
+      topic: input.topic,
+      birthDate: input.birthDate,
+      birthTime: input.birthTime,
+      birthPlace: input.birthPlace,
+      createdAt: existing && existing.createdAt ? existing.createdAt : now,
+      updatedAt: now,
+      input: savedInputFromInput(input)
+    };
+  }
+
+  function savedInputFromInput(input) {
+    return {
+      name: input.name,
+      chartNumber: input.chartNumber,
+      gender: input.gender,
+      ayanamshaKey: input.ayanamshaKey,
+      birthDate: input.birthDate,
+      birthTime: input.birthTime,
+      birthPlace: input.birthPlace,
+      timezone: input.timezone,
+      latitude: Math.abs(input.latitude),
+      latitudeDirection: input.latitudeDirection,
+      longitude: Math.abs(input.longitude),
+      longitudeDirection: input.longitudeDirection,
+      ascOverrideDegree: input.ascOverrideDegree,
+      partner: savedPartnerInput(input.partner),
+      topic: input.topic,
+      question: input.question,
+      asOfDate: input.asOfDate,
+      asOfTime: input.asOfTime,
+      horizonYears: input.horizonYears,
+      externalChartData: input.externalChartData
+    };
+  }
+
+  function savedPartnerInput(partner) {
+    if (!partner) return null;
+    return {
+      name: partner.name,
+      gender: partner.gender,
+      birthDate: partner.birthDate,
+      birthTime: partner.birthTime,
+      birthPlace: partner.birthPlace,
+      timezone: partner.timezone,
+      latitude: Math.abs(partner.latitude),
+      latitudeDirection: partner.latitudeDirection,
+      longitude: Math.abs(partner.longitude),
+      longitudeDirection: partner.longitudeDirection
+    };
+  }
+
+  function savedChartTitle(input) {
+    var name = input.name || "Native";
+    var birth = input.birthDate || "";
+    var number = input.chartNumber ? "Chart " + input.chartNumber : "";
+    return [number, name, birth].filter(Boolean).join(" - ");
+  }
+
+  function renderSavedCharts(selectedId) {
+    var select = document.getElementById("savedChartSelect");
+    if (!select) return;
+    var sorted = savedCharts.slice().sort(function (a, b) {
+      return String(b.updatedAt || "").localeCompare(String(a.updatedAt || ""));
+    });
+    if (!sorted.length) {
+      select.innerHTML = '<option value="">No saved charts</option>';
+      setSavedChartStatus(savedChartsMode === "server" ? "Server chart library is empty." : "Browser chart library is empty.", "");
+      return;
+    }
+    select.innerHTML = '<option value="">Select saved chart</option>' + sorted.map(function (item) {
+      return '<option value="' + escapeHtml(item.id) + '">' + escapeHtml(item.title || item.nativeName || "Saved chart") + " - " + escapeHtml(shortSavedDate(item.updatedAt)) + "</option>";
+    }).join("");
+    if (selectedId) select.value = selectedId;
+    setSavedChartStatus(sorted.length + " saved chart" + (sorted.length === 1 ? "" : "s") + " available in " + (savedChartsMode === "server" ? "server storage" : "this browser") + ".", "good");
+  }
+
+  function loadSelectedChart() {
+    var select = document.getElementById("savedChartSelect");
+    var chartRecord = select ? savedCharts.find(function (item) { return item.id === select.value; }) : null;
+    if (!chartRecord || !chartRecord.input) {
+      setSavedChartStatus("Select a saved chart first.", "warning");
+      return;
+    }
+    setChartStartMode("existing");
+    applySavedInputToForm(chartRecord.input);
+    setSavedChartStatus("Loaded " + (chartRecord.title || "saved chart") + " with Raman ayanamsha.", "good");
+    generate();
+    showReportView("chartData");
+    refreshRailFocusTargets(false);
+  }
+
+  function scrollChartDataSectionIntoView(section) {
+    if (!section) return;
+    window.setTimeout(function () {
+      var rect = section.getBoundingClientRect();
+      var offset = document.body.classList.contains("focus-mode") ? 176 : 190;
+      var top = window.pageYOffset + rect.top - offset;
+      window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    }, 60);
+  }
+
+  async function deleteSelectedChart() {
+    var select = document.getElementById("savedChartSelect");
+    var id = select ? select.value : "";
+    if (!id) {
+      setSavedChartStatus("Select a saved chart first.", "warning");
+      return;
+    }
+    var chartRecord = savedCharts.find(function (item) { return item.id === id; });
+    var ok = typeof window !== "undefined" && typeof window.confirm === "function" ? window.confirm("Delete saved chart: " + (chartRecord && chartRecord.title ? chartRecord.title : id) + "?") : true;
+    if (!ok) return;
+    try {
+      if (serverApisAvailable()) {
+        try {
+          var response = await fetch("/api/saved-charts/" + encodeURIComponent(id), { method: "DELETE" });
+          if (!response.ok) writeLocalSavedCharts(readLocalSavedCharts().filter(function (item) { return item.id !== id; }));
+        } catch (error) {
+          savedChartsMode = "browser";
+          writeLocalSavedCharts(readLocalSavedCharts().filter(function (item) { return item.id !== id; }));
+        }
+      } else {
+        writeLocalSavedCharts(readLocalSavedCharts().filter(function (item) { return item.id !== id; }));
+      }
+      await refreshSavedCharts();
+      setSavedChartStatus("Deleted saved chart.", "good");
+    } catch (error) {
+      setSavedChartStatus(error.message || "Could not delete saved chart.", "warning");
+    }
+  }
+
+  function applySavedInputToForm(input) {
+    setFieldValue("nativeName", input.name || input.nativeName || "Native");
+    setFieldValue("chartNumber", input.chartNumber || "");
+    setFieldValue("gender", input.gender || "unspecified");
+    setFieldValue("ayanamsha", "raman");
+    setFieldValue("birthDate", input.birthDate || "");
+    setBirthTimeFields(input.birthTime || "");
+    setFieldValue("birthPlace", input.birthPlace || "");
+    setFieldValue("timezone", input.timezone === undefined ? "5.5" : input.timezone);
+    setFieldValue("latitude", coordinateDmsText(parseCoordinateInput(input.latitude || 0)));
+    setFieldValue("latitudeDirection", input.latitudeDirection || (Number(input.latitude) < 0 ? "S" : "N"));
+    setFieldValue("longitude", coordinateDmsText(parseCoordinateInput(input.longitude || 0)));
+    setFieldValue("longitudeDirection", input.longitudeDirection || (Number(input.longitude) < 0 ? "W" : "E"));
+    setFieldValue("ascOverrideDegree", input.ascOverrideDegree || input.ascendantOverrideDegree || "");
+    applySavedPartnerInputToForm(input.partner || null);
+    setFieldValue("topic", input.topic || "general");
+    setFieldValue("question", input.question || "");
+    setFieldValue("asOfDate", input.asOfDate || dateInputValue(new Date(), Number(input.timezone || 5.5)));
+    setFieldValue("asOfTime", normalizeTimeInput(input.asOfTime || timeInputValue(new Date(), Number(input.timezone || 5.5))));
+    setFieldValue("horizon", input.horizonYears || input.horizon || "10");
+    setFieldValue("externalChartData", input.externalChartData || "");
+  }
+
+  function applySavedPartnerInputToForm(partner) {
+    setFieldValue("partnerName", partner && partner.name ? partner.name : "");
+    setFieldValue("partnerGender", partner && partner.gender ? partner.gender : "unspecified");
+    setFieldValue("partnerBirthDate", partner && partner.birthDate ? partner.birthDate : "");
+    setFieldValue("partnerBirthTime", partner && partner.birthTime ? normalizeTimeInput(partner.birthTime) : "");
+    setFieldValue("partnerBirthPlace", partner && partner.birthPlace ? partner.birthPlace : "");
+    setFieldValue("partnerTimezone", partner && partner.timezone !== undefined ? partner.timezone : "5.5");
+    setFieldValue("partnerLatitude", partner && partner.latitude !== undefined ? coordinateDmsText(parseCoordinateInput(partner.latitude || 0)) : "");
+    setFieldValue("partnerLatitudeDirection", partner && partner.latitudeDirection ? partner.latitudeDirection : (partner && Number(partner.latitude) < 0 ? "S" : "N"));
+    setFieldValue("partnerLongitude", partner && partner.longitude !== undefined ? coordinateDmsText(parseCoordinateInput(partner.longitude || 0)) : "");
+    setFieldValue("partnerLongitudeDirection", partner && partner.longitudeDirection ? partner.longitudeDirection : (partner && Number(partner.longitude) < 0 ? "W" : "E"));
+  }
+
+  function exportSavedChartLibrary() {
+    var list = savedCharts.length ? savedCharts : readLocalSavedCharts();
+    var payload = {
+      app: "VedNetra",
+      schema: "saved-chart-library-v1",
+      exportedAt: new Date().toISOString(),
+      charts: list
+    };
+    var date = dateInputValue(new Date(), 5.5);
+    downloadBlob("VedNetra_Saved_Charts_" + date + ".json", "application/json;charset=utf-8", JSON.stringify(payload, null, 2));
+    setSavedChartStatus("Exported " + list.length + " saved chart" + (list.length === 1 ? "" : "s") + ".", "good");
+  }
+
+  function importSavedChartLibrary(event) {
+    var file = event && event.target && event.target.files ? event.target.files[0] : null;
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = async function () {
+      try {
+        var parsed = JSON.parse(String(reader.result || "{}"));
+        var incoming = Array.isArray(parsed) ? parsed : parsed.charts;
+        if (!Array.isArray(incoming)) throw new Error("No chart list found in this file.");
+        var imported = incoming.map(normalizeImportedSavedChart).filter(Boolean);
+        if (!imported.length) throw new Error("No usable saved charts found in this file.");
+        if (serverApisAvailable()) {
+          for (var i = 0; i < imported.length; i += 1) await persistSavedChart(imported[i]);
+        } else {
+          mergeLocalSavedCharts(imported);
+        }
+        await refreshSavedCharts(imported[0].id);
+        setSavedChartStatus("Imported " + imported.length + " saved chart" + (imported.length === 1 ? "" : "s") + ".", "good");
+      } catch (error) {
+        setSavedChartStatus(error.message || "Could not import saved chart library.", "warning");
+      } finally {
+        event.target.value = "";
+      }
+    };
+    reader.onerror = function () {
+      setSavedChartStatus("Could not read the selected file.", "warning");
+      event.target.value = "";
+    };
+    reader.readAsText(file);
+  }
+
+  function normalizeImportedSavedChart(raw) {
+    if (!raw || !raw.input) return null;
+    var input = normalizeImportedSavedInput(raw.input);
+    var now = new Date().toISOString();
+    return {
+      id: raw.id || makeSavedChartId(),
+      title: raw.title || savedChartTitle(input),
+      nativeName: raw.nativeName || input.name,
+      chartNumber: raw.chartNumber || input.chartNumber,
+      question: raw.question || input.question,
+      topic: raw.topic || input.topic,
+      birthDate: raw.birthDate || input.birthDate,
+      birthTime: raw.birthTime || input.birthTime,
+      birthPlace: raw.birthPlace || input.birthPlace,
+      createdAt: raw.createdAt || now,
+      updatedAt: raw.updatedAt || now,
+      input: input
+    };
+  }
+
+  function normalizeImportedSavedInput(input) {
+    return {
+      name: input.name || input.nativeName || "Native",
+      chartNumber: input.chartNumber || "",
+      gender: input.gender || "unspecified",
+      ayanamshaKey: "raman",
+      birthDate: input.birthDate || "",
+      birthTime: normalizeTimeInput(input.birthTime || "00:00:00"),
+      birthPlace: input.birthPlace || "",
+      timezone: Number(input.timezone === undefined ? 5.5 : input.timezone),
+      latitude: Number(input.latitude || 0),
+      latitudeDirection: input.latitudeDirection || (Number(input.latitude) < 0 ? "S" : "N"),
+      longitude: Number(input.longitude || 0),
+      longitudeDirection: input.longitudeDirection || (Number(input.longitude) < 0 ? "W" : "E"),
+      ascOverrideDegree: input.ascOverrideDegree || input.ascendantOverrideDegree || "",
+      partner: normalizeImportedPartnerInput(input.partner || null),
+      topic: input.topic || "general",
+      question: input.question || "",
+      asOfDate: input.asOfDate || "",
+      asOfTime: normalizeTimeInput(input.asOfTime || "00:00:00"),
+      horizonYears: Number(input.horizonYears || input.horizon || 10),
+      externalChartData: input.externalChartData || ""
+    };
+  }
+
+  function normalizeImportedPartnerInput(partner) {
+    if (!partner || !partner.birthDate || !partner.birthTime) return null;
+    return {
+      name: partner.name || partner.nativeName || "Partner",
+      gender: partner.gender || "unspecified",
+      birthDate: partner.birthDate || "",
+      birthTime: normalizeTimeInput(partner.birthTime || "00:00:00"),
+      birthPlace: partner.birthPlace || "",
+      timezone: Number(partner.timezone === undefined ? 5.5 : partner.timezone),
+      latitude: Number(partner.latitude || 0),
+      latitudeDirection: partner.latitudeDirection || (Number(partner.latitude) < 0 ? "S" : "N"),
+      longitude: Number(partner.longitude || 0),
+      longitudeDirection: partner.longitudeDirection || (Number(partner.longitude) < 0 ? "W" : "E")
+    };
+  }
+
+  function mergeLocalSavedCharts(imported) {
+    var existing = readLocalSavedCharts();
+    var byId = {};
+    existing.concat(imported).forEach(function (item) {
+      byId[item.id || makeSavedChartId()] = item;
+    });
+    writeLocalSavedCharts(Object.keys(byId).map(function (id) { return byId[id]; }).sort(function (a, b) {
+      return String(b.updatedAt || "").localeCompare(String(a.updatedAt || ""));
+    }));
+  }
+
+  function setFieldValue(id, value) {
+    var field = document.getElementById(id);
+    if (field) field.value = value;
+  }
+
+  function readLocalSavedCharts() {
+    if (!localStorageAvailable()) return [];
+    try {
+      var parsed = JSON.parse(localStorage.getItem(SAVED_CHARTS_STORAGE_KEY) || "[]");
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function writeLocalSavedCharts(list) {
+    if (!localStorageAvailable()) return;
+    localStorage.setItem(SAVED_CHARTS_STORAGE_KEY, JSON.stringify(list.slice(0, 200)));
+  }
+
+  function localStorageAvailable() {
+    try {
+      return typeof localStorage !== "undefined" && localStorage !== null;
+    } catch {
+      return false;
+    }
+  }
+
+  function makeSavedChartId() {
+    return "chart-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
+  }
+
+  function shortSavedDate(value) {
+    if (!value) return "not dated";
+    var date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "not dated";
+    return date.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "2-digit" });
+  }
+
+  function setSavedChartStatus(message, kind) {
+    var status = document.getElementById("savedChartStatus");
+    if (!status) return;
+    status.className = "fine-print saved-status" + (kind ? " " + kind : "");
+    status.textContent = message || "";
+  }
+
+  function wireMobileAccessInfo() {
+    var box = document.getElementById("mobileAccessStatus");
+    if (!box) return;
+    if (standalonePwaMode()) {
+      box.innerHTML = "Standalone iPhone/iPad mode is active on HTTPS. Use Safari Share -> Add to Home Screen. Saved charts stay on this device; use Export/Import library to move them.";
+      return;
+    }
+    if (!serverApisAvailable()) {
+      box.innerHTML = "Local browser mode. Start the local server to get iPhone/iPad access links.";
+      return;
+    }
+    fetch("/api/network-info")
+      .then(function (response) { return response.ok ? response.json() : null; })
+      .then(function (data) {
+        if (!data || !Array.isArray(data.urls) || !data.urls.length) {
+          box.innerHTML = "Local URL: " + escapeHtml(window.location.href);
+          return;
+        }
+        box.innerHTML = data.urls.map(function (url, index) {
+          return '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener">' + escapeHtml(index === 0 ? "This device: " + url : "iPhone/iPad same Wi-Fi: " + url) + "</a>";
+        }).join("");
+      })
+      .catch(function () {
+        box.innerHTML = "Local URL: " + escapeHtml(window.location.href);
+      });
+  }
+
+  function registerServiceWorker() {
+    if (typeof navigator === "undefined" || !navigator.serviceWorker || typeof window === "undefined") return;
+    var host = window.location.hostname;
+    var secureEnough = window.location.protocol === "https:" || host === "localhost" || host === "127.0.0.1";
+    if (!secureEnough) return;
+    navigator.serviceWorker.register("service-worker.js").catch(function () {});
+  }
+
+  function city(name, latitude, longitude, timezone) {
+    return { name: name, latitude: latitude, longitude: longitude, timezone: timezone };
+  }
+
+  function wireBirthTimeControls() {
+    var time = document.getElementById("birthTime");
+    if (time) {
+      time.addEventListener("change", function () {
+        time.value = normalizeTimeInput(time.value || "00:00:00");
+      });
+    }
+  }
+
+  function wireBirthPlaceControls() {
+    var input = document.getElementById("birthPlace");
+    customCities = readCustomLocations();
+    renderCityOptions();
+    if (input) {
+      input.addEventListener("change", applyBirthPlaceLookup);
+      input.addEventListener("blur", applyBirthPlaceLookup);
+    }
+    var defaultButton = document.getElementById("setDefaultLocationBtn");
+    if (defaultButton) defaultButton.addEventListener("click", setDefaultLocationFromCurrentFields);
+    updateDefaultLocationStatus();
+    var partnerInput = document.getElementById("partnerBirthPlace");
+    if (partnerInput) {
+      partnerInput.addEventListener("change", applyPartnerBirthPlaceLookup);
+      partnerInput.addEventListener("blur", applyPartnerBirthPlaceLookup);
+    }
+  }
+
+  function readDefaultLocation() {
+    var fallback = city("Delhi, India", 28.6139, 77.2090, 5.5);
+    if (!localStorageAvailable()) return fallback;
+    try {
+      var parsed = JSON.parse(localStorage.getItem(DEFAULT_LOCATION_STORAGE_KEY) || "null");
+      if (!parsed || !parsed.name || !Number.isFinite(Number(parsed.latitude)) || !Number.isFinite(Number(parsed.longitude)) || !Number.isFinite(Number(parsed.timezone))) return fallback;
+      return city(String(parsed.name).slice(0, 160), Number(parsed.latitude), Number(parsed.longitude), Number(parsed.timezone));
+    } catch {
+      return fallback;
+    }
+  }
+
+  function writeDefaultLocation(item) {
+    if (!localStorageAvailable() || !item) return;
+    localStorage.setItem(DEFAULT_LOCATION_STORAGE_KEY, JSON.stringify(city(item.name, Number(item.latitude), Number(item.longitude), Number(item.timezone))));
+  }
+
+  function applyDefaultLocationToBirthDetails(item) {
+    var location = item || readDefaultLocation();
+    setFieldValue("birthPlace", location.name);
+    setFieldValue("timezone", location.timezone);
+    setCoordinateFields(Number(location.latitude), Number(location.longitude));
+  }
+
+  function setDefaultLocationFromCurrentFields() {
+    try {
+      var place = fieldValue("birthPlace").trim();
+      var timezone = Number(fieldValue("timezone") || 5.5);
+      var latitude = signedCoordinate(fieldValue("latitude"), fieldValue("latitudeDirection") || "N", "S");
+      var longitude = signedCoordinate(fieldValue("longitude"), fieldValue("longitudeDirection") || "E", "W");
+      if (!place) throw new Error("Enter a place name first.");
+      if (!Number.isFinite(timezone)) throw new Error("Timezone is required.");
+      var item = city(place, latitude, longitude, timezone);
+      rememberCustomLocation(place, latitude, longitude, timezone);
+      writeDefaultLocation(item);
+      updateDefaultLocationStatus("Default location saved: " + place + ".");
+    } catch (error) {
+      updateDefaultLocationStatus(error.message || "Could not save default location.");
+    }
+  }
+
+  function updateDefaultLocationStatus(message) {
+    var status = document.getElementById("defaultLocationStatus");
+    if (!status) return;
+    if (message) {
+      status.textContent = message;
+      return;
+    }
+    var item = readDefaultLocation();
+    status.textContent = "Default location: " + item.name + " (" + coordinateText(item.latitude, item.longitude) + ", UTC" + (item.timezone >= 0 ? "+" : "") + item.timezone + ").";
+  }
+
+  function renderCityOptions() {
+    var datalist = document.getElementById("cityOptions");
+    if (!datalist) return;
+    datalist.innerHTML = allCityLookup().map(function (item) {
+      return '<option value="' + escapeHtml(item.name) + '"></option>';
+    }).join("");
+  }
+
+  function allCityLookup() {
+    return CITY_LOOKUP.concat(customCities).filter(function (item, index, list) {
+      var normalized = normalizeCityName(item.name);
+      return normalized && list.findIndex(function (candidate) { return normalizeCityName(candidate.name) === normalized; }) === index;
+    });
+  }
+
+  function applyBirthPlaceLookup() {
+    var input = document.getElementById("birthPlace");
+    if (!input || !input.value.trim()) return;
+    var match = findCity(input.value);
+    if (!match) return;
+    document.getElementById("birthPlace").value = match.name;
+    setCoordinateFields(match.latitude, match.longitude);
+    document.getElementById("timezone").value = match.timezone;
+  }
+
+  function applyPartnerBirthPlaceLookup() {
+    var input = document.getElementById("partnerBirthPlace");
+    if (!input || !input.value.trim()) return;
+    var match = findCity(input.value);
+    if (!match) return;
+    document.getElementById("partnerBirthPlace").value = match.name;
+    setPartnerCoordinateFields(match.latitude, match.longitude);
+    document.getElementById("partnerTimezone").value = match.timezone;
+  }
+
+  function setPartnerCoordinateFields(latitude, longitude) {
+    var lat = document.getElementById("partnerLatitude");
+    var lon = document.getElementById("partnerLongitude");
+    var latDir = document.getElementById("partnerLatitudeDirection");
+    var lonDir = document.getElementById("partnerLongitudeDirection");
+    if (lat) lat.value = coordinateDmsText(latitude);
+    if (lon) lon.value = coordinateDmsText(longitude);
+    if (latDir) latDir.value = latitude < 0 ? "S" : "N";
+    if (lonDir) lonDir.value = longitude < 0 ? "W" : "E";
+  }
+
+  function setCoordinateFields(latitude, longitude) {
+    document.getElementById("latitude").value = coordinateDmsText(latitude);
+    document.getElementById("longitude").value = coordinateDmsText(longitude);
+    var latDir = document.getElementById("latitudeDirection");
+    var lonDir = document.getElementById("longitudeDirection");
+    if (latDir) latDir.value = latitude < 0 ? "S" : "N";
+    if (lonDir) lonDir.value = longitude < 0 ? "W" : "E";
+  }
+
+  function findCity(value) {
+    var normalized = normalizeCityName(value);
+    return allCityLookup().find(function (item) {
+      return normalizeCityName(item.name) === normalized || normalizeCityName(item.name.split(",")[0]) === normalized;
+    }) || null;
+  }
+
+  function rememberCustomLocationFromInput(input) {
+    if (!input) return;
+    rememberCustomLocation(input.birthPlace, input.latitude, input.longitude, input.timezone);
+    if (input.partner) rememberCustomLocation(input.partner.birthPlace, input.partner.latitude, input.partner.longitude, input.partner.timezone);
+  }
+
+  function rememberCustomLocation(name, latitude, longitude, timezone) {
+    var placeName = String(name || "").trim();
+    if (!placeName || !Number.isFinite(Number(latitude)) || !Number.isFinite(Number(longitude)) || !Number.isFinite(Number(timezone))) return;
+    var normalized = normalizeCityName(placeName);
+    if (!normalized || CITY_LOOKUP.some(function (item) { return normalizeCityName(item.name) === normalized; })) return;
+    customCities = readCustomLocations();
+    var existingIndex = customCities.findIndex(function (item) { return normalizeCityName(item.name) === normalized; });
+    var item = city(placeName, Number(latitude), Number(longitude), Number(timezone));
+    if (existingIndex >= 0) customCities[existingIndex] = item;
+    else customCities.push(item);
+    writeCustomLocations(customCities);
+    renderCityOptions();
+  }
+
+  function readCustomLocations() {
+    if (!localStorageAvailable()) return [];
+    try {
+      var parsed = JSON.parse(localStorage.getItem(CUSTOM_LOCATIONS_STORAGE_KEY) || "[]");
+      if (!Array.isArray(parsed)) return [];
+      return parsed.filter(function (item) {
+        return item && item.name && Number.isFinite(Number(item.latitude)) && Number.isFinite(Number(item.longitude)) && Number.isFinite(Number(item.timezone));
+      }).map(function (item) {
+        return city(String(item.name).slice(0, 160), Number(item.latitude), Number(item.longitude), Number(item.timezone));
+      });
+    } catch {
+      return [];
+    }
+  }
+
+  function writeCustomLocations(list) {
+    if (!localStorageAvailable()) return;
+    localStorage.setItem(CUSTOM_LOCATIONS_STORAGE_KEY, JSON.stringify(list.slice(-300)));
+  }
+
+  function normalizeCityName(value) {
+    return String(value || "").toLowerCase().replace(/\s+/g, " ").replace(/[^a-z0-9 ]/g, "").trim();
+  }
+
+  function inputForServer(input) {
+    return {
+      name: input.name,
+      chartNumber: input.chartNumber,
+      gender: input.gender,
+      birthDate: input.birthDate,
+      birthTime: input.birthTime,
+      birthPlace: input.birthPlace,
+      timezone: input.timezone,
+      latitude: Math.abs(input.latitude),
+      longitude: Math.abs(input.longitude),
+      latitudeDirection: input.latitudeDirection,
+      longitudeDirection: input.longitudeDirection,
+      ascOverrideDegree: input.ascOverrideDegree,
+      partner: savedPartnerInput(input.partner),
+      topic: input.topic,
+      question: input.question,
+      asOfDate: input.asOfDate,
+      asOfTime: input.asOfTime,
+      horizonYears: input.horizonYears,
+      externalChartData: input.externalChartData
+    };
+  }
+
+  function serverApisAvailable() {
+    if (typeof fetch !== "function" || typeof window === "undefined" || !window.location || window.location.protocol === "file:") return false;
+    if (window.VEDNETRA_ENABLE_API === true) return true;
+    return window.location.protocol === "http:";
+  }
+
+  function standalonePwaMode() {
+    return typeof window !== "undefined" && window.location && window.location.protocol === "https:" && window.VEDNETRA_ENABLE_API !== true;
+  }
+
+  function placementLabel(placement) {
+    if (!placement) return "Not available";
+    if (placement.signName) {
+      if (Number.isFinite(placement.degreeInSign)) return placement.signName + " " + decimalToDms(placement.degreeInSign);
+      if (Number.isFinite(placement.deg)) return placement.signName + " " + decimalToDms(placement.deg);
+      return placement.signName;
+    }
+    if (Number.isFinite(placement.sign)) return SIGNS[placement.sign].name;
+    return "Not available";
+  }
+
+  function ascendantOverrideSummary(chart) {
+    if (!chart || !chart.ascendant || !chart.ascendant.override) return "";
+    return "Manual " + ascendantLongitudeText(chart.ascendant.lon) + "; computed " + ascendantLongitudeText(chart.ascendant.computedLon);
+  }
+
+  function ascendantLongitudeText(lon) {
+    var normalized = normalize(lon);
+    var sign = signIndex(normalized);
+    return SIGNS[sign].name + " " + decimalToDms(normalized - sign * 30);
+  }
+
+  function decimalToDms(value) {
+    var deg = Math.floor(Math.abs(value));
+    var minutesFloat = (Math.abs(value) - deg) * 60;
+    var min = Math.floor(minutesFloat);
+    var sec = Math.round((minutesFloat - min) * 60);
+    if (sec === 60) {
+      min += 1;
+      sec = 0;
+    }
+    if (min === 60) {
+      deg += 1;
+      min = 0;
+    }
+    return pad(deg) + ":" + pad(min) + ":" + pad(sec);
+  }
+
+  function generate(options) {
+    var opts = options || {};
+    var nextActiveSection = opts.preserveActiveSection ? (activeChartDataSectionId || "viewA-output-library") : "viewA-output-library";
+    if (opts.preserveInteractiveState) opts.interactiveState = collectReportInteractiveState();
+    try {
+      clearMemoCaches();
+      pendingSectionRenders.clear();
+      navAliasToPendingId.clear();
+      activeChartDataSectionId = nextActiveSection;
+      var input = readInput();
+      syncTimeToolInteractiveState(opts.interactiveState, input, opts.timeToolSyncTarget);
+      rememberCustomLocationFromInput(input);
+      var topicKey = inferTopic(input.topic, input.question);
+      var chart = buildChart(input.birthInstant, input.latitude, input.longitude, input.timezone, { ascendantOverride: input.ascendantOverride, ayanamshaKey: input.ayanamshaKey });
+      chart.input = input;
+      var transitChart = buildChart(input.asOfInstant, input.latitude, input.longitude, input.timezone, { ayanamshaKey: input.ayanamshaKey });
+      var analysis = analyzeEvent(chart, transitChart, EVENT_CONFIGS[topicKey], topicKey, input);
+      renderReport(chart, transitChart, analysis, input, opts);
+      if (opts.refreshFocusPopups) refreshOpenFocusPopups();
+      if (opts.interactiveState) restoreReportInteractiveState(opts.interactiveState);
+    } catch (error) {
+      pendingSectionRenders.clear();
+      navAliasToPendingId.clear();
+      document.getElementById("emptyState").classList.add("hidden");
+      var report = document.getElementById("report");
+      report.classList.remove("hidden");
+      report.innerHTML = '<div class="panel-box"><h2>Could not generate report</h2><p class="muted">' + escapeHtml(error.message) + "</p></div>";
+      console.error(error);
+    }
+  }
+
+  function readInput() {
+    var tz = Number(document.getElementById("timezone").value);
+    var birthDate = document.getElementById("birthDate").value;
+    var birthTime = birthTimeWithSeconds();
+    var asOfDate = document.getElementById("asOfDate").value;
+    var asOfTime = document.getElementById("asOfTime").value;
+    var latitude = signedCoordinate(document.getElementById("latitude").value, document.getElementById("latitudeDirection").value, "S");
+    var longitude = signedCoordinate(document.getElementById("longitude").value, document.getElementById("longitudeDirection").value, "W");
+    var ascOverrideDegree = fieldValue("ascOverrideDegree").trim();
+    var ascendantOverride = ascendantOverrideFromDegree(ascOverrideDegree);
+    if (!birthDate || !birthTime || !asOfDate || !asOfTime) {
+      throw new Error("Birth date/time and as-of date/time are required.");
+    }
+    return {
+      name: document.getElementById("nativeName").value.trim() || "Native",
+      chartNumber: document.getElementById("chartNumber").value.trim(),
+      gender: document.getElementById("gender").value,
+      ayanamshaKey: normalizeAyanamshaKey(fieldValue("ayanamsha") || "raman"),
+      birthDate: birthDate,
+      birthTime: normalizeTimeInput(birthTime),
+      birthPlace: document.getElementById("birthPlace").value.trim(),
+      timezone: tz,
+      latitude: latitude,
+      longitude: longitude,
+      latitudeDirection: latitude < 0 ? "S" : "N",
+      longitudeDirection: longitude < 0 ? "W" : "E",
+      ascOverrideDegree: ascOverrideDegree,
+      ascendantOverride: ascendantOverride,
+      partner: readPartnerInput(tz),
+      topic: document.getElementById("topic").value,
+      question: document.getElementById("question").value.trim(),
+      externalChartData: fieldValue("externalChartData").trim(),
+      asOfDate: asOfDate,
+      asOfTime: normalizeTimeInput(asOfTime),
+      horizonYears: Number(document.getElementById("horizon").value),
+      birthInstant: localDateTimeToUtc(birthDate, birthTime, tz),
+      asOfInstant: localDateTimeToUtc(asOfDate, asOfTime, tz)
+    };
+  }
+
+  function readPartnerInput(defaultTimezone) {
+    var name = fieldValue("partnerName").trim();
+    var birthDate = fieldValue("partnerBirthDate").trim();
+    var birthTime = fieldValue("partnerBirthTime").trim();
+    var place = fieldValue("partnerBirthPlace").trim();
+    var hasAny = name || birthDate || birthTime || place || fieldValue("partnerLatitude").trim() || fieldValue("partnerLongitude").trim();
+    if (!hasAny) return null;
+    if (!birthDate || !birthTime) throw new Error("Partner date and time are required when compatibility details are supplied.");
+    var timezone = Number(fieldValue("partnerTimezone") || defaultTimezone || 5.5);
+    if (!Number.isFinite(timezone)) throw new Error("Partner timezone is required.");
+    var latitude = signedCoordinate(fieldValue("partnerLatitude"), fieldValue("partnerLatitudeDirection") || "N", "S");
+    var longitude = signedCoordinate(fieldValue("partnerLongitude"), fieldValue("partnerLongitudeDirection") || "E", "W");
+    return {
+      name: name || "Partner",
+      gender: fieldValue("partnerGender") || "unspecified",
+      birthDate: birthDate,
+      birthTime: normalizeTimeInput(birthTime),
+      birthPlace: place,
+      timezone: timezone,
+      latitude: latitude,
+      longitude: longitude,
+      latitudeDirection: latitude < 0 ? "S" : "N",
+      longitudeDirection: longitude < 0 ? "W" : "E",
+      birthInstant: localDateTimeToUtc(birthDate, birthTime, timezone)
+    };
+  }
+
+  function collectReportInteractiveState() {
+    return {
+      varshfal: collectVarshfalInteractiveState(),
+      dasha: collectDashaInteractiveState(),
+      worksheet: collectWorksheetInteractiveState()
+    };
+  }
+
+  function syncTimeToolInteractiveState(state, input, target) {
+    if (!state || !state.worksheet || target !== "transit" || !input) return;
+    state.worksheet.transitDate = input.asOfDate || state.worksheet.transitDate;
+    state.worksheet.transitTime = normalizeTimeInput(input.asOfTime || state.worksheet.transitTime || "00:00:00");
+  }
+
+  function collectVarshfalInteractiveState() {
+    if (typeof document === "undefined" || !document.querySelector) return null;
+    var scope = document.querySelector("#chartDataReportView #viewA-varshfal") ||
+      document.querySelector(".panel-focus-popup:not(.hidden) #viewA-varshfal") ||
+      document.querySelector(".panel-focus-popup:not(.hidden) .varshfal-section");
+    if (!scope) return null;
+    var yearField = scope.querySelector("#varshfalYear");
+    var divisionField = scope.querySelector("#varshfalDivision");
+    var year = yearField ? clamp(Math.round(Number(yearField.value) || 1), 1, 121) : null;
+    var division = divisionField ? normalizeVarshfalDivision(divisionField.value) : 9;
+    if (!year) return null;
+    return { runningYear: year, division: division };
+  }
+
+  function collectDashaInteractiveState() {
+    if (typeof document === "undefined" || !document.querySelectorAll) return null;
+    var openKeys = Array.prototype.slice.call(document.querySelectorAll(".dasha-group[open][data-dasha-key]")).map(function (details) {
+      return details.getAttribute("data-dasha-key");
+    }).filter(Boolean);
+    var fromField = document.getElementById("dashaRangeFrom");
+    var toField = document.getElementById("dashaRangeTo");
+    return {
+      openKeys: dedupe(openKeys),
+      rangeFrom: fromField ? fromField.value : "",
+      rangeTo: toField ? toField.value : ""
+    };
+  }
+
+  function collectWorksheetInteractiveState() {
+    if (typeof document === "undefined" || !document.querySelector) return null;
+    var section = document.querySelector("#chartDataReportView #viewA-worksheets");
+    if (!section) return null;
+    var select = section.querySelector("#worksheetTemplateSelect");
+    var components = Array.prototype.slice.call(section.querySelectorAll("[data-worksheet-component]")).filter(function (box) {
+      return box.checked;
+    }).map(function (box) { return box.getAttribute("data-worksheet-component"); });
+    return {
+      templateKey: select ? select.value : "birth-i",
+      components: components,
+      varshfalYear: fieldValueIn(section, "worksheetVarshfalYear"),
+      varshfalYearsText: fieldValueIn(section, "worksheetVarshfalYears"),
+      varshfalDivision: fieldValueIn(section, "worksheetVarshfalDivision"),
+      varshfalDivisionsText: fieldValueIn(section, "worksheetVarshfalDivisions"),
+      transitDate: fieldValueIn(section, "worksheetTransitDate"),
+      transitTime: fieldValueIn(section, "worksheetTransitTime"),
+      transitDivision: fieldValueIn(section, "worksheetTransitDivision"),
+      dashaFrom: fieldValueIn(section, "worksheetDashaFrom"),
+      dashaTo: fieldValueIn(section, "worksheetDashaTo")
+    };
+  }
+
+  function fieldValueIn(scope, id) {
+    var field = scope && scope.querySelector ? scope.querySelector("#" + id) : null;
+    return field && field.value !== undefined ? String(field.value) : "";
+  }
+
+  function restoreReportInteractiveState(state) {
+    if (!state) return;
+    if (state.dasha && state.dasha.openKeys && state.dasha.openKeys.length) {
+      expediteSectionForNavTarget("viewA-dasha");
+      restoreDashaInteractiveState(state.dasha);
+    }
+  }
+
+  function restoreDashaInteractiveState(state) {
+    if (!state || !state.openKeys || !state.openKeys.length || typeof document === "undefined") return;
+    var keySet = {};
+    state.openKeys.forEach(function (key) { keySet[key] = true; });
+    Array.prototype.slice.call(document.querySelectorAll(".dasha-group[data-dasha-key]")).forEach(function (details) {
+      var key = details.getAttribute("data-dasha-key");
+      if (!keySet[key]) return;
+      details.open = true;
+      if (details.classList.contains("dasha-sd")) renderPranaRowsForDetails(details, lastReportInput ? lastReportInput.timezone : 5.5);
+    });
+  }
+
+  function fieldValue(id) {
+    var field = document.getElementById(id);
+    return field && field.value !== undefined ? String(field.value) : "";
+  }
+
+  function ascendantOverrideFromDegree(degreeValue) {
+    var rawDegree = String(degreeValue || "").trim();
+    if (!rawDegree) return null;
+    var degree = parseDegreeWithinSign(rawDegree, "D1 Asc degree override");
+    return { sign: null, deg: degree, source: "manual degree override" };
+  }
+
+  function ascendantOverrideFromPayload(payload) {
+    if (!payload) return null;
+    if (payload.ascendantOverride && payload.ascendantOverride.deg !== undefined) {
+      return ascendantOverrideFromDegree(String(payload.ascendantOverride.deg));
+    }
+    return ascendantOverrideFromDegree(payload.ascOverrideDegree || payload.ascendantOverrideDegree || "");
+  }
+
+  function parseDegreeWithinSign(value, label) {
+    var text = String(value || "").trim();
+    if (!text) throw new Error(label + " is required.");
+    var degree = null;
+    if (/^[+-]?\d+(\.\d+)?$/.test(text)) {
+      degree = Number(text);
+    } else {
+      var dmsText = text.indexOf(".") !== text.lastIndexOf(".") ? text.replace(/\./g, ":") : text;
+      var cleaned = dmsText
+        .replace(/[Â°Âº]/g, ":")
+        .replace(/[â€²']/g, ":")
+        .replace(/[â€³"]/g, "")
+        .replace(/[dhms]/gi, ":")
+        .replace(/\s+/g, ":")
+        .replace(/:+/g, ":")
+        .replace(/^:|:$/g, "");
+      var parts = cleaned.split(":").filter(Boolean).map(Number);
+      if (parts.length >= 1 && parts.length <= 3 && parts.every(Number.isFinite)) {
+        degree = Math.abs(parts[0]) + (Math.abs(parts[1] || 0) / 60) + (Math.abs(parts[2] || 0) / 3600);
+      }
+    }
+    if (!Number.isFinite(degree) || degree < 0 || degree >= 30) {
+      throw new Error(label + " must be between 0:00:00 and 29:59:59.");
+    }
+    return degree;
+  }
+
+  function signedCoordinate(value, direction, negativeDirection) {
+    var amount = Math.abs(parseCoordinateInput(value));
+    return direction === negativeDirection ? -amount : amount;
+  }
+
+  function coordinateText(latitude, longitude) {
+    return coordinateDmsText(latitude) + " " + (latitude < 0 ? "S" : "N") + ", " + coordinateDmsText(longitude) + " " + (longitude < 0 ? "W" : "E");
+  }
+
+  function parseCoordinateInput(value) {
+    if (typeof value === "number") return value;
+    var text = String(value || "").trim();
+    if (!text) return 0;
+    if (/^[+-]?\d+(\.\d+)?$/.test(text)) return Number(text);
+    var dmsText = text.indexOf(".") !== text.lastIndexOf(".") ? text.replace(/\./g, ":") : text;
+    var cleaned = dmsText
+      .replace(/[Â°Âº]/g, ":")
+      .replace(/[â€²']/g, ":")
+      .replace(/[â€³"]/g, "")
+      .replace(/[dhms]/gi, ":")
+      .replace(/\s+/g, ":")
+      .replace(/:+/g, ":")
+      .replace(/^:|:$/g, "");
+    var parts = cleaned.split(":").filter(Boolean).map(Number);
+    if (!parts.length || parts.length > 3 || !parts.every(Number.isFinite)) {
+      throw new Error("Latitude and longitude must be entered as decimal degrees or DD.MM.SS.");
+    }
+    var minutes = Math.abs(parts[1] || 0);
+    var seconds = Math.abs(parts[2] || 0);
+    if (minutes >= 60 || seconds >= 60) throw new Error("Coordinate minutes and seconds must be below 60.");
+    return Math.abs(parts[0]) + minutes / 60 + seconds / 3600;
+  }
+
+  function coordinateDmsText(value) {
+    var absolute = Math.abs(Number(value) || 0);
+    var deg = Math.floor(absolute);
+    var minutesFloat = (absolute - deg) * 60;
+    var min = Math.floor(minutesFloat);
+    var sec = Math.round((minutesFloat - min) * 60);
+    if (sec === 60) {
+      min += 1;
+      sec = 0;
+    }
+    if (min === 60) {
+      deg += 1;
+      min = 0;
+    }
+    return pad(deg) + "." + pad(min) + "." + pad(sec);
+  }
+
+  function inferTopic(selected, question) {
+    if (selected && selected !== "general") return selected;
+    var q = (question || "").toLowerCase();
+    var matches = [
+      ["marriage", ["marriage", "spouse", "wife", "husband", "divorce", "relationship"]],
+      ["children", ["child", "children", "progeny", "pregnancy", "son", "daughter"]],
+      ["profession", ["career", "job", "profession", "business", "service", "promotion"]],
+      ["wealth", ["wealth", "money", "finance", "income", "gain"]],
+      ["education", ["education", "study", "exam", "learning", "degree"]],
+      ["foreign", ["foreign", "travel", "abroad", "immigration", "residence"]],
+      ["property", ["property", "vehicle", "house", "land", "home"]],
+      ["health", ["health", "illness", "disease", "accident"]],
+      ["longevity", ["longevity", "lifespan", "life span"]]
+    ];
+    for (var i = 0; i < matches.length; i += 1) {
+      if (matches[i][1].some(function (word) { return q.indexOf(word) >= 0; })) return matches[i][0];
+    }
+    return "general";
+  }
+
+  function buildChart(date, lat, lon, tz, options) {
+    var jd = julianDay(date);
+    var ayanamshaKey = normalizeAyanamshaKey(options && options.ayanamshaKey);
+    var ayanamsa = ayanamshaValue(jd, ayanamshaKey);
+    var ascTropical = ascendantTropical(jd, lat, lon);
+    var computedAscSidereal = normalize(ascTropical - ayanamsa);
+    var ascOverride = normalizeAscendantOverride(options && options.ascendantOverride, computedAscSidereal);
+    var ascSidereal = ascOverride ? ascOverride.lon : computedAscSidereal;
+    var planets = computePlanets(jd).map(function (planet) {
+      var sidereal = normalize(planet.tropical - ayanamsa);
+      var sign = signIndex(sidereal);
+      var nak = nakshatraInfo(sidereal);
+      return {
+        name: planet.name,
+        tropical: planet.tropical,
+        lon: sidereal,
+        sign: sign,
+        signName: SIGNS[sign].name,
+        deg: sidereal - sign * 30,
+        retrograde: planet.retrograde,
+        nakshatra: nak.name,
+        nakLord: nak.lord,
+        pada: nak.pada
+      };
+    });
+    var chart = {
+      jd: jd,
+      date: date,
+      timezone: tz,
+      latitude: lat,
+      longitude: lon,
+      ayanamsa: ayanamsa,
+      ayanamshaKey: ayanamshaKey,
+      ayanamshaLabel: ayanamshaLabel(ayanamshaKey),
+      ascendant: {
+        lon: ascSidereal,
+        sign: signIndex(ascSidereal),
+        deg: ascSidereal % 30,
+        signName: SIGNS[signIndex(ascSidereal)].name,
+        computedLon: computedAscSidereal,
+        computedSign: signIndex(computedAscSidereal),
+        computedDeg: computedAscSidereal % 30,
+        override: Boolean(ascOverride),
+        overrideSource: ascOverride ? ascOverride.source : ""
+      },
+      planets: planets,
+      planetsByName: {},
+      houses: []
+    };
+    enrichChart(chart);
+    return chart;
+  }
+
+  function normalizeAscendantOverride(override, computedLon) {
+    if (!override || !Number.isFinite(Number(override.deg))) return null;
+    var hasSign = override.sign !== undefined && override.sign !== null && override.sign !== "";
+    var sign = hasSign && Number.isFinite(Number(override.sign)) ? normalizeSign(Number(override.sign)) : signIndex(computedLon);
+    var deg = Number(override.deg);
+    if (deg < 0 || deg >= 30) return null;
+    return {
+      sign: sign,
+      deg: deg,
+      lon: normalize(sign * 30 + deg),
+      source: override.source || "manual"
+    };
+  }
+
+  function enrichChart(chart) {
+    chart.planets.forEach(function (planet) {
+      planet.house = houseFromSign(chart.ascendant.sign, planet.sign);
+      planet.equalHouse = equalHouse(chart.ascendant.lon, planet.lon);
+      planet.navamsaSign = vargaSign(planet.lon, 9);
+      planet.navamsaSignName = SIGNS[planet.navamsaSign].name;
+      planet.dispositor = SIGNS[planet.sign].lord;
+      planet.lordships = lordshipsForPlanet(chart.ascendant.sign, planet.name);
+      chart.planetsByName[planet.name] = planet;
+    });
+    chart.moonPhaseAngle = normalize(chart.planetsByName.Moon.lon - chart.planetsByName.Sun.lon);
+    chart.moonStrength = chart.moonPhaseAngle >= 96 && chart.moonPhaseAngle <= 264 ? "Bright" : "Weak/Waning";
+    chart.planets.forEach(function (planet) {
+      planet.naturalNature = naturalNature(chart, planet);
+    });
+    chart.planets.forEach(function (planet) {
+      planet.functionalRole = functionalRole(chart, planet);
+      planet.dignity = dignity(planet);
+      planet.combust = isCombust(chart, planet);
+    });
+    chart.planets.forEach(function (planet) {
+      planet.strength = planetStrength(chart, planet);
+    });
+    chart.planets.forEach(function (planet) {
+      planet.afflictions = afflictionsForPlanet(chart, planet);
+    });
+    chart.houses = [];
+    for (var h = 1; h <= 12; h += 1) {
+      chart.houses.push(houseJudgement(chart, h));
+    }
+    chart.vimshottari = vimshottariSummary(chart);
+  }
+
+  function computePlanets(jd) {
+    var names = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
+    var out = names.map(function (name) {
+      var tropical = name === "Moon" ? moonTropicalLongitude(jd) : planetTropicalLongitude(name, jd);
+      var previous = name === "Moon" ? moonTropicalLongitude(jd - 1) : planetTropicalLongitude(name, jd - 1);
+      return { name: name, tropical: tropical, retrograde: signedDelta(tropical, previous) < 0 && name !== "Sun" && name !== "Moon" };
+    });
+    var node = meanNodeTropical(jd);
+    out.push({ name: "Rahu", tropical: node, retrograde: true });
+    out.push({ name: "Ketu", tropical: normalize(node + 180), retrograde: true });
+    return out;
+  }
+
+  function julianDay(date) {
+    return date.getTime() / DAY_MS + 2440587.5;
+  }
+
+  function localDateTimeToUtc(dateValue, timeValue, tzHours) {
+    var d = dateValue.split("-").map(Number);
+    var t = timeValue.split(":").map(Number);
+    return new Date(Date.UTC(d[0], d[1] - 1, d[2], t[0] || 0, t[1] || 0, t[2] || 0) - tzHours * 3600000);
+  }
+
+  function dateInputValue(date, tzHours) {
+    var shifted = new Date(date.getTime() + tzHours * 3600000);
+    return shifted.getUTCFullYear() + "-" + pad(shifted.getUTCMonth() + 1) + "-" + pad(shifted.getUTCDate());
+  }
+
+  function timeInputValue(date, tzHours) {
+    var shifted = new Date(date.getTime() + tzHours * 3600000);
+    return pad(shifted.getUTCHours()) + ":" + pad(shifted.getUTCMinutes()) + ":" + pad(shifted.getUTCSeconds());
+  }
+
+  function setBirthTimeFields(value) {
+    setFieldValue("birthTime", normalizeTimeInput(value || "00:00:00"));
+  }
+
+  function birthTimeWithSeconds() {
+    return normalizeTimeInput(fieldValue("birthTime") || "00:00:00");
+  }
+
+  function normalizeTimeInput(value) {
+    var parts = String(value || "00:00:00").split(":");
+    return pad(parts[0] || 0) + ":" + pad(parts[1] || 0) + ":" + pad(parts[2] || 0);
+  }
+
+  function formatInTimezone(date, tzHours) {
+    var shifted = new Date(date.getTime() + tzHours * 3600000);
+    var sign = tzHours >= 0 ? "+" : "-";
+    var abs = Math.abs(tzHours);
+    var h = Math.floor(abs);
+    var m = Math.round((abs - h) * 60);
+    return shifted.getUTCFullYear() + "-" + pad(shifted.getUTCMonth() + 1) + "-" + pad(shifted.getUTCDate()) +
+      " " + pad(shifted.getUTCHours()) + ":" + pad(shifted.getUTCMinutes()) + ":" + pad(shifted.getUTCSeconds()) + " UTC" + sign + h + ":" + pad(m);
+  }
+
+  function addDays(date, days) {
+    return new Date(date.getTime() + days * DAY_MS);
+  }
+
+  function pad(value) {
+    return String(value).padStart(2, "0");
+  }
+
+  function normalize(value) {
+    var result = value % 360;
+    return result < 0 ? result + 360 : result;
+  }
+
+  function normalize180(value) {
+    var result = normalize(value);
+    return result > 180 ? result - 360 : result;
+  }
+
+  function signedDelta(a, b) {
+    return normalize180(a - b);
+  }
+
+  function angleDistance(a, b) {
+    return Math.abs(normalize180(a - b));
+  }
+
+  function signIndex(lon) {
+    return Math.floor(normalize(lon) / 30);
+  }
+
+  function signShort(index) {
+    return SIGNS[index].name.slice(0, 3);
+  }
+
+  function fmtDeg(lon) {
+    var sign = signIndex(lon);
+    var deg = normalize(lon) - sign * 30;
+    var d = Math.floor(deg);
+    var min = Math.round((deg - d) * 60);
+    if (min === 60) {
+      d += 1;
+      min = 0;
+    }
+    return d + "d " + pad(min) + "m " + SIGNS[sign].name;
+  }
+
+  function sinDeg(v) { return Math.sin(v * DEG); }
+  function cosDeg(v) { return Math.cos(v * DEG); }
+  function tanDeg(v) { return Math.tan(v * DEG); }
+  function atan2Deg(y, x) { return Math.atan2(y, x) * RAD; }
+  function asinDeg(v) { return Math.asin(Math.max(-1, Math.min(1, v))) * RAD; }
+
+  function lahiriAyanamsa(jd) {
+    var year = 2000 + (jd - 2451545.0) / 365.2422;
+    var t = (year - 1900) / 100;
+    return normalize(22.460148 + 1.396042 * t + 0.000308 * t * t + LAHIRI_CHITRAPAKSHA_OFFSET);
+  }
+
+  function normalizeAyanamshaKey(key) {
+    return AYANAMSHA_OPTIONS[key] ? key : "lahiri";
+  }
+
+  function ayanamshaLabel(key) {
+    return AYANAMSHA_OPTIONS[normalizeAyanamshaKey(key)].label;
+  }
+
+  function ayanamshaValue(jd, key) {
+    return normalize(lahiriAyanamsa(jd) + AYANAMSHA_OPTIONS[normalizeAyanamshaKey(key)].offset);
+  }
+
+  function kp2Ayanamsa(jd) {
+    return normalize(lahiriAyanamsa(jd) + KP2_LAHIRI_OFFSET_DEG);
+  }
+
+  function obliquity(jd) {
+    var t = (jd - 2451545.0) / 36525;
+    return 23.439291 - 0.0130042 * t;
+  }
+
+  function gmstDegrees(jd) {
+    var t = (jd - 2451545.0) / 36525;
+    return normalize(280.46061837 + 360.98564736629 * (jd - 2451545.0) + 0.000387933 * t * t - t * t * t / 38710000);
+  }
+
+  function ascendantTropical(jd, lat, lon) {
+    var lst = normalize(gmstDegrees(jd) + lon);
+    var eps = obliquity(jd);
+    function altitude(lambda) {
+      var alpha = normalize(atan2Deg(sinDeg(lambda) * cosDeg(eps), cosDeg(lambda)));
+      var delta = asinDeg(sinDeg(lambda) * sinDeg(eps));
+      var h = normalize180(lst - alpha);
+      return asinDeg(sinDeg(lat) * sinDeg(delta) + cosDeg(lat) * cosDeg(delta) * cosDeg(h));
+    }
+    function hourAngle(lambda) {
+      var alpha = normalize(atan2Deg(sinDeg(lambda) * cosDeg(eps), cosDeg(lambda)));
+      return normalize180(lst - alpha);
+    }
+    var roots = [];
+    var previousLambda = 0;
+    var previousAlt = altitude(0);
+    for (var lambda = 1; lambda <= 360; lambda += 1) {
+      var alt = altitude(lambda);
+      if ((previousAlt <= 0 && alt >= 0) || (previousAlt >= 0 && alt <= 0)) {
+        var a = previousLambda;
+        var b = lambda;
+        for (var i = 0; i < 24; i += 1) {
+          var mid = (a + b) / 2;
+          var midAlt = altitude(mid);
+          if ((altitude(a) <= 0 && midAlt >= 0) || (altitude(a) >= 0 && midAlt <= 0)) {
+            b = mid;
+          } else {
+            a = mid;
+          }
+        }
+        var root = normalize((a + b) / 2);
+        if (hourAngle(root) < 0) roots.push(root);
+      }
+      previousLambda = lambda;
+      previousAlt = alt;
+    }
+    return roots.length ? roots[0] : normalize(lst + 90);
+  }
+
+  function midheavenTropical(jd, lon) {
+    var lst = normalize(gmstDegrees(jd) + lon);
+    var eps = obliquity(jd);
+    return normalize(atan2Deg(sinDeg(lst), cosDeg(lst) * cosDeg(eps)));
+  }
+
+  function planetTropicalLongitude(name, jd) {
+    var key = name + ":" + _qkey(jd);
+    var hit = _memoPlanetTrop.get(key);
+    if (hit !== undefined) return hit;
+    var result;
+    if (name === "Sun") {
+      var earth = heliocentric("Earth", jd);
+      result = normalize(atan2Deg(earth.y, earth.x));
+    } else {
+      var p = heliocentric(name, jd);
+      var e = heliocentric("Earth", jd);
+      result = normalize(atan2Deg(p.y + e.y, p.x + e.x));
+    }
+    _memoPlanetTrop.set(key, result);
+    return result;
+  }
+
+  function heliocentric(name, jd) {
+    var d = jd - 2451543.5;
+    var el = orbitalElements(name, d);
+    var eAnomaly = kepler(el.M, el.e);
+    var xv = el.a * (cosDeg(eAnomaly) - el.e);
+    var yv = el.a * (Math.sqrt(1 - el.e * el.e) * sinDeg(eAnomaly));
+    var v = atan2Deg(yv, xv);
+    var r = Math.sqrt(xv * xv + yv * yv);
+    var xh = r * (cosDeg(el.N) * cosDeg(v + el.w) - sinDeg(el.N) * sinDeg(v + el.w) * cosDeg(el.i));
+    var yh = r * (sinDeg(el.N) * cosDeg(v + el.w) + cosDeg(el.N) * sinDeg(v + el.w) * cosDeg(el.i));
+    var zh = r * (sinDeg(v + el.w) * sinDeg(el.i));
+    if (name === "Jupiter" || name === "Saturn") {
+      var lon = normalize(atan2Deg(yh, xh) + outerPlanetLongitudePerturbation(name, d));
+      var lat = atan2Deg(zh, Math.sqrt(xh * xh + yh * yh));
+      var rr = Math.sqrt(xh * xh + yh * yh + zh * zh);
+      xh = rr * cosDeg(lon) * cosDeg(lat);
+      yh = rr * sinDeg(lon) * cosDeg(lat);
+      zh = rr * sinDeg(lat);
+    }
+    return { x: xh, y: yh, z: zh };
+  }
+
+  function outerPlanetLongitudePerturbation(name, d) {
+    var j = orbitalElements("Jupiter", d).M;
+    var s = orbitalElements("Saturn", d).M;
+    if (name === "Jupiter") {
+      return -0.332 * sinDeg(2 * j - 5 * s - 67.6) -
+        0.056 * sinDeg(2 * j - 2 * s + 21) +
+        0.042 * sinDeg(3 * j - 5 * s + 21) -
+        0.036 * sinDeg(j - 2 * s) +
+        0.022 * cosDeg(j - s) +
+        0.023 * sinDeg(2 * j - 3 * s + 52) -
+        0.016 * sinDeg(j - 5 * s - 69);
+    }
+    if (name === "Saturn") {
+      return 0.812 * sinDeg(2 * j - 5 * s - 67.6) -
+        0.229 * cosDeg(2 * j - 4 * s - 2) +
+        0.119 * sinDeg(j - 2 * s - 3) +
+        0.046 * sinDeg(2 * j - 6 * s - 69) +
+        0.014 * sinDeg(j - 3 * s + 32);
+    }
+    return 0;
+  }
+
+  function orbitalElements(name, d) {
+    var map = {
+      Mercury: { N: 48.3313 + 3.24587E-5 * d, i: 7.0047 + 5.00E-8 * d, w: 29.1241 + 1.01444E-5 * d, a: 0.387098, e: 0.205635 + 5.59E-10 * d, M: 168.6562 + 4.0923344368 * d },
+      Venus: { N: 76.6799 + 2.46590E-5 * d, i: 3.3946 + 2.75E-8 * d, w: 54.8910 + 1.38374E-5 * d, a: 0.723330, e: 0.006773 - 1.302E-9 * d, M: 48.0052 + 1.6021302244 * d },
+      Earth: { N: 0, i: 0, w: 282.9404 + 4.70935E-5 * d, a: 1.000000, e: 0.016709 - 1.151E-9 * d, M: 356.0470 + 0.9856002585 * d },
+      Mars: { N: 49.5574 + 2.11081E-5 * d, i: 1.8497 - 1.78E-8 * d, w: 286.5016 + 2.92961E-5 * d, a: 1.523688, e: 0.093405 + 2.516E-9 * d, M: 18.6021 + 0.5240207766 * d },
+      Jupiter: { N: 100.4542 + 2.76854E-5 * d, i: 1.3030 - 1.557E-7 * d, w: 273.8777 + 1.64505E-5 * d, a: 5.20256, e: 0.048498 + 4.469E-9 * d, M: 19.8950 + 0.0830853001 * d },
+      Saturn: { N: 113.6634 + 2.38980E-5 * d, i: 2.4886 - 1.081E-7 * d, w: 339.3939 + 2.97661E-5 * d, a: 9.55475, e: 0.055546 - 9.499E-9 * d, M: 316.9670 + 0.0334442282 * d }
+    };
+    var value = map[name];
+    value.M = normalize(value.M);
+    return value;
+  }
+
+  function kepler(meanAnomaly, eccentricity) {
+    var m = normalize(meanAnomaly) * DEG;
+    var e = m + eccentricity * Math.sin(m) * (1 + eccentricity * Math.cos(m));
+    for (var i = 0; i < 8; i += 1) {
+      e = e - (e - eccentricity * Math.sin(e) - m) / (1 - eccentricity * Math.cos(e));
+    }
+    return e * RAD;
+  }
+
+  function moonTropicalLongitude(jd) {
+    var key = _qkey(jd);
+    var hit = _memoMoonTrop.get(key);
+    if (hit !== undefined) return hit;
+    var result = _moonTropicalLongitudeCompute(jd);
+    _memoMoonTrop.set(key, result);
+    return result;
+  }
+
+  function _moonTropicalLongitudeCompute(jd) {
+    var d = jd - 2451543.5;
+    var N = normalize(125.1228 - 0.0529538083 * d);
+    var i = 5.1454;
+    var w = normalize(318.0634 + 0.1643573223 * d);
+    var a = 60.2666;
+    var e = 0.054900;
+    var M = normalize(115.3654 + 13.0649929509 * d);
+    var E = kepler(M, e);
+    var xv = a * (cosDeg(E) - e);
+    var yv = a * (Math.sqrt(1 - e * e) * sinDeg(E));
+    var v = atan2Deg(yv, xv);
+    var r = Math.sqrt(xv * xv + yv * yv);
+    var xh = r * (cosDeg(N) * cosDeg(v + w) - sinDeg(N) * sinDeg(v + w) * cosDeg(i));
+    var yh = r * (sinDeg(N) * cosDeg(v + w) + cosDeg(N) * sinDeg(v + w) * cosDeg(i));
+    var lon = normalize(atan2Deg(yh, xh));
+    var Ms = normalize(356.0470 + 0.9856002585 * d);
+    var Ls = normalize(282.9404 + 4.70935E-5 * d + Ms);
+    var Lm = normalize(N + w + M);
+    var D = normalize(Lm - Ls);
+    var F = normalize(Lm - N);
+    lon += -1.274 * sinDeg(M - 2 * D);
+    lon += 0.658 * sinDeg(2 * D);
+    lon += -0.186 * sinDeg(Ms);
+    lon += -0.059 * sinDeg(2 * M - 2 * D);
+    lon += -0.057 * sinDeg(M - 2 * D + Ms);
+    lon += 0.053 * sinDeg(M + 2 * D);
+    lon += 0.046 * sinDeg(2 * D - Ms);
+    lon += 0.041 * sinDeg(M - Ms);
+    lon += -0.035 * sinDeg(D);
+    lon += -0.031 * sinDeg(M + Ms);
+    lon += -0.015 * sinDeg(2 * F - 2 * D);
+    lon += 0.011 * sinDeg(M - 4 * D);
+    return normalize(lon);
+  }
+
+  function meanNodeTropical(jd) {
+    var t = (jd - 2451545.0) / 36525;
+    return normalize(125.04455501 - 1934.1361849 * t + 0.0020762 * t * t + t * t * t / 467410 - Math.pow(t, 4) / 60616000);
+  }
+
+  function nakshatraInfo(lon) {
+    var key = _qkey(normalize(lon));
+    var hit = _memoNakshatra.get(key);
+    if (hit !== undefined) return hit;
+    var n = Math.floor(normalize(lon) / NAK_SIZE);
+    var within = normalize(lon) - n * NAK_SIZE;
+    var result = {
+      index: n,
+      name: NAKSHATRAS[n],
+      lord: NAK_LORDS[n],
+      pada: Math.floor(within / (NAK_SIZE / 4)) + 1,
+      within: within
+    };
+    _memoNakshatra.set(key, result);
+    return result;
+  }
+
+  function kpLordInfo(lon) {
+    var key = _qkey(normalize(lon));
+    var hit = _memoKpLord.get(key);
+    if (hit !== undefined) return hit;
+    var nak = nakshatraInfo(lon);
+    var sub = kpSubSegment(nak.within, nak.lord, NAK_SIZE);
+    var subSub = kpSubSegment(sub.within, sub.lord, sub.size);
+    var result = {
+      nakshatra: nak.name,
+      pada: nak.pada,
+      starLord: nak.lord,
+      subLord: sub.lord,
+      subSubLord: subSub.lord
+    };
+    _memoKpLord.set(key, result);
+    return result;
+  }
+
+  function kpSubSegment(offset, startLord, span) {
+    var startIndex = Math.max(0, DASHA_SEQUENCE.indexOf(startLord));
+    var cursor = 0;
+    for (var i = 0; i < DASHA_SEQUENCE.length; i += 1) {
+      var lord = DASHA_SEQUENCE[(startIndex + i) % DASHA_SEQUENCE.length];
+      var size = span * DASHA_YEARS[lord] / 120;
+      if (offset <= cursor + size || i === DASHA_SEQUENCE.length - 1) {
+        return {
+          lord: lord,
+          start: cursor,
+          end: cursor + size,
+          size: size,
+          within: Math.max(0, offset - cursor)
+        };
+      }
+      cursor += size;
+    }
+    return { lord: startLord, start: 0, end: span, size: span, within: offset };
+  }
+
+  function buildKpChart(chart) {
+    var jd = chart.jd;
+    var ayanamsa = kp2Ayanamsa(jd);
+    var ascLon = normalize(ascendantTropical(jd, chart.latitude, chart.longitude) - ayanamsa);
+    var ascSign = signIndex(ascLon);
+    var cusps = kpCusps(chart, ayanamsa);
+    var planets = computePlanets(jd).map(function (planet) {
+      var sidereal = normalize(planet.tropical - ayanamsa);
+      var sign = signIndex(sidereal);
+      var kp = kpLordInfo(sidereal);
+      return {
+        name: planet.name,
+        tropical: planet.tropical,
+        lon: sidereal,
+        sign: sign,
+        signName: SIGNS[sign].name,
+        deg: sidereal - sign * 30,
+        house: kpHouseFromCusps(sidereal, cusps) || houseFromSign(ascSign, sign),
+        retrograde: planet.retrograde,
+        combust: false,
+        kp: kp
+      };
+    });
+    var byName = indexBy(planets, "name");
+    planets.forEach(function (planet) {
+      planet.combust = planet.name !== "Sun" && COMBUST_ORB[planet.name] && angleDistance(planet.lon, byName.Sun.lon) <= COMBUST_ORB[planet.name];
+    });
+    return {
+      ayanamsa: ayanamsa,
+      ayanamsaLabel: "KP 2",
+      offsetFromLahiri: KP2_LAHIRI_OFFSET_DEG,
+      houseSystem: "Placidus cusps",
+      ascendant: {
+        lon: ascLon,
+        sign: ascSign,
+        signName: SIGNS[ascSign].name,
+        deg: ascLon - ascSign * 30,
+        kp: kpLordInfo(ascLon)
+      },
+      cusps: cusps,
+      planets: planets,
+      planetsByName: byName
+    };
+  }
+
+  function kpCusps(chart, ayanamsa) {
+    var tropicalCusps = placidusCuspLongitudes(chart) || quadrantCuspLongitudes(chart);
+    var lonByHouse = {};
+    for (var house = 1; house <= 12; house += 1) {
+      lonByHouse[house] = normalize(tropicalCusps[house] - ayanamsa);
+    }
+    return kpCuspObjects(lonByHouse);
+  }
+
+  function quadrantCuspLongitudes(chart) {
+    var ascLon = ascendantTropical(chart.jd, chart.latitude, chart.longitude);
+    var mcLon = midheavenTropical(chart.jd, chart.longitude);
+    var descLon = normalize(ascLon + 180);
+    var icLon = normalize(mcLon + 180);
+    var lonByHouse = {};
+    lonByHouse[1] = ascLon;
+    lonByHouse[4] = icLon;
+    lonByHouse[7] = descLon;
+    lonByHouse[10] = mcLon;
+    fillKpCuspArc(lonByHouse, 10, 11, 12, 1);
+    fillKpCuspArc(lonByHouse, 1, 2, 3, 4);
+    fillKpCuspArc(lonByHouse, 4, 5, 6, 7);
+    fillKpCuspArc(lonByHouse, 7, 8, 9, 10);
+    return lonByHouse;
+  }
+
+  function placidusCuspLongitudes(chart) {
+    if (Math.abs(chart.latitude) >= 66) return null;
+    var ramc = normalize(gmstDegrees(chart.jd) + chart.longitude);
+    var eps = obliquity(chart.jd);
+    var lonByHouse = {
+      1: ascendantTropical(chart.jd, chart.latitude, chart.longitude),
+      10: midheavenTropical(chart.jd, chart.longitude)
+    };
+    lonByHouse[4] = normalize(lonByHouse[10] + 180);
+    lonByHouse[7] = normalize(lonByHouse[1] + 180);
+    var specs = [
+      [11, 30, 1 / 3],
+      [12, 60, 2 / 3],
+      [2, 120, 2 / 3],
+      [3, 150, 1 / 3]
+    ];
+    for (var i = 0; i < specs.length; i += 1) {
+      var value = placidusIntermediateCusp(ramc, chart.latitude, eps, specs[i][1], specs[i][2]);
+      if (!Number.isFinite(value)) return null;
+      lonByHouse[specs[i][0]] = value;
+    }
+    lonByHouse[5] = normalize(lonByHouse[11] + 180);
+    lonByHouse[6] = normalize(lonByHouse[12] + 180);
+    lonByHouse[8] = normalize(lonByHouse[2] + 180);
+    lonByHouse[9] = normalize(lonByHouse[3] + 180);
+    return lonByHouse;
+  }
+
+  function placidusIntermediateCusp(ramc, lat, eps, offset, ratio) {
+    var h = normalize(ramc + offset);
+    var d = asinDeg(sinDeg(eps) * sinDeg(h));
+    var r = NaN;
+    for (var i = 0; i < 4; i += 1) {
+      var arg = tanDeg(lat) * tanDeg(d);
+      if (Math.abs(arg) > 1) return NaN;
+      var a = ratio * asinDeg(arg);
+      var m = atan2Deg(sinDeg(a), cosDeg(h) * tanDeg(d));
+      r = normalize(atan2Deg(sinDeg(h) * cosDeg(m), cosDeg(h) * cosDeg(m + eps)));
+      d = r;
+    }
+    return r;
+  }
+
+  function kpCuspObjects(lonByHouse) {
+    var cusps = [];
+    for (var house = 1; house <= 12; house += 1) {
+      var lon = normalize(lonByHouse[house]);
+      var sign = signIndex(lon);
+      var kp = kpLordInfo(lon);
+      cusps.push({
+        house: house,
+        lon: lon,
+        sign: sign,
+        signName: SIGNS[sign].name,
+        deg: lon - sign * 30,
+        signLord: SIGNS[sign].lord,
+        kp: kp
+      });
+    }
+    return cusps;
+  }
+
+  function fillKpCuspArc(lonByHouse, fromHouse, firstHouse, secondHouse, toHouse) {
+    var start = lonByHouse[fromHouse];
+    var end = lonByHouse[toHouse];
+    var span = normalize(end - start);
+    lonByHouse[firstHouse] = normalize(start + span / 3);
+    lonByHouse[secondHouse] = normalize(start + span * 2 / 3);
+  }
+
+  function kpHouseFromCusps(lon, cusps) {
+    for (var i = 0; i < cusps.length; i += 1) {
+      var cusp = cusps[i];
+      var next = cusps[i === cusps.length - 1 ? 0 : i + 1];
+      var span = normalize(next.lon - cusp.lon);
+      var pos = normalize(lon - cusp.lon);
+      if (pos < span || Math.abs(pos - span) < 0.000001) return cusp.house;
+    }
+    return null;
+  }
+
+  function houseFromSign(baseSign, sign) {
+    return ((sign - baseSign + 12) % 12) + 1;
+  }
+
+  function equalHouse(ascLon, planetLon) {
+    return Math.floor(normalize(planetLon - ascLon + 15) / 30) + 1;
+  }
+
+  function lordOfHouse(chart, house) {
+    return SIGNS[houseSign(chart, house)].lord;
+  }
+
+  function houseSign(chart, house) {
+    return (chart.ascendant.sign + house - 1) % 12;
+  }
+
+  function lordshipsForPlanet(ascSign, planetName) {
+    if (planetName === "Rahu" || planetName === "Ketu") return [];
+    var result = [];
+    for (var h = 1; h <= 12; h += 1) {
+      var sign = (ascSign + h - 1) % 12;
+      if (SIGNS[sign].lord === planetName) result.push(h);
+    }
+    return result;
+  }
+
+  function naturalNature(chart, planet) {
+    if (planet.name === "Jupiter" || planet.name === "Venus") return "Benefic";
+    if (planet.name === "Mars" || planet.name === "Saturn" || planet.name === "Sun" || planet.name === "Rahu" || planet.name === "Ketu") return "Malefic";
+    if (planet.name === "Moon") return chart.moonStrength === "Bright" ? "Benefic" : "Malefic";
+    if (planet.name === "Mercury") {
+      var sameSignMalefic = chart.planets.some(function (p) {
+        return p.name !== "Mercury" && p.sign === planet.sign && ["Sun", "Mars", "Saturn", "Rahu", "Ketu"].indexOf(p.name) >= 0;
+      });
+      return sameSignMalefic ? "Malefic" : "Benefic";
+    }
+    return "Mixed";
+  }
+
+  function functionalRole(chart, planet) {
+    if (planet.name === "Rahu" || planet.name === "Ketu") {
+      var disp = chart.planetsByName[planet.dispositor];
+      return disp ? "Node adopts " + disp.functionalRole : "Node by dispositor";
+    }
+    var bad = planet.lordships.filter(function (h) { return [3, 6, 8, 12].indexOf(h) >= 0; });
+    var good = planet.lordships.filter(function (h) { return [1, 2, 4, 5, 7, 9, 10, 11].indexOf(h) >= 0; });
+    var ownsKendra = planet.lordships.some(function (h) { return [1, 4, 7, 10].indexOf(h) >= 0; });
+    var ownsKona = planet.lordships.some(function (h) { return [1, 5, 9].indexOf(h) >= 0; });
+    if (ownsKendra && ownsKona && planet.name !== "Sun" && planet.name !== "Moon") return "Yogakaraka";
+    if (bad.length === 0) return "Functional benefic";
+    if (good.length === 0) return "Functional malefic";
+    return "Mixed functional";
+  }
+
+  function dignity(planet) {
+    if (planet.name === "Rahu" || planet.name === "Ketu") {
+      if (planet.sign === EXALTATION[planet.name]) return "Exalted";
+      if (planet.sign === DEBILITATION[planet.name]) return "Debilitated";
+      return "Dispositor-led";
+    }
+    var signLord = SIGNS[planet.sign].lord;
+    if (planet.sign === EXALTATION[planet.name]) return "Exalted";
+    if (planet.sign === DEBILITATION[planet.name]) return "Debilitated";
+    if (signLord === planet.name) return "Own sign";
+    if (isMoolatrikona(planet)) return "Moolatrikona";
+    var relation = FRIENDS[planet.name] || { friend: [], enemy: [] };
+    if (relation.friend.indexOf(signLord) >= 0) return "Friendly sign";
+    if (relation.enemy.indexOf(signLord) >= 0) return "Enemy sign";
+    return "Neutral sign";
+  }
+
+  function isMoolatrikona(planet) {
+    var deg = planet.deg;
+    return (planet.name === "Sun" && planet.sign === 4 && deg <= 20) ||
+      (planet.name === "Moon" && planet.sign === 1 && deg >= 3 && deg <= 30) ||
+      (planet.name === "Mars" && planet.sign === 0 && deg <= 12) ||
+      (planet.name === "Mercury" && planet.sign === 5 && deg >= 15 && deg <= 20) ||
+      (planet.name === "Jupiter" && planet.sign === 8 && deg <= 10) ||
+      (planet.name === "Venus" && planet.sign === 6 && deg <= 15) ||
+      (planet.name === "Saturn" && planet.sign === 10 && deg <= 20);
+  }
+
+  function isCombust(chart, planet) {
+    if (planet.name === "Sun" || planet.name === "Rahu" || planet.name === "Ketu") return false;
+    return angleDistance(planet.lon, chart.planetsByName.Sun.lon) <= (COMBUST_ORB[planet.name] || 8);
+  }
+
+  function planetStrength(chart, planet) {
+    var score = 50;
+    var positives = [];
+    var concerns = [];
+    if (["Exalted", "Own sign", "Moolatrikona"].indexOf(planet.dignity) >= 0) {
+      score += 18;
+      positives.push(planet.dignity);
+    }
+    if (planet.dignity === "Friendly sign") {
+      score += 8;
+      positives.push("friendly sign");
+    }
+    if (planet.dignity === "Debilitated") {
+      score -= 20;
+      concerns.push("debilitated");
+    }
+    if (planet.dignity === "Enemy sign") {
+      score -= 8;
+      concerns.push("enemy sign");
+    }
+    if ([1, 4, 5, 7, 9, 10].indexOf(planet.house) >= 0) {
+      score += 10;
+      positives.push("kendra/trikona placement");
+    }
+    if ([6, 8, 12].indexOf(planet.house) >= 0) {
+      score -= 10;
+      concerns.push("dusthana placement");
+    }
+    if (planet.retrograde && ["Mars", "Mercury", "Jupiter", "Venus", "Saturn"].indexOf(planet.name) >= 0) {
+      score += 4;
+      positives.push("retrograde cheshta strength");
+    }
+    if (planet.combust) {
+      score -= 15;
+      concerns.push("combust");
+    }
+    if (planet.navamsaSign === planet.sign) {
+      score += 8;
+      positives.push("vargottama");
+    }
+    var beneficAspects = planetsAspectingPlanet(chart, planet).filter(function (p) { return p.naturalNature === "Benefic"; });
+    var maleficAspects = planetsAspectingPlanet(chart, planet).filter(function (p) { return p.naturalNature === "Malefic"; });
+    score += beneficAspects.length * 5;
+    score -= maleficAspects.length * 7;
+    if (beneficAspects.length) positives.push("benefic aspect by " + beneficAspects.map(function (p) { return p.name; }).join(", "));
+    if (maleficAspects.length) concerns.push("malefic aspect by " + maleficAspects.map(function (p) { return p.name; }).join(", "));
+    var sameHouse = chart.planets.filter(function (p) { return p.name !== planet.name && p.sign === planet.sign; });
+    var beneficConj = sameHouse.filter(function (p) { return p.naturalNature === "Benefic"; });
+    var maleficConj = sameHouse.filter(function (p) { return p.naturalNature === "Malefic"; });
+    score += beneficConj.length * 4;
+    score -= maleficConj.length * 6;
+    if (beneficConj.length) positives.push("benefic conjunction");
+    if (maleficConj.length) concerns.push("malefic conjunction");
+    score = clamp(score, 0, 100);
+    return {
+      score: Math.round(score),
+      label: strengthLabel(score),
+      positives: positives,
+      concerns: concerns
+    };
+  }
+
+  function afflictionsForPlanet(chart, planet) {
+    var issues = [];
+    if ([6, 8, 12].indexOf(planet.house) >= 0) issues.push("Placed in a trika house");
+    if (planet.dignity === "Debilitated") issues.push("Debilitated");
+    if (planet.combust) issues.push("Combust");
+    if (SIGNS[planet.sign].lord && ["Sun", "Mars", "Saturn"].indexOf(SIGNS[planet.sign].lord) >= 0) issues.push("In a sign owned by a natural malefic");
+    var maleficConj = chart.planets.filter(function (p) {
+      return p.name !== planet.name && p.sign === planet.sign && p.naturalNature === "Malefic";
+    });
+    if (maleficConj.length) issues.push("Conjoined malefic: " + maleficConj.map(prop("name")).join(", "));
+    var maleficAspects = planetsAspectingPlanet(chart, planet).filter(function (p) { return p.naturalNature === "Malefic"; });
+    if (maleficAspects.length) issues.push("Aspected by malefic: " + maleficAspects.map(prop("name")).join(", "));
+    var sameDegree = chart.planets.filter(function (p) {
+      return p.name !== planet.name && p.naturalNature === "Malefic" && Math.abs(p.deg - planet.deg) <= 1.5;
+    });
+    if (sameDegree.length) issues.push("Same degree zone as malefic: " + sameDegree.map(prop("name")).join(", "));
+    if (isHemmed(chart, planet.house, "Malefic")) issues.push("Papa-kartari by adjacent houses");
+    if (planet.strength.score < 40) issues.push("Weak strength score");
+    return issues;
+  }
+
+  function houseJudgement(chart, house) {
+    var sign = houseSign(chart, house);
+    var lordName = SIGNS[sign].lord;
+    var lord = chart.planetsByName[lordName];
+    var tenants = chart.planets.filter(function (p) { return p.house === house; });
+    var aspecting = planetsAspectingHouse(chart, house);
+    var score = 45;
+    var positives = [];
+    var concerns = [];
+    if (lord) {
+      score += (lord.strength.score - 50) * 0.45;
+      positives.push("Lord " + lord.name + " is " + lord.strength.label.toLowerCase());
+    }
+    tenants.forEach(function (p) {
+      if (p.naturalNature === "Benefic") {
+        score += 8;
+        positives.push(p.name + " tenants as benefic");
+      } else {
+        score -= 7;
+        concerns.push(p.name + " tenants as malefic");
+      }
+    });
+    aspecting.forEach(function (p) {
+      if (p.naturalNature === "Benefic") {
+        score += 5;
+        positives.push(p.name + " aspects");
+      } else {
+        score -= 5;
+        concerns.push(p.name + " aspects");
+      }
+    });
+    if ([6, 8, 12].indexOf(house) >= 0) score -= 3;
+    var support = supportHouse(house);
+    var supportLord = chart.planetsByName[lordOfHouse(chart, support)];
+    if (supportLord && supportLord.strength.score >= 60) {
+      score += 4;
+      positives.push("Bhavat-bhavam support house " + support + " is supported");
+    }
+    if (isHemmed(chart, house, "Benefic")) {
+      score += 6;
+      positives.push("Shubha-kartari");
+    }
+    if (isHemmed(chart, house, "Malefic")) {
+      score -= 8;
+      concerns.push("Papa-kartari");
+    }
+    score = clamp(score, 0, 100);
+    return {
+      house: house,
+      sign: sign,
+      signName: SIGNS[sign].name,
+      lord: lordName,
+      tenants: tenants,
+      aspecting: aspecting,
+      karakas: KARAKAS[house] || [],
+      score: Math.round(score),
+      label: strengthLabel(score),
+      positives: dedupe(positives).slice(0, 4),
+      concerns: dedupe(concerns).slice(0, 4)
+    };
+  }
+
+  function supportHouse(house) {
+    return ((house - 1) * 2) % 12 + 1;
+  }
+
+  function planetAspectsHouse(planet, targetHouse) {
+    return !!aspectNameToHouse(planet, targetHouse);
+  }
+
+  function aspectNameToHouse(planet, targetHouse) {
+    var distance = ((targetHouse - planet.house + 12) % 12) + 1;
+    if (distance === 7) return "7th Aspect";
+    if (planet.name === "Mars" && (distance === 4 || distance === 8)) return distance + "th Aspect";
+    if (planet.name === "Jupiter" && (distance === 5 || distance === 9)) return distance + "th Aspect";
+    if (planet.name === "Saturn" && (distance === 3 || distance === 10)) return distance + "th Aspect";
+    if ((planet.name === "Rahu" || planet.name === "Ketu") && (distance === 5 || distance === 9)) return distance + "th Aspect";
+    return "";
+  }
+
+  function planetsAspectingHouse(chart, house) {
+    return chart.planets.filter(function (p) { return planetAspectsHouse(p, house); });
+  }
+
+  function planetsAspectingPlanet(chart, planet) {
+    return chart.planets.filter(function (p) { return p.name !== planet.name && planetAspectsHouse(p, planet.house); });
+  }
+
+  function hasSambandha(chart, aName, bName) {
+    var a = chart.planetsByName[aName];
+    var b = chart.planetsByName[bName];
+    if (!a || !b || a.name === b.name) return false;
+    if (a.sign === b.sign) return true;
+    if (planetAspectsHouse(a, b.house) || planetAspectsHouse(b, a.house)) return true;
+    return SIGNS[a.sign].lord === b.name && SIGNS[b.sign].lord === a.name;
+  }
+
+  function isHemmed(chart, house, nature) {
+    var prev = house === 1 ? 12 : house - 1;
+    var next = house === 12 ? 1 : house + 1;
+    var prevHas = chart.planets.some(function (p) { return p.house === prev && p.naturalNature === nature; });
+    var nextHas = chart.planets.some(function (p) { return p.house === next && p.naturalNature === nature; });
+    return prevHas && nextHas;
+  }
+
+  function wrapHouse(house) {
+    return ((house - 1 + 12) % 12) + 1;
+  }
+
+  function strengthLabel(score) {
+    if (score >= 68) return "Strong";
+    if (score >= 48) return "Medium";
+    return "Weak";
+  }
+
+  function vargaSign(lon, division) {
+    var cacheKey = division + ":" + _qkey(lon);
+    var hit = _memoVargaSign.get(cacheKey);
+    if (hit !== undefined) return hit;
+    var result = _vargaSignCompute(lon, division);
+    _memoVargaSign.set(cacheKey, result);
+    return result;
+  }
+
+  function _vargaSignCompute(lon, division) {
+    var sign = signIndex(lon);
+    var deg = normalize(lon) - sign * 30;
+    if (division === 1) return sign;
+    if (division === 2) {
+      var first = deg < 15;
+      var odd = sign % 2 === 0;
+      return odd ? (first ? 4 : 3) : (first ? 3 : 4);
+    }
+    if (division === 3) {
+      var d3 = Math.floor(deg / 10);
+      return normalizeSign(sign + d3 * 4);
+    }
+    if (division === 4) {
+      return normalizeSign(sign + Math.floor(deg / 7.5) * 3);
+    }
+    if (division === 6) {
+      var d6 = Math.floor(deg / 5);
+      return normalizeSign((isOddSign(sign) ? 0 : 6) + d6);
+    }
+    if (division === 7) {
+      var d7 = Math.floor(deg / (30 / 7));
+      var start7 = sign % 2 === 0 ? sign : sign + 6;
+      return normalizeSign(start7 + d7);
+    }
+    if (division === 8) {
+      var d8 = Math.floor(deg / (30 / 8));
+      var mode8 = SIGNS[sign].modality;
+      var start8 = mode8 === "Movable" ? 0 : mode8 === "Fixed" ? 8 : 4;
+      return normalizeSign(start8 + d8);
+    }
+    if (division === 9) {
+      var part = Math.floor(deg / (30 / 9));
+      var modality = SIGNS[sign].modality;
+      var start = modality === "Movable" ? sign : modality === "Fixed" ? sign + 8 : sign + 4;
+      return normalizeSign(start + part);
+    }
+    if (division === 10) {
+      var d10 = Math.floor(deg / 3);
+      var start10 = sign % 2 === 0 ? sign : sign + 8;
+      return normalizeSign(start10 + d10);
+    }
+    if (division === 12) {
+      return normalizeSign(sign + Math.floor(deg / 2.5));
+    }
+    if (division === 16) {
+      var d16 = Math.floor(deg / (30 / 16));
+      var mode = SIGNS[sign].modality;
+      var start16 = mode === "Movable" ? 0 : mode === "Fixed" ? 4 : 8;
+      return normalizeSign(start16 + d16);
+    }
+    if (division === 24) {
+      var d24 = Math.floor(deg / (30 / 24));
+      var start24 = isOddSign(sign) ? 4 : 3;
+      return normalizeSign(start24 + d24);
+    }
+    if (division === 30) {
+      return trimsamsaSign(sign, deg);
+    }
+    if (division === 40) {
+      var d40 = Math.floor(deg / (30 / 40));
+      return normalizeSign((isOddSign(sign) ? 0 : 6) + d40);
+    }
+    if (division === 45) {
+      var d45 = Math.floor(deg / (30 / 45));
+      var start45 = SIGNS[sign].modality === "Movable" ? 0 : SIGNS[sign].modality === "Fixed" ? 4 : 8;
+      return normalizeSign(start45 + d45);
+    }
+    if (division === 60) {
+      return normalizeSign(sign + Math.floor(deg / 0.5));
+    }
+    return normalizeSign(sign * division + Math.floor(deg / (30 / division)));
+  }
+
+  function vargaDegree(lon, division) {
+    var sign = signIndex(lon);
+    var deg = normalize(lon) - sign * 30;
+    if (division === 1) return deg;
+    if (division === 30) return trimsamsaDegree(sign, deg);
+    var segmentSize = 30 / division;
+    var segment = Math.min(division - 1, Math.floor(deg / segmentSize));
+    return ((deg - segment * segmentSize) / segmentSize) * 30;
+  }
+
+  function trimsamsaSign(sign, deg) {
+    if (isOddSign(sign)) {
+      if (deg < 5) return 0;
+      if (deg < 10) return 10;
+      if (deg < 18) return 8;
+      if (deg < 25) return 2;
+      return 6;
+    }
+    if (deg < 5) return 1;
+    if (deg < 12) return 5;
+    if (deg < 20) return 11;
+    if (deg < 25) return 9;
+    return 7;
+  }
+
+  function trimsamsaDegree(sign, deg) {
+    var segments = isOddSign(sign)
+      ? [[0, 5], [5, 10], [10, 18], [18, 25], [25, 30]]
+      : [[0, 5], [5, 12], [12, 20], [20, 25], [25, 30]];
+    for (var i = 0; i < segments.length; i += 1) {
+      var start = segments[i][0];
+      var end = segments[i][1];
+      if (deg >= start && (deg < end || i === segments.length - 1)) {
+        return ((deg - start) / (end - start)) * 30;
+      }
+    }
+    return 0;
+  }
+
+  function normalizeSign(sign) {
+    return ((sign % 12) + 12) % 12;
+  }
+
+  function makeVargaChart(chart, division) {
+    var ascSign = vargaSign(chart.ascendant.lon, division);
+    var ascDegree = vargaDegree(chart.ascendant.lon, division);
+    var planets = chart.planets.map(function (p) {
+      var sign = vargaSign(p.lon, division);
+      var degree = vargaDegree(p.lon, division);
+      return {
+        name: p.name,
+        lon: sign * 30 + degree,
+        deg: degree,
+        sign: sign,
+        signName: SIGNS[sign].name,
+        house: houseFromSign(ascSign, sign),
+        retrograde: p.retrograde,
+        combust: p.combust,
+        d1Sign: p.sign,
+        vargottama: sign === p.sign,
+        naturalNature: p.naturalNature,
+        strength: p.strength,
+        dignity: p.dignity
+      };
+    });
+    return {
+      division: division,
+      ascendant: { sign: ascSign, signName: SIGNS[ascSign].name, deg: ascDegree },
+      planets: planets,
+      planetsByName: indexBy(planets, "name")
+    };
+  }
+
+  function vimshottariSummary(chart) {
+    var moon = chart.planetsByName.Moon;
+    var nak = nakshatraInfo(moon.lon);
+    var balanceFraction = (NAK_SIZE - nak.within) / NAK_SIZE;
+    var balanceDays = balanceFraction * DASHA_YEARS[nak.lord] * 365.25;
+    return {
+      birthNakshatra: nak,
+      balanceLord: nak.lord,
+      balanceDays: balanceDays,
+      balanceYears: balanceDays / 365.25,
+      timeline: generateDashaTimeline(chart.date, moon.lon, 125)
+    };
+  }
+
+  function generateDashaTimeline(birthDate, moonLon, yearsAhead) {
+    var nak = nakshatraInfo(moonLon);
+    var elapsedFraction = nak.within / NAK_SIZE;
+    var elapsedDays = elapsedFraction * DASHA_YEARS[nak.lord] * 365.25;
+    var start = addDays(birthDate, -elapsedDays);
+    var index = DASHA_SEQUENCE.indexOf(nak.lord);
+    var endLimit = addDays(birthDate, yearsAhead * 365.25);
+    var periods = [];
+    var current = start;
+    var guard = 0;
+    while (current < endLimit && guard < 30) {
+      var lord = DASHA_SEQUENCE[(index + guard) % DASHA_SEQUENCE.length];
+      var end = addDays(current, DASHA_YEARS[lord] * 365.25);
+      periods.push({ lord: lord, start: current, end: end, level: "MD" });
+      current = end;
+      guard += 1;
+    }
+    return periods;
+  }
+
+  function subPeriods(period, levelName) {
+    var totalDays = (period.end - period.start) / DAY_MS;
+    var startIndex = DASHA_SEQUENCE.indexOf(period.lord);
+    var result = [];
+    var current = new Date(period.start.getTime());
+    for (var i = 0; i < DASHA_SEQUENCE.length; i += 1) {
+      var lord = DASHA_SEQUENCE[(startIndex + i) % DASHA_SEQUENCE.length];
+      var span = totalDays * DASHA_YEARS[lord] / 120;
+      var end = addDays(current, span);
+      result.push({ lord: lord, start: current, end: end, level: levelName, parent: period.lord });
+      current = end;
+    }
+    return result;
+  }
+
+  function findDashaStack(timeline, date) {
+    var md = timeline.find(function (p) { return date >= p.start && date < p.end; });
+    if (!md) return [];
+    var ad = subPeriods(md, "AD").find(function (p) { return date >= p.start && date < p.end; });
+    var pd = ad ? subPeriods(ad, "PD").find(function (p) { return date >= p.start && date < p.end; }) : null;
+    var sd = pd ? subPeriods(pd, "SD").find(function (p) { return date >= p.start && date < p.end; }) : null;
+    var pr = sd ? subPeriods(sd, "PR").find(function (p) { return date >= p.start && date < p.end; }) : null;
+    return [md, ad, pd, sd, pr].filter(Boolean);
+  }
+
+  function analyzeEvent(chart, transitChart, cfg, topicKey, input) {
+    var promise = eventPromise(chart, cfg);
+    var rules = topicRules(chart, cfg, topicKey, input);
+    var cross = crossChecks(chart, cfg);
+    var timing = timingAnalysis(chart, transitChart, cfg, topicKey, input);
+    var verdict = synthesizeVerdict(promise, rules, cross, topicKey);
+    var yogas = scanYogas(chart);
+    return {
+      topicKey: topicKey,
+      cfg: cfg,
+      promise: promise,
+      rules: rules,
+      cross: cross,
+      timing: timing,
+      verdict: verdict,
+      yogas: yogas
+    };
+  }
+
+  function eventPromise(chart, cfg) {
+    var houses = cfg.houses.map(function (h) { return chart.houses[h - 1]; });
+    var lords = dedupe(cfg.houses.map(function (h) { return lordOfHouse(chart, h); })).map(function (name) { return chart.planetsByName[name]; }).filter(Boolean);
+    var karakas = cfg.karakas.map(function (name) { return chart.planetsByName[name]; }).filter(Boolean);
+    var houseScore = average(houses.map(prop("score")));
+    var lordScore = average(lords.map(function (p) { return p.strength.score; }));
+    var karakaScore = average(karakas.map(function (p) { return p.strength.score; }));
+    var sambandhas = [];
+    lords.forEach(function (lord) {
+      karakas.forEach(function (karaka) {
+        if (hasSambandha(chart, lord.name, karaka.name)) sambandhas.push(lord.name + "-" + karaka.name);
+      });
+    });
+    var score = Math.round(average([houseScore, lordScore, karakaScore]) + Math.min(10, sambandhas.length * 2));
+    return {
+      score: clamp(score, 0, 100),
+      label: strengthLabel(score),
+      houses: houses,
+      lords: lords,
+      karakas: karakas,
+      sambandhas: dedupe(sambandhas)
+    };
+  }
+
+  function topicRules(chart, cfg, topicKey, input) {
+    var rules = [];
+    rules = rules.concat(genericRules(chart, cfg));
+    if (topicKey === "marriage") rules = rules.concat(marriageRules(chart, input));
+    if (topicKey === "children") rules = rules.concat(childrenRules(chart, input));
+    if (topicKey === "profession") rules = rules.concat(professionRules(chart));
+    if (topicKey === "foreign") rules = rules.concat(foreignRules(chart));
+    if (topicKey === "wealth") rules = rules.concat(wealthRules(chart));
+    if (topicKey === "education") rules = rules.concat(educationRules(chart));
+    if (topicKey === "property") rules = rules.concat(propertyRules(chart));
+    if (topicKey === "health") rules = rules.concat(healthRules(chart));
+    if (topicKey === "longevity") rules = rules.concat(longevityRules(chart));
+    rules.push(pendingRule("A.11/D.3", "Ashtakavarga numerical bindu filter", "The methodology gives thresholds but not the planet-by-sign bindu source tables in the attached file."));
+    return rules;
+  }
+
+  function genericRules(chart, cfg) {
+    var out = [];
+    cfg.primaryHouses.forEach(function (h) {
+      var judgement = chart.houses[h - 1];
+      out.push(rule("A.5-H" + h, "House " + h + " is judged first by tenants, aspects, lord, and bhavat-bhavam.", judgement.score >= 48, "positive", "Score " + judgement.score + " (" + judgement.label + "); lord " + judgement.lord + "."));
+      var lord = chart.planetsByName[judgement.lord];
+      out.push(rule("A.4-L" + h, "Lord of house " + h + " should be strong and unafflicted.", lord && lord.strength.score >= 55 && lord.afflictions.length <= 2, "positive", lord ? lord.name + " score " + lord.strength.score + "; afflictions: " + (lord.afflictions.join("; ") || "none") : "Lord unavailable."));
+    });
+    cfg.karakas.forEach(function (name) {
+      var p = chart.planetsByName[name];
+      if (p) out.push(rule("A.9-" + name, "Karaka " + name + " should support the event.", p.strength.score >= 52, "positive", name + " is " + p.strength.label + " in house " + p.house + ", " + p.signName + "."));
+    });
+    return out;
+  }
+
+  function marriageRules(chart, input) {
+    var out = [];
+    var h7 = chart.houses[6];
+    var lord7 = chart.planetsByName[h7.lord];
+    var venus = chart.planetsByName.Venus;
+    var jupiter = chart.planetsByName.Jupiter;
+    var mars = chart.planetsByName.Mars;
+    var lord2 = chart.planetsByName[lordOfHouse(chart, 2)];
+    var lord5 = chart.planetsByName[lordOfHouse(chart, 5)];
+    var lord12 = chart.planetsByName[lordOfHouse(chart, 12)];
+    var lagnesh = chart.planetsByName[lordOfHouse(chart, 1)];
+
+    out.push(rule("C.2.2.1", "7th lord auspicious and powerful.", lord7.strength.score >= 60 && lord7.afflictions.length <= 2, "positive", planetEvidence(lord7)));
+    out.push(rule("C.2.2.2", "Benefics in the 7th not owning 6/8/12 support marriage.", chart.planets.some(function (p) { return p.house === 7 && p.naturalNature === "Benefic" && !p.lordships.some(isDusthana); }), "positive", tenantsEvidence(chart, 7)));
+    out.push(rule("C.2.2.3", "A malefic owner of the 7th in the 7th can still give marriage happiness.", lord7.house === 7 && lord7.naturalNature === "Malefic", "positive", planetEvidence(lord7)));
+    out.push(rule("C.2.2.4", "Lords of 2, 7, 12 in angles/trines and under Jupiter aspect.", [lord2, lord7, lord12].every(function (p) { return p && isKendraTrine(p.house) && planetAspectsHouse(jupiter, p.house); }), "positive", "2L " + lord2.name + ", 7L " + lord7.name + ", 12L " + lord12.name + "."));
+    out.push(rule("C.2.2.6", "Lords of 5th and 7th powerful.", lord5.strength.score >= 55 && lord7.strength.score >= 55, "positive", lord5.name + " " + lord5.strength.score + "; " + lord7.name + " " + lord7.strength.score + "."));
+    out.push(rule("C.2.2.7", "Benefics aspect both 7th house and 7th lord.", hasBeneficAspectOnHouse(chart, 7) && planetsAspectingPlanet(chart, lord7).some(isBenefic), "positive", "7th aspects: " + h7.aspecting.map(prop("name")).join(", ")));
+    out.push(rule("C.2.2.8", "Jupiter and 7th lord strong.", jupiter.strength.score >= 60 && lord7.strength.score >= 60, "positive", "Jupiter " + jupiter.strength.score + "; 7L " + lord7.strength.score + "."));
+    out.push(rule("C.2.2.9", "5th or 9th lord aspects Venus.", [lordOfHouse(chart, 5), lordOfHouse(chart, 9)].some(function (name) { return planetAspectsHouse(chart.planetsByName[name], venus.house); }), "positive", "Venus in house " + venus.house + "."));
+    out.push(rule("C.2.2.14", "7th lord or Venus connected with Jupiter.", hasSambandha(chart, lord7.name, "Jupiter") || hasSambandha(chart, "Venus", "Jupiter"), "positive", "Sambandha checked by conjunction, aspect, or exchange."));
+    out.push(rule("C.2.2.17", "Lagnesh and 7th lord not in 6/8 or 2/12 relation in navamsa.", !badMutualRelation(vargaSign(lagnesh.lon, 9), vargaSign(lord7.lon, 9)), "positive", "Navamsa signs: " + SIGNS[vargaSign(lagnesh.lon, 9)].name + " and " + SIGNS[vargaSign(lord7.lon, 9)].name + "."));
+    out.push(rule("C.2.2.18", "Venus in male chart or Mars in female chart should be unafflicted.", input.gender === "female" ? mars.afflictions.length <= 2 : venus.afflictions.length <= 2, "positive", input.gender === "female" ? planetEvidence(mars) : planetEvidence(venus)));
+
+    out.push(rule("C.2.5.1", "Venus in 8 under Mercury or Saturn influence delays marriage.", venus.house === 8 && (hasSambandha(chart, "Venus", "Mercury") || hasSambandha(chart, "Venus", "Saturn")), "negative", planetEvidence(venus)));
+    out.push(rule("C.2.5.3", "Malefic influence on 7th, 7th lord and Venus delays or denies.", hasMaleficAspectOnHouse(chart, 7) && planetsAspectingPlanet(chart, lord7).some(isMalefic) && planetsAspectingPlanet(chart, venus).some(isMalefic), "negative", "7th, 7L, and Venus all checked."));
+    out.push(rule("C.2.5.4", "Saturn in 7 or 5 without benefic influence delays.", (chart.planetsByName.Saturn.house === 7 || chart.planetsByName.Saturn.house === 5) && !planetsAspectingPlanet(chart, chart.planetsByName.Saturn).some(isBenefic), "negative", planetEvidence(chart.planetsByName.Saturn)));
+    out.push(rule("C.2.5.6", "Venus combust, debilitated, or hemmed by malefics delays.", venus.combust || venus.dignity === "Debilitated" || isHemmed(chart, venus.house, "Malefic"), "negative", planetEvidence(venus)));
+    out.push(rule("C.2.5.10", "Rahu in 7 under malefic influence delays.", chart.planetsByName.Rahu.house === 7 && (hasMaleficAspectOnHouse(chart, 7) || !hasBeneficAspectOnHouse(chart, 7)), "negative", planetEvidence(chart.planetsByName.Rahu)));
+    out.push(rule("C.2.5.17", "Saturn-Mars, Venus-Moon, Venus-Sun, or Sun-Saturn links with 7th involvement can delay.", marriageDelayPair(chart), "negative", "Pair sambandhas checked with 7th house, 7th lord, or Venus."));
+    out.push(rule("C.2.9", "Love marriage signatures: 5th lord connected to 7th house/lord or Venus-Mars/Rahu emphasis.", hasSambandha(chart, lord5.name, lord7.name) || planetAspectsHouse(lord5, 7) || (venus.house === 7 && (planetAspectsHouse(mars, 7) || chart.planetsByName.Rahu.house === 7)), "positive", "5L " + lord5.name + ", 7L " + lord7.name + "."));
+    out.push(rule("C.2.16", "Separation signatures: separative planets influence 7th, 7th lord, or Venus.", separativeInfluenceOnMarriage(chart), "negative", "Sun, Saturn, Rahu, and 12th lord checked."));
+    out = out.concat(manglikRules(chart));
+    out.push(pendingRule("C.2.4/C.2.6/C.2.14/C.2.15", "Marriage extended source tables", "The attached file summarizes plural-marriage, spouse-character, and married-life-quality tables but does not enumerate every row."));
+    return out;
+  }
+
+  function childrenRules(chart, input) {
+    var out = [];
+    var lord5 = chart.planetsByName[lordOfHouse(chart, 5)];
+    var lord7 = chart.planetsByName[lordOfHouse(chart, 7)];
+    var lagnesh = chart.planetsByName[lordOfHouse(chart, 1)];
+    var jupiter = chart.planetsByName.Jupiter;
+    var venus = chart.planetsByName.Venus;
+    var sun = chart.planetsByName.Sun;
+    var moon = chart.planetsByName.Moon;
+    var mars = chart.planetsByName.Mars;
+
+    out.push(rule("C.5.2", "5th from lagna, Moon, Jupiter and 9th must be studied.", true, "positive", "All four reference houses are included in the promise and cross-check sections."));
+    out.push(rule("C.5.6", "5th lord in/aspecting 5th supports children.", lord5.house === 5 || planetAspectsHouse(lord5, 5), "positive", planetEvidence(lord5)));
+    out.push(rule("C.5.6", "Lagnesh, 5th lord, and 7th lord connected supports progeny.", hasSambandha(chart, lagnesh.name, lord5.name) && hasSambandha(chart, lord5.name, lord7.name), "positive", "Lagnesh " + lagnesh.name + ", 5L " + lord5.name + ", 7L " + lord7.name + "."));
+    out.push(rule("C.5.6", "Strong Jupiter connected to the 5th supports children.", jupiter.strength.score >= 55 && (jupiter.house === 5 || planetAspectsHouse(jupiter, 5) || hasSambandha(chart, "Jupiter", lord5.name)), "positive", planetEvidence(jupiter)));
+    out.push(rule("C.5.5", "Beeja sphuta or Kshetra sphuta has supportive parity.", sphutaSupport(chart, input.gender).support, "positive", sphutaSupport(chart, input.gender).evidence));
+    out.push(rule("C.5.9", "5th lord debilitated and afflicted can deny or delay children.", lord5.dignity === "Debilitated" && lord5.afflictions.length >= 2, "negative", planetEvidence(lord5)));
+    out.push(rule("C.5.9", "Rahu, Saturn, or Ketu afflicting 5th can obstruct progeny.", ["Rahu", "Saturn", "Ketu"].some(function (name) { var p = chart.planetsByName[name]; return p.house === 5 || planetAspectsHouse(p, 5); }), "negative", "Affliction to 5th checked."));
+    out.push(rule("C.5.9", "Mars aspect on 5th harms progeny happiness.", planetAspectsHouse(mars, 5), "negative", planetEvidence(mars)));
+    out.push(rule("C.5.3", "5th lord in odd sign leans toward male issue; even sign leans toward female issue.", true, "positive", "5L " + lord5.name + " is in " + SIGNS[lord5.sign].gender + " sign " + lord5.signName + "."));
+    out.push(rule("C.5.4", "Male procreative factors: Sun and Venus in odd signs/navamsas.", input.gender === "male" && isOddSign(sun.sign) && isOddSign(venus.sign) && isOddSign(vargaSign(sun.lon, 9)) && isOddSign(vargaSign(venus.lon, 9)), "positive", "Sun/Venus parity checked."));
+    out.push(rule("C.5.4", "Female procreative factors: Moon and Mars in even signs/navamsas.", input.gender === "female" && !isOddSign(moon.sign) && !isOddSign(mars.sign) && !isOddSign(vargaSign(moon.lon, 9)) && !isOddSign(vargaSign(mars.lon, 9)), "positive", "Moon/Mars parity checked."));
+    out.push(pendingRule("C.5.6/C.5.9/C.5.14", "Children extended source tables", "The methodology summarizes the 37 gain, 35 childlessness, and father-son pair rules but not every exact row."));
+    return out;
+  }
+
+  function professionRules(chart) {
+    var out = [];
+    var det = professionDeterminants(chart);
+    out.push(rule("C.8.1", "Profession determinants: 10th from lagna, 10th from Moon, navamsa lord of 10th lord, and Sun.", true, "positive", det.map(function (d) { return d.label + ": " + d.planet.name + " (" + d.planet.strength.score + ")"; }).join("; ")));
+    out.push(rule("C.8.6", "Strongest-of-four rule selects the primary profession planet.", true, "positive", "Primary: " + det[0].planet.name + " from " + det[0].label + "."));
+    out.push(rule("C.8.7", "Teacher signature: Mercury influences 10th or 10th lord.", planetAspectsHouse(chart.planetsByName.Mercury, 10) || hasSambandha(chart, "Mercury", lordOfHouse(chart, 10)), "positive", "Mercury checked with 10th."));
+    out.push(rule("C.8.7", "Medical signature: Sun/Mars/Saturn/Rahu or Virgo/Scorpio/Pisces influence 10th.", medicalCareerSignature(chart), "positive", "Medical indicators checked."));
+    out.push(rule("C.8.11", "Business tendency: majority planets in 7-12 or fiery/airy signs.", businessSignature(chart), "positive", "Hemisphere and element emphasis checked."));
+    out.push(rule("C.8.11", "Service tendency: 6th/Sun/Mercury/Saturn strength.", serviceSignature(chart), "positive", "6th, Sun, Mercury, Saturn checked."));
+    out.push(pendingRule("C.8.4", "Profession sign and house lookup tables", "The methodology mentions full 12-sign and 12-house occupational tables but only gives condensed categories."));
+    return out;
+  }
+
+  function foreignRules(chart) {
+    var out = [];
+    var lagnesh = chart.planetsByName[lordOfHouse(chart, 1)];
+    var lord9 = chart.planetsByName[lordOfHouse(chart, 9)];
+    var lord12 = chart.planetsByName[lordOfHouse(chart, 12)];
+    out.push(rule("C.10.1", "Majority planets in movable signs favor travel.", chart.planets.filter(function (p) { return SIGNS[p.sign].modality === "Movable"; }).length >= 5, "positive", "Movable planets counted."));
+    out.push(rule("C.10.2", "Rahu in 1/7/12 supports foreign movement.", [1, 7, 12].indexOf(chart.planetsByName.Rahu.house) >= 0, "positive", planetEvidence(chart.planetsByName.Rahu)));
+    out.push(rule("C.10.2", "Lagnesh or 6th lord in 12 supports foreign residence/change.", lagnesh.house === 12 || chart.planetsByName[lordOfHouse(chart, 6)].house === 12, "positive", planetEvidence(lagnesh)));
+    out.push(rule("C.10.2", "Exchange between 1st and 9th or 9th and 12th lords supports abroad.", exchange(chart, lordOfHouse(chart, 1), lordOfHouse(chart, 9)) || exchange(chart, lordOfHouse(chart, 9), lordOfHouse(chart, 12)), "positive", "1/9 and 9/12 exchanges checked."));
+    out.push(rule("C.10.2", "9th and 12th lords in movable signs support travel.", SIGNS[lord9.sign].modality === "Movable" && SIGNS[lord12.sign].modality === "Movable", "positive", "9L " + lord9.signName + "; 12L " + lord12.signName + "."));
+    out.push(rule("C.10.3", "12th lord afflicted by malefics warns of heavy expenses abroad.", lord12.afflictions.length >= 3, "negative", planetEvidence(lord12)));
+    return out;
+  }
+
+  function wealthRules(chart) {
+    var out = [];
+    var lord2 = chart.planetsByName[lordOfHouse(chart, 2)];
+    var lord11 = chart.planetsByName[lordOfHouse(chart, 11)];
+    var lord5 = chart.planetsByName[lordOfHouse(chart, 5)];
+    var lord9 = chart.planetsByName[lordOfHouse(chart, 9)];
+    out.push(rule("B.4", "Dhana yoga: 2nd/11th lords connect with 5th/9th lords.", [lord2, lord11].some(function (a) { return [lord5, lord9].some(function (b) { return hasSambandha(chart, a.name, b.name); }); }), "positive", "2L/11L with 5L/9L checked."));
+    out.push(rule("A.5", "2nd and 11th houses should be strong for wealth.", chart.houses[1].score >= 55 && chart.houses[10].score >= 55, "positive", "2nd " + chart.houses[1].score + "; 11th " + chart.houses[10].score + "."));
+    out.push(rule("D.1.1", "11th and 12th lords association can benefit 12th lord dasa.", hasSambandha(chart, lordOfHouse(chart, 11), lordOfHouse(chart, 12)), "positive", "11L/12L sambandha checked."));
+    out.push(rule("B.6", "Daridra tendency: wealth lords afflicted or in dusthana.", (lord2.afflictions.length >= 3 || lord11.afflictions.length >= 3) || ([6, 8, 12].indexOf(lord2.house) >= 0 && [6, 8, 12].indexOf(lord11.house) >= 0), "negative", "2L " + planetEvidence(lord2) + "; 11L " + planetEvidence(lord11)));
+    return out;
+  }
+
+  function educationRules(chart) {
+    var out = [];
+    var lord4 = chart.planetsByName[lordOfHouse(chart, 4)];
+    var lord5 = chart.planetsByName[lordOfHouse(chart, 5)];
+    var lord2 = chart.planetsByName[lordOfHouse(chart, 2)];
+    out.push(rule("C.11", "Vidya yoga: 4th and 5th lords well placed or in sambandha.", (isKendraTrine(lord4.house) && isKendraTrine(lord5.house)) || hasSambandha(chart, lord4.name, lord5.name), "positive", "4L " + lord4.name + "; 5L " + lord5.name + "."));
+    out.push(rule("C.11", "1st and 5th lord exchange/sambandha supports learning.", hasSambandha(chart, lordOfHouse(chart, 1), lordOfHouse(chart, 5)), "positive", "1L/5L checked."));
+    out.push(rule("C.11", "2nd and 4th lords support education and learning foundation.", hasSambandha(chart, lord2.name, lord4.name) || (lord2.strength.score >= 55 && lord4.strength.score >= 55), "positive", "2L " + lord2.name + "; 4L " + lord4.name + "."));
+    out.push(rule("A.9", "Mercury and Jupiter should be capable for education.", chart.planetsByName.Mercury.strength.score >= 52 && chart.planetsByName.Jupiter.strength.score >= 52, "positive", "Mercury/Jupiter checked."));
+    return out;
+  }
+
+  function propertyRules(chart) {
+    var out = [];
+    var lord4 = chart.planetsByName[lordOfHouse(chart, 4)];
+    var venus = chart.planetsByName.Venus;
+    var mars = chart.planetsByName.Mars;
+    var jupiter = chart.planetsByName.Jupiter;
+    out.push(rule("C.11", "Property and vehicle judgement uses 4th house/lord, Venus, Jupiter, and 10th.", true, "positive", "4th, 10th, Venus, Jupiter, Mars included."));
+    out.push(rule("C.11", "Strong 4th lord supports property and conveyance.", lord4.strength.score >= 60, "positive", planetEvidence(lord4)));
+    out.push(rule("D.2.8", "Jupiter influence on 4th supports immovable property.", jupiter.house === 4 || planetAspectsHouse(jupiter, 4), "positive", planetEvidence(jupiter)));
+    out.push(rule("C.11", "Mars and Venus connected can support land/buildings/vehicles.", hasSambandha(chart, "Mars", "Venus") || planetAspectsHouse(mars, 4) || planetAspectsHouse(venus, 4), "positive", "Mars/Venus checked."));
+    out.push(rule("A.4", "Afflicted 4th house warns of property or domestic strain.", chart.houses[3].score < 45, "negative", "4th score " + chart.houses[3].score + "."));
+    return out;
+  }
+
+  function healthRules(chart) {
+    var out = [];
+    var lagnesh = chart.planetsByName[lordOfHouse(chart, 1)];
+    var lord6 = chart.planetsByName[lordOfHouse(chart, 6)];
+    var lord8 = chart.planetsByName[lordOfHouse(chart, 8)];
+    out.push(rule("C.9.5", "Health rule: 1st, 6th, 8th, 12th houses and their lords are checked.", true, "positive", "Core health houses included."));
+    out.push(rule("A.4", "Strong lagna and lagnesh protect vitality.", chart.houses[0].score >= 55 && lagnesh.strength.score >= 55, "positive", "Lagna " + chart.houses[0].score + "; lagnesh " + lagnesh.strength.score + "."));
+    out.push(rule("D.1.4", "Weak 8th lord or trika lords can activate health strain in dasha.", lord8.strength.score < 45 || lord6.afflictions.length >= 3, "negative", "6L " + planetEvidence(lord6) + "; 8L " + planetEvidence(lord8)));
+    out.push(rule("C.9.7", "Benefic protection to lagna or 6th improves health resilience.", hasBeneficAspectOnHouse(chart, 1) || hasBeneficAspectOnHouse(chart, 6), "positive", "Benefic aspects on 1/6 checked."));
+    out.push(pendingRule("C.9.1/C.9.6", "Medical body-part and disease tables", "The methodology mentions full disease-by-disease tables but they are not included row-by-row in the attached file."));
+    return out;
+  }
+
+  function longevityRules(chart) {
+    var out = [];
+    var lagnesh = chart.planetsByName[lordOfHouse(chart, 1)];
+    var lord8 = chart.planetsByName[lordOfHouse(chart, 8)];
+    var pair1 = lifespanPairClass(lagnesh.sign, lord8.sign);
+    var pair2 = lifespanPairClass(chart.ascendant.sign, chart.planetsByName.Moon.sign);
+    out.push(rule("C.1.1-M1A", "Jaimini pair: lagna lord and 8th lord signs.", pair1 !== "Short", pair1 === "Long" ? "positive" : "warning", SIGNS[lagnesh.sign].modality + " + " + SIGNS[lord8.sign].modality + " = " + pair1 + "."));
+    out.push(rule("C.1.1-M1B", "Jaimini pair: lagna sign and Moon sign.", pair2 !== "Short", pair2 === "Long" ? "positive" : "warning", SIGNS[chart.ascendant.sign].modality + " + " + SIGNS[chart.planetsByName.Moon.sign].modality + " = " + pair2 + "."));
+    out.push(rule("C.1.2", "Long-life support: lagna or chandra lagna strong.", chart.houses[0].score >= 60 || scoreFromBase(chart, chart.planetsByName.Moon.sign, [1]) >= 60, "positive", "Lagna score " + chart.houses[0].score + "."));
+    out.push(rule("C.1.2", "Long-life support: benefics in kendra/trikona/2/8.", chart.planets.filter(function (p) { return p.naturalNature === "Benefic" && [1, 2, 4, 5, 7, 8, 9, 10].indexOf(p.house) >= 0; }).length >= 2, "positive", "Benefic support counted."));
+    out.push(rule("C.1.2", "Long-life support: lord of lagna and 8th strong/friendly.", lagnesh.strength.score >= 55 && lord8.strength.score >= 50 && areFriends(lagnesh.name, lord8.name), "positive", "Lagnesh " + lagnesh.name + "; 8L " + lord8.name + "."));
+    out.push(rule("C.1.4", "Alpayu concern: lagnesh weak and 8th lord dominant.", lagnesh.strength.score < 42 && lord8.strength.score > lagnesh.strength.score + 15, "negative", "Lagnesh " + lagnesh.strength.score + "; 8L " + lord8.strength.score + "."));
+    out.push(rule("C.1.5", "Arishta-bhanga: strong Jupiter in lagna or 10 protects.", chart.planetsByName.Jupiter.strength.score >= 60 && [1, 10].indexOf(chart.planetsByName.Jupiter.house) >= 0, "positive", planetEvidence(chart.planetsByName.Jupiter)));
+    out.push(pendingRule("C.1.3/C.1.4/C.1.8/C.1.10", "Longevity extended source tables", "The methodology summarizes medium/short-life, death-timing, and 22nd-drekkana tables but does not provide all exact rows. This app avoids exact death-date claims."));
+    return out;
+  }
+
+  function crossChecks(chart, cfg) {
+    var dchart = makeVargaChart(chart, cfg.dchart);
+    var checks = [
+      { label: "D-1 lagna", score: scoreFromBase(chart, chart.ascendant.sign, cfg.primaryHouses), note: "Primary houses from natal lagna." },
+      { label: "Chandra lagna", score: scoreFromBase(chart, chart.planetsByName.Moon.sign, cfg.primaryHouses), note: "Same houses counted from Moon." },
+      { label: "Surya lagna", score: scoreFromBase(chart, chart.planetsByName.Sun.sign, cfg.primaryHouses), note: "Same houses counted from Sun." },
+      { label: "D-" + cfg.dchart, score: vargaPromise(dchart, cfg), note: "Relevant divisional chart promise." }
+    ];
+    checks.forEach(function (item) { item.labelScore = strengthLabel(item.score); });
+    return checks;
+  }
+
+  function scoreFromBase(chart, baseSign, houses) {
+    var scores = houses.map(function (h) {
+      var targetSign = (baseSign + h - 1) % 12;
+      var lord = chart.planetsByName[SIGNS[targetSign].lord];
+      var tenants = chart.planets.filter(function (p) { return p.sign === targetSign; });
+      var score = lord ? 45 + (lord.strength.score - 50) * 0.5 : 45;
+      tenants.forEach(function (p) { score += p.naturalNature === "Benefic" ? 8 : -7; });
+      return clamp(score, 0, 100);
+    });
+    return Math.round(average(scores));
+  }
+
+  function vargaPromise(varga, cfg) {
+    var scores = cfg.primaryHouses.map(function (h) {
+      var sign = (varga.ascendant.sign + h - 1) % 12;
+      var tenants = varga.planets.filter(function (p) { return p.sign === sign; });
+      var lord = varga.planetsByName[SIGNS[sign].lord];
+      var score = 45;
+      if (lord && [1, 4, 5, 7, 9, 10, 11].indexOf(lord.house) >= 0) score += 12;
+      tenants.forEach(function (p) { score += p.naturalNature === "Benefic" ? 8 : -7; });
+      cfg.karakas.forEach(function (name) {
+        var p = varga.planetsByName[name];
+        if (p && [1, 4, 5, 7, 9, 10, 11].indexOf(p.house) >= 0) score += 4;
+      });
+      return clamp(score, 0, 100);
+    });
+    return Math.round(average(scores));
+  }
+
+  function timingAnalysis(chart, transitChart, cfg, topicKey, input) {
+    var activators = eventActivators(chart, cfg, topicKey);
+    var stack = findDashaStack(chart.vimshottari.timeline, input.asOfInstant);
+    var horizonEnd = addDays(input.asOfInstant, input.horizonYears * 365.25);
+    var candidates = [];
+    chart.vimshottari.timeline.forEach(function (md) {
+      if (md.end < input.asOfInstant || md.start > horizonEnd) return;
+      subPeriods(md, "AD").forEach(function (ad) {
+        if (ad.end < input.asOfInstant || ad.start > horizonEnd) return;
+        var mdHit = activators.indexOf(md.lord) >= 0;
+        var adHit = activators.indexOf(ad.lord) >= 0;
+        if (!mdHit && !adHit) return;
+        var start = new Date(Math.max(ad.start.getTime(), input.asOfInstant.getTime()));
+        var end = new Date(Math.min(ad.end.getTime(), horizonEnd.getTime()));
+        var transit = scanTransitWindow(chart, cfg, topicKey, start, end);
+        var score = (mdHit ? 35 : 0) + (adHit ? 35 : 0) + transit.score;
+        candidates.push({
+          md: md.lord,
+          ad: ad.lord,
+          start: start,
+          end: end,
+          score: score,
+          transit: transit,
+          note: (mdHit ? "MD activates. " : "") + (adHit ? "AD activates. " : "") + transit.note
+        });
+      });
+    });
+    candidates.sort(function (a, b) { return b.score - a.score || a.start - b.start; });
+    return {
+      activators: activators,
+      currentStack: stack,
+      currentTransits: transitSnapshot(chart, transitChart),
+      candidates: candidates.slice(0, 8)
+    };
+  }
+
+  function eventActivators(chart, cfg, topicKey) {
+    var names = [];
+    cfg.primaryHouses.forEach(function (h) {
+      names.push(lordOfHouse(chart, h));
+      chart.planets.filter(function (p) { return p.house === h || planetAspectsHouse(p, h); }).forEach(function (p) { names.push(p.name); });
+    });
+    cfg.houses.forEach(function (h) { names.push(lordOfHouse(chart, h)); });
+    cfg.timingKarakas.forEach(function (name) { names.push(name); });
+    if (topicKey === "children") {
+      names.push(lordOfHouse(chart, 1), lordOfHouse(chart, 7), chart.planetsByName.Jupiter.dispositor);
+    }
+    if (topicKey === "marriage") {
+      var lord7 = chart.planetsByName[lordOfHouse(chart, 7)];
+      names.push(lord7.dispositor, SIGNS[vargaSign(lord7.lon, 9)].lord);
+    }
+    if (topicKey === "profession") {
+      names.push(lordOfHouse(chartWithBase(chart, chart.planetsByName.Moon.sign), 10));
+    }
+    if (cfg.keyHouse) {
+      var keyHouse = cfg.keyHouse;
+      var nth = cfg.nthHouse || keyHouse;
+      var nthHouse = relativeHouse(keyHouse, nth);
+      names.push(lordOfHouse(chart, nthHouse));
+      var karaka = (cfg.karakas || []).map(function (name) { return chart.planetsByName[name]; }).filter(Boolean).sort(function (a, b) {
+        return b.strength.score - a.strength.score;
+      })[0];
+      if (karaka) {
+        names.push(karaka.name, lordOfHouse(chart, relativeHouse(karaka.house, nth)), karaka.dispositor);
+      }
+      var kalpurshaSign = normalizeSign(keyHouse - 1);
+      names.push(SIGNS[kalpurshaSign].lord);
+    }
+    return dedupe(names.filter(Boolean));
+  }
+
+  function transitSnapshot(chart, transitChart) {
+    return PLANETS.map(function (name) {
+      var p = transitChart.planetsByName[name];
+      var moonHouse = houseFromSign(chart.planetsByName.Moon.sign, p.sign);
+      return {
+        name: name,
+        sign: p.signName,
+        lon: p.lon,
+        moonHouse: moonHouse,
+        goodFromMoon: (GOOD_TRANSIT_FROM_MOON[name] || []).indexOf(moonHouse) >= 0
+      };
+    });
+  }
+
+  function scanTransitWindow(chart, cfg, topicKey, start, end) {
+    var best = { score: 0, date: start, note: "No strong monthly transit confirmation found." };
+    var current = new Date(start.getTime());
+    var guard = 0;
+    while (current <= end && guard < 260) {
+      var tr = buildChart(current, chart.latitude, chart.longitude, chart.timezone, { ayanamshaKey: chart.ayanamshaKey });
+      var score = transitSupportScore(chart, tr, cfg, topicKey);
+      if (score > best.score) {
+        best = { score: score, date: new Date(current.getTime()), note: "Best sampled transit support around " + formatInTimezone(current, chart.timezone) + "." };
+      }
+      current = addDays(current, 30);
+      guard += 1;
+    }
+    return best;
+  }
+
+  function transitSupportScore(chart, transitChart, cfg, topicKey) {
+    var score = 0;
+    var j = transitChart.planetsByName.Jupiter;
+    var s = transitChart.planetsByName.Saturn;
+    var r = transitChart.planetsByName.Rahu;
+    cfg.primaryHouses.forEach(function (h) {
+      var targetSign = houseSign(chart, h);
+      if (j.sign === targetSign || planetAspectsHouse({ name: "Jupiter", house: houseFromSign(chart.ascendant.sign, j.sign) }, h)) score += 18;
+      if (s.sign === targetSign || planetAspectsHouse({ name: "Saturn", house: houseFromSign(chart.ascendant.sign, s.sign) }, h)) score += 10;
+    });
+    var jMoonHouse = houseFromSign(chart.planetsByName.Moon.sign, j.sign);
+    var sMoonHouse = houseFromSign(chart.planetsByName.Moon.sign, s.sign);
+    if (GOOD_TRANSIT_FROM_MOON.Jupiter.indexOf(jMoonHouse) >= 0) score += 10;
+    if (GOOD_TRANSIT_FROM_MOON.Saturn.indexOf(sMoonHouse) >= 0) score += 8;
+    if (topicKey === "marriage" && (jMoonHouse === 7 || houseFromSign(chart.ascendant.sign, j.sign) === 7)) score += 16;
+    if (topicKey === "children" && (houseFromSign(chart.ascendant.sign, j.sign) === 5 || planetAspectsHouse({ name: "Jupiter", house: houseFromSign(chart.ascendant.sign, j.sign) }, 5))) score += 16;
+    if (topicKey === "profession" && (houseFromSign(chart.ascendant.sign, j.sign) === 10 || planetAspectsHouse({ name: "Saturn", house: houseFromSign(chart.ascendant.sign, s.sign) }, 10))) score += 14;
+    if (topicKey === "foreign" && [9, 12].indexOf(houseFromSign(chart.ascendant.sign, r.sign)) >= 0) score += 12;
+    return Math.min(30, score);
+  }
+
+  function synthesizeVerdict(promise, rules, cross, topicKey) {
+    var positiveHits = rules.filter(function (r) { return r.present && r.kind === "positive"; }).length;
+    var negativeHits = rules.filter(function (r) { return r.present && r.kind === "negative"; }).length;
+    var warnings = rules.filter(function (r) { return r.kind === "warning"; }).length;
+    var strongChecks = cross.filter(function (c) { return c.score >= 62; }).length;
+    var moderateChecks = cross.filter(function (c) { return c.score >= 48; }).length;
+    var net = promise.score + positiveHits * 3 - negativeHits * 5 + strongChecks * 4 - warnings;
+    var label = "Conditional";
+    var confidence = "Possible";
+    if (net >= 82 && strongChecks >= 2 && positiveHits > negativeHits) {
+      label = "Definite Yes";
+      confidence = "Definite";
+    } else if (net >= 68 && moderateChecks >= 2 && positiveHits >= negativeHits) {
+      label = "Likely Yes";
+      confidence = "Likely";
+    } else if (net >= 52) {
+      label = "Conditional / delayed";
+      confidence = "Conditional";
+    } else if (net >= 38) {
+      label = "Weak or obstructed";
+      confidence = "Uncertain";
+    } else {
+      label = "Likely No / strongly obstructed";
+      confidence = "Unlikely";
+    }
+    if (topicKey === "health") {
+      label = net >= 60 ? "Manageable with protections" : "Sensitive periods need care";
+      confidence = net >= 60 ? "Likely" : "Conditional";
+    }
+    if (topicKey === "longevity") {
+      label = longevityVerdict(rules);
+      confidence = "Traditional class only";
+    }
+    return { label: label, confidence: confidence, net: Math.round(net), positiveHits: positiveHits, negativeHits: negativeHits };
+  }
+
+  function longevityVerdict(rules) {
+    var text = rules.map(function (r) { return r.evidence; }).join(" ");
+    var longCount = (text.match(/Long/g) || []).length;
+    var shortCount = (text.match(/Short/g) || []).length;
+    if (longCount >= 2) return "Long-life class indicated by available methods";
+    if (shortCount >= 2) return "Short-life concerns appear in available methods";
+    return "Medium or mixed longevity class by available methods";
+  }
+
+  function scanYogas(chart) {
+    var yogas = [];
+    function addYoga(name, category, planets, effect, evidence, strength) {
+      yogas.push({
+        name: name,
+        category: category || "General",
+        planets: planets || [],
+        effect: effect,
+        evidence: evidence || effect,
+        strength: strength || "Applicable"
+      });
+    }
+    var mahapurushaNames = { Mars: "Ruchaka", Mercury: "Bhadra", Jupiter: "Hamsa", Venus: "Malavya", Saturn: "Shasha" };
+    ["Mars", "Mercury", "Jupiter", "Venus", "Saturn"].forEach(function (name) {
+      var p = chart.planetsByName[name];
+      if (p && [1, 4, 7, 10].indexOf(p.house) >= 0 && ["Exalted", "Own sign", "Moolatrikona"].indexOf(p.dignity) >= 0) {
+        addYoga(mahapurushaNames[name] + " Mahapurusha", "Pancha Mahapurusha", [name], "Strong kendra dignity; fructifies in " + name + " periods.", name + " is in H" + p.house + " with " + p.dignity + ".", "Strong");
+      }
+    });
+    if (kendraFrom(chart.planetsByName.Moon.house, chart.planetsByName.Jupiter.house)) addYoga("Gaja-Kesari", "Prosperity / protection", ["Moon", "Jupiter"], "Moon-Jupiter angular relation supports protection, reputation and judgement.", "Moon is in H" + chart.planetsByName.Moon.house + "; Jupiter is in H" + chart.planetsByName.Jupiter.house + ".", "Strong");
+    if (chart.planetsByName.Sun.sign === chart.planetsByName.Mercury.sign) addYoga("Budha-Aditya", "Intellect / authority", ["Sun", "Mercury"], "Sun-Mercury conjunction supports intellect, administration and communication.", "Sun and Mercury are both in " + chart.planetsByName.Sun.signName + ".", "Applicable");
+    if (hasSambandha(chart, "Moon", "Mars")) addYoga("Chandra-Mangala", "Finance / enterprise", ["Moon", "Mars"], "Moon-Mars sambandha supports enterprise, cash movement and initiative.", "Moon and Mars have sambandha by conjunction, aspect or mutual linkage.", "Applicable");
+    var lord9 = lordOfHouse(chart, 9);
+    var lord10 = lordOfHouse(chart, 10);
+    if (hasSambandha(chart, lord9, lord10)) addYoga("Dharma-Karmadhipati", "Raja yoga", [lord9, lord10], "Ninth and tenth lord connection links fortune with karma/career.", "9L " + lord9 + " connects with 10L " + lord10 + ".", "Strong");
+    var lord1 = lordOfHouse(chart, 1);
+    if (hasSambandha(chart, lord1, lord9) || (chart.planetsByName[lord1] && chart.planetsByName[lord1].strength.score >= 60 && chart.planetsByName[lord9] && chart.planetsByName[lord9].strength.score >= 60)) {
+      addYoga("Lakshmi support", "Fortune / prosperity", [lord1, lord9], "Lagna and ninth lord strength/linkage supports fortune, protection and rise.", "1L " + lord1 + " and 9L " + lord9 + " checked for sambandha and strength.", "Supportive");
+    }
+    [2, 11].forEach(function (wealthHouse) {
+      [5, 9].forEach(function (fortuneHouse) {
+        var wealthLord = lordOfHouse(chart, wealthHouse);
+        var fortuneLord = lordOfHouse(chart, fortuneHouse);
+        if (hasSambandha(chart, wealthLord, fortuneLord)) {
+          addYoga("Dhana yoga H" + wealthHouse + "-H" + fortuneHouse, "Wealth", [wealthLord, fortuneLord], "Wealth house lord connects with trinal lord; supports earning, savings or gains in its dasha.", wealthHouse + "L " + wealthLord + " connects with " + fortuneHouse + "L " + fortuneLord + ".", "Supportive");
+        }
+      });
+    });
+    for (var k = 1; k <= 12; k += 1) {
+      var lordK = lordOfHouse(chart, k);
+      for (var t = 1; t <= 12; t += 1) {
+        if (![1, 5, 9].includes(k) || ![4, 7, 10].includes(t)) continue;
+        if (hasSambandha(chart, lordK, lordOfHouse(chart, t))) {
+          addYoga("Raja yoga " + k + "L-" + t + "L", "Raja yoga", [lordK, lordOfHouse(chart, t)], "Kona lord connects with kendra lord, supporting rise when the planets are strong and active in dasha.", "Kona H" + k + " lord " + lordK + " connects with kendra H" + t + " lord " + lordOfHouse(chart, t) + ".", "Supportive");
+        }
+      }
+    }
+    [6, 8, 12].forEach(function (h) {
+      var lord = chart.planetsByName[lordOfHouse(chart, h)];
+      if (lord && [6, 8, 12].indexOf(lord.house) >= 0) addYoga("Vipreeta support " + h + "L", "Vipreeta", [lord.name], "Dusthana lord placed in a dusthana can convert obstruction into resilience after struggle.", h + "L " + lord.name + " is placed in H" + lord.house + ".", "Conditional");
+    });
+    chart.planets.forEach(function (p) {
+      if (p.dignity === "Debilitated" && neechabhanga(chart, p)) addYoga("Neechabhanga for " + p.name, "Cancellation", [p.name], "Debilitation has cancellation support; results improve after pressure or maturity.", p.name + " is debilitated with cancellation factors.", "Conditional");
+    });
+    chart.planets.forEach(function (p) {
+      var dispositor = SIGNS[p.sign].lord;
+      var other = chart.planetsByName[dispositor];
+      if (other && other.name !== p.name && SIGNS[other.sign].lord === p.name && p.name < other.name) {
+        addYoga("Parivartana " + p.name + "-" + other.name, "Exchange", [p.name, other.name], "Sign exchange strongly links the two houses owned by the exchanging planets.", p.name + " occupies " + other.name + "'s sign and " + other.name + " occupies " + p.name + "'s sign.", "Applicable");
+      }
+    });
+    var moon = chart.planetsByName.Moon;
+    var moonPrev = wrapHouse(moon.house - 1);
+    var moonNext = wrapHouse(moon.house + 1);
+    var moonSupport = chart.planets.some(function (p) { return p.name !== "Moon" && p.name !== "Sun" && p.name !== "Rahu" && p.name !== "Ketu" && (p.house === moonPrev || p.house === moonNext); });
+    if (!moonSupport) addYoga("Kemadruma alert", "Mind / support caution", ["Moon"], "Moon lacks adjacent planetary support in the implemented check; judge cancellations before final conclusion.", "No classical planet found in the 2nd or 12th from Moon by house.", "Caution");
+    if (isHemmed(chart, chart.ascendant.house || 1, "Benefic")) addYoga("Shubha Kartari around Lagna", "Protection", [], "Benefics hemming Lagna protect the body, judgement and general promise.", "Benefics occupy both adjacent houses to Lagna.", "Supportive");
+    if (isHemmed(chart, chart.ascendant.house || 1, "Malefic")) addYoga("Paap Kartari around Lagna", "Pressure", [], "Malefics hemming Lagna increase pressure and require stronger benefic or dasha support.", "Malefics occupy both adjacent houses to Lagna.", "Caution");
+    if (kalasarpa(chart)) addYoga("Kalasarpa pattern", "Nodal pattern", ["Rahu", "Ketu"], "Classical planets fall within the nodal arc; interpret with cancellation checks.", "All classical planets are contained within the Rahu-Ketu arc in the implemented check.", "Caution");
+    return dedupeBy(yogas, "name");
+  }
+
+  function chartWideYogasSection(chart, input) {
+    var yogas = scanYogas(chart);
+    var rows = yogas.length ? yogas.map(function (yoga, index) {
+      return "<tr><td>" + (index + 1) + "</td><td><strong>" + escapeHtml(yoga.name) + "</strong></td><td>" + escapeHtml(yoga.category || "-") + "</td><td>" + escapeHtml((yoga.planets || []).join(", ") || "-") + "</td><td>" + escapeHtml(yoga.strength || "Applicable") + "</td><td>" + escapeHtml(yoga.effect) + "</td><td>" + escapeHtml(yoga.evidence || "-") + "</td><td>" + escapeHtml(yogaWindow(chart, input, yoga)) + "</td></tr>";
+    }).join("") : '<tr><td colspan="8">No implemented yoga is strongly applicable in this chart. Continue with house, lord, karaka, varga and dasha judgement.</td></tr>';
+    return '<section id="viewA-yogas" class="section yoga-section"><div class="section-head"><div><p class="eyebrow">Yoga Section</p><h3>Applicable Yogas Of The Chart</h3></div><span class="small-pill">' + yogas.length + ' found</span></div>' +
+      '<div class="table-wrap yoga-table-wrap"><table><thead><tr><th>#</th><th>Yoga</th><th>Category</th><th>Planets involved</th><th>Strength</th><th>Meaning</th><th>Chart evidence</th><th>Likely fructification</th></tr></thead><tbody>' + rows + "</tbody></table></div>" +
+      '<p class="fine-print">This is an implemented yoga scanner. It lists yogas found from the computed D-1 relationships and should be read with planetary strength, varga confirmation and dasha activation.</p></section>';
+  }
+
+  function rule(id, text, present, kind, evidence) {
+    return {
+      id: id,
+      text: text,
+      present: Boolean(present),
+      kind: kind,
+      evidence: evidence || ""
+    };
+  }
+
+  function pendingRule(id, text, evidence) {
+    return { id: id, text: text, present: false, kind: "warning", evidence: evidence };
+  }
+
+  function manglikRules(chart) {
+    var mars = chart.planetsByName.Mars;
+    var bases = [
+      { label: "Lagna", sign: chart.ascendant.sign },
+      { label: "Moon", sign: chart.planetsByName.Moon.sign },
+      { label: "Venus", sign: chart.planetsByName.Venus.sign }
+    ];
+    var hits = bases.map(function (base) {
+      return { label: base.label, house: houseFromSign(base.sign, mars.sign) };
+    }).filter(function (item) { return [1, 2, 4, 7, 8, 12].indexOf(item.house) >= 0; });
+    var cancellations = [];
+    if (["Own sign", "Exalted", "Moolatrikona"].indexOf(mars.dignity) >= 0) cancellations.push("Mars dignity");
+    if (planetsAspectingPlanet(chart, mars).some(function (p) { return p.name === "Jupiter"; })) cancellations.push("Jupiter aspect");
+    if (hasBeneficAspectOnHouse(chart, mars.house)) cancellations.push("benefic protection");
+    return [
+      rule("C.3.1", "Kuja dosha: Mars in 1/2/4/7/8/12 from lagna, Moon, or Venus.", hits.length > 0, "negative", hits.map(function (h) { return h.label + " " + h.house; }).join("; ") || "No Kuja placement hit."),
+      rule("C.3.2", "Manglik cancellation by Mars strength or benefic/Jupiter protection.", cancellations.length > 0, "positive", cancellations.join("; ") || "No cancellation found in implemented set.")
+    ];
+  }
+
+  function sphutaSupport(chart, gender) {
+    var lon;
+    var label;
+    if (gender === "female") {
+      lon = normalize(chart.planetsByName.Jupiter.lon + chart.planetsByName.Moon.lon + chart.planetsByName.Mars.lon);
+      label = "Kshetra sphuta";
+      var evenEven = !isOddSign(signIndex(lon)) && !isOddSign(vargaSign(lon, 9));
+      return { support: evenEven, evidence: label + " at " + fmtDeg(lon) + ", navamsa " + SIGNS[vargaSign(lon, 9)].name + "." };
+    }
+    lon = normalize(chart.planetsByName.Sun.lon + chart.planetsByName.Venus.lon + chart.planetsByName.Jupiter.lon);
+    label = "Beeja sphuta";
+    var oddOdd = isOddSign(signIndex(lon)) && isOddSign(vargaSign(lon, 9));
+    return { support: oddOdd, evidence: label + " at " + fmtDeg(lon) + ", navamsa " + SIGNS[vargaSign(lon, 9)].name + "." };
+  }
+
+  function professionDeterminants(chart) {
+    var p10 = strongestPlanetInHouse(chart, 10);
+    var lord10 = chart.planetsByName[lordOfHouse(chart, 10)];
+    var moonChart = chartWithBase(chart, chart.planetsByName.Moon.sign);
+    var lord10Moon = chart.planetsByName[lordOfHouse(moonChart, 10)];
+    var navLord10 = chart.planetsByName[SIGNS[vargaSign(lord10.lon, 9)].lord];
+    var d10 = makeVargaChart(chart, 10);
+    var d10Lord = chart.planetsByName[SIGNS[d10.ascendant.sign].lord];
+    var det = [
+      { label: "Planets in 10th", planet: p10 || lord10 },
+      { label: "10th lord", planet: lord10 },
+      { label: "10th from Moon lord", planet: lord10Moon },
+      { label: "Navamsa lord of 10th lord", planet: navLord10 },
+      { label: "D-10 lagna lord", planet: d10Lord },
+      { label: "Sun karaka", planet: chart.planetsByName.Sun }
+    ];
+    det.sort(function (a, b) { return b.planet.strength.score - a.planet.strength.score; });
+    return det;
+  }
+
+  function renderReport(chart, transitChart, analysis, input, options) {
+    var opts = options || {};
+    var interactiveState = opts.interactiveState || {};
+    document.getElementById("emptyState").classList.add("hidden");
+    var report = document.getElementById("report");
+    report.classList.remove("hidden");
+    var cfg = analysis.cfg;
+    var topicVarga = makeVargaChart(chart, cfg.dchart);
+    var externalVarga = parseExternalVarga(input.externalChartData, cfg.dchart);
+    if (externalVarga) applyImportedVargaToAnalysis(analysis, externalVarga);
+    var transitInput = transitInputFromReportInput(input, chart.ascendant.sign);
+
+    // -------------------------------------------------------------------------
+    // Lazy section pipeline. Immediate sections render now (above-the-fold);
+    // deferred sections render placeholders that are filled in idle slots.
+    // -------------------------------------------------------------------------
+    pendingSectionRenders.clear();
+    navAliasToPendingId.clear();
+    if (!opts.preserveActiveSection) activeChartDataSectionId = "viewA-output-library";
+
+    var sections = [
+      // ---- immediate (above the fold) ----
+      { html: reportHeaderHtml("View A", "Chart Data Report", nativeReportName(input), "D-1, planets, vargas, transit chart and Vimshottari timeline", "Technical dossier"), immediate: true },
+      { id: "viewA-output-library", immediate: true, render: function () { return outputLibrarySection(); }, wire: wireOutputLibraryControls },
+      { id: "viewA-worksheets",     immediate: true, render: function () { return worksheetsSection(chart, input, interactiveState.worksheet); }, wire: function () { wireWorksheetControls(chart, input); } },
+      { id: "viewA-d1-d9-top",      immediate: true, render: function () { return topD1D9ChartsSection(chart); } },
+      { id: "viewA-summary",        immediate: true, render: function () { return chartSummarySection(chart, analysis, input); } },
+      { id: "viewA-panchang",       immediate: true, render: function () { return panchangSection(chart, input); } },
+      { id: "viewA-current-panchang", immediate: true, render: function () { return currentPanchangSection(chart, input); }, wire: function () { wireCurrentPanchangControls(chart, input); } },
+      { id: "viewA-d1-details",     immediate: true, render: function () { return d1DetailsSection(chart); } },
+      { id: "viewA-yogas",          immediate: true, render: function () { return chartWideYogasSection(chart, input); } },
+      // ---- deferred (rendered via requestIdleCallback) ----
+      { id: "viewA-vargas",         label: "Vargas",            render: function () { return allVargaChartsSection(chart, externalVarga, analysis.cfg.dchart); } },
+      { id: "viewA-varshfal",       label: "Varshfal",          render: function () { return varshfalSection(chart, input, interactiveState.varshfal); }, wire: function () { wireVarshfalControls(chart, input); } },
+      { id: "viewA-transit",        label: "Transit chart",     render: function () { return transitChartSection(transitInput, chart); }, wire: function () { wireTransitChartControls(transitInput, chart); } },
+      { id: "viewA-ephemeris",      label: "Ephemeris",         render: function () { return ephemerisSection(chart, input); }, wire: function () { wireEphemerisControls(chart, input); } },
+      { id: "viewA-references",     label: "Reference tables",  render: function () { return referenceTablesSection(chart); } },
+      { id: "viewA-shadbala",       label: "Shadbala",          render: function () { return shadbalaSection(chart); } },
+      { id: "viewA-jaimini",        label: "Jaimini",           render: function () { return jaiminiSection(chart); } },
+      { id: "viewA-compatibility",  label: "Compatibility",     render: function () { return marriageCompatibilityReportSection(chart, input); }, wire: wireCompatibilityInlineControls },
+      { id: "viewA-chakras",        label: "Chakras",           render: function () { return chakrasSection(chart); } },
+      { id: "viewA-dasha",          label: "Dasha",             render: function () { return fullDashaSection(chart, input, interactiveState.dasha); }, wire: wireDashaGroupControls },
+      { id: "viewA-sav",            label: "Sarvashtakavarga",  render: function () { return sarvashtakavargaSection(chart); } },
+      { id: "viewA-bav",            label: "Bhinnashtakavarga", render: function () { return bhinnaAshtakavargaSection(chart); } },
+      { id: "viewA-kp",             label: "KP system",         render: function () { return kpSection(chart); } },
+      // predictive block is one deferred bundle; nav targets viewA-predictive and viewA-faq-pillars both expedite it
+      { id: "viewA-predictive-bundle", label: "Predictive analysis", render: function () { return predictiveReportHtml(chart, analysis, input); }, navAliases: ["viewA-predictive", "viewA-faq-pillars"] }
+    ];
+
+    // Build initial HTML: immediate sections fully rendered; deferred sections as placeholders.
+    var initialHtml = '<div id="chartDataReportView" class="report-view">';
+    for (var i = 0; i < sections.length; i++) {
+      var s = sections[i];
+      if (s.immediate) {
+        initialHtml += (typeof s.html !== "undefined") ? s.html : s.render();
+      } else {
+        var label = s.label || s.id;
+        initialHtml += '<section id="' + s.id + '" class="section section-pending" data-pending="1">' +
+          '<div class="section-loading">' +
+            '<span class="section-loading-spinner" aria-hidden="true"></span>' +
+            '<span class="section-loading-label">Preparing ' + escapeHtml(label) + '&hellip;</span>' +
+          '</div></section>';
+        pendingSectionRenders.set(s.id, s);
+        var aliases = s.navAliases || [];
+        for (var a = 0; a < aliases.length; a++) navAliasToPendingId.set(aliases[a], s.id);
+      }
+    }
+    initialHtml += '</div>';
+    report.innerHTML = initialHtml;
+
+      lastReportInput = Object.assign({}, input, { reportCreatedAt: new Date() });
+      updatePartAIdentityStrip(lastReportInput);
+    lastReportChart = chart;
+    lastReportAnalysis = analysis;
+    // Plain-text reports are needed for copy/download â€” they don't touch the DOM and
+    // are still computed synchronously so the buttons work immediately after Generate.
+    lastPlainReports.chartData = chartDataPlainReport(chart, analysis, lastReportInput) + "\n\nPredictive Analysis:\n" + predictivePlainReport(chart, lastReportInput);
+    lastPlainReports.predictive = "";
+    lastPlainReport = lastPlainReports.chartData;
+
+    showReportView("chartData");
+
+    // Wire immediate-section controls and table-top-buttons.
+    for (var j = 0; j < sections.length; j++) {
+      if (sections[j].immediate && typeof sections[j].wire === "function") {
+        try { sections[j].wire(); } catch (wireErr) { console.error(wireErr); }
+      }
+    }
+    enhanceReportTableTopControls();
+    showSingleChartDataSection(activeChartDataSectionId || "viewA-output-library", { skipScroll: true });
+
+    // Stream the rest in idle slots.
+    scheduleDeferredSections();
+  }
+
+  function scheduleDeferredSections() {
+    if (!pendingSectionRenders.size) return;
+    var idle = (typeof window !== "undefined" && window.requestIdleCallback)
+      ? window.requestIdleCallback.bind(window)
+      : function (cb) { return setTimeout(function () { cb({ timeRemaining: function () { return 30; }, didTimeout: false }); }, 0); };
+
+    function step(deadline) {
+      var processedThisSlot = 0;
+      // Iterate over a snapshot of keys to avoid mutating-while-iterating.
+      var keys = [];
+      pendingSectionRenders.forEach(function (_v, k) { keys.push(k); });
+      for (var i = 0; i < keys.length; i++) {
+        // Always process at least one section per slot, then check the budget.
+        if (processedThisSlot > 0 && deadline.timeRemaining() < 6 && !deadline.didTimeout) break;
+        materializeSection(keys[i]);
+        processedThisSlot += 1;
+      }
+      if (pendingSectionRenders.size) {
+        idle(step);
+      } else {
+        // Final pass: wire any table-top buttons for newly materialised tables.
+        enhanceReportTableTopControls();
+      }
+    }
+    idle(step);
+  }
+
+  function materializeSection(id) {
+    var s = pendingSectionRenders.get(id);
+    if (!s) return;
+    pendingSectionRenders.delete(id);
+    // Remove any nav-alias entries pointing to this id, now resolved.
+    var staleAliases = [];
+    navAliasToPendingId.forEach(function (pendingId, alias) {
+      if (pendingId === id) staleAliases.push(alias);
+    });
+    for (var a = 0; a < staleAliases.length; a++) navAliasToPendingId.delete(staleAliases[a]);
+
+    var placeholder = document.getElementById(id);
+    if (!placeholder) return;
+    var html = "";
+    try { html = s.render(); } catch (renderErr) {
+      console.error("Render failed for", id, renderErr);
+      html = '<section id="' + id + '" class="section"><div class="panel-box"><p class="muted">This section could not be rendered: ' + escapeHtml(renderErr.message) + '</p></div></section>';
+    }
+    var parent = placeholder.parentNode;
+    if (!parent) return;
+    if (!html) {
+      parent.removeChild(placeholder);
+      syncSingleChartDataSectionVisibility();
+      return;
+    }
+
+    // Move ALL children of the wrap to before the placeholder, then remove the
+    // placeholder. This correctly handles render-fns that return multiple
+    // top-level <section> elements (e.g. predictiveReportHtml).
+    var wrap = document.createElement("div");
+    wrap.innerHTML = html;
+    while (wrap.firstChild) {
+      parent.insertBefore(wrap.firstChild, placeholder);
+    }
+    parent.removeChild(placeholder);
+
+    if (typeof s.wire === "function") {
+      try { s.wire(); } catch (wireErr) { console.error("Wire failed for", id, wireErr); }
+    }
+    enhanceReportTableTopControls();
+    syncSingleChartDataSectionVisibility();
+  }
+
+  // Called from nav-click handlers: if the user jumps to a section that
+  // hasn't materialised yet, render it synchronously so the scroll lands on real content.
+  function expediteSectionForNavTarget(targetId) {
+    if (pendingSectionRenders.has(targetId)) {
+      materializeSection(targetId);
+      return;
+    }
+    var pendingId = navAliasToPendingId.get(targetId);
+    if (pendingId && pendingSectionRenders.has(pendingId)) {
+      materializeSection(pendingId);
+    }
+  }
+
+  function chartDataReportHtml(chart, analysis, input, externalVarga) {
+    var html = reportHeaderHtml("View A", "Chart Data Report", nativeReportName(input), "D-1, planets, vargas, transit chart and Vimshottari timeline", "Technical dossier");
+    html += outputLibrarySection();
+    html += worksheetsSection(chart, input);
+    html += topD1D9ChartsSection(chart);
+    html += chartSummarySection(chart, analysis, input);
+    html += panchangSection(chart, input);
+    html += currentPanchangSection(chart, input);
+    html += d1DetailsSection(chart);
+    html += chartWideYogasSection(chart, input);
+    html += allVargaChartsSection(chart, externalVarga, analysis.cfg.dchart);
+    html += varshfalSection(chart, input);
+    html += transitChartSection(transitInputFromReportInput(input, chart.ascendant.sign), chart);
+    html += ephemerisSection(chart, input);
+    html += referenceTablesSection(chart);
+    html += shadbalaSection(chart);
+    html += jaiminiSection(chart);
+    html += marriageCompatibilityReportSection(chart, input);
+    html += chakrasSection(chart);
+    html += fullDashaSection(chart, input);
+    html += sarvashtakavargaSection(chart);
+    html += bhinnaAshtakavargaSection(chart);
+    html += kpSection(chart);
+    html += predictiveReportHtml(chart, analysis, input);
+    return html;
+  }
+
+  function predictiveReportHtml(chart, analysis, input) {
+    var html = '<section id="viewA-predictive" class="section predictive-section"><div class="section-head"><div><p class="eyebrow">Predictive</p><h3>Predictive Analysis</h3></div><span class="small-pill">Single report view</span></div><div class="predictive-section-stack">';
+    html += nestedPredictivePanel(planetRelationsSection(chart));
+    html += nestedPredictivePanel(lordshipOverviewSection(chart));
+    html += nestedPredictivePanel(chawdhriPredictiveMethodSection(chart, analysis, input));
+    html += nestedPredictivePanel(swotAnalysisSection(chart));
+    html += nestedPredictivePanel(sixMonthDashaSection(chart, input));
+    html += nestedPredictivePanel(dashaTransitSynthesisSection(chart, input));
+    html += "</div></section>";
+    html += frequentQueriesPillarsSection(chart, input);
+    return html;
+  }
+
+  function nestedPredictivePanel(html) {
+    return String(html || "")
+      .replace(/^<section\b/, "<div")
+      .replace(/\bclass="section\b/, 'class="predictive-subsection')
+      .replace(/<\/section>\s*$/, "</div>");
+  }
+
+  function outputLibrarySection() {
+    return '<section id="viewA-output-library" class="section output-library-section"><div class="section-head"><div><p class="eyebrow">VedNetra Output Library</p><h3>Tables, Context, Special Charts And Vargas</h3></div><span class="small-pill">Workbench layout</span></div>' +
+      '<div class="output-library-grid">' + outputModuleLibrary().map(moduleColumnHtml).filter(Boolean).join("") + "</div>" +
+      '<p class="fine-print">Ready items jump to sections generated for the current native. Partial items use VedNetra data already available but need deeper formula tables for certification.</p></section>';
+  }
+
+  function worksheetTemplates() {
+    return [
+      { key: "birth-i", label: "1. Birth Chart I", components: ["d1", "d9", "transit", "d1-details", "varshfal-d1", "vimshottari"] },
+      { key: "varshaphala", label: "61. Varshaphala", components: ["varshfal-d1", "d1", "varshfal-d9", "mudda", "d9", "vimshottari"] },
+      { key: "lordships", label: "14. Lordships", components: ["d1", "lordships-d1", "d9", "lordships-d9", "d10", "lordships-d10"] },
+      { key: "kp", label: "131. Krishnamurti / KP", components: ["kp-chart", "kp-planets", "kp-grahas", "kp-ruling"] },
+      { key: "dasha", label: "2. Birth Chart II / Dasha", components: ["vimshottari", "vimshottari-next", "mudda"] },
+      { key: "blank", label: "Blank custom worksheet", components: [] }
+    ];
+  }
+
+  function worksheetComponents() {
+    return [
+      { key: "d1", label: "Birth Chart D-1" },
+      { key: "d9", label: "D-9 Navamsha" },
+      { key: "d10", label: "D-10 Dashamsha" },
+      { key: "d24", label: "D-24 Siddhamsha" },
+      { key: "transit", label: "Gochara / Transit" },
+      { key: "varshfal-d1", label: "Varshfal D-1" },
+      { key: "varshfal-d9", label: "Varshfal D-9" },
+      { key: "d1-details", label: "D-1 planet details table" },
+      { key: "varga-table", label: "Divisional placement table" },
+      { key: "lordships-d1", label: "D-1 lordships" },
+      { key: "lordships-d9", label: "D-9 lordships" },
+      { key: "lordships-d10", label: "D-10 lordships" },
+      { key: "vimshottari", label: "Vimshottari dasha" },
+      { key: "vimshottari-next", label: "Second Vimshottari panel" },
+      { key: "mudda", label: "Mudda dasha" },
+      { key: "kp-chart", label: "KP chart" },
+      { key: "kp-planets", label: "KP planet table" },
+      { key: "kp-grahas", label: "KP significators" },
+      { key: "kp-ruling", label: "KP ruling planets" },
+      { key: "sav", label: "Samudaya Ashtakavarga" },
+      { key: "panchang", label: "Birth panchang" }
+    ];
+  }
+
+  function worksheetTemplateByKey(key) {
+    return worksheetTemplates().find(function (template) { return template.key === key; }) || worksheetTemplates()[0];
+  }
+
+  function worksheetsSection(chart, input, preservedState) {
+    var worksheetState = worksheetStateDefaults(chart, input, preservedState);
+    var selected = worksheetTemplateByKey(worksheetState.templateKey || "birth-i");
+    var selectedComponents = worksheetState.components && worksheetState.components.length ? worksheetState.components : selected.components;
+    return '<section id="viewA-worksheets" class="section worksheets-section">' +
+      '<div class="worksheet-topbar">' +
+        '<button type="button" id="worksheetControlsToggleBtn" class="worksheet-cfg-btn" title="Configure worksheet">⚙ Configure</button>' +
+        '<span class="worksheet-topbar-label" id="worksheetTopbarLabel">' + escapeHtml(selected.label) + '</span>' +
+        '<div class="worksheet-topbar-actions">' +
+          '<button type="button" class="ws-util-btn" id="wsTimeToolBtn" title="Open Time Tool">⏱ Time Tool</button>' +
+          '<button type="button" class="ws-util-btn" id="wsToggleInputBtn" title="Show / Hide input panel">⇄ Input</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="worksheet-controls-overlay" id="worksheetControlsOverlay" role="dialog" aria-modal="true" aria-label="Worksheet configuration">' +
+        '<div class="worksheet-controls-overlay-box">' +
+          '<div class="worksheet-controls-overlay-head">' +
+            '<strong>Worksheet Configuration</strong>' +
+            '<button type="button" id="worksheetControlsCloseBtn" class="worksheet-cfg-close-btn" aria-label="Close configuration">✕ Close</button>' +
+          '</div>' +
+          '<div class="worksheet-controls-overlay-body">' +
+            '<div class="grid-2"><label>Worksheet template<select id="worksheetTemplateSelect">' +
+            worksheetTemplates().map(function (template) { return '<option value="' + escapeHtml(template.key) + '"' + (template.key === selected.key ? " selected" : "") + ">" + escapeHtml(template.label) + "</option>"; }).join("") +
+            '</select></label><label class="button-label">Apply<button type="button" id="worksheetApplyTemplateBtn" class="primary-action">Apply &amp; Close</button></label></div>' +
+            '<div class="worksheet-flex-controls"><div class="grid-3"><label>Dasha from<input id="worksheetDashaFrom" type="date" value="' + escapeHtml(worksheetState.dashaFrom) + '"></label><label>Dasha to<input id="worksheetDashaTo" type="date" value="' + escapeHtml(worksheetState.dashaTo) + '"></label><label>Transit time<input id="worksheetTransitTime" type="text" inputmode="numeric" value="' + escapeHtml(worksheetState.transitTime) + '"></label></div>' +
+            '<div class="grid-3"><label>Transit date<input id="worksheetTransitDate" type="date" value="' + escapeHtml(worksheetState.transitDate) + '"></label><label>Transit chart<select id="worksheetTransitDivision">' + transitDivisionOptions(worksheetState.transitDivision) + '</select></label><label>Varshfal varga(s)<input id="worksheetVarshfalDivisions" type="text" value="' + escapeHtml(worksheetState.varshfalDivisionsText) + '" placeholder="9 or 9,10"></label></div>' +
+            '<label class="worksheet-varshfal-years-label">Varshfal years / ages<textarea id="worksheetVarshfalYears" rows="3">' + escapeHtml(worksheetState.varshfalYearsText) + '</textarea></label>' +
+            '<input id="worksheetVarshfalYear" type="hidden" value="' + escapeHtml(String(worksheetState.varshfalYear)) + '">' +
+            '<input id="worksheetVarshfalDivision" type="hidden" value="' + escapeHtml(String(worksheetState.varshfalDivision)) + '">' +
+            '<p class="fine-print">One running year/age per line. Varshfal charts repeat for all listed years.</p></div>' +
+            '<div class="worksheet-component-grid">' + worksheetComponents().map(function (component) {
+              var checked = selectedComponents.indexOf(component.key) >= 0 ? " checked" : "";
+              return '<label class="check-row worksheet-check"><input type="checkbox" data-worksheet-component="' + escapeHtml(component.key) + '"' + checked + '><span>' + escapeHtml(component.label) + "</span></label>";
+            }).join("") + '</div><p class="fine-print">Tick only the panels you want, then click Apply &amp; Close.</p>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div id="worksheetCanvasMount">' + worksheetCanvasHtml(chart, input, selected.key, selectedComponents, worksheetState) + "</div></section>";
+  }
+
+  function worksheetStateDefaults(chart, input, state) {
+    var defaults = state || {};
+    var varshfalYear = defaults.varshfalYear ? Number(defaults.varshfalYear) : completedYears(input.birthInstant, input.asOfInstant, input.timezone) + 1;
+    var years = parseWorksheetVarshfalYears(defaults.varshfalYearsText || defaults.varshfalYears || defaults.varshfalYear, varshfalYear);
+    var divisions = parseWorksheetVarshfalDivisions(defaults.varshfalDivisionsText || defaults.varshfalDivisions || defaults.varshfalDivision || 9);
+    return {
+      templateKey: defaults.templateKey || "birth-i",
+      components: Array.isArray(defaults.components) ? defaults.components : null,
+      varshfalYear: years[0] || clamp(Math.round(varshfalYear || 1), 1, 121),
+      varshfalYears: years,
+      varshfalYearsText: worksheetVarshfalYearsText(chart, input, years),
+      varshfalDivision: divisions[0] || 9,
+      varshfalDivisions: divisions,
+      varshfalDivisionsText: divisions.join(","),
+      transitDate: defaults.transitDate || input.asOfDate || dateInputValue(new Date(), input.timezone),
+      transitTime: normalizeTimeInput(defaults.transitTime || input.asOfTime || timeInputValue(new Date(), input.timezone)),
+      transitDivision: normalizeVarshfalDivision(defaults.transitDivision || 1),
+      dashaFrom: defaults.dashaFrom || dateInputValue(input.asOfInstant || input.birthInstant, input.timezone),
+      dashaTo: defaults.dashaTo || dateInputValue(addDays(input.asOfInstant || input.birthInstant, 365.25 * 7), input.timezone)
+    };
+  }
+
+  function wireWorksheetControls(chart, input) {
+    var section = document.getElementById("viewA-worksheets");
+    var select = document.getElementById("worksheetTemplateSelect");
+    var apply = document.getElementById("worksheetApplyTemplateBtn");
+    var mount = document.getElementById("worksheetCanvasMount");
+    var overlay = document.getElementById("worksheetControlsOverlay");
+    var toggleBtn = document.getElementById("worksheetControlsToggleBtn");
+    var closeBtn = document.getElementById("worksheetControlsCloseBtn");
+    var topbarLabel = document.getElementById("worksheetTopbarLabel");
+    if (!select || !apply || !mount) return;
+
+    function openOverlay() {
+      if (overlay) { overlay.classList.add("is-open"); overlay.setAttribute("aria-hidden", "false"); }
+    }
+    function closeOverlay() {
+      if (overlay) { overlay.classList.remove("is-open"); overlay.setAttribute("aria-hidden", "true"); }
+    }
+    function setChecksForTemplate() {
+      var template = worksheetTemplateByKey(select.value);
+      Array.prototype.slice.call((section || document).querySelectorAll("[data-worksheet-component]")).forEach(function (box) {
+        box.checked = template.components.indexOf(box.getAttribute("data-worksheet-component")) >= 0;
+      });
+    }
+    function selectedComponents() {
+      return Array.prototype.slice.call((section || document).querySelectorAll("[data-worksheet-component]")).filter(function (box) {
+        return box.checked;
+      }).map(function (box) { return box.getAttribute("data-worksheet-component"); });
+    }
+    // closeAfter: only true when explicitly applied via the Apply button.
+    // Field-level changes (date pickers, blur, etc.) re-render silently and keep dialog open.
+    function applyWorksheet(closeAfter) {
+      var state = worksheetStateFromControls(section, chart, input);
+      mount.innerHTML = worksheetCanvasHtml(chart, input, state.templateKey, state.components, state);
+      wireDashaGroupControls();
+      enhanceReportTableTopControls();
+      wireWorksheetPanelResize(section);
+      if (closeAfter === true) closeOverlay();
+      if (topbarLabel && select) topbarLabel.textContent = select.options[select.selectedIndex] ? select.options[select.selectedIndex].text : "";
+    }
+    if (toggleBtn) toggleBtn.addEventListener("click", function () {
+      if (overlay && overlay.classList.contains("is-open")) closeOverlay(); else openOverlay();
+    });
+    if (closeBtn) closeBtn.addEventListener("click", closeOverlay);
+
+    // ── Utility buttons in the worksheet topbar ──────────────────────────────
+    // Call the underlying functions DIRECTLY (not via .click() proxies, which
+    // can fail silently if the source button's listener wasn't bound yet).
+    var wsTimeToolBtn = document.getElementById("wsTimeToolBtn");
+    var wsToggleInputBtn = document.getElementById("wsToggleInputBtn");
+    if (wsTimeToolBtn) wsTimeToolBtn.addEventListener("click", function (e) {
+      e.preventDefault(); e.stopPropagation();
+      var popup = document.getElementById("timeToolPopup");
+      if (!popup) return;
+      popup.classList.remove("hidden");
+      if (typeof positionFloatingPanelInViewport === "function") positionFloatingPanelInViewport(popup);
+      if (typeof syncTimeToolDisplay === "function") syncTimeToolDisplay();
+    });
+    if (wsToggleInputBtn) wsToggleInputBtn.addEventListener("click", function (e) {
+      e.preventDefault(); e.stopPropagation();
+      toggleInputPanel();
+    });
+    // Close overlay when clicking backdrop
+    if (overlay) overlay.addEventListener("click", function (e) { if (e.target === overlay) closeOverlay(); });
+    // Esc key closes overlay
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && overlay && overlay.classList.contains("is-open")) closeOverlay(); });
+    select.addEventListener("change", function () { setChecksForTemplate(); });
+    // Apply button: re-render AND close the dialog
+    apply.addEventListener("click", function () { applyWorksheet(true); });
+    // Field changes: re-render silently, KEEP the dialog open so user can keep editing
+    ["worksheetDashaFrom", "worksheetDashaTo", "worksheetTransitDate", "worksheetTransitTime", "worksheetTransitDivision", "worksheetVarshfalYears", "worksheetVarshfalDivisions"].forEach(function (id) {
+      var field = document.getElementById(id);
+      if (field) {
+        field.addEventListener("change", function () { applyWorksheet(false); });
+        if (field.tagName === "TEXTAREA" || field.tagName === "INPUT") {
+          field.addEventListener("blur", function () { applyWorksheet(false); });
+        }
+      }
+    });
+    // Start with overlay closed
+    closeOverlay();
+    // Wire drag-resize handles for all worksheet panels
+    wireWorksheetPanelResize(section);
+  }
+
+  function wireWorksheetPanelResize(section) {
+    if (!section) return;
+    var grid = section.querySelector(".worksheet-grid");
+    if (!grid) return;
+    // Inject a custom drag handle into each direct child panel
+    Array.prototype.slice.call(grid.children).forEach(function (panel) {
+      if (panel.querySelector(".ws-drag-handle")) return; // already wired
+      var handle = document.createElement("div");
+      handle.className = "ws-drag-handle";
+      handle.title = "Drag to resize panel";
+      handle.innerHTML = '<span aria-hidden="true">&#x2922;</span>';
+      panel.appendChild(handle);
+
+      var startX, startY, startW, startH;
+      function onPointerDown(e) {
+        e.preventDefault();
+        handle.setPointerCapture(e.pointerId);
+        startX = e.clientX; startY = e.clientY;
+        var rect = panel.getBoundingClientRect();
+        startW = rect.width; startH = rect.height;
+        document.body.classList.add("ws-resizing");
+      }
+      function onPointerMove(e) {
+        if (!document.body.classList.contains("ws-resizing")) return;
+        var newW = Math.max(200, startW + (e.clientX - startX));
+        var newH = Math.max(160, startH + (e.clientY - startY));
+        // Lock out of flex-grow/shrink so width applies directly
+        panel.style.flex   = "0 0 auto";
+        panel.style.width  = newW + "px";
+        panel.style.height = newH + "px";
+      }
+      function onPointerUp() {
+        document.body.classList.remove("ws-resizing");
+      }
+      handle.addEventListener("pointerdown", onPointerDown);
+      handle.addEventListener("pointermove", onPointerMove);
+      handle.addEventListener("pointerup", onPointerUp);
+      // Double-click handle → reset to default size
+      handle.addEventListener("dblclick", function () {
+        panel.style.flex   = "";
+        panel.style.width  = "";
+        panel.style.height = "";
+      });
+    });
+  }
+
+  function worksheetStateFromControls(section, chart, input) {
+    var base = worksheetStateDefaults(chart, input, {
+      templateKey: fieldValueIn(section, "worksheetTemplateSelect"),
+      components: Array.prototype.slice.call((section || document).querySelectorAll("[data-worksheet-component]")).filter(function (box) {
+        return box.checked;
+      }).map(function (box) { return box.getAttribute("data-worksheet-component"); }),
+      varshfalYear: fieldValueIn(section, "worksheetVarshfalYear"),
+      varshfalYearsText: fieldValueIn(section, "worksheetVarshfalYears"),
+      varshfalDivision: fieldValueIn(section, "worksheetVarshfalDivision"),
+      varshfalDivisionsText: fieldValueIn(section, "worksheetVarshfalDivisions"),
+      transitDate: fieldValueIn(section, "worksheetTransitDate"),
+      transitTime: fieldValueIn(section, "worksheetTransitTime"),
+      transitDivision: fieldValueIn(section, "worksheetTransitDivision"),
+      dashaFrom: fieldValueIn(section, "worksheetDashaFrom"),
+      dashaTo: fieldValueIn(section, "worksheetDashaTo")
+    });
+    if (!base.dashaTo) base.dashaTo = base.dashaFrom;
+    return base;
+  }
+
+  function parseWorksheetVarshfalYears(value, fallbackYear) {
+    var fallback = clamp(Math.round(Number(fallbackYear) || 1), 1, 121);
+    var raw = Array.isArray(value) ? value.join("\n") : String(value || "");
+    var chunks = raw.indexOf("\n") >= 0 ? raw.split(/\r?\n/) : raw.split(/[;,]+/);
+    var years = chunks.map(function (chunk) {
+      var text = String(chunk || "").trim();
+      if (!text) return null;
+      var labelled = text.match(/(?:age|year|running\s*year)\s*[:#-]?\s*(\d{1,3})/i);
+      var plain = text.match(/^\s*(\d{1,3})\b/);
+      var value = labelled ? Number(labelled[1]) : plain ? Number(plain[1]) : NaN;
+      return Number.isFinite(value) ? clamp(Math.round(value), 1, 121) : null;
+    }).filter(Boolean);
+    return dedupe(years.length ? years : [fallback]).slice(0, 8);
+  }
+
+  function parseWorksheetVarshfalDivisions(value) {
+    var raw = Array.isArray(value) ? value.join(",") : String(value || "");
+    var divisions = raw.split(/[^0-9]+/).filter(function (part) { return part.trim(); }).map(function (part) { return normalizeVarshfalDivision(part); }).filter(Boolean);
+    return dedupe(divisions.length ? divisions : [9]).slice(0, 6);
+  }
+
+  function worksheetVarshfalYearsText(chart, input, years) {
+    return (years && years.length ? years : [completedYears(input.birthInstant, input.asOfInstant, input.timezone) + 1]).map(function (year) {
+      return worksheetVarshfalAgeLabel(computeVarshfal(chart, input, year), input);
+    }).join("\n");
+  }
+
+  function worksheetVarshfalAgeLabel(result, input) {
+    return "Age " + result.runningYear + " (From " + worksheetDateSlash(result.returnInstant, input.timezone) + " to " + worksheetDateSlash(result.nextReturnInstant, input.timezone) + ")";
+  }
+
+  function worksheetDateSlash(date, timezone) {
+    var shifted = new Date(date.getTime() + Number(timezone || 0) * 3600000);
+    return pad(shifted.getUTCDate()) + "/" + pad(shifted.getUTCMonth() + 1) + "/" + shifted.getUTCFullYear();
+  }
+
+  function worksheetCanvasHtml(chart, input, templateKey, components, worksheetState) {
+    var template = worksheetTemplateByKey(templateKey);
+    var list = Array.isArray(components) ? components : template.components;
+    var state = worksheetStateDefaults(chart, input, Object.assign({}, worksheetState || {}, { templateKey: template.key, components: list }));
+    var html = '<div class="worksheet-page worksheet-template-' + escapeHtml(template.key) + '"><div class="worksheet-header"><span>' + escapeHtml(nativeReportName(input)) + '</span><strong>' + escapeHtml(template.label) + '</strong></div>';
+    if (!list.length) {
+      html += '<div class="panel-box worksheet-empty"><h3>Blank Worksheet</h3><p class="fine-print">Tick items above and click Apply template to build a custom working page.</p></div>';
+    } else {
+      html += '<div class="worksheet-grid">' + list.map(function (key) { return worksheetComponentHtml(key, chart, input, state); }).join("") + "</div>";
+    }
+    return html + "</div>";
+  }
+
+  function worksheetComponentHtml(key, chart, input, worksheetState) {
+    var d9, d10, d24, varshfal, varga;
+    if (key === "d1") return chartBox("Birth Chart", chart.ascendant.sign, chart.planets, { division: 1, rootChart: chart, showAscDegree: true, ascDegree: chart.ascendant.deg });
+    if (key === "d9") {
+      d9 = tableVarga(chart, 9);
+      return chartBox("D9 Navamsha (spouse)", d9.ascendant.sign, d9.planets, { division: 9, rootChart: chart, showAscDegree: true, ascDegree: d9.ascendant.deg });
+    }
+    if (key === "d10") {
+      d10 = tableVarga(chart, 10);
+      return chartBox("D10 Dashamsha (profession)", d10.ascendant.sign, d10.planets, { division: 10, rootChart: chart, showAscDegree: true, ascDegree: d10.ascendant.deg });
+    }
+    if (key === "d24") {
+      d24 = tableVarga(chart, 24);
+      return chartBox("D24 Siddhamsha (education)", d24.ascendant.sign, d24.planets, { division: 24, rootChart: chart, showAscDegree: true, ascDegree: d24.ascendant.deg });
+    }
+    if (key === "transit") {
+      var transitInput = transitInputFromReportInput(input, chart.ascendant.sign);
+      transitInput.date = worksheetState.transitDate;
+      transitInput.time = normalizeTimeInput(worksheetState.transitTime);
+      transitInput.division = Number(worksheetState.transitDivision || 1);
+      var transitChart = buildTransitChartFromInput(transitInput);
+      var display = transitDisplayChart(transitChart, transitInput, transitInput.division);
+      return chartBox("D-" + transitInput.division + " Gochara (Transits)", display.ascSign, display.planets, { division: transitInput.division, rootChart: transitChart, showAscDegree: true, ascDegree: transitChart.ascendant.deg });
+    }
+    if (key === "varshfal-d1" || key === "varshfal-d9" || key === "mudda") {
+      if (key === "varshfal-d1") return worksheetVarshfalChartsHtml("Varshfal D-1", chart, input, worksheetState, 1);
+      if (key === "varshfal-d9") {
+        return worksheetVarshfalChartsHtml("Varshfal Varga", chart, input, worksheetState, 0);
+      }
+      varshfal = worksheetVarshfalResult(chart, input, worksheetState.varshfalYear);
+      return muddaDashaHtml(varshfal, input);
+    }
+    if (key === "d1-details") return d1DetailedTable(chart);
+    if (key === "varga-table") return divisionalPlacementTables(chart);
+    if (key === "lordships-d1") return lordshipWorksheetPanel("Lordships", tableVarga(chart, 1));
+    if (key === "lordships-d9") return lordshipWorksheetPanel("D9 Navamsha Lordships", tableVarga(chart, 9));
+    if (key === "lordships-d10") return lordshipWorksheetPanel("D10 Dashamsha Lordships", tableVarga(chart, 10));
+    if (key === "vimshottari") return dashaWorksheetPanel("Vimshottari", chart, input, worksheetState, 0);
+    if (key === "vimshottari-next") return dashaWorksheetPanel("Vimshottari", chart, input, worksheetState, 1);
+    if (key === "kp-chart" || key === "kp-planets" || key === "kp-grahas" || key === "kp-ruling") return kpWorksheetComponent(key, chart);
+    if (key === "sav") return sarvashtakavargaWorksheetPanel(chart);
+    if (key === "panchang") return panchangWorksheetPanel(chart, input);
+    return '<div class="panel-box"><h3>' + escapeHtml(key) + '</h3><p class="fine-print">Worksheet component is not available yet.</p></div>';
+  }
+
+  function worksheetVarshfalResult(chart, input, runningYear) {
+    return computeVarshfal(chart, input, clamp(Math.round(Number(runningYear) || 1), 1, 121));
+  }
+
+  function worksheetVarshfalChartsHtml(title, chart, input, worksheetState, fixedDivision) {
+    var years = worksheetState.varshfalYears && worksheetState.varshfalYears.length ? worksheetState.varshfalYears : [worksheetState.varshfalYear];
+    var divisions = fixedDivision ? [fixedDivision] : (worksheetState.varshfalDivisions && worksheetState.varshfalDivisions.length ? worksheetState.varshfalDivisions : [worksheetState.varshfalDivision || 9]);
+    var cards = [];
+    years.forEach(function (runningYear) {
+      var result = worksheetVarshfalResult(chart, input, runningYear);
+      divisions.forEach(function (division) {
+        if (division === 1) {
+          cards.push(chartBox("Varshfal D-1 - " + worksheetVarshfalAgeLabel(result, input), result.varshfal.ascendant.sign, result.planetsWithMuntha, { division: 1, rootChart: result.varshfal, showAscDegree: true, ascDegree: result.varshfal.ascendant.deg }));
+          return;
+        }
+        var varga = makeVarshfalVarga(result, division);
+        cards.push(chartBox("Varshfal D-" + division + " " + vargaName(division) + " - " + worksheetVarshfalAgeLabel(result, input), varga.ascendant.sign, varga.planetsWithMuntha, { division: division, rootChart: result.varshfal, showAscDegree: true, ascDegree: varga.ascendant.deg }));
+      });
+    });
+    return '<div class="panel-box worksheet-varshfal-series worksheet-span-all"><h3>' + escapeHtml(title) + '</h3><div class="worksheet-varshfal-chart-grid">' + cards.join("") + '</div></div>';
+  }
+
+  function lordshipWorksheetPanel(title, varga) {
+    var ascSign = varga.ascendant.sign;
+    var rows = [];
+    for (var house = 1; house <= 12; house += 1) {
+      var sign = normalizeSign(ascSign + house - 1);
+      var lord = SIGNS[sign].lord;
+      var planet = (varga.planets || []).find(function (p) { return p.name === lord; });
+      var lordHouse = planet ? houseFromSign(ascSign, planet.sign) : "-";
+      rows.push({ house: house, sign: sign, lord: lord, lordHouse: lordHouse });
+    }
+    return '<div class="panel-box worksheet-lordship-panel"><h3>' + escapeHtml(title) + '</h3><div class="worksheet-lordship-list">' + rows.map(function (row) {
+      return '<div><span>Lord of ' + row.house + ' in ' + (row.lordHouse || "-") + '</span><strong class="' + planetCssClass(row.lord) + '">' + escapeHtml(planetShort(row.lord)) + '</strong></div>';
+    }).join("") + '</div><p class="fine-print">Lordship is calculated from this worksheet chart ascendant. Asterisk-style exchange markings remain for manual judgement.</p></div>';
+  }
+
+  function dashaWorksheetPanel(title, chart, input, worksheetState, nextRange) {
+    var startDate = worksheetState && worksheetState.dashaFrom ? worksheetState.dashaFrom : dateInputValue(input.asOfInstant || new Date(), input.timezone);
+    var endDate = worksheetState && worksheetState.dashaTo ? worksheetState.dashaTo : dateInputValue(addDays(input.asOfInstant || new Date(), 365.25 * 7), input.timezone);
+    var start = localDateTimeToUtc(startDate, "00:00:00", Number(input.timezone));
+    var end = localDateTimeToUtc(endDate, "23:59:59", Number(input.timezone));
+    if (end < start) {
+      var temp = start;
+      start = end;
+      end = temp;
+    }
+    if (nextRange) {
+      var spanDays = Math.max(1, (end.getTime() - start.getTime()) / 86400000);
+      start = addDays(end, 1);
+      end = addDays(start, spanDays);
+    }
+    return '<div class="worksheet-dasha-panel worksheet-dasha-explorer">' +
+      dashaExplorerPanelHtml(chart, input, start, end) +
+      '</div>';
+  }
+
+  function kpWorksheetComponent(key, chart) {
+    var kp = buildKpChart(chart);
+    if (key === "kp-chart") return chartBox("Krishnamurti chart", kp.ascendant.sign, kp.planets, { showAscDegree: true, ascDegree: kp.ascendant.deg });
+    if (key === "kp-planets") return kpPlanetarySignificationTable(kp);
+    if (key === "kp-grahas") return kpCuspSignificationTable(kp);
+    return '<div class="panel-box worksheet-ruling-panel"><h3>Ruling Planets</h3>' + metricRows([
+      ["Day Lord", WEEKDAY_LORDS[(chart.date.getUTCDay() + 7) % 7]],
+      ["Lagna Lord", SIGNS[chart.ascendant.sign].lord],
+      ["Lagna Nak Lord", nakshatraInfo(chart.ascendant.lon).lord],
+      ["Moon Rashi Lord", SIGNS[chart.planetsByName.Moon.sign].lord],
+      ["Moon Nak Lord", chart.planetsByName.Moon.nakLord],
+      ["KP Ayanamsha", analysisNumber(kp.ayanamsa)]
+    ]) + "</div>";
+  }
+
+  function sarvashtakavargaWorksheetPanel(chart) {
+    var section = sarvashtakavargaSection(chart);
+    return section.replace(/^<section[^>]*>/, "").replace(/<\/section>$/, "");
+  }
+
+  function panchangWorksheetPanel(chart, input) {
+    var p = panchangInfo(chart, input);
+    return '<div class="panel-box worksheet-panchang-panel"><h3>Birth Panchang</h3>' + metricRows([
+      ["Vara", p.vara],
+      ["Tithi", p.tithi + " (" + p.paksha + ")"],
+      ["Nakshatra", p.nakshatra + " pada " + p.pada + " - " + p.nakLord],
+      ["Yoga", p.yoga],
+      ["Karana", p.karana]
+    ]) + "</div>";
+  }
+
+  function metricRows(rows) {
+    return '<div class="worksheet-metric-rows">' + rows.map(function (row) {
+      return '<div class="metric-row"><strong>' + escapeHtml(row[0]) + '</strong><span>' + escapeHtml(row[1]) + '</span></div>';
+    }).join("") + "</div>";
+  }
+
+  function outputModuleLibrary() {
+    return [
+      {
+        title: "Tables",
+        groups: [
+          { items: [
+            moduleItem("Chart", "ready", "viewA-vargas"),
+            moduleItem("Chart with degrees in chart", "partial", "viewA-d1-details"),
+            moduleItem("Applicable Yogas", "ready", "viewA-yogas"),
+            moduleItem("Composite chart", "pending"),
+            moduleItem("Sudarshan Chakra", "ready", "viewA-vargas"),
+            moduleItem("Rashi with Navamsha position", "ready", "viewA-d1-details"),
+            moduleItem("Dashas", "ready", "viewA-dasha"),
+            moduleItem("Current Antardashas (3 levels)", "ready", "viewA-predictive")
+          ] },
+          { heading: "Planet details", items: [
+            moduleItem("Planetary info", "ready", "viewA-d1-details"),
+            moduleItem("Declination", "pending"),
+            moduleItem("House cusp details", "partial", "viewA-kp"),
+            moduleItem("Lordships", "ready", "viewA-predictive"),
+            moduleItem("Elements, lordships, strengths", "partial", "viewA-predictive"),
+            moduleItem("Mrityu Bhaga", "pending"),
+            moduleItem("Varga Deities", "pending"),
+            moduleItem("Shashtiamsha Deities", "pending"),
+            moduleItem("Nadiamshas", "pending")
+          ] },
+          { heading: "Balas & Phalas", items: [
+            moduleItem("Shadbala", "ready", "viewA-shadbala"),
+            moduleItem("Shadbala score graph", "ready", "viewA-shadbala"),
+            moduleItem("Bhava Bala table", "partial", "viewA-predictive"),
+            moduleItem("Bhava Bala Graph", "pending"),
+            moduleItem("Auspiciousness graph", "pending"),
+            moduleItem("Dominance", "partial", "viewA-predictive"),
+            moduleItem("Vimshopaka", "pending"),
+            moduleItem("Vargavimsopaka", "pending"),
+            moduleItem("Dignities in the 16 divisions", "ready", "viewA-references"),
+            moduleItem("Signs occupied in the 16 divisions", "ready", "viewA-references"),
+            moduleItem("Dispositors in 6 divisions (Shad Varga)", "pending"),
+            moduleItem("Predominant Elements", "partial", "viewA-predictive")
+          ] },
+          { heading: "Ashtakavarga", items: [
+            moduleItem("Ashtakavarga chart", "partial", "viewA-sav"),
+            moduleItem("Ashtakavarga Sun chart", "partial", "viewA-sav"),
+            moduleItem("Samudaya Ashtakavarga graph", "pending"),
+            moduleItem("Samudaya Ashtakavarga table", "ready", "viewA-sav"),
+            moduleItem("Prastarashtaka Varga table", "pending"),
+            moduleItem("Sarva Chanchala Chakra", "pending"),
+            moduleItem("Vedastana", "pending"),
+            moduleItem("Trikona Reduction", "pending"),
+            moduleItem("Ekadhipatya Reduction", "pending"),
+            moduleItem("Shodhana", "pending")
+          ] },
+          { heading: "Aspects", items: [
+            moduleItem("Aspects between planets", "ready", "viewA-predictive"),
+            moduleItem("Aspects from planets to Sri Pati Houses", "pending"),
+            moduleItem("Aspects on planet Graph", "pending"),
+            moduleItem("Aspects on house Graph", "pending"),
+            moduleItem("Aspects on house+lord Graph", "pending"),
+            moduleItem("Aspects on all planets Graph", "pending"),
+            moduleItem("Aspects on all houses Graph", "pending"),
+            moduleItem("Aspects on all houses+lord Graph", "pending")
+          ] },
+          { heading: "Jaimini", items: [
+            moduleItem("Karakas(7)", "ready", "viewA-jaimini"),
+            moduleItem("Karakas(8)", "ready", "viewA-jaimini"),
+            moduleItem("Jaimini Karakas and aspects 7", "ready", "viewA-jaimini"),
+            moduleItem("Jaimini Karakas and aspects 8", "ready", "viewA-jaimini"),
+            moduleItem("Pada", "ready", "viewA-jaimini"),
+            moduleItem("Alt. Lagnas", "ready", "viewA-jaimini"),
+            moduleItem("Jeeva", "ready", "viewA-jaimini")
+          ] },
+          { heading: "Varshaphala specific", items: [
+            moduleItem("Varsh. year lord", "partial", "viewA-varshfal"),
+            moduleItem("Varsh. strength", "partial", "viewA-varshfal"),
+            moduleItem("Sahams 1-10", "pending"),
+            moduleItem("Sahams 11-20", "pending"),
+            moduleItem("Sahams 21-30", "pending"),
+            moduleItem("Sahams 31-37", "pending")
+          ] },
+          { heading: "KP", items: [
+            moduleItem("Bhava (KP)", "ready", "viewA-kp"),
+            moduleItem("KP significators", "ready", "viewA-kp"),
+            moduleItem("KP Grahas", "ready", "viewA-kp"),
+            moduleItem("Ruling Planets", "pending")
+          ] },
+          { heading: "Timelines", items: [
+            moduleItem("Shadbala Timeline", "pending"),
+            moduleItem("Transit Timeline", "partial", "viewA-transit"),
+            moduleItem("Kaksha Timeline", "pending"),
+            moduleItem("Malefic transit Timeline", "pending"),
+            moduleItem("Dasha timeline", "ready", "viewA-dasha"),
+            moduleItem("Muhurta timeline", "partial", "viewA-transit"),
+            moduleItem("Calendar", "partial", "viewA-panchang"),
+            moduleItem("Upcoming Transits", "partial", "viewA-transit"),
+            moduleItem("Sign transits yearly overview", "pending")
+          ] },
+          { heading: "Misc Tables", items: [
+            moduleItem("Birth data", "ready", "viewA-summary"),
+            moduleItem("Events", "partial", "viewA-predictive"),
+            moduleItem("Notes", "partial", "viewA-predictive"),
+            moduleItem("Male/Female Rashi", "pending"),
+            moduleItem("Yogi, Dagdha", "pending"),
+            moduleItem("Gochara data", "ready", "viewA-transit"),
+            moduleItem("Panch Pakshi", "pending"),
+            moduleItem("Indian Calendar", "partial", "viewA-panchang"),
+            moduleItem("Panchang Details", "ready", "viewA-panchang"),
+            moduleItem("Avakhada Chakra", "pending"),
+            moduleItem("Ghat Chakra", "pending"),
+            moduleItem("Hindu Calendar", "partial", "viewA-panchang"),
+            moduleItem("Photo", "pending")
+          ] },
+          { heading: "Planetary relations", items: [
+            moduleItem("Natural Relationships (Naisargika)", "partial", "viewA-predictive"),
+            moduleItem("Temporary Relationships (Tatkalika)", "pending"),
+            moduleItem("Compound Relationships (Panchadha)", "pending"),
+            moduleItem("Nakshatra Spatial Matrix", "partial", "viewA-predictive")
+          ] },
+          { heading: "Muhurta tools", items: [
+            moduleItem("Panchang Thermometer", "pending"),
+            moduleItem("Nakshatra & Tithi Activities", "pending"),
+            moduleItem("Kakshas", "pending"),
+            moduleItem("Bala, Vimshopaka, Ishta/Kashta", "pending")
+          ] },
+          { heading: "Compatibility", items: [
+            moduleItem("Ashtakoota", "ready", "viewA-compatibility"),
+            moduleItem("Dashkoota", "ready", "viewA-compatibility"),
+            moduleItem("Rashi based compatibility", "ready", "viewA-compatibility"),
+            moduleItem("Compatibility analysis", "ready", "viewA-compatibility")
+          ] },
+          { heading: "Chakras", items: [
+            moduleItem("Sarvatobhadra Chakra", "ready", "viewA-chakras"),
+            moduleItem("Kota Chakra", "ready", "viewA-chakras"),
+            moduleItem("Sanghatta Chakra", "ready", "viewA-chakras")
+          ] },
+          { heading: "Tools", items: [
+            moduleItem("Rectification Tool", "pending"),
+            moduleItem("Dasha browser", "ready", "viewA-dasha")
+          ] }
+        ]
+      },
+      {
+        title: "Context",
+        groups: [
+          { items: [
+            moduleItem("Birth", "ready", "viewA-summary"),
+            moduleItem("Animated Transits", "pending"),
+            moduleItem("Gochara (Transits)", "ready", "viewA-transit"),
+            moduleItem("Gochara (Transits) - Asc", "ready", "viewA-transit"),
+            moduleItem("Gochara (Transits) - Moon", "ready", "viewA-transit"),
+            moduleItem("Varshaphala", "ready", "viewA-varshfal"),
+            moduleItem("Varshaphala(L)", "partial", "viewA-varshfal"),
+            moduleItem("Monthly prog.", "pending"),
+            moduleItem("Monthly prog.(L)", "pending"),
+            moduleItem("Daily prog.", "pending"),
+            moduleItem("Daily prog.(L)", "pending"),
+            moduleItem("Tithi Pravesh", "pending"),
+            moduleItem("Tithi Pravesh(L)", "pending"),
+            moduleItem("Muhurta", "partial", "viewA-transit"),
+            moduleItem("Prashna", "pending"),
+            moduleItem("Krishnamurti chart(Prashna)", "pending"),
+            moduleItem("Sunrise", "partial", "viewA-panchang")
+          ] }
+        ]
+      },
+      {
+        title: "Special Charts",
+        groups: [
+          { items: [
+            moduleItem("Sign", "ready", "viewA-vargas"),
+            moduleItem("Bhava Chalit (Sripati)", "ready", "viewA-vargas"),
+            moduleItem("Bhava (equal)", "partial", "viewA-references"),
+            moduleItem("Chandra", "ready", "viewA-vargas"),
+            moduleItem("Surya", "ready", "viewA-vargas"),
+            moduleItem("Karakamsha(Birth)", "pending"),
+            moduleItem("Karakamsha(Navamsha)", "pending"),
+            moduleItem("Bhava Lagna", "pending"),
+            moduleItem("Hora Lagna", "pending"),
+            moduleItem("Ghatika Lagna", "pending"),
+            moduleItem("Krishnamurti chart", "ready", "viewA-kp"),
+            moduleItem("Upapada Lagna", "pending")
+          ] }
+        ]
+      },
+      {
+        title: "Vargas",
+        groups: [
+          { items: [
+            moduleItem("Janma (all areas of life)", "ready", "viewA-vargas"),
+            moduleItem("Hora (wealth)", "ready", "viewA-vargas"),
+            moduleItem("Dreshkana (happiness siblings)", "ready", "viewA-vargas"),
+            moduleItem("Chaturthamsha (destiny)", "ready", "viewA-vargas"),
+            moduleItem("Saptamsha (children)", "ready", "viewA-vargas"),
+            moduleItem("Navamsha (spouse)", "ready", "viewA-vargas"),
+            moduleItem("Dashamsha (great successes)", "ready", "viewA-vargas"),
+            moduleItem("Dwadashamsha (parents)", "ready", "viewA-vargas"),
+            moduleItem("Shodashamsha (conveyances)", "ready", "viewA-vargas"),
+            moduleItem("Vimshamsha (spiritual progress)", "ready", "viewA-vargas"),
+            moduleItem("Chaturvimshamsha (knowledge)", "ready", "viewA-vargas"),
+            moduleItem("Saptavimshamsha (strength)", "ready", "viewA-vargas"),
+            moduleItem("Trimshamsha (misfortunes)", "ready", "viewA-vargas"),
+            moduleItem("Khavedamsha (Ausp.Inausp.effects)", "ready", "viewA-vargas"),
+            moduleItem("Akshavedamsha (All areas)", "ready", "viewA-vargas"),
+            moduleItem("Shashtiamsha (All areas)", "ready", "viewA-vargas"),
+            moduleItem("Panchamsha 1/5", "pending"),
+            moduleItem("Shashtamsha 1/6 Disease", "pending"),
+            moduleItem("Ashtamsha 1/8 Accidents", "pending"),
+            moduleItem("Ekadashamsha 1/11 Cure", "pending"),
+            moduleItem("Nadiamsha 1/150", "pending"),
+            moduleItem("Parivriti dvaya Hora", "pending"),
+            moduleItem("Samasaptaka Hora", "pending"),
+            moduleItem("Parivriti Traya Dreshkana", "pending"),
+            moduleItem("Chaturthamsha 123", "pending"),
+            moduleItem("Dashamsha 123", "pending"),
+            moduleItem("Dvadashamsha 123", "pending"),
+            moduleItem("Trimshamsha 123", "pending"),
+            moduleItem("Panchamamsha", "pending"),
+            moduleItem("Shodashamsha Iyer (conveyances)", "pending"),
+            moduleItem("Ekadashamsha 1/11 Iyer Cure", "pending"),
+            moduleItem("Astottaramsa ND", "pending"),
+            moduleItem("Astottaramsa DN", "pending"),
+            moduleItem("Kashinatha Hora", "pending"),
+            moduleItem("Somanatha Hora", "pending"),
+            moduleItem("Jagannatha Drekkana", "pending"),
+            moduleItem("Somanatha Drekkana", "pending")
+          ] }
+        ]
+      }
+    ];
+  }
+
+  function moduleItem(label, status, target) {
+    return { label: label, status: status || "pending", target: target || "" };
+  }
+
+  function moduleColumnHtml(column) {
+    var groups = column.groups.map(function (group) {
+      return {
+        heading: group.heading,
+        items: group.items.filter(function (item) { return item.status !== "pending"; })
+      };
+    }).filter(function (group) {
+      return group.items.length > 0;
+    });
+    if (!groups.length) return "";
+    return '<div class="module-column"><h4>' + escapeHtml(column.title) + '</h4><div class="module-list">' +
+      groups.map(function (group) {
+        var heading = group.heading ? '<div class="module-group-title">---' + escapeHtml(group.heading) + '---</div>' : "";
+        return heading + group.items.map(moduleItemHtml).join("");
+      }).join("") +
+      "</div></div>";
+  }
+
+  function moduleItemHtml(item) {
+    var status = moduleStatus(item.status);
+    var target = item.target === "viewA-predictive" ? "viewA-predictive" : item.target;
+    var label = target ? '<button type="button" class="module-link" data-module-target="' + escapeHtml(target) + '">' + escapeHtml(item.label) + "</button>" : '<span>' + escapeHtml(item.label) + "</span>";
+    return '<div class="module-item ' + escapeHtml(status.className) + '">' + label + "</div>";
+  }
+
+  function moduleStatus(status) {
+    if (status === "ready") return { label: "Ready", className: "module-ready" };
+    if (status === "partial") return { label: "Partial", className: "module-partial" };
+    return { label: "Formula pending", className: "module-pending" };
+  }
+
+  function wireOutputLibraryControls() {
+    var library = document.getElementById("viewA-output-library");
+    if (!library) return;
+    library.addEventListener("click", function (event) {
+      var button = event.target && event.target.closest ? event.target.closest("[data-module-target]") : null;
+      if (!button) return;
+      var targetId = button.getAttribute("data-module-target");
+      showReportView("chartData");
+      setTimeout(function () {
+        showSingleChartDataSection(targetId);
+      }, 0);
+    });
+  }
+
+  function enhanceReportTableTopControls() {
+    var report = document.getElementById("report");
+    if (!report || !report.querySelectorAll) return;
+    setupCollapsibleReportSections();
+    if (!report.dataset.tableTopWired) {
+      report.addEventListener("click", function (event) {
+        var button = event.target && event.target.closest ? event.target.closest("[data-report-top-target]") : null;
+        if (button) {
+          var target = document.getElementById(button.getAttribute("data-report-top-target"));
+          if (target && target.scrollIntoView) target.scrollIntoView({ behavior: "smooth", block: "start" });
+          return;
+        }
+        var closeButton = event.target && event.target.closest ? event.target.closest("[data-focus-popup-close]") : null;
+        if (closeButton) closePanelFocusPopup();
+      });
+      report.dataset.tableTopWired = "1";
+    }
+    refreshRailFocusTargets(false);
+    ["chartDataReportView"].forEach(function (rootId) {
+      var root = document.getElementById(rootId);
+      if (!root || !root.querySelectorAll) return;
+      Array.prototype.slice.call(root.querySelectorAll(".table-wrap")).forEach(function (wrap) {
+        addReportTopActionAfter(wrap, rootId);
+      });
+      Array.prototype.slice.call(root.querySelectorAll("table")).forEach(function (table) {
+        var wrapped = table.closest && table.closest(".table-wrap");
+        addReportTopActionAfter(wrapped || table, rootId);
+      });
+    });
+  }
+
+  function addReportTopActionAfter(node, rootId) {
+    if (!node || !node.insertAdjacentElement) return;
+    if (node.nextElementSibling && node.nextElementSibling.classList && node.nextElementSibling.classList.contains("table-top-action")) return;
+    var action = document.createElement("div");
+    action.className = "table-top-action";
+    var button = document.createElement("button");
+    button.type = "button";
+    button.className = "table-top-button";
+    button.setAttribute("data-report-top-target", rootId);
+    button.textContent = "Back To Top";
+    action.appendChild(button);
+    node.insertAdjacentElement("afterend", action);
+  }
+
+  function enhancePanelFocusRails(root) {
+    refreshRailFocusTargets(false);
+  }
+
+  function addPanelFocusRail(panel, kind, label) {
+    if (!panel || panel.querySelector(".panel-focus-rail")) return;
+    var rail = document.createElement("div");
+    rail.className = "panel-focus-rail panel-focus-rail-" + kind;
+    var button = document.createElement("button");
+    button.type = "button";
+    button.setAttribute("data-panel-focus", kind);
+    button.setAttribute("aria-label", label + " focus popup");
+    button.textContent = label;
+    rail.appendChild(button);
+    panel.appendChild(rail);
+  }
+
+  function openPanelFocusPopup(button) {
+    var kind = button.getAttribute("data-panel-focus") || "chart";
+    var selector = kind === "dasha" ? ".dasha-panel" : ".chart-panel";
+    var source = button.closest(selector);
+    if (!source) return;
+    openPanelFocusPopupFromSource(source, kind);
+  }
+
+  function openPanelFocusPopupFromSource(source, kind) {
+    var layer = createPanelFocusPopupLayer();
+    var title = panelFocusTitle(source, kind);
+    var section = source && source.closest ? source.closest("section[id]") : null;
+    layer.dataset.focusKind = kind || "chart";
+    layer.dataset.focusTitle = title || "";
+    layer.dataset.focusSectionId = section ? section.id : "";
+    layer.dataset.focusSourceId = source && source.id ? source.id : "";
+    populatePanelFocusPopupLayer(layer, source, kind, title);
+    bringPanelFocusPopupToFront(layer);
+  }
+
+  function populatePanelFocusPopupLayer(layer, source, kind, title) {
+    if (!layer || !source) return;
+    var clone = source.cloneNode(true);
+    clone.classList.remove("section-collapsed");
+    clone.removeAttribute("data-section-collapsed");
+    Array.prototype.slice.call(clone.querySelectorAll("[data-dasha-control-wired], [data-dasha-level-wired], [data-prana-toggle-wired], [data-dasha-toggle-wired], [data-prana-rendered]")).forEach(function (node) {
+      delete node.dataset.dashaControlWired;
+      delete node.dataset.dashaLevelWired;
+      delete node.dataset.pranaToggleWired;
+      delete node.dataset.dashaToggleWired;
+      delete node.dataset.pranaRendered;
+    });
+    Array.prototype.slice.call(clone.querySelectorAll(".panel-focus-rail, .table-top-action")).forEach(function (node) {
+      if (node && node.parentNode) node.parentNode.removeChild(node);
+    });
+    if (kind === "dasha") {
+      clone.classList.add("focus-popup-dasha-panel");
+      Array.prototype.slice.call(clone.querySelectorAll("details")).forEach(function (details) {
+        details.open = false;
+      });
+    } else if (kind === "table") {
+      clone.classList.add("focus-popup-table-panel");
+    } else if (kind === "chart") {
+      clone.classList.add("focus-popup-chart-panel");
+    } else {
+      clone.classList.add("focus-popup-section-panel");
+    }
+    layer.querySelector(".panel-focus-popup-title").textContent = title || panelFocusTitle(source, kind);
+    var body = layer.querySelector(".panel-focus-popup-body");
+    body.innerHTML = "";
+    body.appendChild(clone);
+    layer.classList.remove("hidden");
+    if (kind === "dasha") setTimeout(wireDashaGroupControls, 0);
+    if (clone.querySelector && clone.querySelector("#varshfalUpdateBtn") && lastReportChart && lastReportInput) {
+      wireVarshfalControls(lastReportChart, lastReportInput, clone);
+    }
+  }
+
+  function refreshOpenFocusPopups() {
+    if (typeof document === "undefined" || !document.querySelectorAll) return;
+    Array.prototype.slice.call(document.querySelectorAll(".panel-focus-popup:not(.hidden)")).forEach(function (layer) {
+      var source = findFocusPopupSource(layer);
+      if (!source) return;
+      populatePanelFocusPopupLayer(layer, source, layer.dataset.focusKind || "chart", layer.dataset.focusTitle || "");
+    });
+  }
+
+  function findFocusPopupSource(layer) {
+    var kind = layer.dataset.focusKind || "chart";
+    var title = layer.dataset.focusTitle || "";
+    var sectionId = layer.dataset.focusSectionId || "";
+    var sourceId = layer.dataset.focusSourceId || "";
+    if (sectionId) expediteSectionForNavTarget(sectionId);
+    if (kind === "dasha") expediteSectionForNavTarget("viewA-dasha");
+    if (kind === "table") expediteSectionForNavTarget("viewA-d1-details");
+    var scope = sectionId ? document.getElementById(sectionId) : document;
+    if (!scope) scope = document;
+    if (sourceId) {
+      var byId = scope.querySelector ? scope.querySelector("#" + sourceId) : document.getElementById(sourceId);
+      if (byId) return byId;
+    }
+    if (kind === "section" && sectionId) return document.getElementById(sectionId);
+    var selector = kind === "dasha" ? ".dasha-panel" : (kind === "table" ? ".d1-details-table-panel" : ".chart-panel");
+    var candidates = scope.querySelectorAll ? Array.prototype.slice.call(scope.querySelectorAll(selector)) : [];
+    if (!candidates.length && scope !== document) candidates = Array.prototype.slice.call(document.querySelectorAll(selector));
+    if (!candidates.length) return null;
+    if (title) {
+      var match = candidates.find(function (candidate) {
+        return panelFocusTitle(candidate, kind) === title;
+      });
+      if (match) return match;
+    }
+    return candidates[0];
+  }
+
+  function closeFocusRailPanel() {
+    var rail = document.getElementById("focusModeRail");
+    if (!rail) return;
+    rail.classList.remove("is-open");
+    var tab = rail.querySelector(".focus-rail-tab");
+    if (tab) tab.setAttribute("aria-expanded", "false");
+  }
+
+  function panelFocusTitle(source, kind) {
+    var titleNode = source.querySelector(kind === "dasha" ? ".dasha-titlebar strong" : (kind === "chart" ? ".chart-title-strip" : "h3, .chart-title-strip"));
+    return titleNode ? titleNode.textContent.trim() : (kind === "dasha" ? "Vimshottari Dasha" : (kind === "table" ? "D-1 Details" : "Chart"));
+  }
+
+  function ensurePanelFocusPopupLayer() {
+    return createPanelFocusPopupLayer();
+  }
+
+  function createPanelFocusPopupLayer() {
+    var layer = document.getElementById("panelFocusPopup");
+    layer = document.createElement("div");
+    window.__vednetraFocusPopupCounter = (window.__vednetraFocusPopupCounter || 0) + 1;
+    layer.id = "panelFocusPopup-" + window.__vednetraFocusPopupCounter;
+    layer.className = "panel-focus-popup hidden";
+    layer.innerHTML = '<div class="panel-focus-popup-shell" role="dialog" aria-modal="false" aria-label="Focused VedNetra panel">' +
+        '<div class="panel-focus-popup-head"><strong class="panel-focus-popup-title">Focus</strong><span><button type="button" data-focus-popup-close="1">Close</button></span></div>' +
+        '<div class="panel-focus-popup-body"></div>' +
+      '</div>';
+    document.body.appendChild(layer);
+    setupPanelFocusPopupMotion(layer);
+    layer.addEventListener("pointerdown", function () {
+      bringPanelFocusPopupToFront(layer);
+    });
+    layer.addEventListener("mousedown", function () {
+      bringPanelFocusPopupToFront(layer);
+    });
+    layer.addEventListener("click", function (event) {
+      bringPanelFocusPopupToFront(layer);
+      var close = event.target && event.target.closest ? event.target.closest("[data-focus-popup-close]") : null;
+      if (close) {
+        closePanelFocusPopup(layer);
+      }
+    });
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape") closePanelFocusPopup();
+    });
+    return layer;
+  }
+
+  function bringPanelFocusPopupToFront(layer) {
+    if (!layer || !layer.style) return;
+    window.__vednetraFocusZIndex = Math.max(window.__vednetraFocusZIndex || 3000, 3000) + 1;
+    layer.style.zIndex = String(window.__vednetraFocusZIndex);
+  }
+
+  function setupPanelFocusPopupMotion(layer) {
+    if (!layer || layer.dataset.motionReady === "1") return;
+    layer.dataset.motionReady = "1";
+    var head = layer.querySelector(".panel-focus-popup-head");
+    if (!head) return;
+    head.addEventListener("pointerdown", function (event) {
+      if ((event.button || 0) !== 0) return;
+      if (event.target && event.target.closest && event.target.closest("button, select, input, textarea, a")) return;
+      var rect = layer.getBoundingClientRect();
+      var startX = event.clientX;
+      var startY = event.clientY;
+      var startLeft = rect.left;
+      var startTop = rect.top;
+      layer.style.left = startLeft + "px";
+      layer.style.top = startTop + "px";
+      layer.style.right = "auto";
+      layer.style.bottom = "auto";
+      layer.classList.add("is-dragging");
+      if (head.setPointerCapture && event.pointerId !== undefined) {
+        try { head.setPointerCapture(event.pointerId); } catch (err) {}
+      }
+      function move(moveEvent) {
+        var nextLeft = startLeft + moveEvent.clientX - startX;
+        var nextTop = startTop + moveEvent.clientY - startY;
+        var current = layer.getBoundingClientRect();
+        var maxLeft = Math.max(0, window.innerWidth - Math.min(90, current.width));
+        var maxTop = Math.max(0, window.innerHeight - Math.min(54, current.height));
+        layer.style.left = Math.min(Math.max(nextLeft, -current.width + 90), maxLeft) + "px";
+        layer.style.top = Math.min(Math.max(nextTop, 0), maxTop) + "px";
+      }
+      function done() {
+        layer.classList.remove("is-dragging");
+        document.removeEventListener("pointermove", move);
+        document.removeEventListener("pointerup", done);
+        document.removeEventListener("pointercancel", done);
+      }
+      event.preventDefault();
+      document.addEventListener("pointermove", move);
+      document.addEventListener("pointerup", done);
+      document.addEventListener("pointercancel", done);
+    });
+  }
+
+  function closePanelFocusPopup(layer) {
+    if (!layer) {
+      var popups = Array.prototype.slice.call(document.querySelectorAll(".panel-focus-popup"));
+      layer = popups[popups.length - 1];
+    }
+    if (!layer) return;
+    var body = layer.querySelector(".panel-focus-popup-body");
+    if (body) body.innerHTML = "";
+    if (layer.parentNode) layer.parentNode.removeChild(layer);
+  }
+
+  function nativeReportName(input) {
+    var chartNumber = input && input.chartNumber ? "Chart " + input.chartNumber + " - " : "";
+    return chartNumber + (input && input.name ? input.name : "Native");
+  }
+
+  function planetRelationsSection(chart) {
+    var html = '<section id="viewA-planet-relations" class="section"><div class="section-head"><div><p class="eyebrow">Planet Relations</p><h3>Relationship Basis For Prediction</h3></div><span class="small-pill">D-1</span></div><div class="report-grid">';
+    html += relationTableHtml("Conjunctions", relationRows(chart, "conjunction"), "No planetary conjunction found in D-1.");
+    html += relationTableHtml("Mutual Aspects", relationRows(chart, "mutualAspect"), "No mutual planetary aspect found in D-1.");
+    html += relationTableHtml("Planets In Each Other's Zodiac Sign", relationRows(chart, "signExchange"), "No mutual zodiac sign exchange found.");
+    html += relationTableHtml("Planets In Each Other's Nakshatra", relationRows(chart, "nakshatraExchange"), "No mutual nakshatra exchange found.");
+    html += relationTableHtml("Planets In Same Nakshatra", relationRows(chart, "sameNakshatra"), "No planets share the same nakshatra.");
+    html += "</div></section>";
+    return html;
+  }
+
+  function relationTableHtml(title, rows, emptyText) {
+    return '<div class="panel-box"><h3>' + escapeHtml(title) + '</h3><div class="table-wrap compact-table"><table><thead><tr><th>Planets</th><th>Relation detail</th><th>Interpretive use</th></tr></thead><tbody>' +
+      (rows.length ? rows.map(function (row) {
+        return "<tr><td><strong>" + escapeHtml(row.pair) + "</strong></td><td>" + escapeHtml(row.detail) + "</td><td>" + escapeHtml(row.use) + "</td></tr>";
+      }).join("") : '<tr><td colspan="3">' + escapeHtml(emptyText) + "</td></tr>") +
+      "</tbody></table></div></div>";
+  }
+
+  function relationRows(chart, type) {
+    var rows = [];
+    planetPairs(chart).forEach(function (pair) {
+      var a = pair[0];
+      var b = pair[1];
+      var detail = relationDetail(chart, a, b, type);
+      if (!detail) return;
+      rows.push({
+        pair: a.name + " - " + b.name,
+        detail: detail,
+        use: relationInterpretiveUse(chart, a, b, type)
+      });
+    });
+    return rows;
+  }
+
+  function planetPairs(chart) {
+    var pairs = [];
+    for (var i = 0; i < PLANETS.length; i += 1) {
+      for (var j = i + 1; j < PLANETS.length; j += 1) {
+        var a = chart.planetsByName[PLANETS[i]];
+        var b = chart.planetsByName[PLANETS[j]];
+        if (a && b) pairs.push([a, b]);
+      }
+    }
+    return pairs;
+  }
+
+  function relationDetail(chart, a, b, type) {
+    if (type === "conjunction" && a.sign === b.sign) {
+      return "Together in " + a.signName + " / house " + a.house + ".";
+    }
+    if (type === "mutualAspect" && planetAspectsHouse(a, b.house) && planetAspectsHouse(b, a.house)) {
+      return a.name + " aspects house " + b.house + " and " + b.name + " aspects house " + a.house + ".";
+    }
+    if (type === "signExchange" && SIGNS[a.sign].lord === b.name && SIGNS[b.sign].lord === a.name) {
+      return a.name + " is in " + b.name + "'s sign and " + b.name + " is in " + a.name + "'s sign.";
+    }
+    if (type === "nakshatraExchange" && a.nakLord === b.name && b.nakLord === a.name) {
+      return a.name + " is in " + b.name + "'s nakshatra and " + b.name + " is in " + a.name + "'s nakshatra.";
+    }
+    if (type === "sameNakshatra" && a.nakshatra === b.nakshatra) {
+      return a.name + " and " + b.name + " are both in " + a.nakshatra + " nakshatra.";
+    }
+    return "";
+  }
+
+  function relationshipTypesBetween(chart, aName, bName) {
+    var a = chart.planetsByName[aName];
+    var b = chart.planetsByName[bName];
+    if (!a || !b || a.name === b.name) return [];
+    return [
+      relationDetail(chart, a, b, "conjunction") ? "Conjunction" : "",
+      relationDetail(chart, a, b, "mutualAspect") ? "Mutual aspect" : "",
+      relationDetail(chart, a, b, "signExchange") ? "Mutual sign exchange" : "",
+      relationDetail(chart, a, b, "nakshatraExchange") ? "Mutual nakshatra exchange" : "",
+      relationDetail(chart, a, b, "sameNakshatra") ? "Same nakshatra" : ""
+    ].filter(Boolean);
+  }
+
+  function relationInterpretiveUse(chart, a, b, type) {
+    var lordship = a.name + " activates " + lordshipSummary(a) + "; " + b.name + " activates " + lordshipSummary(b) + ".";
+    if (type === "conjunction") return "Joined result: " + lordship;
+    if (type === "mutualAspect") return "Mutual influence: each planet repeatedly triggers the other's houses. " + lordship;
+    if (type === "signExchange") return "Exchange strengthens linkage between their houses. " + lordship;
+    if (type === "nakshatraExchange") return "Nakshatra exchange links motive and result at a subtle dasha level. " + lordship;
+    return "Same nakshatra links temperament, impulse and activation style. " + lordship;
+  }
+
+  function lordshipSummary(planet) {
+    if (!planet || !planet.lordships || !planet.lordships.length) return "its dispositor/nodal field";
+    return planet.lordships.map(function (house) { return "H" + house + " " + houseMeaning(house); }).join(", ");
+  }
+
+  function lordshipOverviewSection(chart) {
+    var html = '<section id="viewA-lordship-overview" class="section"><div class="section-head"><div><p class="eyebrow">Lordships</p><h3>Trine, Kendra And Trik Lords</h3></div><span class="small-pill">Functional roles</span></div><div class="report-grid three">';
+    html += lordshipTableHtml("Trine Lords", [1, 5, 9], chart);
+    html += lordshipTableHtml("Kendra Lords", [1, 4, 7, 10], chart);
+    html += lordshipTableHtml("Trik Lords", [6, 8, 12], chart);
+    html += "</div></section>";
+    return html;
+  }
+
+  function lordshipTableHtml(title, houses, chart) {
+    var rows = houses.map(function (house) {
+      var lordName = lordOfHouse(chart, house);
+      var lord = chart.planetsByName[lordName];
+      return {
+        house: "H" + house,
+        sign: SIGNS[houseSign(chart, house)].name,
+        lord: lordName,
+        role: lord ? lord.functionalRole : "-",
+        condition: lord ? conditionText(lord) : "-"
+      };
+    });
+    return '<div class="panel-box"><h3>' + escapeHtml(title) + '</h3><div class="table-wrap compact-table"><table><thead><tr><th>House</th><th>Sign</th><th>Lord</th><th>Role</th><th>Condition</th></tr></thead><tbody>' +
+      rows.map(function (row) {
+        return "<tr><td><strong>" + escapeHtml(row.house) + "</strong></td><td>" + escapeHtml(row.sign) + "</td><td>" + escapeHtml(row.lord) + "</td><td>" + escapeHtml(row.role) + "</td><td>" + escapeHtml(row.condition) + "</td></tr>";
+      }).join("") +
+      "</tbody></table></div></div>";
+  }
+
+  function frequentQueriesPillarsSection(chart, input) {
+    var analyses = FREQUENT_QUERY_PILLARS.map(function (cfg) {
+      return analyzeFrequentQueryPillar(chart, input, cfg);
+    });
+    var summaryRows = analyses.map(function (item, index) {
+      return "<tr><td>" + (index + 1) + "</td><td><strong>" + escapeHtml(item.cfg.label) + "</strong></td><td>" + escapeHtml(pillarVerdict(item.promiseScore, item.cfg)) + "</td><td>" + escapeHtml(String(item.promiseScore)) + "</td><td>" + escapeHtml(item.timing.slice(0, 2).map(function (row) { return dashaCode(row.md, row.ad, row.pd) + " " + dashaDate(row.start, input.timezone); }).join("; ") || "No focused period found") + "</td><td>" + escapeHtml(item.transitSummary) + "</td></tr>";
+    }).join("");
+    return '<section id="viewA-faq-pillars" class="section faq-pillars-section"><div class="section-head"><div><p class="eyebrow">Most Frequently Asked Queries</p><h3>Most Frequently Asked Queries&apos; Pillars</h3></div><span class="small-pill">20 drilldowns</span></div>' +
+      '<div class="panel-box"><h3>All Pillars Snapshot</h3><div class="table-wrap"><table><thead><tr><th>#</th><th>Query pillar</th><th>Promise judgement</th><th>Score</th><th>Likely timing</th><th>Transit validation</th></tr></thead><tbody>' + summaryRows + "</tbody></table></div></div>" +
+      '<div class="faq-pillar-list">' + analyses.map(function (item, index) { return frequentQueryPillarHtml(item, input, index); }).join("") + "</div>" +
+      '<p class="fine-print">Scoring starts from benefic promise and then discounts for affliction, weakness, dusthana placement, combustion, debility and poor varga support. This is a structured judgement aid, not a replacement for a final human reading where the topic is sensitive.</p></section>';
+  }
+
+  function analyzeFrequentQueryPillar(chart, input, cfg) {
+    var effectiveCfg = Object.assign({}, cfg, {
+      label: cfg.label,
+      houses: cfg.houses,
+      primaryHouses: cfg.primaryHouses,
+      karakas: cfg.karakas,
+      dchart: cfg.dchart,
+      timingKarakas: cfg.timingKarakas
+    });
+    var d9 = makeVargaChart(chart, 9);
+    var topicVarga = makeVargaChart(chart, cfg.dchart);
+    var lifeStage = frequentPillarLifeStage(input, cfg);
+    var context = frequentPillarContext(input, cfg, lifeStage);
+    var factorRows = frequentPillarFactorRows(chart, d9, topicVarga, effectiveCfg);
+    var promiseScore = Math.round(clamp(50 + factorRows.reduce(function (sum, row) { return sum + row.impact; }, 0), 0, 100));
+    var methodologyRows = frequentPillarMethodologyRows(chart, d9, topicVarga, effectiveCfg);
+    var pastTiming = frequentPillarTimingRows(chart, input, effectiveCfg, "past", lifeStage, promiseScore, context);
+    var futureTiming = frequentPillarTimingRows(chart, input, effectiveCfg, "future", lifeStage, promiseScore, context);
+    var timing = lifeStage.status === "past" ? pastTiming : (futureTiming.length ? futureTiming : pastTiming);
+    var pastTransitValidation = pastTiming.slice(0, 3).map(function (row) { return frequentPillarTransitValidation(chart, row, effectiveCfg); });
+    var futureTransitValidation = futureTiming.slice(0, 3).map(function (row) { return frequentPillarTransitValidation(chart, row, effectiveCfg); });
+    var transitValidation = timing.slice(0, 3).map(function (row) { return frequentPillarTransitValidation(chart, row, effectiveCfg); });
+    var transitScore = Math.round(average(transitValidation.map(prop("score"))));
+    var lagnaMoonSun = frequentReferenceRows(chart, d9, topicVarga, effectiveCfg);
+    return {
+      cfg: effectiveCfg,
+      d9: d9,
+      topicVarga: topicVarga,
+      lifeStage: lifeStage,
+      context: context,
+      factorRows: factorRows,
+      methodologyRows: methodologyRows,
+      promiseScore: promiseScore,
+      lagnaMoonSun: lagnaMoonSun,
+      timing: timing,
+      pastTiming: pastTiming,
+      futureTiming: futureTiming,
+      pastTransitValidation: pastTransitValidation,
+      futureTransitValidation: futureTransitValidation,
+      transitValidation: transitValidation,
+      transitScore: transitScore,
+      transitSummary: transitScore >= 60 ? "Supportive" : transitScore >= 42 ? "Mixed" : "Weak"
+    };
+  }
+
+  function frequentQueryPillarHtml(item, input, index) {
+    var cfg = item.cfg;
+    var timingRows = item.timing.slice(0, 6);
+    return '<details class="faq-pillar-card"' + (index === 0 ? " open" : "") + '><summary><span><strong>' + (index + 1) + ". " + escapeHtml(cfg.label) + '</strong><em>Relevant houses: ' + escapeHtml(cfg.houses.map(function (h) { return "H" + h; }).join(", ")) + "; D-" + cfg.dchart + " " + vargaName(cfg.dchart) + '</em></span><b>' + escapeHtml(pillarVerdict(item.promiseScore, cfg)) + " (" + item.promiseScore + ')</b></summary>' +
+      '<div class="faq-pillar-body">' +
+      '<div class="report-grid three">' +
+      metricBox("Promise", [["Judgement", pillarVerdict(item.promiseScore, cfg)], ["Weighted score", item.promiseScore + "/100"], ["Key house", "H" + cfg.keyHouse + " " + houseMeaning(cfg.keyHouse)], ["Relevant varga", "D-" + cfg.dchart + " " + vargaName(cfg.dchart)]]) +
+      metricBox("Life-stage context", [["Native age", item.lifeStage.age + " years"], ["Normal event window", item.lifeStage.windowText], ["Timing mode", item.lifeStage.modeText], ["Top period", timingRows[0] ? dashaCode(timingRows[0].md, timingRows[0].ad, timingRows[0].pd) : "No focused period"]]) +
+      metricBox("Precision context", [["Gender context", item.context.genderText], ["Desh-kaal-patra", item.context.deshKaalPatra], ["Promise effect", item.context.promiseText], ["Past precision", item.pastTiming[0] ? item.pastTiming[0].precision : "No past candidate"]]) +
+      "</div>" +
+      frequentReferenceTable(item) +
+      frequentMethodologyStepsTable(item) +
+      frequentWeightageTable(item) +
+      frequentTimingTable(item.pastTiming, input, "Most Likely Past / Already-Happened Dasha Periods", item.lifeStage.pastNote) +
+      frequentTransitTable(item.pastTransitValidation, input, "Transit Support For Past / Already-Happened Periods") +
+      frequentTimingTable(item.futureTiming, input, "Most Likely Future / Continuing Dasha Periods", item.lifeStage.futureNote) +
+      frequentTransitTable(item.futureTransitValidation, input, "Transit Support For Future / Continuing Periods") +
+      '<p class="fine-print">Methodology cadence: first judge D-1 from lagna, repeat from Moon and Sun reference where useful, check the relevant bhava/lord, bhavat-bhavam/Nth house, karaka, Nth house from karaka, Kalpursha reference, D-9, relevant varga, dasha activation and slow-planet transit.</p>' +
+      "</div></details>";
+  }
+
+  function frequentReferenceTable(item) {
+    var rows = item.lagnaMoonSun.map(function (row) {
+      return "<tr><td><strong>" + escapeHtml(row.reference) + "</strong></td><td>" + escapeHtml(row.houseText) + "</td><td>" + escapeHtml(row.lordText) + "</td><td>" + escapeHtml(row.karakaText) + "</td><td>" + escapeHtml(row.construction) + "</td></tr>";
+    }).join("");
+    return '<div class="panel-box"><h3>D-1 Sudarshan Reference</h3><div class="table-wrap"><table><thead><tr><th>Reference</th><th>Relevant house</th><th>House lord</th><th>Karaka</th><th>Construction</th></tr></thead><tbody>' + rows + "</tbody></table></div></div>";
+  }
+
+  function frequentWeightageTable(item) {
+    var rows = item.factorRows.map(function (row) {
+      var impact = row.impact >= 0 ? "+" + row.impact.toFixed(1) : row.impact.toFixed(1);
+      return "<tr><td><strong>" + escapeHtml(row.factor) + "</strong></td><td>" + escapeHtml(String(row.weight)) + "</td><td>" + escapeHtml(row.score + "/100") + "</td><td>" + escapeHtml(impact) + "</td><td>" + escapeHtml(row.evidence) + "</td></tr>";
+    }).join("");
+    return '<div class="panel-box"><h3>Weighted Promise Construction</h3><div class="table-wrap"><table><thead><tr><th>Factor</th><th>Weight</th><th>Factor score</th><th>Promise impact</th><th>Evidence</th></tr></thead><tbody>' + rows + "</tbody></table></div></div>";
+  }
+
+  function frequentMethodologyStepsTable(item) {
+    var rows = item.methodologyRows.map(function (row) {
+      return "<tr><td><strong>" + escapeHtml(row.step) + "</strong></td><td>" + escapeHtml(row.factor) + "</td><td>" + escapeHtml(row.evidence) + "</td><td>" + escapeHtml(row.construction) + "</td></tr>";
+    }).join("");
+    return '<div class="panel-box"><h3>Mandatory Methodology Steps</h3><div class="table-wrap"><table><thead><tr><th>Step</th><th>Factor checked</th><th>Evidence</th><th>Construction</th></tr></thead><tbody>' + rows + "</tbody></table></div></div>";
+  }
+
+  function frequentTimingTable(rows, input, title, emptyText) {
+    var body = rows.length ? rows.map(function (row) {
+      return "<tr><td><strong>" + escapeHtml(dashaCode(row.md, row.ad, row.pd)) + "</strong><br><span class=\"fine-print\">Score " + escapeHtml(String(row.score)) + "</span></td><td>" + escapeHtml(dashaDate(row.start, input.timezone) + " to " + dashaDate(row.end, input.timezone)) + "</td><td>" + escapeHtml(row.activating.join(", ")) + "</td><td>" + escapeHtml(row.precision || "-") + "</td><td>" + escapeHtml(row.construction) + "</td></tr>";
+    }).join("") : '<tr><td colspan="5">' + escapeHtml(emptyText || "No focused MD-AD-PD period found in this life-stage range.") + "</td></tr>";
+    return '<div class="panel-box"><h3>' + escapeHtml(title || "Most Likely Dasha-Antra-Pratyantra Timing") + '</h3><div class="table-wrap"><table><thead><tr><th>Period</th><th>Dates</th><th>Activating lords</th><th>Precision basis</th><th>Construction</th></tr></thead><tbody>' + body + "</tbody></table></div></div>";
+  }
+
+  function frequentTransitTable(rows, input, title) {
+    var body = rows.length ? rows.map(function (row) {
+      return "<tr><td><strong>" + escapeHtml(row.period) + "</strong></td><td>" + escapeHtml(dashaDate(row.date, input.timezone)) + "</td><td>" + escapeHtml(row.score + "/100") + "</td><td>" + escapeHtml(row.supports.join("; ") || "No major support") + "</td><td>" + escapeHtml(row.concerns.join("; ") || "No major concern") + "</td></tr>";
+    }).join("") : '<tr><td colspan="5">Transit validation appears after a timing period is isolated.</td></tr>';
+    return '<div class="panel-box"><h3>' + escapeHtml(title || "Transit Validation Of Selected Periods") + '</h3><div class="table-wrap"><table><thead><tr><th>Dasha period</th><th>Sample date</th><th>Score</th><th>Support</th><th>Discount / caution</th></tr></thead><tbody>' + body + "</tbody></table></div></div>";
+  }
+
+  function frequentPillarFactorRows(chart, d9, topicVarga, cfg) {
+    var keyHouse = cfg.keyHouse || cfg.primaryHouses[0];
+    var keyLord = chart.planetsByName[lordOfHouse(chart, keyHouse)];
+    var tenants = chart.planets.filter(function (p) { return p.house === keyHouse; });
+    var d1Sign = houseSign(chart, keyHouse);
+    var d9HouseOfSign = houseFromSign(d9.ascendant.sign, d1Sign);
+    var d9Lord = d9.planetsByName[keyLord.name];
+    var topicSignHouse = houseFromSign(topicVarga.ascendant.sign, d1Sign);
+    var topicLord = topicVarga.planetsByName[keyLord.name];
+    var dignityScore = keyLord ? dignityFactorScore(keyLord) : 50;
+    var rows = [
+      factorRow("Planets posited in relevant house", 20, tenants.length ? average(tenants.map(function (p) { return planetTopicFactorScore(chart, p); })) : 50, tenants.length ? tenants.map(function (p) { return p.name + " " + planetPredictionStatus(chart, p) + " (" + conditionCategory(p) + ")"; }).join("; ") : "No tenant; house result moves to lord/aspect strength."),
+      factorRow("Planets/house in Navamsha", 12, goodVargaHouseScore(d9HouseOfSign), "D-1 key sign " + SIGNS[d1Sign].name + " rises in D-9 H" + d9HouseOfSign + "."),
+      factorRow("House condition", 12, chart.houses[keyHouse - 1].score, "H" + keyHouse + " " + chart.houses[keyHouse - 1].label + "; tenants " + (tenants.map(prop("name")).join(", ") || "none") + "; aspects " + (chart.houses[keyHouse - 1].aspecting.map(function (p) { return p.name + " (" + (aspectNameToHouse(p, keyHouse) || "aspect") + ")"; }).join(", ") || "none") + "."),
+      factorRow("House lord condition", 15, keyLord ? planetTopicFactorScore(chart, keyLord) : 50, keyLord ? keyLord.name + " in H" + keyLord.house + ", " + keyLord.signName + ", " + keyLord.dignity + ", " + conditionCategory(keyLord) + "." : "House lord unavailable."),
+      factorRow("House lord in Navamsha", 10, d9Lord ? goodVargaHouseScore(d9Lord.house) : 50, d9Lord ? keyLord.name + " is in D-9 H" + d9Lord.house + " " + d9Lord.signName + "." : "D-9 lord placement unavailable."),
+      factorRow("Exaltation / debilitation", 8, dignityScore, keyLord ? keyLord.name + " is " + keyLord.dignity + "." : "Dignity unavailable."),
+      factorRow("Zodiac of analysed planet/sign", 6, zodiacFactorScore(chart, keyLord, d1Sign), "House sign " + SIGNS[d1Sign].name + " is " + SIGNS[d1Sign].modality + " " + SIGNS[d1Sign].element + "; lord relation considered."),
+      factorRow("Nakshatra and pada", 5, keyLord ? nakshatraFactorScore(keyLord) : 50, keyLord ? keyLord.name + " in " + keyLord.nakshatra + " pada " + keyLord.pada + ", nakshatra lord " + keyLord.nakLord + "." : "Nakshatra unavailable."),
+      factorRow("Relevant divisional chart", 8, average([goodVargaHouseScore(topicSignHouse), topicLord ? goodVargaHouseScore(topicLord.house) : 50]), "D-" + cfg.dchart + ": D-1 key sign rises in H" + topicSignHouse + "; " + keyLord.name + " in H" + (topicLord ? topicLord.house : "-") + "."),
+      factorRow("Remaining factors", 4, remainingFactorScore(chart, cfg), "Bhavat-bhavam H" + supportHouse(keyHouse) + ", karaka strength, conjunctions, kartari and topic sambandha included.")
+    ];
+    return rows;
+  }
+
+  function frequentPillarMethodologyRows(chart, d9, topicVarga, cfg) {
+    var keyHouse = cfg.keyHouse || cfg.primaryHouses[0];
+    var nth = cfg.nthHouse || keyHouse;
+    var keyLord = chart.planetsByName[lordOfHouse(chart, keyHouse)];
+    var nthHouse = relativeHouse(keyHouse, nth);
+    var nthLord = chart.planetsByName[lordOfHouse(chart, nthHouse)];
+    var karaka = cfg.karakas.map(function (name) { return chart.planetsByName[name]; }).filter(Boolean).sort(function (a, b) {
+      return b.strength.score - a.strength.score;
+    })[0];
+    var karakaNthHouse = karaka ? relativeHouse(karaka.house, nth) : keyHouse;
+    var karakaNthLord = chart.planetsByName[lordOfHouse(chart, karakaNthHouse)];
+    var kalpurshaSign = normalizeSign(keyHouse - 1);
+    var kalpurshaHouse = houseFromSign(chart.ascendant.sign, kalpurshaSign);
+    var kalpurshaLord = chart.planetsByName[SIGNS[kalpurshaSign].lord];
+    var d9KeyLord = keyLord ? d9.planetsByName[keyLord.name] : null;
+    var topicKeyLord = keyLord ? topicVarga.planetsByName[keyLord.name] : null;
+    return [
+      methodologyRow("A", "Relevant house", "H" + keyHouse + " " + houseMeaning(keyHouse) + " has " + chart.houses[keyHouse - 1].label + " score " + chart.houses[keyHouse - 1].score + ".", houseConstruction(chart.houses[keyHouse - 1].score)),
+      methodologyRow("A", "Relevant house lord", keyLord ? keyLord.name + " in H" + keyLord.house + ", " + keyLord.signName + ", " + keyLord.dignity + ", " + conditionCategory(keyLord) + "." : "House lord unavailable.", keyLord ? planetConstruction(chart, keyLord) : "Cannot judge house lord."),
+      methodologyRow("B", "Nth house from query house", nth + "th from H" + keyHouse + " is H" + nthHouse + " " + houseMeaning(nthHouse) + "; lord " + (nthLord ? nthLord.name : "-") + ".", houseConstruction(chart.houses[nthHouse - 1].score)),
+      methodologyRow("C", "Fixed karaka planet", karaka ? karaka.name + " is strongest listed karaka; H" + karaka.house + ", " + karaka.signName + ", " + karaka.dignity + ", " + conditionCategory(karaka) + "." : "No karaka listed.", karaka ? planetConstruction(chart, karaka) : "Cannot judge karaka."),
+      methodologyRow("D", "Nth house from karaka", karaka ? nth + "th from " + karaka.name + " gives H" + karakaNthHouse + "; lord " + (karakaNthLord ? karakaNthLord.name : "-") + "." : "No karaka reference available.", karakaNthLord ? planetConstruction(chart, karakaNthLord) : houseConstruction(chart.houses[karakaNthHouse - 1].score)),
+      methodologyRow("E", "Kalpursha reference", "Kalpursha H" + keyHouse + " is " + SIGNS[kalpurshaSign].name + "; it falls in natal H" + kalpurshaHouse + "; lord " + kalpurshaLord.name + " is in H" + kalpurshaLord.house + ".", planetConstruction(chart, kalpurshaLord)),
+      methodologyRow("F", "D-9 Navamsha", keyLord && d9KeyLord ? keyLord.name + " occupies D-9 H" + d9KeyLord.house + "; D-1 key sign rises in D-9 H" + houseFromSign(d9.ascendant.sign, houseSign(chart, keyHouse)) + "." : "D-9 key lord unavailable.", d9KeyLord ? vargaHouseConstruction(d9KeyLord.house) : "D-9 cannot confirm this factor."),
+      methodologyRow("G", "Relevant divisional chart", keyLord && topicKeyLord ? "D-" + cfg.dchart + ": " + keyLord.name + " occupies H" + topicKeyLord.house + "; key sign rises in H" + houseFromSign(topicVarga.ascendant.sign, houseSign(chart, keyHouse)) + "." : "Relevant varga key lord unavailable.", topicKeyLord ? vargaHouseConstruction(topicKeyLord.house) : "Relevant varga cannot confirm this factor.")
+    ];
+  }
+
+  function methodologyRow(step, factor, evidence, construction) {
+    return { step: step, factor: factor, evidence: evidence, construction: construction };
+  }
+
+  function relativeHouse(baseHouse, nth) {
+    return ((baseHouse + nth - 2) % 12) + 1;
+  }
+
+  function houseConstruction(score) {
+    if (score >= 62) return "Enhances the promise strongly.";
+    if (score >= 48) return "Gives workable/mixed promise.";
+    return "Discounts the promise and demands stronger dasha/varga support.";
+  }
+
+  function planetConstruction(chart, planet) {
+    var status = planetPredictionStatus(chart, planet);
+    if (["Rajyogkaraka", "Yogkaraka", "Strong"].indexOf(status) >= 0) return status + "; enhances promise and can deliver in its period.";
+    if (status === "Medium strong") return "Medium strong; can deliver with conditions or delay.";
+    return status + "; discounts promise unless supported by sambandha, varga and transit.";
+  }
+
+  function vargaHouseConstruction(house) {
+    if ([1, 4, 5, 7, 9, 10, 11].indexOf(house) >= 0) return "Well placed in varga; confirms domain support.";
+    if (house === 2) return "Supportive resource house in varga.";
+    return "Difficult varga placement; discounts or delays domain result.";
+  }
+
+  function factorRow(factor, weight, score, evidence) {
+    var safeScore = Math.round(clamp(score, 0, 100));
+    return {
+      factor: factor,
+      weight: weight,
+      score: safeScore,
+      impact: ((safeScore - 50) / 50) * weight,
+      evidence: evidence
+    };
+  }
+
+  function planetTopicFactorScore(chart, planet) {
+    var score = planet && planet.strength ? planet.strength.score : 50;
+    if (!planet) return score;
+    if (planet.naturalNature === "Benefic") score += 5;
+    if (planet.naturalNature === "Malefic") score -= 5;
+    if (planet.functionalRole === "Yogakaraka") score += 8;
+    if (planet.functionalRole === "Functional malefic") score -= 8;
+    if (planet.dignity === "Exalted" || planet.dignity === "Own sign" || planet.dignity === "Moolatrikona") score += 8;
+    if (planet.dignity === "Debilitated") score -= 12;
+    if (planet.combust) score -= 8;
+    if (isHemmed(chart, planet.house, "Malefic")) score -= 6;
+    if (isHemmed(chart, planet.house, "Benefic")) score += 5;
+    return clamp(score, 0, 100);
+  }
+
+  function dignityFactorScore(planet) {
+    if (!planet) return 50;
+    if (planet.dignity === "Exalted") return 82;
+    if (planet.dignity === "Moolatrikona" || planet.dignity === "Own sign") return 75;
+    if (planet.dignity === "Friendly sign") return 62;
+    if (planet.dignity === "Debilitated") return 24;
+    if (planet.dignity === "Enemy sign") return 38;
+    return 50;
+  }
+
+  function zodiacFactorScore(chart, planet, sign) {
+    var score = 50;
+    if (["Fire", "Water"].indexOf(SIGNS[sign].element) >= 0) score += 3;
+    if (SIGNS[sign].modality === "Movable") score += 3;
+    if (planet && areFriends(planet.name, SIGNS[sign].lord)) score += 8;
+    if (planet && (FRIENDS[planet.name] || { enemy: [] }).enemy.indexOf(SIGNS[sign].lord) >= 0) score -= 8;
+    return clamp(score, 0, 100);
+  }
+
+  function nakshatraFactorScore(planet) {
+    if (!planet) return 50;
+    var score = 50;
+    if (["Jupiter", "Venus", "Mercury", "Moon"].indexOf(planet.nakLord) >= 0) score += 8;
+    if (["Saturn", "Mars", "Rahu", "Ketu", "Sun"].indexOf(planet.nakLord) >= 0) score -= 4;
+    if (planet.pada === 1 || planet.pada === 4) score += 3;
+    return clamp(score, 0, 100);
+  }
+
+  function goodVargaHouseScore(house) {
+    if ([1, 4, 5, 7, 9, 10, 11].indexOf(house) >= 0) return 68;
+    if ([2].indexOf(house) >= 0) return 62;
+    if ([3, 6].indexOf(house) >= 0) return 46;
+    return 34;
+  }
+
+  function remainingFactorScore(chart, cfg) {
+    var keyHouse = cfg.keyHouse || cfg.primaryHouses[0];
+    var keyLord = chart.planetsByName[lordOfHouse(chart, keyHouse)];
+    var karakas = cfg.karakas.map(function (name) { return chart.planetsByName[name]; }).filter(Boolean);
+    var score = average([chart.houses[supportHouse(keyHouse) - 1].score, keyLord ? keyLord.strength.score : 50, average(karakas.map(function (p) { return p.strength.score; }))]);
+    if (isHemmed(chart, keyHouse, "Benefic")) score += 6;
+    if (isHemmed(chart, keyHouse, "Malefic")) score -= 8;
+    return clamp(score, 0, 100);
+  }
+
+  function frequentReferenceRows(chart, d9, topicVarga, cfg) {
+    return [
+      frequentReferenceRow("Lagna chart", chart, chart.ascendant.sign, cfg),
+      frequentReferenceRow("Moon chart", chart, chart.planetsByName.Moon.sign, cfg),
+      frequentReferenceRow("Sun chart", chart, chart.planetsByName.Sun.sign, cfg),
+      frequentVargaReferenceRow("D-9 Navamsha", d9, cfg),
+      frequentVargaReferenceRow("D-" + cfg.dchart + " " + vargaName(cfg.dchart), topicVarga, cfg)
+    ];
+  }
+
+  function frequentReferenceRow(label, chart, baseSign, cfg) {
+    var keyHouse = cfg.keyHouse || cfg.primaryHouses[0];
+    var targetSign = normalizeSign(baseSign + keyHouse - 1);
+    var lord = chart.planetsByName[SIGNS[targetSign].lord];
+    var tenants = chart.planets.filter(function (p) { return p.sign === targetSign; });
+    var karakas = cfg.karakas.map(function (name) { return chart.planetsByName[name]; }).filter(Boolean);
+    var houseScore = scoreFromBase(chart, baseSign, [keyHouse]);
+    return {
+      reference: label,
+      houseText: "H" + keyHouse + " from " + SIGNS[baseSign].name + " falls in " + SIGNS[targetSign].name + "; tenants " + (tenants.map(prop("name")).join(", ") || "none") + ".",
+      lordText: lord.name + " " + planetPredictionStatus(chart, lord) + " in D-1 H" + lord.house + ".",
+      karakaText: karakas.map(function (p) { return p.name + " " + planetPredictionStatus(chart, p); }).join(", ") || "-",
+      construction: houseScore >= 60 ? "Reference supports the promise." : houseScore >= 45 ? "Reference is mixed and needs dasha confirmation." : "Reference discounts the promise."
+    };
+  }
+
+  function frequentVargaReferenceRow(label, varga, cfg) {
+    var keyHouse = cfg.keyHouse || cfg.primaryHouses[0];
+    var targetSign = normalizeSign(varga.ascendant.sign + keyHouse - 1);
+    var lord = varga.planetsByName[SIGNS[targetSign].lord];
+    var tenants = varga.planets.filter(function (p) { return p.sign === targetSign; });
+    var score = average([goodVargaHouseScore(keyHouse), lord ? goodVargaHouseScore(lord.house) : 50]);
+    return {
+      reference: label,
+      houseText: "Key H" + keyHouse + " in " + SIGNS[targetSign].name + "; tenants " + (tenants.map(prop("name")).join(", ") || "none") + ".",
+      lordText: lord ? lord.name + " in varga H" + lord.house + "." : "Lord unavailable.",
+      karakaText: cfg.karakas.map(function (name) { var p = varga.planetsByName[name]; return p ? p.name + " H" + p.house : name + " -"; }).join(", "),
+      construction: score >= 60 ? "Varga confirms the domain." : score >= 45 ? "Varga gives mixed support." : "Varga weakens the domain."
+    };
+  }
+
+  function frequentPillarLifeStage(input, cfg) {
+    var age = completedYears(input.birthInstant, input.asOfInstant, input.timezone);
+    var window = frequentPillarAgeWindow(cfg.key);
+    var status = "active";
+    if (age > window.end + 1) status = "past";
+    else if (age < window.start) status = "future";
+    else if (window.ongoing) status = "ongoing";
+    var windowText = window.ongoing ? window.start + "+ years / continuing" : window.start + "-" + window.end + " years";
+    var modeText = status === "past" ? "Mostly past: show already-happened windows first." : status === "future" ? "Mostly future: show upcoming windows first." : status === "ongoing" ? "Continuing: show both past and future windows." : "Current life-stage: show both past and future windows.";
+    return {
+      age: age,
+      startAge: window.start,
+      endAge: window.end,
+      ongoing: Boolean(window.ongoing),
+      status: status,
+      windowText: windowText,
+      modeText: modeText,
+      pastNote: status === "future" ? "Native is younger than the usual event window; past periods are shown only if early manifestation indications exist." : "No focused past MD-AD-PD period found for this pillar.",
+      futureNote: status === "past" && !window.ongoing ? "This topic normally belongs to an earlier life-stage for the current native age. Future rows are shown only if the theme can repeat or continue." : "No focused future MD-AD-PD period found for this pillar."
+    };
+  }
+
+  function frequentPillarContext(input, cfg, lifeStage) {
+    var gender = String(input.gender || "unspecified").toLowerCase();
+    var place = String(input.birthPlace || "").trim();
+    var placeLower = place.toLowerCase();
+    var desh = place ? (placeLower.indexOf("india") >= 0 ? "Indian place context" : "non-India / diaspora place context") : "manual-coordinate place context";
+    var urban = /(delhi|mumbai|kolkata|chennai|bengaluru|bangalore|hyderabad|pune|ahmedabad|surat|jaipur|lucknow|kanpur|nagpur|indore|thane|bhopal|visakhapatnam|patna|vadodara|ghaziabad|ludhiana|agra|nashik|faridabad|meerut|rajkot|varanasi|srinagar|aurangabad|dhanbad|amritsar|allahabad|prayagraj|ranchi|howrah|coimbatore|jabalpur|gwalior|vijayawada|jodhpur|madurai|raipur|kota|chandigarh|guwahati)/i.test(place);
+    var genderText = gender === "male" ? "Male chart: marriage/children/profession timing leans slightly later unless chart strongly advances it." : gender === "female" ? "Female chart: marriage/children timing uses Venus plus Jupiter/Moon sensitivity." : "Unspecified gender: no gender-specific timing adjustment applied.";
+    var placeText = desh + (urban ? "; urban/tier-city timing windows are kept broader and slightly later for education/profession." : "; non-metro/manual context keeps traditional age bands active.");
+    return {
+      gender: gender,
+      place: place,
+      isIndia: placeLower.indexOf("india") >= 0,
+      urban: urban,
+      genderText: genderText,
+      deshKaalPatra: placeText,
+      promiseText: "Promise score will raise or lower timing confidence instead of selecting periods by dasha alone.",
+      lifeStage: lifeStage
+    };
+  }
+
+  function frequentPillarAgeWindow(key) {
+    var map = {
+      birth_childhood: { start: 0, end: 12 },
+      basic_education: { start: 4, end: 16 },
+      higher_education: { start: 16, end: 30 },
+      profession_job: { start: 18, end: 65, ongoing: true },
+      profession_business: { start: 18, end: 75, ongoing: true },
+      marriage: { start: 18, end: 50, ongoing: true },
+      parents: { start: 0, end: 75, ongoing: true },
+      diseases: { start: 0, end: 120, ongoing: true },
+      longevity: { start: 0, end: 120, ongoing: true },
+      foreign_travel: { start: 12, end: 80, ongoing: true },
+      income_wealth: { start: 18, end: 80, ongoing: true },
+      love_affairs: { start: 13, end: 45, ongoing: true },
+      siblings: { start: 0, end: 70, ongoing: true },
+      children: { start: 20, end: 50, ongoing: true },
+      luck_religion: { start: 0, end: 120, ongoing: true },
+      reputation: { start: 16, end: 80, ongoing: true },
+      friend_circle: { start: 6, end: 90, ongoing: true },
+      enemies_court: { start: 16, end: 90, ongoing: true },
+      loss_hospital: { start: 0, end: 120, ongoing: true },
+      fooding_habits: { start: 0, end: 120, ongoing: true }
+    };
+    return map[key] || { start: 0, end: 120, ongoing: true };
+  }
+
+  function instantAtNativeAge(input, ageYears) {
+    return addDays(input.birthInstant, Math.max(0, ageYears) * 365.25);
+  }
+
+  function frequentPillarTimingRows(chart, input, cfg, phase, lifeStage, promiseScore, context) {
+    var activators = eventActivators(chart, cfg, cfg.topicKey || "general");
+    lifeStage = lifeStage || frequentPillarLifeStage(input, cfg);
+    context = context || frequentPillarContext(input, cfg, lifeStage);
+    promiseScore = Number.isFinite(Number(promiseScore)) ? Number(promiseScore) : 50;
+    var stageStart = instantAtNativeAge(input, lifeStage.startAge);
+    var stageEnd = lifeStage.ongoing ? addDays(input.asOfInstant, Math.max(5, Number(input.horizonYears || 10)) * 365.25) : instantAtNativeAge(input, lifeStage.endAge);
+    var rangeStart;
+    var rangeEnd;
+    if (phase === "past") {
+      rangeStart = new Date(Math.max(input.birthInstant.getTime(), stageStart.getTime()));
+      rangeEnd = new Date(Math.min(input.asOfInstant.getTime(), stageEnd.getTime()));
+    } else {
+      rangeStart = new Date(Math.max(input.asOfInstant.getTime(), stageStart.getTime()));
+      rangeEnd = new Date(Math.max(rangeStart.getTime(), stageEnd.getTime()));
+      if (!lifeStage.ongoing && lifeStage.status === "past") rangeEnd = rangeStart;
+    }
+    if (!(rangeEnd > rangeStart)) return [];
+    var rows = [];
+    chart.vimshottari.timeline.forEach(function (md) {
+      if (!periodOverlaps(md, rangeStart, rangeEnd)) return;
+      subPeriods(md, "AD").forEach(function (ad) {
+        if (!periodOverlaps(ad, rangeStart, rangeEnd)) return;
+        subPeriods(ad, "PD").forEach(function (pd) {
+          if (!periodOverlaps(pd, rangeStart, rangeEnd)) return;
+          var lords = [md.lord, ad.lord, pd.lord];
+          var hits = lords.filter(function (lord) { return activators.indexOf(lord) >= 0; });
+          if (!hits.length) return;
+          var periodStart = new Date(Math.max(pd.start.getTime(), rangeStart.getTime()));
+          var periodEnd = new Date(Math.min(pd.end.getTime(), rangeEnd.getTime()));
+          var midpoint = new Date(periodStart.getTime() + Math.max(0, periodEnd.getTime() - periodStart.getTime()) / 2);
+          var precision = frequentTimingPrecision(chart, input, cfg, phase, lifeStage, context, promiseScore, midpoint, lords, hits);
+          var score = hits.length * 18 + (activators.indexOf(md.lord) >= 0 ? 8 : 0) + (activators.indexOf(ad.lord) >= 0 ? 5 : 0) + precision.score;
+          rows.push({
+            md: md.lord,
+            ad: ad.lord,
+            pd: pd.lord,
+            start: periodStart,
+            end: periodEnd,
+            score: Math.round(score),
+            activating: dedupe(hits),
+            precision: precision.text,
+            construction: (phase === "past" ? "Past candidate: " : "Future/continuing candidate: ") + "period activates " + dedupe(hits).join(", ") + "; " + precision.construction
+          });
+        });
+      });
+    });
+    rows.sort(function (a, b) { return b.score - a.score || a.start - b.start; });
+    return rows.slice(0, 8);
+  }
+
+  function frequentTimingPrecision(chart, input, cfg, phase, lifeStage, context, promiseScore, date, lords, hits) {
+    var nativeAge = ageAtInstant(input, date);
+    var ageScore = frequentAgeFitScore(nativeAge, cfg, lifeStage, context);
+    var genderScore = frequentGenderTimingScore(cfg, context, nativeAge, lords);
+    var deshScore = frequentDeshKaalPatraScore(cfg, context, nativeAge, phase);
+    var promiseComponent = (promiseScore - 50) * 0.35;
+    var chartComponent = frequentChartPromiseTimingScore(chart, cfg, lords);
+    var score = ageScore + genderScore + deshScore + promiseComponent + chartComponent;
+    var parts = [
+      "age " + nativeAge.toFixed(1) + "y " + signedScoreText(ageScore),
+      "gender " + signedScoreText(genderScore),
+      "desh-kaal-patra " + signedScoreText(deshScore),
+      "chart promise " + signedScoreText(promiseComponent + chartComponent)
+    ];
+    var construction = "precision weighted by age fit, gender, desh-kaal-patra and actual chart promise. " + parts.join("; ") + ".";
+    return { score: Math.round(score), text: parts.join("; "), construction: construction };
+  }
+
+  function ageAtInstant(input, date) {
+    return Math.max(0, (date.getTime() - input.birthInstant.getTime()) / (365.25 * DAY_MS));
+  }
+
+  function frequentAgeFitScore(age, cfg, lifeStage, context) {
+    var window = frequentContextualAgeWindow(cfg, context);
+    if (age >= window.start && age <= window.end) return 20;
+    var distance = age < window.start ? window.start - age : age - window.end;
+    if (distance <= 2) return 12;
+    if (distance <= 5) return 5;
+    if (cfg && cfg.ongoing) return 4;
+    return -Math.min(16, distance * 1.6);
+  }
+
+  function frequentContextualAgeWindow(cfg, context) {
+    var base = frequentPillarAgeWindow(cfg.key);
+    var start = base.start;
+    var end = base.end;
+    if (context && context.urban) {
+      if (cfg.key === "higher_education") end += 3;
+      if (cfg.key === "profession_job" || cfg.key === "profession_business") start += 1;
+      if (cfg.key === "marriage" && context.gender === "male") start += 2;
+      if (cfg.key === "marriage" && context.gender === "female") start += 1;
+      if (cfg.key === "children") start += 1;
+    }
+    if (context && !context.isIndia && (cfg.key === "marriage" || cfg.key === "children" || cfg.key === "higher_education")) {
+      start += 1;
+      end += 4;
+    }
+    return { start: start, end: end, ongoing: base.ongoing };
+  }
+
+  function frequentGenderTimingScore(cfg, context, age, lords) {
+    if (!context || context.gender === "unspecified") return 0;
+    var score = 0;
+    if (cfg.key === "marriage") {
+      if (context.gender === "female") score += age >= 18 && age <= 38 ? 4 : -2;
+      if (context.gender === "male") score += age >= 21 && age <= 45 ? 4 : -2;
+      if (context.gender === "female" && lords.indexOf("Jupiter") >= 0) score += 3;
+      if (lords.indexOf("Venus") >= 0) score += 3;
+    }
+    if (cfg.key === "children") {
+      if (context.gender === "female") score += age >= 20 && age <= 42 ? 4 : -3;
+      if (context.gender === "male") score += age >= 22 && age <= 50 ? 3 : -2;
+      if (lords.indexOf("Jupiter") >= 0 || lords.indexOf("Moon") >= 0) score += 3;
+    }
+    if ((cfg.key === "profession_job" || cfg.key === "profession_business") && age >= 18) score += 2;
+    return score;
+  }
+
+  function frequentDeshKaalPatraScore(cfg, context, age, phase) {
+    if (!context) return 0;
+    var score = 0;
+    if (context.urban && cfg.key === "basic_education" && age >= 4 && age <= 18) score += 4;
+    if (context.urban && cfg.key === "higher_education" && age >= 16 && age <= 33) score += 4;
+    if (context.urban && (cfg.key === "profession_job" || cfg.key === "profession_business") && age >= 21) score += 4;
+    if (!context.urban && cfg.key === "profession_business" && age >= 18) score += 2;
+    if (!context.isIndia && (cfg.key === "foreign_travel" || cfg.key === "higher_education")) score += 4;
+    if (phase === "past" && (cfg.key === "birth_childhood" || cfg.key === "basic_education") && age <= frequentContextualAgeWindow(cfg, context).end + 2) score += 5;
+    return score;
+  }
+
+  function frequentChartPromiseTimingScore(chart, cfg, lords) {
+    var score = 0;
+    lords.forEach(function (lord) {
+      var p = chart.planetsByName[lord];
+      if (!p) return;
+      if (p.strength && p.strength.score >= 62) score += 5;
+      if (p.strength && p.strength.score < 42) score -= 5;
+      if (p.dignity === "Exalted" || p.dignity === "Own sign" || p.dignity === "Moolatrikona") score += 3;
+      if (p.dignity === "Debilitated" || p.combust) score -= 4;
+      if (cfg.primaryHouses.indexOf(p.house) >= 0) score += 4;
+    });
+    return clamp(score, -15, 18);
+  }
+
+  function signedScoreText(value) {
+    var rounded = Math.round(value);
+    return (rounded >= 0 ? "+" : "") + rounded;
+  }
+
+  function frequentPillarTransitValidation(chart, timingRow, cfg) {
+    var date = new Date(timingRow.start.getTime() + Math.max(0, (timingRow.end.getTime() - timingRow.start.getTime()) / 2));
+    var tr = buildChart(date, chart.latitude, chart.longitude, chart.timezone, { ayanamshaKey: chart.ayanamshaKey });
+    var supports = [];
+    var concerns = [];
+    var score = 40;
+    ["Saturn", "Jupiter", "Rahu", "Ketu", "Sun"].forEach(function (name) {
+      var p = tr.planetsByName[name];
+      var transitHouse = houseFromSign(chart.ascendant.sign, p.sign);
+      var moonHouse = houseFromSign(chart.planetsByName.Moon.sign, p.sign);
+      var touches = cfg.primaryHouses.some(function (h) {
+        return transitHouse === h || planetAspectsHouse({ name: name, house: transitHouse }, h);
+      });
+      if (touches) {
+        score += name === "Jupiter" ? 16 : name === "Saturn" ? 12 : name === "Sun" ? 6 : 8;
+        supports.push(name + " touches relevant house from natal ascendant");
+      }
+      if ((GOOD_TRANSIT_FROM_MOON[name] || []).indexOf(moonHouse) >= 0) {
+        score += name === "Jupiter" ? 10 : 6;
+        supports.push(name + " favorable from Moon H" + moonHouse);
+      } else {
+        score -= name === "Sun" ? 2 : 4;
+        concerns.push(name + " not favorable from Moon H" + moonHouse);
+      }
+    });
+    return {
+      period: dashaCode(timingRow.md, timingRow.ad, timingRow.pd),
+      date: date,
+      score: Math.round(clamp(score, 0, 100)),
+      supports: supports.slice(0, 6),
+      concerns: concerns.slice(0, 6)
+    };
+  }
+
+  function pillarVerdict(score, cfg) {
+    if (cfg && cfg.sensitive) {
+      if (score >= 64) return "Manageable / protected";
+      if (score >= 48) return "Sensitive but workable";
+      return "Needs caution";
+    }
+    if (score >= 70) return "Strong promise";
+    if (score >= 56) return "Good promise";
+    if (score >= 44) return "Conditional promise";
+    return "Weak / obstructed promise";
+  }
+
+  function chawdhriPredictiveMethodSection(chart, analysis, input) {
+    var cfg = analysis.cfg || EVENT_CONFIGS.general;
+    var topicLabel = cfg.label || "General life reading";
+    var transit = buildChart(input.asOfInstant, chart.latitude, chart.longitude, chart.timezone, { ayanamshaKey: chart.ayanamshaKey });
+    var rows = [
+      ["House", "Judge " + cfg.houses.map(function (h) { return "H" + h + " " + houseMeaning(h); }).join("; ") + ". This fixes the life-field being promised."],
+      ["House lord", "Primary lords are " + cfg.primaryHouses.map(function (h) { return lordOfHouse(chart, h) + " for H" + h; }).join(", ") + ". Their dignity, house, aspect and kartari decide agency."],
+      ["Karaka", "Natural significators: " + cfg.karakas.map(function (name) { return name + " (" + planetPredictionStatus(chart, chart.planetsByName[name]) + ")"; }).join(", ") + "."],
+      ["Varga", "D-" + cfg.dchart + " " + vargaName(cfg.dchart) + " refines the domain. It confirms or qualifies the D-1 promise, it does not replace it."],
+      ["Dasha", "Likely operating lords: " + eventActivators(chart, cfg, inferTopic(input.topic, input.question)).slice(0, 7).join(", ") + ". These periods open the event door."],
+      ["Transit", transitConfirmationText(chart, transit, cfg) + " Transit is treated as confirmation of the dasha promise."]
+    ];
+    return '<section id="viewA-chawdhri-method" class="section"><div class="section-head"><div><p class="eyebrow">Chawdhri Predictive Method</p><h3>House, Lord, Karaka, Dasha And Transit</h3></div><span class="small-pill">' + escapeHtml(topicLabel) + '</span></div><div class="table-wrap"><table><thead><tr><th>Layer</th><th>Prediction construction</th></tr></thead><tbody>' +
+      rows.map(function (row) { return "<tr><td><strong>" + escapeHtml(row[0]) + "</strong></td><td>" + escapeHtml(row[1]) + "</td></tr>"; }).join("") +
+      '</tbody></table></div><p class="fine-print">Based on the attached Chawdhri teaching notes: one factor only suggests; repeated promise across house, lord, karaka, varga, dasha and transit is treated as actionable prediction.</p></section>';
+  }
+
+  function lifeEventPromiseSection(chart, input) {
+    var transit = buildChart(input.asOfInstant, chart.latitude, chart.longitude, chart.timezone, { ayanamshaKey: chart.ayanamshaKey });
+    var rows = chawdhriLifeEventItems().map(function (item) {
+      var cfg = EVENT_CONFIGS[item.key] || item.cfg;
+      return lifeEventPromiseRow(chart, transit, item, cfg);
+    });
+    return '<section class="section"><div class="section-head"><div><p class="eyebrow">Life Event Promise Matrix</p><h3>Chawdhri Life Event Prediction</h3></div><span class="small-pill">Notes 41</span></div><div class="table-wrap"><table><thead><tr><th>Event</th><th>Promise</th><th>Judgement basis</th><th>Dasha activation</th><th>Transit confirmation</th></tr></thead><tbody>' +
+      rows.map(function (row) {
+        return "<tr><td><strong>" + escapeHtml(row.event) + "</strong><br><span class=\"fine-print\">" + escapeHtml(row.ref) + "</span></td><td>" + escapeHtml(row.promise) + "</td><td>" + escapeHtml(row.basis) + "</td><td>" + escapeHtml(row.dasha) + "</td><td>" + escapeHtml(row.transit) + "</td></tr>";
+      }).join("") +
+      "</tbody></table></div></section>";
+  }
+
+  function lifeEventPromiseRow(chart, transit, item, cfg) {
+    var houseQualities = cfg.houses.map(function (h) {
+      var house = chart.houses[h - 1];
+      return "H" + h + " " + (house ? house.label : "-");
+    }).join(", ");
+    var karakas = cfg.karakas.map(function (name) {
+      return name + " " + planetPredictionStatus(chart, chart.planetsByName[name]);
+    }).join(", ");
+    var dchart = makeVargaChart(chart, cfg.dchart);
+    var promise = promiseLabelForTopic(chart, cfg);
+    var dashaLords = eventActivators(chart, cfg, item.key).slice(0, 7).join(", ");
+    return {
+      event: item.label,
+      ref: item.ref,
+      promise: promise,
+      basis: "Houses: " + houseQualities + ". Karakas: " + karakas + ". D-" + cfg.dchart + " " + vargaName(cfg.dchart) + " is " + predictionStatusFromScore(vargaPromise(dchart, cfg)) + ". " + item.note,
+      dasha: dashaLords ? dashaLords + " periods are priority windows." : "Use periods of relevant house lords, karakas and tenant/aspecting planets.",
+      transit: transitConfirmationText(chart, transit, cfg)
+    };
+  }
+
+  function chawdhriLifeEventItems() {
+    return [
+      { key: "education", label: "Education", ref: "41.3-41.4", note: "Basic education leans on H2/H3/Mercury/Moon; higher education leans on H5/H9/Jupiter/Mercury." },
+      { key: "profession", label: "Profession", ref: "41.5", note: "Profession is read from H10 with H6 service, H7 business, H2 income and H11 gains." },
+      { key: "marriage", label: "Marriage", ref: "41.6", note: "Marriage requires H7, H2, Venus/Jupiter and D-9 agreement; separation needs repeated adverse evidence." },
+      { key: "children", label: "Children", ref: "41.7", note: "Children require H5, H5 lord, Jupiter, H2/H9 and D-7 support." },
+      { key: "wealth", label: "Wealth", ref: "41.10", note: "Wealth repeats through savings H2, gains H11, fortune H9, earning H10 and Jupiter/Venus support." },
+      { key: "property", label: "Property", ref: "41.12", note: "Property and vehicles need H4, H4 lord, Mars, Venus and supportive dasha/transit." },
+      { key: "health", label: "Disease / Health", ref: "41.13 + 41.19", note: "Health is read from Lagna, Moon, H6/H8/H12 and benefic protection for recovery." },
+      { key: "foreign", label: "Foreign / Distance", ref: "39.20 + 41.18", note: "Foreign movement strengthens when H9/H12/Rahu/Saturn/Moon repeat in dasha and transit." }
+    ];
+  }
+
+  function promiseLabelForTopic(chart, cfg) {
+    var houseScore = average(cfg.primaryHouses.map(function (h) { return chart.houses[h - 1] ? chart.houses[h - 1].score : 45; }));
+    var karakaScore = average(cfg.karakas.map(function (name) {
+      var p = chart.planetsByName[name];
+      return p && p.strength ? p.strength.score : 45;
+    }));
+    var vargaScore = vargaPromise(makeVargaChart(chart, cfg.dchart), cfg);
+    var score = average([houseScore, karakaScore, vargaScore]);
+    var spread = Math.max(houseScore, karakaScore, vargaScore) - Math.min(houseScore, karakaScore, vargaScore);
+    if (spread >= 30 && score >= 45) return "Conditional";
+    return predictionStatusFromScore(score);
+  }
+
+  function transitConfirmationText(chart, transit, cfg) {
+    var hits = [];
+    ["Jupiter", "Saturn", "Rahu", "Ketu"].forEach(function (name) {
+      var p = transit.planetsByName[name];
+      if (!p) return;
+      var lagnaHouse = houseFromSign(chart.ascendant.sign, p.sign);
+      var moonHouse = houseFromSign(chart.planetsByName.Moon.sign, p.sign);
+      var transient = { name: name, house: lagnaHouse };
+      if (cfg.houses.indexOf(lagnaHouse) >= 0) hits.push(name + " transits H" + lagnaHouse + " from Lagna");
+      if (cfg.primaryHouses.some(function (h) { return planetAspectsHouse(transient, h); })) {
+        hits.push(name + " aspects the primary house field from Lagna");
+      }
+      if (cfg.houses.indexOf(moonHouse) >= 0) hits.push(name + " transits H" + moonHouse + " from Moon");
+    });
+    return hits.length ? dedupe(hits).slice(0, 3).join("; ") + "." : "No direct current Jupiter/Saturn/nodal hit to the main event houses; wait for dasha-backed transit repetition.";
+  }
+
+  function dashaTransitSynthesisSection(chart, input) {
+    var stack = findDashaStack(chart.vimshottari.timeline, input.asOfInstant);
+    var transit = buildChart(input.asOfInstant, chart.latitude, chart.longitude, chart.timezone, { ayanamshaKey: chart.ayanamshaKey });
+    return '<section id="viewA-dasha-transit" class="section"><div class="section-head"><div><p class="eyebrow">Dasha + Transit Synthesis</p><h3>Current Period Prediction Lens</h3></div><span class="small-pill">Door + bell</span></div><div class="table-wrap"><table><thead><tr><th>Level</th><th>Lord</th><th>Activated matters</th><th>Transit support now</th><th>Prediction use</th></tr></thead><tbody>' +
+      (stack.length ? stack.map(function (period) {
+        var planet = chart.planetsByName[period.lord];
+        return "<tr><td><strong>" + escapeHtml(period.level) + "</strong></td><td>" + escapeHtml(period.lord) + "</td><td>" + escapeHtml(dashaActivatedMatters(chart, period.lord)) + "</td><td>" + escapeHtml(transitSupportForDashaLord(chart, transit, period.lord)) + "</td><td>" + escapeHtml(planet ? planetPredictionStatus(chart, planet) + " lord; read through " + conditionText(planet) + ", " + planet.dignity + ", H" + planet.house + "." : "Use as sub-period trigger.") + "</td></tr>";
+      }).join("") : '<tr><td colspan="5">No active Vimshottari stack found for the reference date.</td></tr>') +
+      '</tbody></table></div><p class="fine-print">Chawdhri timing logic used here: dasha/bhukti opens the promised karma; transit confirms the concrete manifestation and timing quality.</p></section>';
+  }
+
+  function dashaActivatedMatters(chart, lordName) {
+    var planet = chart.planetsByName[lordName];
+    if (!planet) return naturalSignification(lordName);
+    var houseText = lordshipSummary(planet);
+    var tenantText = "placed in H" + planet.house + " " + houseMeaning(planet.house);
+    return houseText + "; " + tenantText + "; natural " + naturalSignification(lordName);
+  }
+
+  function transitSupportForDashaLord(chart, transit, lordName) {
+    var natal = chart.planetsByName[lordName];
+    var moving = transit.planetsByName[lordName];
+    var support = [];
+    if (moving) {
+      support.push(lordName + " transits H" + houseFromSign(chart.ascendant.sign, moving.sign) + " from Lagna");
+      support.push("H" + houseFromSign(chart.planetsByName.Moon.sign, moving.sign) + " from Moon");
+    }
+    if (natal) {
+      ["Jupiter", "Saturn", "Rahu", "Ketu"].forEach(function (name) {
+        var tr = transit.planetsByName[name];
+        if (!tr) return;
+        var trHouse = houseFromSign(chart.ascendant.sign, tr.sign);
+        if (tr.sign === natal.sign) support.push(name + " over natal " + lordName);
+        if (planetAspectsHouse({ name: name, house: trHouse }, natal.house)) support.push(name + " aspects natal " + lordName + " house");
+      });
+    }
+    return support.length ? dedupe(support).slice(0, 4).join("; ") + "." : "No direct major transit contact to this dasha lord currently.";
+  }
+
+  function swotAnalysisSection(chart) {
+    var rows = [];
+    for (var house = 1; house <= 12; house += 1) {
+      rows.push(swotHouseAnalysis(chart, house));
+    }
+    return '<section id="viewA-swot-analysis" class="section"><div class="section-head"><div><p class="eyebrow">SWOT Analysis</p><h3>D-1 Houses And House Lords</h3></div><span class="small-pill">Asc + 12 bhavas</span></div>' +
+      '<div class="swot-list">' +
+      rows.map(function (row) {
+        return '<div class="panel-box swot-panel"><h3>' + escapeHtml(row.area) + '</h3><p class="fine-print">' + escapeHtml(row.houseTheme) + '</p>' +
+          '<div class="swot-columns"><div>' + analysisListHtml("House Analysis", row.housePoints) + '</div><div>' + analysisListHtml("House Lord Analysis", row.lordPoints) + "</div></div></div>";
+      }).join("") +
+      "</div></section>";
+  }
+
+  function analysisListHtml(title, points) {
+    return '<div class="analysis-list"><h4>' + escapeHtml(title) + '</h4><ul>' + points.map(function (point) {
+      var header = point.header || "Point";
+      var detail = point.detail || String(point);
+      var children = point.children && point.children.length ? '<ul class="analysis-sublist">' + point.children.map(function (child) {
+        return '<li><strong>' + escapeHtml(child.header) + '</strong><span>' + escapeHtml(child.detail) + "</span></li>";
+      }).join("") + "</ul>" : "";
+      return '<li><strong>' + escapeHtml(header) + '</strong><span>' + escapeHtml(detail) + "</span>" + children + "</li>";
+    }).join("") + "</ul></div>";
+  }
+
+  function swotHouseAnalysis(chart, house) {
+    var lordName = lordOfHouse(chart, house);
+    var lord = chart.planetsByName[lordName];
+    var moon = chart.planetsByName.Moon;
+    var d9 = makeVargaChart(chart, 9);
+    var d9Lord = d9.planets.find(function (p) { return p.name === lordName; });
+    var housePlanets = chart.planets.filter(function (p) { return p.house === house; });
+    var conjuncts = lord ? chart.planets.filter(function (p) { return p.name !== lord.name && p.sign === lord.sign; }) : [];
+    var aspectsOnHouse = planetsAspectingHouse(chart, house);
+    var aspectsOnLord = lord ? planetsAspectingPlanet(chart, lord) : [];
+    var lordPlacement = lord ? houseClassText(lord.house) : "-";
+    var lordFromMoonHouse = lord && moon ? houseFromSign(moon.sign, lord.sign) : null;
+    var lordFromMoon = lordFromMoonHouse ? houseClassText(lordFromMoonHouse) : "-";
+    var d9LordHouse = d9Lord ? houseFromSign(d9.ascendant.sign, d9Lord.sign) : null;
+    var d9LordPlacement = d9LordHouse ? houseClassText(d9LordHouse) : "-";
+    var houseKartari = kartariDetails(chart, house);
+    var lordKartari = lord ? kartariDetails(chart, lord.house) : { label: "-", planets: [] };
+    var beneficConjuncts = conjuncts.filter(function (p) { return p.naturalNature === "Benefic"; });
+    var maleficConjuncts = conjuncts.filter(function (p) { return p.naturalNature === "Malefic"; });
+    var beneficAspects = aspectsOnHouse.concat(aspectsOnLord).filter(function (p) { return p.naturalNature === "Benefic"; });
+    var maleficAspects = aspectsOnHouse.concat(aspectsOnLord).filter(function (p) { return p.naturalNature === "Malefic"; });
+    var housePoints = [
+      bulletPoint("House identity", "H" + house + " covers " + houseMeaning(house) + " and falls in " + SIGNS[houseSign(chart, house)].name + "."),
+      bulletPoint("Planets posited in house", describePlanetsForSwot(housePlanets) + "."),
+      bulletPoint("Lordships of tenants", housePlanets.length ? housePlanets.map(function (p) { return p.name + " rules " + lordshipSummary(p) + "."; }).join(" ") : "No tenant planet, so the house depends more strongly on its lord, aspects and dasha triggers."),
+      bulletPoint("Natural significations of tenants", housePlanets.length ? housePlanets.map(function (p) { return p.name + ": " + naturalSignification(p.name) + "."; }).join(" ") : "No tenant planet natural signification is directly seated in this house."),
+      bulletPoint("Aspects on house", describeAspectsToHouse(chart, aspectsOnHouse, house) + "."),
+      bulletPoint("Kartari on house", houseKartari.label + ". " + describePlanetsForSwot(houseKartari.planets) + ".")
+    ];
+    var lordPoints = [
+      bulletPoint("House lord placement", lordName + " is in H" + (lord ? lord.house : "-") + " from Lagna, classified as " + lordPlacement + "."),
+      bulletPoint("House lord from Moon", lordName + " is in H" + (lordFromMoonHouse || "-") + " from Moon, classified as " + lordFromMoon + "."),
+      conjunctionBulletPoint(conjuncts),
+      bulletPoint("Aspects on house lord", lord ? describeAspectsToHouse(chart, aspectsOnLord, lord.house) + "." : "No house lord found."),
+      bulletPoint("Kartari on house lord", lordKartari.label + ". " + describePlanetsForSwot(lordKartari.planets) + "."),
+      bulletPoint("House lord in D-9", lordName + " is in H" + (d9LordHouse || "-") + " in D-9, classified as " + d9LordPlacement + "."),
+      bulletPoint("Benefic or malefic conjunction with lord", "Natural benefic conjunctions: " + planetNames(beneficConjuncts) + ". Natural malefic conjunctions: " + planetNames(maleficConjuncts) + ".")
+    ];
+    var strengths = [];
+    var weaknesses = [];
+    var opportunities = [];
+    var threats = [];
+    if (isKendraOrTrine(lord && lord.house)) strengths.push(bulletPoint("Kendra/trine lord support", lordName + " gains support from kendra/trine placement."));
+    if (isTrik(lord && lord.house)) weaknesses.push(bulletPoint("Trik lord placement", lordName + " in trik placement can strain " + houseMeaning(house) + "."));
+    if (isKendraOrTrine(lordFromMoonHouse)) strengths.push(bulletPoint("Moon reference support", "From Moon, " + lordName + " repeats kendra/trine support."));
+    if (isTrik(lordFromMoonHouse)) weaknesses.push(bulletPoint("Moon reference pressure", "From Moon, " + lordName + " falls in trik, adding emotional or operational pressure."));
+    if (isKendraOrTrine(d9LordHouse)) opportunities.push(bulletPoint("D-9 maturation", "D-9 keeps the lord in a kendra/trine frame for maturation."));
+    if (isTrik(d9LordHouse)) threats.push(bulletPoint("D-9 complication", "D-9 trik position can delay or complicate full expression."));
+    if (houseKartari.label.indexOf("Shubh") >= 0 || lordKartari.label.indexOf("Shubh") >= 0) strengths.push(bulletPoint("Kartari protection", "Shubh kartari protection is present."));
+    if (houseKartari.label.indexOf("Paap") >= 0 || lordKartari.label.indexOf("Paap") >= 0) threats.push(bulletPoint("Kartari pressure", "Paap kartari can hem the result and require stronger dasha support."));
+    if (beneficConjuncts.length || beneficAspects.length) opportunities.push(bulletPoint("Benefic contact", "Natural benefic contact can improve outcome quality."));
+    if (maleficConjuncts.length || maleficAspects.length) threats.push(bulletPoint("Malefic contact", "Natural malefic contact can create pressure, conflict or delay."));
+    if (housePlanets.length) opportunities.push(bulletPoint("Tenant activation", "Tenant planets actively bring " + houseMeaning(house) + " into lived experience."));
+    if (!strengths.length) strengths.push(bulletPoint("Strength marker", "No major structural strength marker found from this checklist."));
+    if (!weaknesses.length) weaknesses.push(bulletPoint("Weakness marker", "No major structural weakness marker found from this checklist."));
+    if (!opportunities.length) opportunities.push(bulletPoint("Activation route", "Opportunities depend mainly on dasha/transit activation of " + lordName + " and tenant planets."));
+    if (!threats.length) threats.push(bulletPoint("Threat marker", "No major threat marker found from kartari, trik or malefic contact checks."));
+    return {
+      area: house === 1 ? "D-1 Asc And Asc Lord" : "House " + house + " And Lord",
+      houseTheme: houseMeaning(house),
+      housePoints: housePoints,
+      lordPoints: lordPoints,
+      strengths: dedupe(strengths),
+      weaknesses: dedupe(weaknesses),
+      opportunities: dedupe(opportunities),
+      threats: dedupe(threats)
+    };
+  }
+
+  function bulletPoint(header, detail) {
+    return { header: header, detail: detail };
+  }
+
+  function bulletPointWithChildren(header, detail, children) {
+    return { header: header, detail: detail, children: children || [] };
+  }
+
+  function conjunctionBulletPoint(planets) {
+    if (!planets || !planets.length) return bulletPoint("House lord conjunctions", "No conjunction with the house lord.");
+    return bulletPointWithChildren("House lord conjunctions", "Each conjunction is read separately below.", planets.map(function (p) {
+      return {
+        header: p.name,
+        detail: lordshipSummary(p) + "; " + p.functionalRole + "; natural " + naturalSignification(p.name)
+      };
+    }));
+  }
+
+  function houseClassText(house) {
+    var labels = [];
+    if (isKendra(house)) labels.push("Kendra");
+    if (isTrine(house)) labels.push("Trine");
+    if (isTrik(house)) labels.push("Trik");
+    return labels.join(" + ") || "Other house";
+  }
+
+  function isKendra(house) {
+    return [1, 4, 7, 10].indexOf(Number(house)) >= 0;
+  }
+
+  function isTrine(house) {
+    return [1, 5, 9].indexOf(Number(house)) >= 0;
+  }
+
+  function isKendraOrTrine(house) {
+    return isKendra(house) || isTrine(house);
+  }
+
+  function isTrik(house) {
+    return [6, 8, 12].indexOf(Number(house)) >= 0;
+  }
+
+  function kartariText(chart, house) {
+    return kartariDetails(chart, house).label;
+  }
+
+  function kartariDetails(chart, house) {
+    var prev = house === 1 ? 12 : house - 1;
+    var next = house === 12 ? 1 : house + 1;
+    var prevPlanets = chart.planets.filter(function (p) { return p.house === prev; });
+    var nextPlanets = chart.planets.filter(function (p) { return p.house === next; });
+    var paapPrev = prevPlanets.filter(function (p) { return p.naturalNature === "Malefic"; });
+    var paapNext = nextPlanets.filter(function (p) { return p.naturalNature === "Malefic"; });
+    var shubhPrev = prevPlanets.filter(function (p) { return p.naturalNature === "Benefic"; });
+    var shubhNext = nextPlanets.filter(function (p) { return p.naturalNature === "Benefic"; });
+    var labels = [];
+    var planets = [];
+    if (paapPrev.length && paapNext.length) {
+      labels.push("Paap kartari");
+      planets = planets.concat(paapPrev, paapNext);
+    }
+    if (shubhPrev.length && shubhNext.length) {
+      labels.push("Shubh kartari");
+      planets = planets.concat(shubhPrev, shubhNext);
+    }
+    if (!labels.length) return { label: "No kartari", planets: [] };
+    return { label: labels.join(" and "), planets: dedupeBy(planets, "name") };
+  }
+
+  function describeAspectsToHouse(chart, planets, house) {
+    if (!planets || !planets.length) return "none";
+    return planets.map(function (p) {
+      var aspect = aspectNameToHouse(p, house);
+      return p.name + (aspect ? " (" + aspect + ")" : "") + " - " + lordshipSummary(p) + "; " + p.functionalRole + "; natural " + naturalSignification(p.name);
+    }).join("; ");
+  }
+
+  function describePlanetsForSwot(planets) {
+    if (!planets || !planets.length) return "none";
+    return planets.map(function (p) {
+      return p.name + " (" + lordshipSummary(p) + "; " + p.functionalRole + "; natural " + naturalSignification(p.name) + ")";
+    }).join("; ");
+  }
+
+  function planetNames(planets) {
+    return planets && planets.length ? dedupe(planets.map(prop("name"))).join(", ") : "none";
+  }
+
+  function sixMonthDashaSection(chart, input) {
+    var rows = sixMonthDashaRows(chart, input);
+    return '<section id="viewA-six-month-dasha" class="section"><div class="section-head"><div><p class="eyebrow">Current Dasha</p><h3>Next Six Months: Dasha-Antra-Pratyantra-Sookshma</h3></div><span class="small-pill">' + escapeHtml(dashaDate(input.asOfInstant, input.timezone)) + '</span></div>' +
+      '<div class="table-wrap"><table><thead><tr><th>Status</th><th>MD</th><th>AD</th><th>PD</th><th>SD</th><th>From</th><th>To</th></tr></thead><tbody>' +
+      (rows.length ? rows.map(function (row) {
+        return "<tr><td>" + escapeHtml(row.status) + "</td><td><strong>" + escapeHtml(row.md) + "</strong></td><td>" + escapeHtml(row.ad) + "</td><td>" + escapeHtml(row.pd) + "</td><td>" + escapeHtml(row.sd) + "</td><td>" + escapeHtml(dashaDate(row.start, input.timezone)) + "</td><td>" + escapeHtml(dashaDate(row.end, input.timezone)) + "</td></tr>";
+      }).join("") : '<tr><td colspan="7">No Vimshottari sookshma periods found in the next six months.</td></tr>') +
+      "</tbody></table></div></section>";
+  }
+
+  function dashaFocusAreasSection(chart, input) {
+    var rows = sixMonthDashaRows(chart, input);
+    return '<section class="section"><div class="section-head"><div><p class="eyebrow">Focus Areas</p><h3>How Each Running Lord Supports Or Conflicts</h3></div><span class="small-pill">A-type relations</span></div>' +
+      '<div class="table-wrap"><table><thead><tr><th>Period</th><th>Dasha lord theme</th><th>Antra lord role</th><th>Pratyantra lord role</th><th>Sookshma lord role</th></tr></thead><tbody>' +
+      (rows.length ? rows.map(function (row) {
+        return "<tr><td><strong>" + escapeHtml(dashaCode(row.md, row.ad, row.pd, row.sd)) + "</strong><br>" + escapeHtml(dashaDate(row.start, input.timezone) + " to " + dashaDate(row.end, input.timezone)) + "</td><td>" + escapeHtml(planetTheme(chart, row.md)) + "</td><td>" + escapeHtml(planetRoleAgainst(chart, row.ad, [row.md])) + "</td><td>" + escapeHtml(planetRoleAgainst(chart, row.pd, [row.md, row.ad])) + "</td><td>" + escapeHtml(planetRoleAgainst(chart, row.sd, [row.md, row.ad, row.pd])) + "</td></tr>";
+      }).join("") : '<tr><td colspan="5">No focus rows available.</td></tr>') +
+      "</tbody></table></div></section>";
+  }
+
+  function sixMonthDashaRows(chart, input) {
+    var rangeStart = input.asOfInstant || new Date();
+    var rangeEnd = addDays(rangeStart, 365.25 / 2);
+    var rows = [];
+    chart.vimshottari.timeline.forEach(function (md) {
+      if (!periodOverlaps(md, rangeStart, rangeEnd)) return;
+      subPeriods(md, "AD").forEach(function (ad) {
+        if (!periodOverlaps(ad, rangeStart, rangeEnd)) return;
+        subPeriods(ad, "PD").forEach(function (pd) {
+          if (!periodOverlaps(pd, rangeStart, rangeEnd)) return;
+          subPeriods(pd, "SD").forEach(function (sd) {
+            if (!periodOverlaps(sd, rangeStart, rangeEnd)) return;
+            rows.push({
+              md: md.lord,
+              ad: ad.lord,
+              pd: pd.lord,
+              sd: sd.lord,
+              status: sd.start <= rangeStart && sd.end > rangeStart ? "Current" : "Upcoming",
+              start: new Date(Math.max(sd.start.getTime(), rangeStart.getTime())),
+              end: new Date(Math.min(sd.end.getTime(), rangeEnd.getTime()))
+            });
+          });
+        });
+      });
+    });
+    return rows;
+  }
+
+  function planetTheme(chart, planetName) {
+    var planet = chart.planetsByName[planetName];
+    if (!planet) return planetName + ": unavailable.";
+    return planetName + ": natural significations - " + naturalSignification(planetName) + ". Functional significations - " + lordshipSummary(planet) + ". Role - " + planetPredictionStatus(chart, planet) + ".";
+  }
+
+  function planetRoleAgainst(chart, planetName, targetNames) {
+    var base = planetTheme(chart, planetName);
+    var relations = dedupe(targetNames.filter(function (name) { return name && name !== planetName; }).map(function (target) {
+      return interactionSentence(chart, planetName, target);
+    }));
+    if (!relations.length) relations.push("Same lord repeats the earlier theme.");
+    return base + " Relation to prior lords: " + relations.join(" ");
+  }
+
+  function interactionSentence(chart, actorName, targetName) {
+    var types = relationshipTypesBetween(chart, actorName, targetName);
+    var natural = naturalRelation(actorName, targetName);
+    if (!types.length) {
+      return actorName + " has no direct A-type relation with " + targetName + "; it works independently unless linked through lordship or transit.";
+    }
+    var stance = natural === "Enemy" ? "conflicts or gives mixed pressure with" : "supports";
+    return actorName + " " + stance + " " + targetName + " through " + types.join(", ") + " (" + natural.toLowerCase() + " natural relation).";
+  }
+
+  function naturalRelation(aName, bName) {
+    var rel = FRIENDS[aName];
+    if (!rel) return "Neutral";
+    if (rel.friend.indexOf(bName) >= 0) return "Friend";
+    if (rel.enemy.indexOf(bName) >= 0) return "Enemy";
+    return "Neutral";
+  }
+
+  function naturalSignification(planetName) {
+    var map = {
+      Sun: "soul, father, authority, vitality, status, government and confidence",
+      Moon: "mind, mother, emotions, public support, nourishment, fluids and comfort",
+      Mars: "courage, action, land, engineering, surgery, competition, conflict and younger siblings",
+      Mercury: "intellect, speech, trade, writing, learning, accounts, analytics and communication",
+      Jupiter: "wisdom, dharma, children, teachers, counsel, wealth expansion and grace",
+      Venus: "marriage, relationships, art, luxury, vehicles, comforts, pleasure and agreements",
+      Saturn: "karma, discipline, delay, service, profession, masses, endurance and structure",
+      Rahu: "foreignness, ambition, technology, obsession, sudden rise, unconventional paths and material hunger",
+      Ketu: "detachment, moksha, breaks, research, intuition, hidden work and sharp separation"
+    };
+    return map[planetName] || "general planetary significations";
+  }
+
+  function houseMeaning(house) {
+    var map = {
+      1: "self/vitality",
+      2: "wealth/speech/family",
+      3: "courage/siblings/effort",
+      4: "mother/home/property/education",
+      5: "intelligence/children/purva punya",
+      6: "disease/debt/service/competition",
+      7: "marriage/partnership/public dealings",
+      8: "longevity/obstacles/research/transformation",
+      9: "fortune/dharma/father/higher learning",
+      10: "career/status/karma",
+      11: "gains/networks/fulfilment",
+      12: "expense/foreign/spiritual release"
+    };
+    return map[house] || "house matters";
+  }
+
+  function panchangSection(chart, input) {
+    var p = panchangInfo(chart, input);
+    var rows = [
+      ["Vara", p.vara],
+      ["Tithi", p.tithi + " (" + p.paksha + ")"],
+      ["Nakshatra", p.nakshatra + " pada " + p.pada + " - lord " + p.nakLord],
+      ["Yoga", p.yoga],
+      ["Karana", p.karana],
+      ["Sun / Moon", p.sunSign + " / " + p.moonSign]
+    ];
+    return '<section id="viewA-panchang" class="section panchang-section"><div class="section-head"><div><p class="eyebrow">Birth Panchang</p><h3>Day And Time Panchang</h3></div><span class="small-pill">' + escapeHtml(p.paksha) + '</span></div><div class="report-grid three">' +
+      metricBox("Panchang at birth", rows.slice(0, 3)) +
+      metricBox("Lunar day details", rows.slice(3)) +
+      metricBox("Computed reference", [
+        ["Birth moment", formatInTimezone(input.birthInstant, input.timezone)],
+        ["Tithi progress", p.tithiProgress + "%"],
+        ["Yoga progress", p.yogaProgress + "%"]
+      ]) +
+      "</div></section>";
+  }
+
+  function currentPanchangSection(chart, input) {
+    var date = input.asOfDate || dateInputValue(new Date(), input.timezone);
+    var time = input.asOfTime || timeInputValue(new Date(), input.timezone);
+    var ctx = {
+      date: date,
+      time: normalizeTimeInput(time),
+      place: input.birthPlace || "",
+      timezone: input.timezone,
+      latitude: input.latitude,
+      longitude: input.longitude,
+      ayanamshaKey: input.ayanamshaKey
+    };
+    return '<section id="viewA-current-panchang" class="section panchang-section current-panchang-section"><div class="section-head"><div><p class="eyebrow">Current Panchang</p><h3>Panchang For Selected Date And Time</h3></div><span class="small-pill">Editable</span></div>' +
+      '<div class="panel-box current-panchang-controls"><div class="grid-3"><label>Date<input id="currentPanchangDate" type="date" value="' + escapeHtml(date) + '"></label><label>Time HH:MM:SS<input id="currentPanchangTime" type="text" inputmode="numeric" pattern="[0-9]{2}:[0-9]{2}:[0-9]{2}" value="' + escapeHtml(normalizeTimeInput(time)) + '"></label><label>Reference place<input id="currentPanchangPlace" list="cityOptions" placeholder="Example: Delhi, India" value="' + escapeHtml(ctx.place) + '"></label></div><div class="grid-3"><label>Timezone<input id="currentPanchangTimezone" type="number" step="0.25" value="' + escapeHtml(String(ctx.timezone)) + '"></label><label>Latitude<input id="currentPanchangLatitude" type="number" step="0.0001" value="' + escapeHtml(Number(ctx.latitude).toFixed(4)) + '"></label><label>Longitude<input id="currentPanchangLongitude" type="number" step="0.0001" value="' + escapeHtml(Number(ctx.longitude).toFixed(4)) + '"></label></div><label class="button-label">Update<button type="button" id="currentPanchangUpdateBtn" class="primary-action">Update Panchang</button></label></div>' +
+      '<div id="currentPanchangMount">' + currentPanchangPanelHtml(ctx, chart) + "</div></section>";
+  }
+
+  function currentPanchangPanelHtml(ctx, natalChart) {
+    var instant = localDateTimeToUtc(ctx.date, ctx.time, Number(ctx.timezone));
+    var chart = buildChart(instant, Number(ctx.latitude), Number(ctx.longitude), Number(ctx.timezone), { ayanamshaKey: ctx.ayanamshaKey });
+    var p = panchangInfo(chart, {
+      birthInstant: instant,
+      timezone: Number(ctx.timezone),
+      latitude: Number(ctx.latitude),
+      longitude: Number(ctx.longitude)
+    });
+    var rows = panchangTableRows(p, ctx, chart);
+    return '<div class="panel-box"><h3>Table A Panchang Details</h3><div class="metric-row"><strong>Place</strong><span>' + escapeHtml((ctx.place ? ctx.place + " - " : "") + coordinateText(Number(ctx.latitude), Number(ctx.longitude))) + '</span></div><div class="table-wrap compact-table"><table><thead><tr><th>Item</th><th>Value</th></tr></thead><tbody>' +
+      rows.map(function (row) { return "<tr><td><strong>" + escapeHtml(row[0]) + "</strong></td><td>" + escapeHtml(row[1]) + "</td></tr>"; }).join("") +
+      '</tbody></table></div><p class="fine-print">End times are estimated by scanning forward from the selected moment with the current offline ephemeris.</p></div>';
+  }
+
+  function panchangTableRows(p, ctx, chart) {
+    var sunTimes;
+    try { sunTimes = sunTimesForDate(ctx.date, Number(ctx.latitude), Number(ctx.longitude), Number(ctx.timezone)); } catch (error) { sunTimes = null; }
+    var dinman = sunTimes ? minutesDurationLabel(sunTimes.sunset - sunTimes.sunrise) : "-";
+    var elongation = normalize(chart.planetsByName.Moon.lon - chart.planetsByName.Sun.lon);
+    var moonrise = sunTimes ? normalizeMinutes(sunTimes.sunrise + elongation / 360 * 1440) : null;
+    var moonset = moonrise === null ? null : normalizeMinutes(moonrise + 720);
+    return [
+      ["Tithi", p.tithi + " (" + p.paksha + ")"],
+      ["Tithi End", nextPanchangBoundary(ctx, "tithi")],
+      ["Vaar", p.vara],
+      ["Nakshatra", p.nakshatra + " pada " + p.pada],
+      ["Nakshatra End", nextPanchangBoundary(ctx, "nakshatra")],
+      ["Yoga", p.yoga],
+      ["Yoga End", nextPanchangBoundary(ctx, "yoga")],
+      ["Karana", p.karana],
+      ["Karana End", nextPanchangBoundary(ctx, "karana")],
+      ["Dinman", dinman],
+      ["Sunrise", sunTimes ? minuteTimeLabel(sunTimes.sunrise) : "-"],
+      ["Sunset", sunTimes ? minuteTimeLabel(sunTimes.sunset) : "-"],
+      ["Moonrise", moonrise === null ? "-" : minuteTimeLabel(moonrise)],
+      ["Moonset", moonset === null ? "-" : minuteTimeLabel(moonset)],
+      ["Date", ctx.date + " " + normalizeTimeInput(ctx.time)]
+    ];
+  }
+
+  function wireCurrentPanchangControls(chart, input) {
+    var button = document.getElementById("currentPanchangUpdateBtn");
+    var dateField = document.getElementById("currentPanchangDate");
+    var timeField = document.getElementById("currentPanchangTime");
+    var placeField = document.getElementById("currentPanchangPlace");
+    var timezoneField = document.getElementById("currentPanchangTimezone");
+    var latitudeField = document.getElementById("currentPanchangLatitude");
+    var longitudeField = document.getElementById("currentPanchangLongitude");
+    var mount = document.getElementById("currentPanchangMount");
+    if (!button || !dateField || !timeField || !mount) return;
+    function applyCurrentPanchangPlaceLookup() {
+      if (!placeField || !placeField.value.trim()) return;
+      var found = findCity(placeField.value);
+      if (!found) return;
+      placeField.value = found.name;
+      if (timezoneField) timezoneField.value = found.timezone;
+      if (latitudeField) latitudeField.value = Number(found.latitude).toFixed(4);
+      if (longitudeField) longitudeField.value = Number(found.longitude).toFixed(4);
+    }
+    if (placeField) {
+      placeField.addEventListener("change", applyCurrentPanchangPlaceLookup);
+      placeField.addEventListener("blur", applyCurrentPanchangPlaceLookup);
+    }
+    button.addEventListener("click", function () {
+      try {
+        applyCurrentPanchangPlaceLookup();
+        var timezone = timezoneField ? Number(timezoneField.value) : Number(input.timezone);
+        var latitude = latitudeField ? Number(latitudeField.value) : Number(input.latitude);
+        var longitude = longitudeField ? Number(longitudeField.value) : Number(input.longitude);
+        if (!Number.isFinite(timezone) || !Number.isFinite(latitude) || !Number.isFinite(longitude)) throw new Error("Reference place, timezone, latitude and longitude are required.");
+        if (placeField && placeField.value.trim()) rememberCustomLocation(placeField.value.trim(), latitude, longitude, timezone);
+        mount.innerHTML = currentPanchangPanelHtml({
+          date: dateField.value,
+          time: normalizeTimeInput(timeField.value),
+          place: placeField ? placeField.value.trim() : input.birthPlace,
+          timezone: timezone,
+          latitude: latitude,
+          longitude: longitude,
+          ayanamshaKey: input.ayanamshaKey
+        }, chart);
+        enhanceReportTableTopControls();
+      } catch (error) {
+        alertUser(error.message || "Could not update Current Panchang.");
+      }
+    });
+  }
+
+  function transitInputFromReportInput(input, natalAscSign) {
+    return {
+      date: input.asOfDate || dateInputValue(new Date(), input.timezone),
+      time: input.asOfTime || timeInputValue(new Date(), input.timezone),
+      timezone: input.timezone,
+      place: input.birthPlace || "",
+      latitude: input.latitude,
+      longitude: input.longitude,
+      ayanamshaKey: input.ayanamshaKey,
+      natalAscSign: Number.isFinite(natalAscSign) ? natalAscSign : null,
+      division: 1
+    };
+  }
+
+  function transitChartSection(transitInput, natalChart) {
+    var chart = buildTransitChartFromInput(transitInput);
+    return '<section id="viewA-transit" class="section transit-section"><div class="section-head"><div><p class="eyebrow">Transit Chart</p><h3>Current Transit With Editable Date, Time And Location</h3></div><span class="small-pill">Gochara</span></div>' +
+      '<div class="panel-box transit-controls"><div class="grid-2"><label>Transit date<input id="transitDate" type="date" value="' + escapeHtml(transitInput.date) + '"></label><label>Transit time HH:MM:SS<input id="transitTime" type="text" inputmode="numeric" pattern="[0-9]{2}:[0-9]{2}:[0-9]{2}" placeholder="HH:MM:SS" value="' + escapeHtml(normalizeTimeInput(transitInput.time)) + '"></label></div>' +
+      '<label>Transit city / location<input id="transitPlace" list="cityOptions" placeholder="Example: Delhi, India" value="' + escapeHtml(transitInput.place) + '"></label>' +
+      '<div class="grid-3"><label>Timezone<input id="transitTimezone" type="number" step="0.25" value="' + escapeHtml(String(transitInput.timezone)) + '"></label><label>Latitude<input id="transitLatitude" type="number" step="0.0001" value="' + escapeHtml(Math.abs(transitInput.latitude).toFixed(4)) + '"></label><label>Lat direction<select id="transitLatitudeDirection"><option value="N"' + (transitInput.latitude < 0 ? "" : " selected") + '>N</option><option value="S"' + (transitInput.latitude < 0 ? " selected" : "") + '>S</option></select></label></div>' +
+      '<div class="grid-3"><label>Longitude<input id="transitLongitude" type="number" step="0.0001" value="' + escapeHtml(Math.abs(transitInput.longitude).toFixed(4)) + '"></label><label>Long direction<select id="transitLongitudeDirection"><option value="E"' + (transitInput.longitude < 0 ? "" : " selected") + '>E</option><option value="W"' + (transitInput.longitude < 0 ? " selected" : "") + '>W</option></select></label><label class="button-label">Update transit<button type="button" id="transitUpdateBtn" class="primary-action">Update chart</button></label></div>' +
+      '<p class="fine-print">Use this to cast the transit for any date, time and location. City lookup fills latitude, longitude and timezone when the city is known locally.</p></div>' +
+      '<div id="transitChartMount">' + transitChartPanelHtml(chart, transitInput, natalChart) + "</div></section>";
+  }
+
+  function ephemerisSection(chart, input) {
+    var date = input.asOfDate || dateInputValue(new Date(), input.timezone);
+    var time = input.asOfTime || "12:00:00";
+    var ctx = {
+      date: date,
+      time: normalizeTimeInput(time),
+      place: input.birthPlace || "",
+      timezone: input.timezone,
+      latitude: input.latitude,
+      longitude: input.longitude,
+      ayanamshaKey: input.ayanamshaKey
+    };
+    return '<section id="viewA-ephemeris" class="section ephemeris-section"><div class="section-head"><div><p class="eyebrow">Ephemeris</p><h3>Planetary Snapshot For Reference Moment</h3></div><span class="small-pill">Selected moment</span></div>' +
+      '<div class="panel-box ephemeris-controls"><div class="grid-3"><label>Reference date<input id="ephemerisDate" type="date" value="' + escapeHtml(date) + '"></label><label>Reference time<input id="ephemerisTime" type="text" inputmode="numeric" pattern="[0-9]{2}:[0-9]{2}:[0-9]{2}" value="' + escapeHtml(normalizeTimeInput(time)) + '"></label><label>Reference place<input id="ephemerisPlace" list="cityOptions" placeholder="Example: Delhi, India" value="' + escapeHtml(ctx.place) + '"></label></div><div class="grid-3 ephemeris-location-fields"><label>Timezone<input id="ephemerisTimezone" type="number" step="0.25" value="' + escapeHtml(String(ctx.timezone)) + '"></label><label>Latitude<input id="ephemerisLatitude" type="number" step="0.0001" value="' + escapeHtml(Number(ctx.latitude).toFixed(4)) + '"></label><label>Longitude<input id="ephemerisLongitude" type="number" step="0.0001" value="' + escapeHtml(Number(ctx.longitude).toFixed(4)) + '"></label></div><label class="button-label">Update<button type="button" id="ephemerisUpdateBtn" class="primary-action">Update Ephemeris</button></label></div>' +
+      '<div id="ephemerisMount">' + ephemerisPanelHtml(ctx) + "</div></section>";
+  }
+
+  function ephemerisPanelHtml(ctx) {
+    var rows = ephemerisSnapshotRows(ctx);
+    var instant = localDateTimeToUtc(ctx.date, ctx.time, Number(ctx.timezone));
+    return '<div class="panel-box"><h3>Ephemeris For Selected Reference Moment</h3><div class="metric-row"><strong>Date / Time</strong><span>' + escapeHtml(formatInTimezone(instant, Number(ctx.timezone))) + '</span></div><div class="metric-row"><strong>Place</strong><span>' + escapeHtml((ctx.place ? ctx.place + " - " : "") + coordinateText(Number(ctx.latitude), Number(ctx.longitude))) + '</span></div><div class="table-wrap ephemeris-table-wrap"><table><thead><tr><th>#</th><th>Planet</th><th>Sidereal Longitude</th><th>Sign</th><th>Nakshatra</th><th>Pada</th><th>Motion</th><th>Combust</th><th>Exalt/Debil</th><th>Avastha</th><th>Conjunction Zone</th></tr></thead><tbody>' +
+      rows.map(function (row, index) {
+        return "<tr><td>" + (index + 1) + "</td><td><strong>" + escapeHtml(row.planet) + "</strong></td><td>" + escapeHtml(row.longitude) + "</td><td>" + escapeHtml(row.sign) + "</td><td>" + escapeHtml(row.nakshatra) + "</td><td>" + escapeHtml(row.pada) + "</td><td>" + escapeHtml(row.motion) + "</td><td>" + escapeHtml(row.combust) + "</td><td>" + escapeHtml(row.dignity) + "</td><td>" + escapeHtml(row.avastha) + "</td><td>" + escapeHtml(row.conjunctions) + "</td></tr>";
+      }).join("") +
+      '</tbody></table></div><p class="fine-print">This table is limited to the selected reference date, time and place. It does not scan future or past dates.</p></div>';
+  }
+
+  function wireEphemerisControls(chart, input) {
+    var button = document.getElementById("ephemerisUpdateBtn");
+    var dateField = document.getElementById("ephemerisDate");
+    var timeField = document.getElementById("ephemerisTime");
+    var placeField = document.getElementById("ephemerisPlace");
+    var timezoneField = document.getElementById("ephemerisTimezone");
+    var latitudeField = document.getElementById("ephemerisLatitude");
+    var longitudeField = document.getElementById("ephemerisLongitude");
+    var mount = document.getElementById("ephemerisMount");
+    if (!button || !dateField || !timeField || !mount) return;
+    function applyEphemerisPlaceLookup() {
+      if (!placeField || !placeField.value.trim()) return;
+      var found = findCity(placeField.value);
+      if (!found) return;
+      placeField.value = found.name;
+      if (timezoneField) timezoneField.value = found.timezone;
+      if (latitudeField) latitudeField.value = Number(found.latitude).toFixed(4);
+      if (longitudeField) longitudeField.value = Number(found.longitude).toFixed(4);
+    }
+    if (placeField) {
+      placeField.addEventListener("change", applyEphemerisPlaceLookup);
+      placeField.addEventListener("blur", applyEphemerisPlaceLookup);
+    }
+    button.addEventListener("click", function () {
+      try {
+        applyEphemerisPlaceLookup();
+        var timezone = timezoneField ? Number(timezoneField.value) : Number(input.timezone);
+        var latitude = latitudeField ? Number(latitudeField.value) : Number(input.latitude);
+        var longitude = longitudeField ? Number(longitudeField.value) : Number(input.longitude);
+        if (!Number.isFinite(timezone) || !Number.isFinite(latitude) || !Number.isFinite(longitude)) throw new Error("Reference place, timezone, latitude and longitude are required.");
+        if (placeField && placeField.value.trim()) rememberCustomLocation(placeField.value.trim(), latitude, longitude, timezone);
+        mount.innerHTML = ephemerisPanelHtml({
+          date: dateField.value,
+          time: normalizeTimeInput(timeField.value),
+          place: placeField ? placeField.value.trim() : input.birthPlace,
+          timezone: timezone,
+          latitude: latitude,
+          longitude: longitude,
+          ayanamshaKey: input.ayanamshaKey
+        });
+        enhanceReportTableTopControls();
+      } catch (error) {
+        alertUser(error.message || "Could not update Ephemeris.");
+      }
+    });
+  }
+
+  function ephemerisSnapshotRows(ctx) {
+    var instant = localDateTimeToUtc(ctx.date, ctx.time, Number(ctx.timezone));
+    var chart = buildChart(instant, Number(ctx.latitude), Number(ctx.longitude), Number(ctx.timezone), { ayanamshaKey: ctx.ayanamshaKey });
+    var planets = chart.planets.filter(function (p) { return p.name !== "Asc"; });
+    var ascNak = nakshatraInfo(chart.ascendant.lon);
+    var ascRow = {
+      name: "Ascendant",
+      lon: chart.ascendant.lon,
+      sign: chart.ascendant.sign,
+      signName: chart.ascendant.signName,
+      deg: chart.ascendant.deg,
+      nakshatra: ascNak.name,
+      pada: ascNak.pada,
+      retrograde: false,
+      combust: false,
+      dignity: "-"
+    };
+    return [ascRow].concat(planets).map(function (p) {
+      var conjunctions = planets.filter(function (other) {
+        return other.name !== p.name && angularSeparation(p.lon, other.lon) <= 2;
+      }).map(function (other) {
+        return other.name + " (" + analysisNumber(angularSeparation(p.lon, other.lon)) + " deg)";
+      });
+      return {
+        planet: p.name,
+        longitude: decimalToDms(p.lon),
+        sign: p.signName || SIGNS[p.sign].name,
+        nakshatra: p.nakshatra,
+        pada: String(p.pada),
+        motion: p.retrograde ? "Retrograde" : "Direct",
+        combust: p.combust ? "Yes" : "No",
+        dignity: p.dignity || "-",
+        avastha: baaladiAvastha(p.deg, p.sign),
+        conjunctions: conjunctions.length ? conjunctions.join("; ") : "-"
+      };
+    });
+  }
+
+  function ephemerisRows(ctx) {
+    var start = localDateTimeToUtc(ctx.date, ctx.time, Number(ctx.timezone));
+    var rows = [];
+    var previous = ephemerisSnapshot(start, ctx);
+    for (var day = 1; day <= 60; day += 1) {
+      var instant = addDays(start, day);
+      var current = ephemerisSnapshot(instant, ctx);
+      CLASSICAL_PLANETS.concat(["Rahu", "Ketu"]).forEach(function (name) {
+        var prev = previous[name];
+        var cur = current[name];
+        if (!prev || !cur) return;
+        if (prev.sign !== cur.sign) rows.push(ephemerisEvent(ctx, start, day - 1, day, name, "Sign change", SIGNS[prev.sign].name, SIGNS[cur.sign].name, "sign"));
+        if (prev.nakshatra !== cur.nakshatra) rows.push(ephemerisEvent(ctx, start, day - 1, day, name, "Nakshatra change", prev.nakshatra, cur.nakshatra, "nakshatra"));
+        if (prev.retrograde !== cur.retrograde) rows.push(ephemerisEvent(ctx, start, day - 1, day, name, cur.retrograde ? "Retrograde begins" : "Retrograde ends", prev.retrograde ? "Retrograde" : "Direct", cur.retrograde ? "Retrograde" : "Direct", "retrograde"));
+        if (prev.combust !== cur.combust) rows.push(ephemerisEvent(ctx, start, day - 1, day, name, cur.combust ? "Combustion begins" : "Combustion ends", prev.combust ? "Combust" : "Normal", cur.combust ? "Combust" : "Normal", "combust"));
+        if (prev.dignity !== cur.dignity && (prev.dignity === "Exalted" || cur.dignity === "Exalted" || prev.dignity === "Debilitated" || cur.dignity === "Debilitated")) rows.push(ephemerisEvent(ctx, start, day - 1, day, name, "Exaltation/Debilitation change", prev.dignity, cur.dignity, "dignity"));
+        if (prev.avastha !== cur.avastha) rows.push(ephemerisEvent(ctx, start, day - 1, day, name, "Avastha change", prev.avastha, cur.avastha, "avastha"));
+      });
+      rows = rows.concat(conjunctionEvents(previous, current, instant));
+      previous = current;
+    }
+    return rows.sort(function (a, b) { return a.date - b.date; }).slice(0, 160);
+  }
+
+  function ephemerisSnapshot(instant, ctx) {
+    var chart = buildChart(instant, Number(ctx.latitude), Number(ctx.longitude), Number(ctx.timezone), { ayanamshaKey: ctx.ayanamshaKey });
+    var out = {};
+    chart.planets.forEach(function (p) {
+      out[p.name] = {
+        sign: p.sign,
+        nakshatra: p.nakshatra,
+        retrograde: p.retrograde,
+        combust: p.combust,
+        dignity: p.dignity,
+        avastha: baaladiAvastha(p.deg, p.sign),
+        lon: p.lon
+      };
+    });
+    return out;
+  }
+
+  function ephemerisEvent(ctx, start, leftDays, rightDays, planet, change, from, to, type) {
+    var left = addDays(start, leftDays);
+    var right = addDays(start, rightDays);
+    for (var i = 0; i < 10; i += 1) {
+      var mid = new Date((left.getTime() + right.getTime()) / 2);
+      var l = ephemerisSnapshot(left, ctx)[planet];
+      var m = ephemerisSnapshot(mid, ctx)[planet];
+      if (!l || !m) break;
+      if (ephemerisEventKey(l, type) === ephemerisEventKey(m, type)) left = mid;
+      else right = mid;
+    }
+    return { date: right, planet: planet, change: change, from: from, to: to };
+  }
+
+  function ephemerisEventKey(item, type) {
+    if (type === "sign") return item.sign;
+    if (type === "nakshatra") return item.nakshatra;
+    if (type === "retrograde") return item.retrograde;
+    if (type === "combust") return item.combust;
+    if (type === "dignity") return item.dignity;
+    if (type === "avastha") return item.avastha;
+    return "";
+  }
+
+  function conjunctionEvents(previous, current, instant) {
+    var rows = [];
+    for (var i = 0; i < CLASSICAL_PLANETS.length; i += 1) {
+      for (var j = i + 1; j < CLASSICAL_PLANETS.length; j += 1) {
+        var a = CLASSICAL_PLANETS[i];
+        var b = CLASSICAL_PLANETS[j];
+        var prevClose = angularSeparation(previous[a].lon, previous[b].lon) <= 2;
+        var curClose = angularSeparation(current[a].lon, current[b].lon) <= 2;
+        if (!prevClose && curClose) rows.push({ date: instant, planet: a + "-" + b, change: "Conjunction zone begins", from: ">2 deg apart", to: "within 2 deg" });
+        if (prevClose && !curClose) rows.push({ date: instant, planet: a + "-" + b, change: "Conjunction zone ends", from: "within 2 deg", to: ">2 deg apart" });
+      }
+    }
+    return rows;
+  }
+
+  function angularSeparation(a, b) {
+    var diff = Math.abs(normalize(a) - normalize(b));
+    return Math.min(diff, 360 - diff);
+  }
+
+  function varshfalSection(chart, input, preservedState) {
+    var completed = completedYears(input.birthInstant, input.asOfInstant, input.timezone);
+    var runningYear = preservedState && preservedState.runningYear ? clamp(Math.round(Number(preservedState.runningYear) || 1), 1, 121) : completed + 1;
+    var division = preservedState && preservedState.division ? normalizeVarshfalDivision(preservedState.division) : 9;
+    return '<section id="viewA-varshfal" class="section varshfal-section"><div class="section-head"><div><p class="eyebrow">Tajik Varshfal</p><h3>Annual Solar Return With Muntha</h3></div><span class="small-pill">Before transit</span></div>' +
+      '<div class="panel-box varshfal-controls"><div class="grid-3"><label>Running year of life<input id="varshfalYear" type="number" min="1" max="121" step="1" value="' + runningYear + '"></label><label>Varshfal Shodashvarga<select id="varshfalDivision">' + varshfalDivisionOptions(division) + '</select></label><div class="button-label"><span>Update Varshfal</span><button type="button" id="varshfalUpdateBtn" class="primary-action">Update chart</button></div></div><p id="varshfalStatus" class="fine-print varshfal-status">Showing running year ' + runningYear + (preservedState && preservedState.runningYear ? " from the previous Varshfal selection" : "") + '.</p><p class="fine-print">Choose the running year of life: 1 means birth to first birthday, 2 means first birthday to second birthday, and so on. VedNetra casts the annual chart at the sidereal Sun return to the natal Sun longitude. Muntha is advanced by completed years elapsed from natal Lagna. The varga selector keeps D-9 as default and can switch the annual chart to any Shodashvarga.</p></div>' +
+      '<div id="varshfalChartMount">' + varshfalPanelHtml(chart, input, runningYear, division) + "</div></section>";
+  }
+
+  function varshfalPanelHtml(chart, input, completedYear, selectedDivision) {
+    var runningYear = clamp(Math.round(Number(completedYear) || 1), 1, 121);
+    var division = normalizeVarshfalDivision(selectedDivision);
+    var result = computeVarshfal(chart, input, runningYear);
+    var varshfalVarga = makeVarshfalVarga(result, division);
+    return '<div class="report-grid varshfal-grid">' +
+      chartBox("Varshfal D-1 Year " + runningYear, result.varshfal.ascendant.sign, result.planetsWithMuntha, { division: 1, rootChart: result.varshfal, showAscDegree: true, ascDegree: result.varshfal.ascendant.deg }) +
+      chartBox("Varshfal D-" + division + " " + vargaName(division) + " Year " + runningYear, varshfalVarga.ascendant.sign, varshfalVarga.planetsWithMuntha, { division: division, rootChart: result.varshfal, showAscDegree: true, ascDegree: varshfalVarga.ascendant.deg }) +
+      '<div class="panel-box"><h3>Varshfal Details</h3>' +
+      '<div class="metric-row"><strong>Varsha Pravesh</strong><span>' + escapeHtml(formatInTimezone(result.returnInstant, input.timezone)) + '</span></div>' +
+      '<div class="metric-row"><strong>Natal Sun target</strong><span>' + escapeHtml(SIGNS[signIndex(result.natalSunLon)].name + " " + decimalToDms(result.natalSunLon - signIndex(result.natalSunLon) * 30)) + '</span></div>' +
+      '<div class="metric-row"><strong>Annual ascendant</strong><span>' + escapeHtml(result.varshfal.ascendant.signName + " " + decimalToDms(result.varshfal.ascendant.deg)) + '</span></div>' +
+      '<div class="metric-row"><strong>Annual D-' + division + ' ascendant</strong><span>' + escapeHtml(varshfalVarga.ascendant.signName + " " + decimalToDms(varshfalVarga.ascendant.deg)) + '</span></div>' +
+      '<div class="metric-row"><strong>Muntha</strong><span>' + escapeHtml("Sign " + (result.munthaSign + 1) + ", " + SIGNS[result.munthaSign].name + ", house " + result.munthaHouse) + '</span></div>' +
+      '<div class="metric-row"><strong>Mudda starts from</strong><span>' + escapeHtml(result.muddaStartLord) + '</span></div>' +
+      '<div class="metric-row"><strong>Running year</strong><span>Year ' + result.runningYear + ', after ' + result.completedYearsElapsed + ' completed years</span></div>' +
+      '<div class="metric-row"><strong>Location used</strong><span>' + escapeHtml((input.birthPlace ? input.birthPlace + ", " : "") + coordinateText(input.latitude, input.longitude) + " UTC" + (input.timezone >= 0 ? "+" : "") + input.timezone) + '</span></div>' +
+      '<p class="fine-print">This is a Tajik annual reference chart. Muntha is progressed from natal Lagna by completed years elapsed; the annual ascendant is cast for the Varsha Pravesh time above.</p></div></div>' +
+      muddaDashaHtml(result, input);
+  }
+
+  function varshfalDivisionOptions(selectedDivision) {
+    var selected = normalizeVarshfalDivision(selectedDivision);
+    return vargaDivisions().map(function (division) {
+      return '<option value="' + division + '"' + (division === selected ? " selected" : "") + '>D-' + division + ' ' + escapeHtml(vargaName(division)) + '</option>';
+    }).join("");
+  }
+
+  function normalizeVarshfalDivision(value) {
+    var division = Number(value || 9);
+    return vargaDivisions().indexOf(division) >= 0 ? division : 9;
+  }
+
+  function computeVarshfal(chart, input, completedYear) {
+    var runningYear = clamp(Math.round(Number(completedYear) || 1), 1, 121);
+    var yearsElapsed = runningYear - 1;
+    var returnInstant = solarReturnInstant(chart, input, yearsElapsed);
+    var nextReturnInstant = solarReturnInstant(chart, input, yearsElapsed + 1);
+    var varshfal = buildChart(returnInstant, input.latitude, input.longitude, input.timezone, { ayanamshaKey: chart.ayanamshaKey });
+    var munthaSign = normalizeSign(chart.ascendant.sign + yearsElapsed);
+    var munthaHouse = houseFromSign(varshfal.ascendant.sign, munthaSign);
+    var munthaLon = normalize(munthaSign * 30 + chart.ascendant.deg);
+    var muddaStartLord = muddaStartingLord(chart, yearsElapsed);
+    var muntha = {
+      name: "Muntha",
+      sign: munthaSign,
+      signName: SIGNS[munthaSign].name,
+      house: munthaHouse,
+      deg: chart.ascendant.deg
+    };
+    return {
+      returnInstant: returnInstant,
+      nextReturnInstant: nextReturnInstant,
+      varshfal: varshfal,
+      munthaSign: munthaSign,
+      munthaHouse: munthaHouse,
+      munthaLon: munthaLon,
+      runningYear: runningYear,
+      completedYearsElapsed: yearsElapsed,
+      muddaStartLord: muddaStartLord,
+      muddaTimeline: generateMuddaTimeline(returnInstant, nextReturnInstant, muddaStartLord),
+      natalSunLon: chart.planetsByName.Sun.lon,
+      planetsWithMuntha: varshfal.planets.concat([muntha])
+    };
+  }
+
+  function makeVarshfalVarga(result, division) {
+    var varga = makeVargaChart(result.varshfal, division);
+    var munthaSign = vargaSign(result.munthaLon, division);
+    var muntha = {
+      name: "Muntha",
+      sign: munthaSign,
+      signName: SIGNS[munthaSign].name,
+      house: houseFromSign(varga.ascendant.sign, munthaSign),
+      deg: result.munthaLon % 30,
+      lon: normalize(munthaSign * 30 + (result.munthaLon % 30))
+    };
+    varga.planetsWithMuntha = varga.planets.concat([muntha]);
+    return varga;
+  }
+
+  function makeVarshfalD9(result) {
+    return makeVarshfalVarga(result, 9);
+  }
+
+  function muddaStartingLord(chart, completedYearsElapsed) {
+    var birthLord = chart.vimshottari && chart.vimshottari.birthNakshatra ? chart.vimshottari.birthNakshatra.lord : nakshatraInfo(chart.planetsByName.Moon.lon).lord;
+    var startIndex = DASHA_SEQUENCE.indexOf(birthLord);
+    if (startIndex < 0) startIndex = 0;
+    return DASHA_SEQUENCE[(startIndex + completedYearsElapsed) % DASHA_SEQUENCE.length];
+  }
+
+  function generateMuddaTimeline(startInstant, endInstant, startLord) {
+    var totalDays = Math.max(1, (endInstant.getTime() - startInstant.getTime()) / DAY_MS);
+    var startIndex = DASHA_SEQUENCE.indexOf(startLord);
+    if (startIndex < 0) startIndex = 0;
+    var current = new Date(startInstant.getTime());
+    return DASHA_SEQUENCE.map(function (_, index) {
+      var lord = DASHA_SEQUENCE[(startIndex + index) % DASHA_SEQUENCE.length];
+      var span = totalDays * DASHA_YEARS[lord] / 120;
+      var end = index === DASHA_SEQUENCE.length - 1 ? new Date(endInstant.getTime()) : addDays(current, span);
+      var period = { lord: lord, start: current, end: end, level: "Mudda MD" };
+      current = end;
+      return period;
+    });
+  }
+
+  function muddaDashaHtml(result, input) {
+    var rows = result.muddaTimeline || [];
+    return '<div class="panel-box dasha-panel mudda-dasha-panel"><div class="dasha-titlebar"><strong>Mudda Dasha</strong><span>Varshfal Year ' + result.runningYear + '</span></div>' +
+      '<p class="fine-print">Mudda dasha is scaled across this exact Varsha year from ' + escapeHtml(formatInTimezone(result.returnInstant, input.timezone)) + ' to ' + escapeHtml(formatInTimezone(result.nextReturnInstant, input.timezone)) + '. The starting lord is the natal Moon nakshatra lord advanced by completed years elapsed.</p>' +
+      '<div class="dasha-group-list dasha-tree mudda-dasha-tree">' + rows.map(function (md) { return muddaMdHtml(md, input); }).join("") + '</div></div>';
+  }
+
+  function muddaMdHtml(md, input) {
+    return '<details class="dasha-group dasha-md mudda-md"><summary><strong>' + escapeHtml(md.lord) + '</strong>' + dashaSummarySpan(md.start, md.end, input.timezone) + '</summary><div class="table-wrap"><table><thead><tr><th>#</th><th>MD-AD</th><th>Start</th><th>To</th><th>Days</th></tr></thead><tbody>' +
+      subPeriods(md, "Mudda AD").map(function (ad, index) {
+        return '<tr><td>' + (index + 1) + '</td><td>' + escapeHtml(dashaCode(md.lord, ad.lord)) + '</td><td>' + escapeHtml(dashaDate(ad.start, input.timezone)) + '</td><td>' + escapeHtml(dashaDate(ad.end, input.timezone)) + '</td><td>' + escapeHtml(String(Math.round((ad.end.getTime() - ad.start.getTime()) / DAY_MS))) + '</td></tr>';
+      }).join("") + '</tbody></table></div></details>';
+  }
+
+  function solarReturnInstant(chart, input, completedYear) {
+    var natalSun = chart.planetsByName.Sun.lon;
+    var yearsElapsed = Math.max(0, Number(completedYear || 0));
+    if (yearsElapsed === 0) return new Date(input.birthInstant.getTime());
+    var estimate = addDays(input.birthInstant, yearsElapsed * 365.24219052);
+    var current = estimate;
+    for (var i = 0; i < 12; i += 1) {
+      var sunLon = siderealSunLongitude(current, chart.ayanamshaKey);
+      var delta = signedDelta(sunLon, natalSun);
+      current = new Date(current.getTime() - (delta / 0.98564736) * DAY_MS);
+      if (Math.abs(delta) < 0.00001) break;
+    }
+    return refineSolarReturnInstant(current, natalSun, chart.ayanamshaKey);
+  }
+
+  function refineSolarReturnInstant(estimate, natalSun, ayanamshaKey) {
+    var left = addDays(estimate, -1.25);
+    var right = addDays(estimate, 1.25);
+    var leftDelta = signedDelta(siderealSunLongitude(left, ayanamshaKey), natalSun);
+    var rightDelta = signedDelta(siderealSunLongitude(right, ayanamshaKey), natalSun);
+    for (var expand = 0; expand < 6 && !(leftDelta <= 0 && rightDelta >= 0); expand += 1) {
+      left = addDays(left, -1);
+      right = addDays(right, 1);
+      leftDelta = signedDelta(siderealSunLongitude(left, ayanamshaKey), natalSun);
+      rightDelta = signedDelta(siderealSunLongitude(right, ayanamshaKey), natalSun);
+    }
+    if (!(leftDelta <= 0 && rightDelta >= 0)) return estimate;
+    for (var i = 0; i < 42; i += 1) {
+      var middle = new Date((left.getTime() + right.getTime()) / 2);
+      var middleDelta = signedDelta(siderealSunLongitude(middle, ayanamshaKey), natalSun);
+      if (Math.abs(middleDelta) < 0.000001) return middle;
+      if (middleDelta < 0) left = middle;
+      else right = middle;
+    }
+    return new Date((left.getTime() + right.getTime()) / 2);
+  }
+
+  function siderealSunLongitude(date, ayanamshaKey) {
+    var jd = julianDay(date);
+    var sun = computePlanets(jd).find(function (p) { return p.name === "Sun"; });
+    return normalize(sun.tropical - ayanamshaValue(jd, ayanamshaKey));
+  }
+
+  function completedYears(birthInstant, asOfInstant, timezone) {
+    var birth = new Date(birthInstant.getTime() + timezone * 3600000);
+    var asOf = new Date(asOfInstant.getTime() + timezone * 3600000);
+    var years = asOf.getUTCFullYear() - birth.getUTCFullYear();
+    var birthdayThisYear = Date.UTC(asOf.getUTCFullYear(), birth.getUTCMonth(), birth.getUTCDate(), birth.getUTCHours(), birth.getUTCMinutes(), birth.getUTCSeconds());
+    var asOfUtc = Date.UTC(asOf.getUTCFullYear(), asOf.getUTCMonth(), asOf.getUTCDate(), asOf.getUTCHours(), asOf.getUTCMinutes(), asOf.getUTCSeconds());
+    if (asOfUtc < birthdayThisYear) years -= 1;
+    return clamp(years, 0, 120);
+  }
+
+  function wireVarshfalControls(chart, input, root) {
+    if (typeof document === "undefined") return;
+    var section = root || document.getElementById("viewA-varshfal");
+    if (!section || section._varshfalWired) return;
+    section.addEventListener("click", function (event) {
+      var button = event.target && event.target.closest ? event.target.closest("#varshfalUpdateBtn") : null;
+      if (!button) return;
+      updateVarshfalFromControls(chart, input, section);
+    });
+    section.addEventListener("change", function (event) {
+      if (event.target && (event.target.id === "varshfalYear" || event.target.id === "varshfalDivision")) {
+        updateVarshfalFromControls(chart, input, section);
+      }
+    });
+    section.addEventListener("keydown", function (event) {
+      if (event.target && event.target.id === "varshfalYear" && event.key === "Enter") {
+        event.preventDefault();
+        updateVarshfalFromControls(chart, input, section);
+      }
+    });
+    section._varshfalWired = true;
+  }
+
+  function updateVarshfalFromControls(chart, input, root) {
+    var scope = root && root.querySelector ? root : document;
+    var field = scope.querySelector ? scope.querySelector("#varshfalYear") : document.getElementById("varshfalYear");
+    var divisionField = scope.querySelector ? scope.querySelector("#varshfalDivision") : document.getElementById("varshfalDivision");
+    var mount = scope.querySelector ? scope.querySelector("#varshfalChartMount") : document.getElementById("varshfalChartMount");
+    var status = scope.querySelector ? scope.querySelector("#varshfalStatus") : document.getElementById("varshfalStatus");
+    if (!field || !mount) return;
+    var runningYear = clamp(Math.round(Number(field.value) || 1), 1, 121);
+    field.value = String(runningYear);
+    try {
+      mount.innerHTML = varshfalPanelHtml(chart, input, runningYear, divisionField ? divisionField.value : 9);
+      if (status) status.textContent = "Updated Varshfal to running year " + runningYear + ".";
+      enhanceReportTableTopControls();
+    } catch (error) {
+      alertUser(error.message || "Could not update Varshfal chart.");
+    }
+  }
+
+  function buildTransitChartFromInput(transitInput) {
+    var instant = localDateTimeToUtc(transitInput.date, transitInput.time, Number(transitInput.timezone));
+    return buildChart(instant, Number(transitInput.latitude), Number(transitInput.longitude), Number(transitInput.timezone), { ayanamshaKey: transitInput.ayanamshaKey });
+  }
+
+  function transitChartPanelHtml(chart, transitInput, natalChart) {
+    var division = Number(transitInput.division || 1);
+    var display = transitDisplayChart(chart, transitInput, division);
+    var comparison = natalChart ? chartBox("D-1 Natal Reference", natalChart.ascendant.sign, natalChart.planets, { showAscDegree: true, ascDegree: natalChart.ascendant.deg, division: 1, rootChart: natalChart }) : "";
+    var transitReference = "Date/time: " + transitInput.date + " " + normalizeTimeInput(transitInput.time) + " UTC" + (Number(transitInput.timezone) >= 0 ? "+" : "") + transitInput.timezone +
+      " | Place: " + ((transitInput.place ? transitInput.place + " - " : "") + coordinateText(Number(transitInput.latitude), Number(transitInput.longitude)));
+    return '<div class="report-grid transit-chart-grid">' +
+      chartBox("D-" + division + " Transit Chart", display.ascSign, display.planets, { footerHtml: transitQuickButtonsHtml(), division: division, rootChart: chart, showAscDegree: true, ascDegree: display.ascDegree }) +
+      comparison +
+      '<div class="panel-box transit-details-panel"><h3>Transit Details</h3>' +
+      '<label>Transit chart<select id="transitDivision">' + transitDivisionOptions(division) + '</select></label>' +
+      '<div class="metric-row"><strong>Transit ascendant</strong><span>' + escapeHtml(chart.ascendant.signName + " " + decimalToDms(chart.ascendant.deg)) + '</span></div>' +
+      '<div class="metric-row"><strong>Chart reference</strong><span>' + escapeHtml(display.reference) + '</span></div>' +
+      '<div class="table-wrap compact-table"><table><thead><tr><th>Planet</th><th>Transit sign</th><th>Degree</th><th>Nakshatra</th><th>Condition</th></tr></thead><tbody>' +
+      '<tr class="transit-reference-row"><td colspan="5"><strong>Transit reference:</strong> ' + escapeHtml(transitReference) + '</td></tr>' +
+      display.tablePlanets.map(function (p) {
+        return "<tr><td><strong>" + escapeHtml(p.name) + "</strong></td><td>" + escapeHtml(p.signName) + "</td><td>" + escapeHtml(decimalToDms(p.deg)) + "</td><td>" + escapeHtml(p.nakshatra + " pada " + p.pada) + "</td><td>" + escapeHtml(conditionText(p)) + "</td></tr>";
+      }).join("") +
+      "</tbody></table></div></div></div>" +
+      horaSubhoraPanelHtml(transitInput, natalChart, chart);
+  }
+
+  function horaSubhoraPanelHtml(transitInput, natalChart, transitChart) {
+    var ctx;
+    try {
+      ctx = horaSubhoraContext(transitInput, natalChart, transitChart);
+    } catch (error) {
+      return '<div class="hora-panel"><h3>Hora And Sub Hora</h3><p class="muted">' + escapeHtml(error.message || "Hora could not be calculated for this date/time.") + "</p></div>";
+    }
+    return '<div class="hora-panel"><div class="section-head compact-section-head"><div><p class="eyebrow">Hora And Sub Hora</p><h3>Planetary Hour For Selected Transit Time</h3></div><span class="small-pill">' + escapeHtml(ctx.periodType + " Hora") + '</span></div>' +
+      '<div class="report-grid three">' +
+      metricBox("Selected moment", [
+        ["Reference", ctx.selectedLabel],
+        ["Sunrise", ctx.sunriseLabel],
+        ["Sunset", ctx.sunsetLabel]
+      ]) +
+      metricBox("Current Hora", [
+        ["Hora lord", ctx.horaLord],
+        ["Natal judgement", ctx.horaJudgement],
+        ["Transit judgement", ctx.horaTransitJudgement],
+        ["Hora number", String(ctx.horaNumber) + " of 12 " + ctx.periodType.toLowerCase() + " horas"],
+        ["Hora span", ctx.horaStartLabel + " to " + ctx.horaEndLabel]
+      ]) +
+      metricBox("Current Sub Hora", [
+        ["Sub Hora lord", ctx.subHoraLord],
+        ["Natal judgement", ctx.subHoraJudgement],
+        ["Transit judgement", ctx.subHoraTransitJudgement],
+        ["Sub Hora number", String(ctx.subHoraNumber) + " of 12 within this hora"],
+        ["Sub Hora span", ctx.subHoraStartLabel + " to " + ctx.subHoraEndLabel]
+      ]) +
+      '</div><div class="table-wrap compact-table"><table><thead><tr><th>#</th><th>Sub Hora lord</th><th>Natal judgement</th><th>Transit judgement</th><th>From</th><th>To</th></tr></thead><tbody>' +
+      ctx.subHoras.map(function (row) {
+        return '<tr' + (row.current ? ' class="current-row"' : "") + "><td>" + row.number + "</td><td><strong>" + escapeHtml(row.lord) + "</strong></td><td>" + escapeHtml(row.judgement) + "</td><td>" + escapeHtml(row.transitJudgement) + "</td><td>" + escapeHtml(row.startLabel) + "</td><td>" + escapeHtml(row.endLabel) + "</td></tr>";
+      }).join("") +
+      '</tbody></table></div><p class="fine-print">Edit the transit date, year, time and location above, then click Update chart. Sub Hora is currently calculated by dividing the active Hora into 12 equal parts starting from the Hora lord and following the standard hora sequence.</p></div>';
+  }
+
+  function horaSubhoraContext(transitInput, natalChart, transitChart) {
+    var date = transitInput.date;
+    var time = normalizeTimeInput(transitInput.time);
+    var tz = Number(transitInput.timezone);
+    var lat = Number(transitInput.latitude);
+    var lon = Number(transitInput.longitude);
+    if (!date || !time || !Number.isFinite(tz) || !Number.isFinite(lat) || !Number.isFinite(lon)) {
+      throw new Error("Date, time, timezone, latitude and longitude are required for Hora.");
+    }
+    var selectedMinutes = timeToMinutes(time);
+    var todaySun = sunTimesForDate(date, lat, lon, tz);
+    var selectedAbs = selectedMinutes;
+    var periodStart;
+    var periodEnd;
+    var periodBaseDate;
+    var periodType;
+    var baseOffset;
+    if (selectedMinutes >= todaySun.sunrise && selectedMinutes < todaySun.sunset) {
+      periodType = "Day";
+      periodStart = todaySun.sunrise;
+      periodEnd = todaySun.sunset;
+      periodBaseDate = date;
+      baseOffset = 0;
+    } else if (selectedMinutes >= todaySun.sunset) {
+      var nextDate = shiftDateInput(date, 1);
+      var nextSun = sunTimesForDate(nextDate, lat, lon, tz);
+      periodType = "Night";
+      periodStart = todaySun.sunset;
+      periodEnd = nextSun.sunrise + 1440;
+      periodBaseDate = date;
+      baseOffset = 12;
+    } else {
+      var prevDate = shiftDateInput(date, -1);
+      var prevSun = sunTimesForDate(prevDate, lat, lon, tz);
+      periodType = "Night";
+      selectedAbs = selectedMinutes + 1440;
+      periodStart = prevSun.sunset;
+      periodEnd = todaySun.sunrise + 1440;
+      periodBaseDate = prevDate;
+      baseOffset = 12;
+    }
+    var periodLength = periodEnd - periodStart;
+    if (!Number.isFinite(periodLength) || periodLength <= 0) throw new Error("Could not determine sunrise/sunset for this location.");
+    var horaLength = periodLength / 12;
+    var horaIndex = clamp(Math.floor((selectedAbs - periodStart) / horaLength), 0, 11);
+    var horaStart = periodStart + horaIndex * horaLength;
+    var horaEnd = horaStart + horaLength;
+    var weekdayLord = weekdayLordForDate(periodBaseDate);
+    var horaLordName = horaLord(weekdayLord, baseOffset + horaIndex);
+    var subLength = horaLength / 12;
+    var subIndex = clamp(Math.floor((selectedAbs - horaStart) / subLength), 0, 11);
+    var subStart = horaStart + subIndex * subLength;
+    var subEnd = subStart + subLength;
+    var subHoras = [];
+    for (var i = 0; i < 12; i += 1) {
+      var subLord = horaLord(horaLordName, i);
+      subHoras.push({
+        number: i + 1,
+        lord: subLord,
+        judgement: horaAuspiciousness(natalChart, subLord).label,
+        transitJudgement: horaAuspiciousness(transitChart, subLord).label,
+        startLabel: minuteDateTimeLabel(periodBaseDate, horaStart + i * subLength),
+        endLabel: minuteDateTimeLabel(periodBaseDate, horaStart + (i + 1) * subLength),
+        current: i === subIndex
+      });
+    }
+    return {
+      selectedLabel: date + " " + time + " UTC" + (tz >= 0 ? "+" : "") + tz,
+      periodType: periodType,
+      sunriseLabel: minuteTimeLabel(todaySun.sunrise),
+      sunsetLabel: minuteTimeLabel(todaySun.sunset),
+      horaLord: horaLordName,
+      horaJudgement: horaAuspiciousness(natalChart, horaLordName).label,
+      horaTransitJudgement: horaAuspiciousness(transitChart, horaLordName).label,
+      horaNumber: horaIndex + 1,
+      horaStartLabel: minuteDateTimeLabel(periodBaseDate, horaStart),
+      horaEndLabel: minuteDateTimeLabel(periodBaseDate, horaEnd),
+      subHoraLord: horaLord(horaLordName, subIndex),
+      subHoraJudgement: horaAuspiciousness(natalChart, horaLord(horaLordName, subIndex)).label,
+      subHoraTransitJudgement: horaAuspiciousness(transitChart, horaLord(horaLordName, subIndex)).label,
+      subHoraNumber: subIndex + 1,
+      subHoraStartLabel: minuteDateTimeLabel(periodBaseDate, subStart),
+      subHoraEndLabel: minuteDateTimeLabel(periodBaseDate, subEnd),
+      subHoras: subHoras
+    };
+  }
+
+  function transitDisplayChart(chart, transitInput, division) {
+    if (division === 1) {
+      var natalAscSign = Number.isFinite(transitInput.natalAscSign) ? transitInput.natalAscSign : chart.ascendant.sign;
+      return {
+        ascSign: natalAscSign,
+        ascDegree: chart.ascendant.deg,
+        planets: transitPlanetsForAsc(chart.planets, natalAscSign),
+        tablePlanets: chart.planets,
+        reference: "Displayed from natal ascendant " + (natalAscSign + 1) + " / " + SIGNS[natalAscSign].name
+      };
+    }
+    var varga = makeVargaChart(chart, division);
+    return {
+      ascSign: varga.ascendant.sign,
+      ascDegree: varga.ascendant.deg,
+      planets: varga.planets,
+      tablePlanets: varga.planets,
+      reference: "Displayed from D-" + division + " transit ascendant " + (varga.ascendant.sign + 1) + " / " + varga.ascendant.signName
+    };
+  }
+
+  function transitPlanetsForAsc(planets, ascSign) {
+    return planets.map(function (p) {
+      var copy = Object.assign({}, p);
+      copy.house = houseFromSign(ascSign, p.sign);
+      return copy;
+    });
+  }
+
+  function horaAuspiciousness(chart, lordName) {
+    if (!chart || !chart.planetsByName) return { label: "Inauspicious" };
+    var planet = chart.planetsByName[lordName];
+    if (!planet) return { label: "Inauspicious" };
+    var status = planetPredictionStatus(chart, planet);
+    var score = planet.strength && Number.isFinite(planet.strength.score) ? planet.strength.score : 50;
+    var adverse = planet.functionalRole === "Functional malefic" || status === "Malefic" || planet.dignity === "Debilitated" || score < 38;
+    var supportive = status === "Rajyogkaraka" || status === "Yogkaraka" || score >= 60 || ["Exalted", "Own sign", "Moolatrikona"].indexOf(planet.dignity) >= 0;
+    var label = supportive && !adverse ? "Auspicious" : "Inauspicious";
+    return { label: label };
+  }
+
+  function sunTimesForDate(dateValue, latitude, longitude, timezone) {
+    var n = dayOfYear(dateValue);
+    var gamma = 2 * Math.PI / 365 * (n - 1);
+    var eqtime = 229.18 * (0.000075 + 0.001868 * Math.cos(gamma) - 0.032077 * Math.sin(gamma) - 0.014615 * Math.cos(2 * gamma) - 0.040849 * Math.sin(2 * gamma));
+    var decl = 0.006918 - 0.399912 * Math.cos(gamma) + 0.070257 * Math.sin(gamma) - 0.006758 * Math.cos(2 * gamma) + 0.000907 * Math.sin(2 * gamma) - 0.002697 * Math.cos(3 * gamma) + 0.00148 * Math.sin(3 * gamma);
+    var latRad = latitude * DEG;
+    var zenith = 90.833 * DEG;
+    var haArg = (Math.cos(zenith) / (Math.cos(latRad) * Math.cos(decl))) - Math.tan(latRad) * Math.tan(decl);
+    if (haArg < -1 || haArg > 1) throw new Error("Sunrise/sunset is not available for this latitude on the selected date.");
+    var hourAngle = Math.acos(clamp(haArg, -1, 1)) * RAD;
+    var solarNoon = 720 - 4 * longitude - eqtime + timezone * 60;
+    return {
+      sunrise: solarNoon - hourAngle * 4,
+      sunset: solarNoon + hourAngle * 4
+    };
+  }
+
+  function dayOfYear(dateValue) {
+    var parts = dateParts(dateValue);
+    var date = Date.UTC(parts.year, parts.month - 1, parts.day);
+    var start = Date.UTC(parts.year, 0, 0);
+    return Math.floor((date - start) / DAY_MS);
+  }
+
+  function dateParts(dateValue) {
+    var parts = String(dateValue || "").split("-").map(Number);
+    if (parts.length < 3 || parts.some(function (part) { return !Number.isFinite(part); })) {
+      throw new Error("Valid date is required for Hora.");
+    }
+    return { year: parts[0], month: parts[1], day: parts[2] };
+  }
+
+  function shiftDateInput(dateValue, days) {
+    var parts = dateParts(dateValue);
+    var date = new Date(Date.UTC(parts.year, parts.month - 1, parts.day + days));
+    return date.getUTCFullYear() + "-" + pad(date.getUTCMonth() + 1) + "-" + pad(date.getUTCDate());
+  }
+
+  function weekdayLordForDate(dateValue) {
+    var parts = dateParts(dateValue);
+    var day = new Date(Date.UTC(parts.year, parts.month - 1, parts.day)).getUTCDay();
+    return WEEKDAY_LORDS[day];
+  }
+
+  function horaLord(startLord, offset) {
+    var start = HORA_SEQUENCE.indexOf(startLord);
+    if (start < 0) start = 0;
+    return HORA_SEQUENCE[(start + offset) % HORA_SEQUENCE.length];
+  }
+
+  function timeToMinutes(timeValue) {
+    var parts = normalizeTimeInput(timeValue).split(":").map(Number);
+    return (parts[0] || 0) * 60 + (parts[1] || 0) + (parts[2] || 0) / 60;
+  }
+
+  function minuteTimeLabel(minutesValue) {
+    var totalSeconds = Math.round(minutesValue * 60);
+    var secondsInDay = ((totalSeconds % 86400) + 86400) % 86400;
+    var h = Math.floor(secondsInDay / 3600);
+    var m = Math.floor((secondsInDay % 3600) / 60);
+    var s = secondsInDay % 60;
+    return pad(h) + ":" + pad(m) + ":" + pad(s);
+  }
+
+  function minuteDateTimeLabel(dateValue, minutesValue) {
+    var totalSeconds = Math.round(minutesValue * 60);
+    var dayOffset = Math.floor(totalSeconds / 86400);
+    var secondsInDay = ((totalSeconds % 86400) + 86400) % 86400;
+    if (totalSeconds < 0 && secondsInDay) dayOffset -= 1;
+    var date = shiftDateInput(dateValue, dayOffset);
+    var h = Math.floor(secondsInDay / 3600);
+    var m = Math.floor((secondsInDay % 3600) / 60);
+    var s = secondsInDay % 60;
+    return date + " " + pad(h) + ":" + pad(m) + ":" + pad(s);
+  }
+
+  function transitDivisionOptions(selected) {
+    return vargaDivisions().map(function (division) {
+      return '<option value="' + division + '"' + (division === selected ? " selected" : "") + '>D-' + division + " " + escapeHtml(vargaName(division)) + " Transit Chart</option>";
+    }).join("");
+  }
+
+  function transitQuickButtonsHtml() {
+    var buttons = [
+      ["-10Y", "year", -10], ["+10Y", "year", 10],
+      ["-1Y", "year", -1], ["+1Y", "year", 1],
+      ["-1M", "month", -1], ["+1M", "month", 1],
+      ["-1W", "week", -1], ["+1W", "week", 1],
+      ["-1D", "day", -1], ["+1D", "day", 1],
+      ["-1H", "hour", -1], ["+1H", "hour", 1],
+      ["-1m", "minute", -1], ["+1m", "minute", 1],
+      ["-10s", "second", -10], ["+10s", "second", 10],
+      ["-1s", "second", -1], ["+1s", "second", 1]
+    ];
+    return '<div class="transit-quick-actions" aria-label="Quick transit updates">' + buttons.map(function (button) {
+      return '<button type="button" data-transit-unit="' + button[1] + '" data-transit-step="' + button[2] + '">' + button[0] + "</button>";
+    }).join("") + "</div>";
+  }
+
+  function wireTransitChartControls(input, natalChart) {
+    if (typeof document === "undefined") return;
+    var update = document.getElementById("transitUpdateBtn");
+    var place = document.getElementById("transitPlace");
+    var mount = document.getElementById("transitChartMount");
+    function updateTransitMount() {
+      var transitInput = readTransitControls(input);
+      rememberCustomLocation(transitInput.place, transitInput.latitude, transitInput.longitude, transitInput.timezone);
+      var chart = buildTransitChartFromInput(transitInput);
+      if (mount) {
+        mount.innerHTML = transitChartPanelHtml(chart, transitInput, natalChart);
+        enhanceReportTableTopControls();
+      }
+    }
+    if (place) {
+      place.addEventListener("change", function () {
+        var found = findCity(place.value);
+        if (!found) return;
+        document.getElementById("transitTimezone").value = found.timezone;
+        document.getElementById("transitLatitude").value = Math.abs(found.latitude).toFixed(4);
+        document.getElementById("transitLatitudeDirection").value = found.latitude < 0 ? "S" : "N";
+        document.getElementById("transitLongitude").value = Math.abs(found.longitude).toFixed(4);
+        document.getElementById("transitLongitudeDirection").value = found.longitude < 0 ? "W" : "E";
+      });
+    }
+    if (mount) {
+      mount.addEventListener("click", function (event) {
+        var target = event.target && event.target.closest ? event.target.closest("[data-transit-step]") : null;
+        if (!target) return;
+        try {
+          adjustTransitControls(target.getAttribute("data-transit-unit"), Number(target.getAttribute("data-transit-step")));
+          updateTransitMount();
+        } catch (error) {
+          alertUser(error.message || "Could not update transit chart.");
+        }
+      });
+      mount.addEventListener("change", function (event) {
+        if (!event.target || event.target.id !== "transitDivision") return;
+        try {
+          updateTransitMount();
+        } catch (error) {
+          alertUser(error.message || "Could not update transit chart.");
+        }
+      });
+    }
+    if (!update) return;
+    update.addEventListener("click", function () {
+      try {
+        updateTransitMount();
+      } catch (error) {
+        alertUser(error.message || "Could not update transit chart.");
+      }
+    });
+  }
+
+  function readTransitControls(fallbackInput) {
+    var date = document.getElementById("transitDate").value;
+    var time = document.getElementById("transitTime").value;
+    var timezone = Number(document.getElementById("transitTimezone").value);
+    if (!date || !time || !Number.isFinite(timezone)) throw new Error("Transit date, time and timezone are required.");
+    return {
+      date: date,
+      time: normalizeTimeInput(time),
+      timezone: timezone,
+      place: document.getElementById("transitPlace").value.trim(),
+      latitude: signedCoordinate(document.getElementById("transitLatitude").value || fallbackInput.latitude, document.getElementById("transitLatitudeDirection").value, "S"),
+      longitude: signedCoordinate(document.getElementById("transitLongitude").value || fallbackInput.longitude, document.getElementById("transitLongitudeDirection").value, "W"),
+      natalAscSign: fallbackInput.natalAscSign,
+      division: Number((document.getElementById("transitDivision") && document.getElementById("transitDivision").value) || fallbackInput.division || 1)
+    };
+  }
+
+  function adjustTransitControls(unit, amount) {
+    var dateField = document.getElementById("transitDate");
+    var timeField = document.getElementById("transitTime");
+    if (!dateField || !timeField || !dateField.value || !timeField.value) throw new Error("Transit date and time are required.");
+    var parts = normalizeTimeInput(timeField.value).split(":").map(Number);
+    var date = new Date(dateField.value + "T" + pad(parts[0]) + ":" + pad(parts[1]) + ":" + pad(parts[2] || 0));
+    if (unit === "year") date.setFullYear(date.getFullYear() + amount);
+    if (unit === "month") date.setMonth(date.getMonth() + amount);
+    if (unit === "week") date.setDate(date.getDate() + amount * 7);
+    if (unit === "day") date.setDate(date.getDate() + amount);
+    if (unit === "hour") date.setHours(date.getHours() + amount);
+    if (unit === "minute") date.setMinutes(date.getMinutes() + amount);
+    if (unit === "second") date.setSeconds(date.getSeconds() + amount);
+    dateField.value = date.getFullYear() + "-" + pad(date.getMonth() + 1) + "-" + pad(date.getDate());
+    timeField.value = pad(date.getHours()) + ":" + pad(date.getMinutes()) + ":" + pad(date.getSeconds());
+  }
+
+  function panchangInfo(chart, input) {
+    var sun = chart.planetsByName.Sun;
+    var moon = chart.planetsByName.Moon;
+    var elongation = normalize(moon.lon - sun.lon);
+    var tithiIndex = Math.floor(elongation / 12);
+    var tithiWithin = elongation - tithiIndex * 12;
+    var yogaValue = normalize(moon.lon + sun.lon);
+    var yogaIndex = Math.floor(yogaValue / NAK_SIZE);
+    var yogaWithin = yogaValue - yogaIndex * NAK_SIZE;
+    var halfTithiIndex = Math.floor(elongation / 6);
+    var shifted = new Date(input.birthInstant.getTime() + input.timezone * 3600000);
+    return {
+      vara: VARAS[shifted.getUTCDay()],
+      tithi: TITHIS[tithiIndex],
+      paksha: tithiIndex < 15 ? "Shukla Paksha" : "Krishna Paksha",
+      tithiProgress: Math.round((tithiWithin / 12) * 100),
+      nakshatra: moon.nakshatra,
+      pada: moon.pada,
+      nakLord: moon.nakLord,
+      yoga: YOGAS[yogaIndex],
+      yogaProgress: Math.round((yogaWithin / NAK_SIZE) * 100),
+      karana: karanaName(halfTithiIndex),
+      sunSign: sun.signName,
+      moonSign: moon.signName
+    };
+  }
+
+  function karanaName(halfTithiIndex) {
+    if (halfTithiIndex === 0) return "Kimstughna";
+    if (halfTithiIndex === 57) return "Shakuni";
+    if (halfTithiIndex === 58) return "Chatushpada";
+    if (halfTithiIndex === 59) return "Naga";
+    return KARANA_REPEAT[(halfTithiIndex - 1) % KARANA_REPEAT.length];
+  }
+
+  function nextPanchangBoundary(ctx, type) {
+    var start = localDateTimeToUtc(ctx.date, ctx.time, Number(ctx.timezone));
+    var initial = panchangBoundaryIndex(buildChart(start, Number(ctx.latitude), Number(ctx.longitude), Number(ctx.timezone), { ayanamshaKey: ctx.ayanamshaKey }), type);
+    var stepMinutes = type === "karana" ? 10 : 20;
+    var prev = start;
+    for (var i = 1; i <= 216; i += 1) {
+      var probe = new Date(start.getTime() + i * stepMinutes * 60000);
+      var chart = buildChart(probe, Number(ctx.latitude), Number(ctx.longitude), Number(ctx.timezone), { ayanamshaKey: ctx.ayanamshaKey });
+      if (panchangBoundaryIndex(chart, type) !== initial) {
+        return formatInTimezone(refinePanchangBoundary(prev, probe, initial, type, ctx), Number(ctx.timezone));
+      }
+      prev = probe;
+    }
+    return "Beyond scan range";
+  }
+
+  function refinePanchangBoundary(left, right, initial, type, ctx) {
+    for (var i = 0; i < 12; i += 1) {
+      var mid = new Date((left.getTime() + right.getTime()) / 2);
+      var chart = buildChart(mid, Number(ctx.latitude), Number(ctx.longitude), Number(ctx.timezone), { ayanamshaKey: ctx.ayanamshaKey });
+      if (panchangBoundaryIndex(chart, type) === initial) left = mid;
+      else right = mid;
+    }
+    return right;
+  }
+
+  function panchangBoundaryIndex(chart, type) {
+    var sun = chart.planetsByName.Sun;
+    var moon = chart.planetsByName.Moon;
+    var elongation = normalize(moon.lon - sun.lon);
+    if (type === "tithi") return Math.floor(elongation / 12);
+    if (type === "karana") return Math.floor(elongation / 6);
+    if (type === "nakshatra") return Math.floor(moon.lon / NAK_SIZE);
+    if (type === "yoga") return Math.floor(normalize(moon.lon + sun.lon) / NAK_SIZE);
+    return 0;
+  }
+
+  function normalizeMinutes(minutesValue) {
+    return ((minutesValue % 1440) + 1440) % 1440;
+  }
+
+  function minutesDurationLabel(minutesValue) {
+    var total = Math.max(0, Math.round(minutesValue));
+    var h = Math.floor(total / 60);
+    var m = total % 60;
+    return h + "h " + pad(m) + "m";
+  }
+
+  function reportHeaderHtml(eyebrow, title, name, subtitle, tag, tagClass) {
+    return '<header class="report-head">' +
+      '<div><div class="report-brand"><img class="report-brand-logo" src="icon.svg" alt="" aria-hidden="true"><p class="report-brand-title">VedNetra</p></div>' +
+      '<p class="eyebrow">' + escapeHtml(eyebrow) + '</p><h2>' + escapeHtml(title) + " - " + escapeHtml(name) + "</h2><p>" + escapeHtml(subtitle) + '</p></div><div><span class="tag ' + escapeHtml(tagClass || "mixed") + '">' + escapeHtml(tag) + "</span></div></header>";
+  }
+
+  function predictionStatusFromScore(score) {
+    if (score >= 68) return "Strong";
+    if (score >= 52) return "Medium strong";
+    if (score >= 38) return "Weak";
+    return "Very weak";
+  }
+
+  function planetPredictionStatus(chart, planet) {
+    if (!planet) return "Weak";
+    var strengthScore = planet.strength && Number.isFinite(planet.strength.score) ? planet.strength.score : 50;
+    if (chart && isRajyogkarakaPlanet(chart, planet.name)) return "Rajyogkaraka";
+    if (planet.functionalRole === "Yogakaraka") return "Yogkaraka";
+    if (planet.functionalRole === "Functional malefic" || (planet.naturalNature === "Malefic" && strengthScore < 55)) return "Malefic";
+    return predictionStatusFromScore(strengthScore);
+  }
+
+  function isRajyogkarakaPlanet(chart, planetName) {
+    for (var k = 1; k <= 12; k += 1) {
+      if ([1, 5, 9].indexOf(k) < 0) continue;
+      var konaLord = lordOfHouse(chart, k);
+      for (var t = 1; t <= 12; t += 1) {
+        if ([4, 7, 10].indexOf(t) < 0) continue;
+        var kendraLord = lordOfHouse(chart, t);
+        if ((konaLord === planetName || kendraLord === planetName) && hasSambandha(chart, konaLord, kendraLord)) return true;
+      }
+    }
+    return false;
+  }
+
+  function conditionCategory(planet) {
+    var flags = [];
+    if (planet.retrograde) flags.push("Retrograde");
+    if (planet.combust) flags.push("Combust");
+    return flags.join(" / ") || "Normal";
+  }
+
+  function methodologyWorkflowSection() {
+    var rows = [
+      ["1. Cast and annotate", "D-1, Moon reference, Shodashvarga, Panchang and Vimshottari are fixed before judgement."],
+      ["2. Judge strength", "Bhava, Bhavesh and Karaka are assessed first from D-1, then from Chandra lagna."],
+      ["3. Apply varga layer", "The relevant divisional chart refines the domain; it does not override an absent D-1 promise."],
+      ["4. Identify yogas", "Active yogas are listed with the dasha periods in which they can fructify."],
+      ["5. Topic reading", "The asked question is answered by the three pillars, topic rules, D-60 tone and timing activation."],
+      ["6. Integrate", "Specific rules outweigh general rules; D-1 gives trajectory, varga gives domain-specific refinement."]
+    ];
+    return '<section class="section"><div class="section-head"><div><p class="eyebrow">JKHNH Phaladesh Checklist</p><h3>Repeatable Prediction Cadence</h3></div><span class="small-pill">Part VIII</span></div><div class="table-wrap"><table><thead><tr><th>Step</th><th>What is construed for this question</th></tr></thead><tbody>' +
+      rows.map(function (row) {
+        return "<tr><td><strong>" + escapeHtml(row[0]) + "</strong></td><td>" + escapeHtml(row[1]) + "</td></tr>";
+      }).join("") +
+      "</tbody></table></div></section>";
+  }
+
+  function foundationalProfileSection(chart, input) {
+    var lagnesh = chart.planetsByName[lordOfHouse(chart, 1)];
+    var moon = chart.planetsByName.Moon;
+    var fortune = [
+      ["Desh-kul-kal context", (input && input.birthPlace ? input.birthPlace : "Place supplied by coordinates") + "; environmental context moderates results."],
+      ["Lagna nature", chart.ascendant.signName + " - " + SIGNS[chart.ascendant.sign].modality + " " + SIGNS[chart.ascendant.sign].element],
+      ["Lagna lord", lagnesh.name + " in H" + lagnesh.house + ", " + lagnesh.signName + " - " + planetPredictionStatus(chart, lagnesh)],
+      ["Chandra reference", moon.signName + " / " + moon.nakshatra + " - " + chart.moonStrength],
+      ["9th lord fortune factor", lordOfHouse(chart, 9) + " - " + planetPredictionStatus(chart, chart.planetsByName[lordOfHouse(chart, 9)])]
+    ];
+    var chain = dispositorChain(chart, lagnesh.name);
+    var final = chart.planetsByName[chain[chain.length - 1]];
+    return '<section class="section"><div class="section-head"><div><p class="eyebrow">Foundational Profile</p><h3>Fortune Determinants, Lagna Nature And Final Dispositor</h3></div><span class="small-pill">Part I</span></div><div class="report-grid three">' +
+      metricBox("Operating determinants", fortune) +
+      metricBox("Dispositor chain", [["Chain", chain.join(" -> ")], ["Final dispositor", final.name], ["Planetary type", final.naturalNature + ", " + final.functionalRole + ", " + final.dignity]]) +
+      metricBox("Lagna-Chandra twin test", [["From Lagna", "Lagna promise is " + predictionStatusFromScore(chart.houses[0].score) + "."], ["From Moon", "Moon in " + moon.signName + " becomes the parallel reference lagna."], ["Construction", "Events need support from both reference frames for higher confidence."]]) +
+      "</div></section>";
+  }
+
+  function threePillarTopicSection(chart, topicVarga, analysis, input, externalVarga) {
+    var cfg = analysis.cfg;
+    var houses = cfg.primaryHouses && cfg.primaryHouses.length ? cfg.primaryHouses : cfg.houses;
+    var rows = houses.map(function (house) {
+      var lagnaPillar = pillarFromBase(chart, chart.ascendant.sign, house, cfg.karakas);
+      var moonPillar = pillarFromBase(chart, chart.planetsByName.Moon.sign, house, cfg.karakas);
+      var vargaP = vargaPillar(topicVarga, house, cfg.karakas);
+      var construed = construeThreePillar(lagnaPillar, moonPillar, vargaP, cfg.label);
+      return "<tr><td><strong>H" + house + "</strong><br><span class=\"fine-print\">Bhava-Bhavesh-Karaka</span></td><td>" +
+        escapeHtml(pillarText(lagnaPillar)) + "</td><td>" + escapeHtml(pillarText(moonPillar)) + "</td><td>" +
+        escapeHtml(pillarText(vargaP)) + "</td><td>" + escapeHtml(construed) + "</td></tr>";
+    }).join("");
+    return '<section class="section"><div class="section-head"><div><p class="eyebrow">Three-Pillar Topic Reading</p><h3>Bhava, Bhavesh And Karaka For The Asked Question</h3></div><span class="small-pill">Part II + VIII.5</span></div><div class="table-wrap"><table><thead><tr><th>Reference</th><th>D-1 From Lagna</th><th>D-1 From Moon</th><th>D-' + cfg.dchart + (externalVarga ? " Reference" : " Computed") + '</th><th>Construction for this question</th></tr></thead><tbody>' + rows + "</tbody></table></div></section>";
+  }
+
+  function pillarFromBase(chart, baseSign, house, karakas) {
+    var targetSign = normalizeSign(baseSign + house - 1);
+    var targetHouse = houseFromSign(chart.ascendant.sign, targetSign);
+    var baseChart = chartWithBase(chart, baseSign);
+    var lord = chart.planetsByName[SIGNS[targetSign].lord];
+    var tenants = chart.planets.filter(function (p) { return p.sign === targetSign; });
+    var aspects = planetsAspectingHouse(baseChart, house);
+    var karakaPlanets = (karakas || []).map(function (name) { return chart.planetsByName[name]; }).filter(Boolean);
+    var parts = [];
+    if (lord && lord.strength) parts.push(lord.strength.score);
+    if (tenants.length) parts.push(average(tenants.map(function (p) { return p.strength.score; })));
+    if (karakaPlanets.length) parts.push(average(karakaPlanets.map(function (p) { return p.strength.score; })));
+    var score = average(parts);
+    aspects.forEach(function (p) { score += p.naturalNature === "Benefic" ? 3 : -3; });
+    return {
+      sign: SIGNS[targetSign].name,
+      chartHouse: targetHouse,
+      lord: lord,
+      tenants: tenants,
+      aspects: aspects,
+      karakas: karakaPlanets,
+      rootChart: chart,
+      score: Math.round(clamp(score, 0, 100))
+    };
+  }
+
+  function vargaPillar(varga, house, karakas) {
+    var targetSign = normalizeSign(varga.ascendant.sign + house - 1);
+    var lord = varga.planetsByName[SIGNS[targetSign].lord];
+    var tenants = varga.planets.filter(function (p) { return p.sign === targetSign; });
+    var karakaPlanets = (karakas || []).map(function (name) { return varga.planetsByName[name]; }).filter(Boolean);
+    var parts = [];
+    if (lord) parts.push(45 + ([1, 4, 5, 7, 9, 10, 11].indexOf(lord.house) >= 0 ? 12 : -6));
+    if (tenants.length) parts.push(45 + tenants.reduce(function (sum, p) { return sum + (p.naturalNature === "Benefic" ? 8 : -7); }, 0));
+    if (karakaPlanets.length) parts.push(average(karakaPlanets.map(function (p) { return p.strength ? p.strength.score : 50; })));
+    return {
+      sign: SIGNS[targetSign].name,
+      chartHouse: house,
+      lord: lord,
+      tenants: tenants,
+      aspects: [],
+      karakas: karakaPlanets,
+      rootChart: null,
+      score: Math.round(clamp(average(parts), 0, 100))
+    };
+  }
+
+  function pillarText(pillar) {
+    var lordText = pillar.lord ? pillar.lord.name + " " + (pillar.lord.strength ? planetPredictionStatus(pillar.rootChart || null, pillar.lord) : "placed") : "lord unavailable";
+    var tenants = pillar.tenants.map(prop("name")).join(", ") || "no tenants";
+    var karakas = pillar.karakas.map(function (p) { return p.name + (p.strength ? " " + planetPredictionStatus(pillar.rootChart || null, p) : ""); }).join(", ") || "no karaka listed";
+    return pillar.sign + "; lord " + lordText + "; tenants " + tenants + "; karaka " + karakas + "; " + predictionStatusFromScore(pillar.score);
+  }
+
+  function construeThreePillar(lagnaPillar, moonPillar, vargaPillarItem, topicLabel) {
+    var averageScore = Math.round(average([lagnaPillar.score, moonPillar.score, vargaPillarItem.score]));
+    if (averageScore >= 65) return topicLabel + " promise is well supported because Lagna, Chandra and varga references broadly agree.";
+    if (averageScore >= 48) return topicLabel + " promise exists but needs dasha support and may show delay, conditions or mixed results.";
+    return topicLabel + " promise is weak or obstructed unless strong yogas and dasha activation compensate.";
+  }
+
+  function strengthAssessmentMethodologySection(chart, analysis) {
+    var planets = dedupeBy(analysis.promise.lords.concat(analysis.promise.karakas), "name").sort(function (a, b) {
+      return b.strength.score - a.strength.score;
+    });
+    var rows = planets.map(function (p) {
+      var dispositor = chart.planetsByName[p.dispositor];
+      var trik = [6, 8, 12].indexOf(p.house) >= 0 ? "Yes, in H" + p.house : "No";
+      var papakartari = isHemmed(chart, p.house, "Malefic") ? "Malefic hemming indicated" : "No";
+      var status = planetPredictionStatus(chart, p);
+      var construed = status === "Strong" || status === "Rajyogkaraka" || status === "Yogkaraka" ? "Capable of delivering promised result in its period." : status === "Medium strong" ? "Can deliver with delay/conditions." : "Needs support; weak as an independent giver.";
+      return "<tr><td><strong>" + escapeHtml(p.name) + "</strong><br><span class=\"fine-print\">" + escapeHtml(p.functionalRole) + "</span></td><td>" + escapeHtml(p.signName + " / " + p.dignity) + "</td><td>" + escapeHtml(p.navamsaSignName || "-") + "</td><td>" + escapeHtml(p.dispositor + (dispositor ? " " + planetPredictionStatus(chart, dispositor) : "")) + "</td><td>" + escapeHtml(trik) + "</td><td>" + escapeHtml(conditionCategory(p)) + "</td><td>" + escapeHtml(papakartari) + "</td><td>" + escapeHtml(status + ". " + construed) + "</td></tr>";
+    }).join("");
+    return '<section class="section"><div class="section-head"><div><p class="eyebrow">Strength Assessment</p><h3>Bhavesh And Karaka Capacity</h3></div><span class="small-pill">Part II</span></div><div class="table-wrap"><table><thead><tr><th>Factor</th><th>Rashi / dignity</th><th>Navamsha</th><th>Rashisha</th><th>Trik</th><th>Combust / Retro</th><th>Papakartari</th><th>Construction</th></tr></thead><tbody>' + rows + "</tbody></table></div></section>";
+  }
+
+  function divisionalCrossCheckMethodologySection(chart, topicVarga, analysis, externalVarga) {
+    var cfg = analysis.cfg;
+    var d60 = makeVargaChart(chart, 60);
+    var rows = analysis.cross.map(function (item) {
+      var construction = item.score >= 62 ? "Confirms the D-1 promise." : item.score >= 48 ? "Gives conditional support." : "Weakens confidence and calls for caution.";
+      return "<tr><td><strong>" + escapeHtml(item.label) + "</strong></td><td>" + escapeHtml(predictionStatusFromScore(item.score)) + "</td><td>" + escapeHtml(item.note) + "</td><td>" + escapeHtml(construction) + "</td></tr>";
+    }).join("");
+    return '<section class="section"><div class="section-head"><div><p class="eyebrow">Divisional Cross-Check</p><h3>D-1 First, D-' + cfg.dchart + ' Refines The Domain</h3></div><span class="small-pill">Part III + VIII.5</span></div><div class="report-grid"><div class="panel-box"><h3>Relevant Varga</h3><p>D-' + cfg.dchart + ' ascendant is <strong>' + escapeHtml(topicVarga.ascendant.signName) + '</strong> (' + escapeHtml(externalVarga ? "reference override" : "computed") + '). The methodology uses this chart to refine the ' + escapeHtml(cfg.label.toLowerCase()) + ' result, not to invent a result absent in D-1.</p></div><div class="panel-box"><h3>D-60 Tone</h3><p>D-60 ascendant is <strong>' + escapeHtml(d60.ascendant.signName) + '</strong>. This is used only as fine detail for intensity, subtle cause and timing flavour after D-1 and the relevant varga are read.</p></div></div><div class="table-wrap"><table><thead><tr><th>Reference</th><th>Status</th><th>Method note</th><th>Construction</th></tr></thead><tbody>' + rows + "</tbody></table></div></section>";
+  }
+
+  function topicWiseMethodologySection(chart, analysis, input) {
+    var positive = analysis.rules.filter(function (r) { return r.present && r.kind === "positive"; });
+    var negative = analysis.rules.filter(function (r) { return r.present && r.kind === "negative"; });
+    var warnings = analysis.rules.filter(function (r) { return r.kind === "warning"; });
+    var rows = [
+      ["Outcome", analysis.verdict.label + " (" + analysis.verdict.confidence + ")"],
+      ["Supporting combinations", positive.slice(0, 6).map(function (r) { return r.id + ": " + r.text; }).join(" | ") || "No strong topic-specific supportive rule fired beyond the house/lord/karaka promise."],
+      ["Negating combinations", negative.slice(0, 6).map(function (r) { return r.id + ": " + r.text; }).join(" | ") || "No strong implemented negating rule fired."],
+      ["Manual source-table gaps", warnings.slice(0, 4).map(function (r) { return r.id + ": " + r.text; }).join(" | ") || "No source-table warning for this topic."]
+    ];
+    return '<section class="section"><div class="section-head"><div><p class="eyebrow">Topic-Wise Prediction</p><h3>Part IV Rules Applied To The Asked Question</h3></div><span class="small-pill">' + escapeHtml(analysis.cfg.label) + '</span></div><div class="report-grid">' +
+      metricBox("Rule synthesis", rows) +
+      metricBox("What this constructs", [["Asked question", input.question || analysis.cfg.label], ["Promise", predictionStatusFromScore(analysis.promise.score)], ["Sambandha", analysis.promise.sambandhas.join(", ") || "No strong lord-karaka sambandha found"], ["Conclusion", "The answer is based on D-1 promise, Chandra agreement, D-" + analysis.cfg.dchart + " refinement and dasha activation."]]) +
+      "</div></section>";
+  }
+
+  function timingAndIntegrationSection(chart, analysis, input) {
+    var first = analysis.timing.candidates[0];
+    var integrationRows = [
+      ["Activation principle", "A result manifests only when the relevant bhava, bhavesh, karaka or yoga planet is activated in Vimshottari MD/AD/PD/SD."],
+      ["Current stack", analysis.timing.currentStack.map(function (p) { return p.level + " " + p.lord; }).join(" / ") || "No active stack found"],
+      ["Best available window", first ? first.md + "/" + first.ad + " " + dashaDate(first.start, input.timezone) + " to " + dashaDate(first.end, input.timezone) : "No focused high-activation window in the selected horizon"],
+      ["Integration rule", "Specific topic rules outweigh general promise; D-1 gives trajectory while the varga refines the domain."]
+    ];
+    return '<section class="section"><div class="section-head"><div><p class="eyebrow">Timing And Integration</p><h3>Dasha Activation And Final Weighing</h3></div><span class="small-pill">Part V + VIII.7</span></div>' +
+      '<div class="report-grid">' + metricBox("Integration notes", integrationRows) + metricBox("What is construed", [["Result capacity", analysis.promise.label + " natal promise"], ["Confidence", analysis.verdict.confidence], ["Timing logic", "Vimshottari windows are preferred when dasha activation overlaps supportive transit checks."]]) + "</div>" +
+      timingBox(chart, analysis, input) +
+      "</section>" +
+      periodSummarySection(chart, input);
+  }
+
+  function yogaInventorySection(chart, analysis, input) {
+    var yogas = analysis.yogas.length ? analysis.yogas : [{ name: "No dominant implemented yoga", effect: "No Part B yoga fired strongly in the implemented set." }];
+    var rows = yogas.map(function (yoga) {
+      var window = yogaWindow(chart, input, yoga);
+      return "<tr><td><strong>" + escapeHtml(yoga.name) + "</strong><br><span class=\"fine-print\">Ref Part V</span></td><td>" + escapeHtml(yoga.effect) + "</td><td>" + escapeHtml(window) + "</td></tr>";
+    }).join("");
+    return '<section class="section"><div class="section-head"><div><p class="eyebrow">Yoga Inventory</p><h3>Active Yogas And Fructification</h3></div><span class="small-pill">Part V</span></div><div class="table-wrap"><table><thead><tr><th>Yoga</th><th>Meaning</th><th>Fructification window</th></tr></thead><tbody>' + rows + "</tbody></table></div></section>";
+  }
+
+  function majorTopicYogasSection(chart, analysis, input) {
+    var yogas = analysis.yogas.length ? analysis.yogas : [{ name: "No dominant yoga isolated", effect: "The judgement rests mainly on Bhava, Bhavesh, Karaka, varga agreement and dasha activation." }];
+    var rows = yogas.map(function (yoga) {
+      return "<tr><td><strong>" + escapeHtml(yoga.name) + "</strong><br><span class=\"fine-print\">Part V yoga check</span></td><td>" +
+        escapeHtml(yoga.effect) + "</td><td>" + escapeHtml(yogaTopicExplanation(chart, analysis, yoga, input)) + "</td><td>" +
+        escapeHtml(yogaWindow(chart, input, yoga)) + "</td></tr>";
+    }).join("");
+    return '<section class="section"><div class="section-head"><div><p class="eyebrow">Major Yogas For This Question</p><h3>How The Yogas Support The Topic Under Analysis</h3></div><span class="small-pill">Part V + VIII</span></div><div class="table-wrap"><table><thead><tr><th>Yoga found</th><th>Classical meaning</th><th>Construction for the asked topic</th><th>Likely activating periods</th></tr></thead><tbody>' + rows + "</tbody></table></div></section>";
+  }
+
+  function yogaTopicExplanation(chart, analysis, yoga, input) {
+    var cfg = analysis.cfg;
+    var activators = eventActivators(chart, cfg, analysis.topicKey);
+    var yogaPlanets = PLANETS.filter(function (name) { return (yoga.name + " " + yoga.effect).indexOf(name) >= 0; });
+    var relevantYogaPlanets = yogaPlanets.filter(function (name) { return activators.indexOf(name) >= 0; });
+    var houseText = cfg.primaryHouses.map(function (h) { return "H" + h + " lord " + lordOfHouse(chart, h); }).join(", ");
+    if (relevantYogaPlanets.length) {
+      return "This yoga directly touches topic activators through " + relevantYogaPlanets.join(", ") + ". For " + cfg.label.toLowerCase() + ", it supports the question when these planets connect with " + houseText + " and operate in dasha.";
+    }
+    return "This yoga gives background support. It strengthens the native's overall capacity, but the final result for " + cfg.label.toLowerCase() + " still depends on " + houseText + ", the karakas, D-" + cfg.dchart + " and dasha activation.";
+  }
+
+  function dashaSookshmaManifestationSection(chart, analysis, input) {
+    var rows = dashaManifestationRows(chart, analysis, input).slice(0, 18);
+    var body = rows.length ? rows.map(function (row) {
+      return "<tr><td><strong>" + escapeHtml(dashaCode(row.md, row.ad, row.pd, row.sd)) + "</strong><br><span class=\"fine-print\">" + escapeHtml(row.status) + "</span></td><td>" +
+        escapeHtml(dashaDate(row.start, input.timezone) + " to " + dashaDate(row.end, input.timezone)) + "</td><td>" +
+        escapeHtml(row.activating.join(", ")) + "</td><td>" + escapeHtml(row.explanation) + "</td></tr>";
+    }).join("") : '<tr><td colspan="4">No clear MD/AD/PD/SD activation was isolated in the generated range.</td></tr>';
+    return '<section class="section"><div class="section-head"><div><p class="eyebrow">Dasha-Antra-Pratyantra-Sookshma</p><h3>Major Periods For Manifestation Of The Asked Event</h3></div><span class="small-pill">Vimshottari</span></div><div class="table-wrap"><table><thead><tr><th>Period</th><th>Dates</th><th>Activating planets</th><th>How this supports or explains the event</th></tr></thead><tbody>' + body + "</tbody></table></div><p class=\"fine-print\">Periods are selected when MD, AD, PD or Sookshma lords activate the relevant bhava, bhavesh, karaka or topic-yoga planets. Past periods show when the event might have manifested; future/current periods show when it can manifest.</p></section>";
+  }
+
+  function dashaManifestationRows(chart, analysis, input) {
+    var activators = analysis.timing.activators;
+    var allRows = fullDashaRows(chart, input).map(function (row) {
+      var lords = [row.md, row.ad, row.pd, row.sd];
+      var hits = lords.filter(function (lord) { return activators.indexOf(lord) >= 0; });
+      return Object.assign({}, row, {
+        hitCount: hits.length,
+        activating: dedupe(hits),
+        status: dashaPeriodStatus(row, input),
+        explanation: dashaManifestationExplanation(row, hits, analysis)
+      });
+    });
+    var filtered = allRows.filter(function (row) { return row.hitCount >= 2; });
+    if (!filtered.length) filtered = allRows.filter(function (row) { return row.hitCount >= 1; });
+    filtered.sort(function (a, b) {
+      if (b.hitCount !== a.hitCount) return b.hitCount - a.hitCount;
+      var aFuture = a.end >= input.asOfInstant ? 0 : 1;
+      var bFuture = b.end >= input.asOfInstant ? 0 : 1;
+      if (aFuture !== bFuture) return aFuture - bFuture;
+      return a.start - b.start;
+    });
+    var future = filtered.filter(function (row) { return row.end >= input.asOfInstant; }).slice(0, 12);
+    var past = filtered.filter(function (row) { return row.end < input.asOfInstant; }).sort(function (a, b) {
+      if (b.hitCount !== a.hitCount) return b.hitCount - a.hitCount;
+      return b.end - a.end;
+    }).slice(0, 6);
+    return dedupeDashaRows(future.concat(past)).sort(function (a, b) { return a.start - b.start; });
+  }
+
+  function dedupeDashaRows(rows) {
+    var seen = {};
+    return rows.filter(function (row) {
+      var key = [row.md, row.ad, row.pd, row.sd, row.start.getTime()].join("|");
+      if (seen[key]) return false;
+      seen[key] = true;
+      return true;
+    });
+  }
+
+  function dashaPeriodStatus(row, input) {
+    if (row.end < input.asOfInstant) return "Might have happened / past activation";
+    if (row.start <= input.asOfInstant && row.end >= input.asOfInstant) return "Current activation";
+    return "Can happen / future activation";
+  }
+
+  function dashaManifestationExplanation(row, hits, analysis) {
+    if (!hits.length) return "This period is close to the topic but does not directly activate a listed significator.";
+    var levelMap = { md: "Mahadasha", ad: "Antardasha", pd: "Pratyantardasha", sd: "Sookshma" };
+    var pairs = ["md", "ad", "pd", "sd"].filter(function (key) { return hits.indexOf(row[key]) >= 0; }).map(function (key) {
+      return levelMap[key] + " lord " + row[key];
+    });
+    return pairs.join(", ") + " activate the " + analysis.cfg.label.toLowerCase() + " significators. This is therefore a practical manifestation period when the natal promise and varga support can give results.";
+  }
+
+  function transitManifestationSection(chart, transitChart, analysis, input) {
+    var dashaRows = dashaManifestationRows(chart, analysis, input).slice(0, 12);
+    var rows = dashaRows.map(function (row) {
+      var transit = scanTransitWindow(chart, analysis.cfg, analysis.topicKey, row.start, row.end);
+      var transitChartAtWindow = buildChart(transit.date, chart.latitude, chart.longitude, chart.timezone, { ayanamshaKey: chart.ayanamshaKey });
+      var support = majorTransitSupportText(chart, transitChartAtWindow, analysis.cfg);
+      var verb = row.end < input.asOfInstant ? "assisted" : row.start <= input.asOfInstant ? "is assisting" : "will assist";
+      return "<tr><td><strong>" + escapeHtml(dashaCode(row.md, row.ad, row.pd, row.sd)) + "</strong><br><span class=\"fine-print\">" + escapeHtml(dashaDate(row.start, input.timezone) + " to " + dashaDate(row.end, input.timezone)) + "</span></td><td>" +
+        escapeHtml(dashaDate(transit.date, input.timezone)) + "</td><td>" + escapeHtml(support) + "</td><td>" +
+        escapeHtml("Transit " + verb + " the dasha promise because " + transit.note) + "</td></tr>";
+    }).join("");
+    if (!rows) rows = '<tr><td colspan="4">No dasha-supported transit manifestation period was isolated in the generated range.</td></tr>';
+    return '<section class="section"><div class="section-head"><div><p class="eyebrow">Transit Assistance</p><h3>Major Planet Transits Supporting Dasha Manifestation</h3></div><span class="small-pill">Gochara + Dasha</span></div><div class="report-grid"><div class="panel-box"><h3>Current major transit frame</h3>' +
+      currentMajorTransitRows(chart, transitChart) +
+      '</div></div><div class="table-wrap"><table><thead><tr><th>Dasha-supported period</th><th>Transit reference</th><th>Major planet support</th><th>Manifestation note</th></tr></thead><tbody>' + rows + "</tbody></table></div></section>";
+  }
+
+  function currentMajorTransitRows(chart, transitChart) {
+    return ["Jupiter", "Saturn", "Rahu", "Ketu"].map(function (name) {
+      var p = transitChart.planetsByName[name];
+      var fromLagna = houseFromSign(chart.ascendant.sign, p.sign);
+      var fromMoon = houseFromSign(chart.planetsByName.Moon.sign, p.sign);
+      return '<div class="metric-row"><strong>' + escapeHtml(name) + '</strong><span>' + escapeHtml(p.signName + "; H" + fromLagna + " from Lagna, H" + fromMoon + " from Moon") + "</span></div>";
+    }).join("");
+  }
+
+  function majorTransitSupportText(chart, transitChart, cfg) {
+    return ["Jupiter", "Saturn", "Rahu", "Ketu"].map(function (name) {
+      var p = transitChart.planetsByName[name];
+      var fromLagna = houseFromSign(chart.ascendant.sign, p.sign);
+      var fromMoon = houseFromSign(chart.planetsByName.Moon.sign, p.sign);
+      var touches = cfg.primaryHouses.filter(function (h) {
+        return p.sign === houseSign(chart, h) || planetAspectsHouse({ name: name, house: fromLagna }, h);
+      });
+      var touchText = touches.length ? "touches H" + touches.join("/H") : "does not directly touch the primary house";
+      return name + " in " + p.signName + " (" + touchText + "; H" + fromMoon + " from Moon)";
+    }).join("; ");
+  }
+
+  function houseByHouseSection(chart) {
+    var rows = chart.houses.map(function (h) {
+      var support = supportHouse(h.house);
+      var supportJudgement = chart.houses[support - 1];
+      var lord = chart.planetsByName[h.lord];
+      var status = h.score < 40 || h.concerns.length >= 3 ? "Afflicted" : predictionStatusFromScore(h.score);
+      return "<tr><td><strong>" + h.house + "</strong><br>" + h.signName + "<br><span class=\"fine-print\">Part VI/VII</span></td><td>" + (h.tenants.map(prop("name")).join(", ") || "-") + "</td><td>" + (h.aspecting.map(prop("name")).join(", ") || "-") + "</td><td>" + h.lord + " in H" + lord.house + " - " + planetPredictionStatus(chart, lord) + "</td><td>" + (h.karakas.join(", ") || "-") + "</td><td>H" + support + " " + predictionStatusFromScore(supportJudgement.score) + "</td><td>" + status + "</td></tr>";
+    }).join("");
+    return '<section class="section"><div class="section-head"><div><p class="eyebrow">House-By-House Judgement</p><h3>12 Bhavas Ranked</h3></div><span class="small-pill">Part VI + VII</span></div><div class="table-wrap"><table><thead><tr><th>Bhava</th><th>Tenanting</th><th>Aspects</th><th>Lord status</th><th>Karaka</th><th>Bhavat-bhavam</th><th>Verdict</th></tr></thead><tbody>' + rows + "</tbody></table></div><p class=\"fine-print\">Ashtakavarga source-table gaps remain for manual verification; the prediction view states qualitative verdicts only.</p></section>";
+  }
+
+  function eventPredictionsSection(chart, transitChart, input) {
+    var rows = standardPredictionEvents().map(function (item) {
+      var cfg = item.cfg;
+      var promise = eventPromise(chart, cfg);
+      var rules = topicRules(chart, cfg, item.key, input);
+      var cross = crossChecks(chart, cfg);
+      var timing = timingAnalysis(chart, transitChart, cfg, item.key, input);
+      var verdict = item.risk ? riskOutcome(promise, rules) : synthesizeVerdict(promise, rules, cross, item.key);
+      var support = rules.filter(function (r) { return r.present && r.kind === "positive"; }).slice(0, 3).map(function (r) { return r.id; }).join(", ") || "House/lord promise";
+      var negate = rules.filter(function (r) { return r.present && r.kind === "negative"; }).slice(0, 3).map(function (r) { return r.id; }).join(", ") || "No strong negation fired";
+      var windows = timing.candidates.slice(0, 2).map(function (c) { return c.md + "/" + c.ad + " " + dashaDate(c.start, input.timezone) + " to " + dashaDate(c.end, input.timezone); }).join("; ") || "No focused window in horizon";
+      return "<tr><td><strong>" + escapeHtml(item.label) + "</strong><br><span class=\"fine-print\">" + escapeHtml(item.refs) + "</span></td><td>" + escapeHtml(verdict.label || verdict) + "</td><td>" + escapeHtml(support) + "</td><td>" + escapeHtml(negate) + "</td><td>" + escapeHtml(windows) + "</td></tr>";
+    }).join("");
+    return '<section class="section"><div class="section-head"><div><p class="eyebrow">Event Predictions</p><h3>Standard Life Events</h3></div><span class="small-pill">Part IV</span></div><div class="table-wrap"><table><thead><tr><th>Event</th><th>Outcome</th><th>Supporting combinations</th><th>Negating combinations</th><th>Timing windows</th></tr></thead><tbody>' + rows + "</tbody></table></div></section>";
+  }
+
+  function diseaseAccidentRiskSection(chart, input) {
+    var risks = diseaseRiskRows(chart, input);
+    return '<section class="section"><div class="section-head"><div><p class="eyebrow">Disease And Accident Risk</p><h3>Body Areas, Disease Types And Activation</h3></div><span class="small-pill">Part IV.3</span></div><div class="table-wrap"><table><thead><tr><th>Risk factor</th><th>Body / disease indication</th><th>Why active</th><th>Dasha/transit window</th></tr></thead><tbody>' + risks.map(function (r) {
+      return "<tr><td><strong>" + escapeHtml(r.factor) + "</strong></td><td>" + escapeHtml(r.body) + "</td><td>" + escapeHtml(r.why) + "</td><td>" + escapeHtml(r.window) + "</td></tr>";
+    }).join("") + "</tbody></table></div><p class=\"fine-print\">Traditional risk indications only; this is not medical diagnosis or emergency guidance.</p></section>";
+  }
+
+  function marriageCompatibilitySection() {
+    return '<section class="section"><div class="section-head"><div><p class="eyebrow">Marriage Compatibility</p><h3>Partner Chart Matching</h3></div><span class="small-pill">C.4.4</span></div><div class="panel-box"><p>No partner chart is supplied in the current form, so 36-guna matching, the 5 additional kutas, and the 13 observation rules are not computed in this pass.</p><p class="fine-print">When partner birth data fields are added, this section should compute Varna, Vashya, Tara, Yoni, Graha Maitri, Gana, Bhakoot, Nadi, the additional kutas, and the C.4.4 observation rules.</p></div></section>';
+  }
+
+  function careerProfileSection(chart, input) {
+    var determinants = professionDeterminants(chart);
+    var primary = determinants[0].planet;
+    var profTiming = timingAnalysis(chart, buildChart(input.asOfInstant, chart.latitude, chart.longitude, chart.timezone, { ayanamshaKey: chart.ayanamshaKey }), EVENT_CONFIGS.profession, "profession", input);
+    var windows = profTiming.candidates.slice(0, 3).map(function (c) { return c.md + "/" + c.ad + " " + dashaDate(c.start, input.timezone) + " to " + dashaDate(c.end, input.timezone); }).join("; ") || "No strong profession window in selected horizon";
+    return '<section class="section"><div class="section-head"><div><p class="eyebrow">Career Profile</p><h3>Strongest-Of-Four Profession Planet</h3></div><span class="small-pill">Part IV.23</span></div><div class="report-grid"><div class="panel-box"><h3>Primary profession planet</h3><p><strong>' + escapeHtml(primary.name) + '</strong> is strongest among the profession determinants. Suggested fields: ' + escapeHtml((PROFESSION_KEYWORDS[primary.name] || ["mixed/advisory roles"]).join(", ")) + '.</p></div><div class="panel-box"><h3>Rise windows</h3><p>' + escapeHtml(windows) + "</p></div></div></section>";
+  }
+
+  function deathAnalysisSection(chart, input) {
+    var longevity = longevityVerdict(longevityRules(chart));
+    var markesh = dedupe([lordOfHouse(chart, 2), lordOfHouse(chart, 7)].concat(chart.planets.filter(function (p) { return p.house === 2 || p.house === 7; }).map(prop("name"))));
+    var chhidra = chhidraGrahas(chart);
+    var d22 = twentySecondDrekkana(chart);
+    return '<section class="section"><div class="section-head"><div><p class="eyebrow">Death Analysis</p><h3>Longevity Class And Maraka Factors</h3></div><span class="small-pill">Part IV.19 + VII.8</span></div><div class="report-grid three">' +
+      metricBox("Lifespan class", [["Class", longevity], ["Method", "Jaimini-Mantreswara-Parashari triangulation"], ["Safety", "No exact death-date claim"]]) +
+      metricBox("Maraka and chhidra", [["Markesh planets", markesh.join(", ")], ["Chhidragrahas", chhidra.join(", ")], ["22nd drekkana", d22.sign + " / " + d22.lord + " - " + d22.cause]]) +
+      metricBox("Transit formulas monitored", [["Formula set", "8 classical transit checks"], ["Activation", "Only when matching dasha supports"], ["Current pass", dashaMarkeshWindows(chart, input, markesh)]]) +
+      "</div><p class=\"fine-print\">Traditional longevity analysis is shown for textual completeness only. It must not be read as a guaranteed event or exact death timing.</p></section>";
+  }
+
+  function periodSummarySection(chart, input) {
+    var end = addDays(input.asOfInstant, 10 * 365.25);
+    var rows = chart.vimshottari.timeline.filter(function (md) { return periodOverlaps(md, input.birthInstant, end); }).map(function (md) {
+      var lord = chart.planetsByName[md.lord];
+      var themes = periodThemes(chart, lord);
+      var events = standardPredictionEvents().filter(function (item) { return eventActivators(chart, item.cfg, item.key).indexOf(md.lord) >= 0; }).slice(0, 4).map(prop("label")).join(", ") || "General life themes";
+      var special = subPeriods(md, "AD").filter(function (ad) { return ad.start < end && ad.end > input.birthInstant && eventActivators(chart, EVENT_CONFIGS.profession, "profession").indexOf(ad.lord) >= 0; }).slice(0, 2).map(function (ad) { return md.lord + "/" + ad.lord + " " + dashaDate(ad.start, input.timezone); }).join("; ") || "-";
+      return "<tr><td><strong>" + md.lord + " MD</strong><br>" + dashaDate(md.start, input.timezone) + " to " + dashaDate(md.end, input.timezone) + "</td><td>" + escapeHtml(themes.good) + "</td><td>" + escapeHtml(themes.bad) + "</td><td>" + escapeHtml(events) + "</td><td>" + escapeHtml(special) + "</td></tr>";
+    }).join("");
+    return '<section class="section"><div class="section-head"><div><p class="eyebrow">Period-By-Period Summary</p><h3>Vimshottari MD Themes</h3></div><span class="small-pill">Dasha synthesis</span></div><div class="table-wrap"><table><thead><tr><th>Period</th><th>Dominant good themes</th><th>Dominant cautions</th><th>Likely events</th><th>Special sub-periods</th></tr></thead><tbody>' + rows + "</tbody></table></div></section>";
+  }
+
+  function dispositorChain(chart, planetName) {
+    var chain = [];
+    var current = chart.planetsByName[planetName];
+    var seen = {};
+    while (current && !seen[current.name] && chain.length < 10) {
+      chain.push(current.name);
+      seen[current.name] = true;
+      var nextName = SIGNS[current.sign].lord;
+      if (nextName === current.name) break;
+      current = chart.planetsByName[nextName];
+    }
+    return chain.length ? chain : [planetName];
+  }
+
+  function yogaWindow(chart, input, yoga) {
+    var text = yoga.name + " " + yoga.effect;
+    var names = PLANETS.filter(function (name) { return text.indexOf(name) >= 0; });
+    if (!names.length) names = [lordOfHouse(chart, 1), lordOfHouse(chart, 9), lordOfHouse(chart, 10)];
+    var end = addDays(input.asOfInstant, 10 * 365.25);
+    var windows = [];
+    chart.vimshottari.timeline.forEach(function (md) {
+      if (!periodOverlaps(md, input.asOfInstant, end)) return;
+      subPeriods(md, "AD").forEach(function (ad) {
+        if (periodOverlaps(ad, input.asOfInstant, end) && (names.indexOf(md.lord) >= 0 || names.indexOf(ad.lord) >= 0)) {
+          windows.push(md.lord + "/" + ad.lord + " " + dashaDate(ad.start, input.timezone) + " to " + dashaDate(ad.end, input.timezone));
+        }
+      });
+    });
+    return windows.slice(0, 2).join("; ") || names.join("/") + " periods";
+  }
+
+  function standardPredictionEvents() {
+    return [
+      { key: "longevity", label: "Longevity", cfg: EVENT_CONFIGS.longevity, refs: "C.1" },
+      { key: "marriage", label: "Marriage", cfg: EVENT_CONFIGS.marriage, refs: "C.2-C.4" },
+      { key: "children", label: "Children", cfg: EVENT_CONFIGS.children, refs: "C.5" },
+      { key: "profession", label: "Profession", cfg: EVENT_CONFIGS.profession, refs: "C.8" },
+      { key: "health", label: "Health", cfg: EVENT_CONFIGS.health, refs: "C.9" },
+      { key: "wealth", label: "Wealth", cfg: EVENT_CONFIGS.wealth, refs: "D.1" },
+      { key: "education", label: "Education", cfg: EVENT_CONFIGS.education, refs: "D-24 / education rules" },
+      { key: "foreign", label: "Foreign travel/residence", cfg: EVENT_CONFIGS.foreign, refs: "C.10" },
+      { key: "spirituality", label: "Spirituality", cfg: eventCfg("Spirituality", [5, 9, 12], [9, 12], ["Jupiter", "Ketu", "Sun"], 20, ["Jupiter", "Ketu"]), refs: "Part C spiritual indicators" },
+      { key: "vehicles", label: "Vehicles", cfg: eventCfg("Vehicles", [4, 11, 12], [4], ["Venus", "Moon", "Mars"], 16, ["Venus", "Moon"]), refs: "C.11 / D.2" },
+      { key: "property", label: "Property", cfg: EVENT_CONFIGS.property, refs: "C.11 / D.2" },
+      { key: "fame", label: "Fame", cfg: eventCfg("Fame", [1, 5, 9, 10, 11], [10, 11], ["Sun", "Jupiter", "Moon"], 10, ["Sun", "Jupiter"]), refs: "Part B Raja yoga + 10/11" },
+      { key: "litigation", label: "Litigation", cfg: eventCfg("Litigation", [6, 7, 8, 12], [6], ["Mars", "Saturn", "Rahu"], 6, ["Mars", "Saturn", "Rahu"]), refs: "6th house dispute rules", risk: true },
+      { key: "accidentRisk", label: "Accident risk", cfg: eventCfg("Accident risk", [1, 6, 8, 12], [8], ["Mars", "Saturn", "Rahu", "Ketu"], 8, ["Mars", "Saturn", "Rahu"]), refs: "C.9 accident indicators", risk: true }
+    ];
+  }
+
+  function eventCfg(label, houses, primaryHouses, karakas, dchart, timingKarakas) {
+    return { label: label, houses: houses, primaryHouses: primaryHouses, karakas: karakas, dchart: dchart, timingKarakas: timingKarakas };
+  }
+
+  function riskOutcome(promise, rules) {
+    var adverse = rules.filter(function (r) { return r.present && r.kind === "negative"; }).length;
+    if (adverse >= 3 || promise.score >= 62) return { label: "Elevated risk during activating periods" };
+    if (adverse >= 1 || promise.score >= 48) return { label: "Conditional / manageable risk" };
+    return { label: "Low active risk in implemented checks" };
+  }
+
+  function diseaseRiskRows(chart, input) {
+    var riskMap = {
+      Sun: "heart, eyes, vitality, fever/inflammation",
+      Moon: "fluids, chest, mind, sleep, digestion",
+      Mars: "blood, injury, burns, surgery, inflammatory disease",
+      Mercury: "skin, nerves, speech, respiratory sensitivity",
+      Jupiter: "liver, fat, growth, metabolic excess",
+      Venus: "kidney, reproductive, sugar/urinary balance",
+      Saturn: "bones, chronic disease, nerves, obstruction",
+      Rahu: "toxins, unusual diagnosis, anxiety, sudden spikes",
+      Ketu: "hidden pain, cuts, infections, mysterious symptoms"
+    };
+    var candidates = chart.planets.filter(function (p) { return p.afflictions.length || [6, 8, 12].indexOf(p.house) >= 0; })
+      .sort(function (a, b) { return b.afflictions.length - a.afflictions.length || a.strength.score - b.strength.score; })
+      .slice(0, 6);
+    if (!candidates.length) candidates = [chart.planetsByName.Mars, chart.planetsByName.Saturn, chart.planetsByName.Rahu];
+    return candidates.map(function (p) {
+      return {
+        factor: p.name + " in H" + p.house,
+        body: riskMap[p.name] || "general sensitivity",
+        why: (p.afflictions.slice(0, 2).join("; ") || "Dusthana/karaka activation watch") + " [C.9]",
+        window: planetActivationWindow(chart, input, p.name)
+      };
+    });
+  }
+
+  function planetActivationWindow(chart, input, planetName) {
+    var end = addDays(input.asOfInstant, 10 * 365.25);
+    var found = [];
+    chart.vimshottari.timeline.forEach(function (md) {
+      if (!periodOverlaps(md, input.asOfInstant, end)) return;
+      if (md.lord === planetName) found.push(md.lord + " MD " + dashaDate(md.start, input.timezone));
+      subPeriods(md, "AD").forEach(function (ad) {
+        if (ad.lord === planetName && periodOverlaps(ad, input.asOfInstant, end)) found.push(md.lord + "/" + ad.lord + " " + dashaDate(ad.start, input.timezone));
+      });
+    });
+    return found.slice(0, 2).join("; ") || planetName + " transit/dasha activation";
+  }
+
+  function chhidraGrahas(chart) {
+    var names = [lordOfHouse(chart, 8), lordOfHouse(chartWithBase(chart, chart.planetsByName.Moon.sign), 8), twentySecondDrekkana(chart).lord];
+    return dedupe(names.concat(chart.planets.filter(function (p) { return p.house === 8 || p.house === 12; }).map(prop("name")))).slice(0, 6);
+  }
+
+  function twentySecondDrekkana(chart) {
+    var ascDrekkana = Math.floor(chart.ascendant.deg / 10);
+    var absolute = chart.ascendant.sign * 3 + ascDrekkana + 21;
+    var sign = normalizeSign(Math.floor(absolute / 3));
+    var lord = SIGNS[sign].lord;
+    var causeMap = {
+      Sun: "heat, fever, bile, authority/fire themes",
+      Moon: "water, fluids, mental or chest themes",
+      Mars: "injury, blood, weapons, burns",
+      Mercury: "nerves, skin, respiratory or mixed causes",
+      Jupiter: "swelling, liver, excess, growth",
+      Venus: "urinary/reproductive or sugar-fluid themes",
+      Saturn: "chronicity, fall, obstruction, bones"
+    };
+    return { sign: SIGNS[sign].name, lord: lord, cause: causeMap[lord] || "nodal/hidden cause" };
+  }
+
+  function dashaMarkeshWindows(chart, input, markesh) {
+    var end = addDays(input.asOfInstant, 10 * 365.25);
+    var windows = [];
+    chart.vimshottari.timeline.forEach(function (md) {
+      if (!periodOverlaps(md, input.asOfInstant, end)) return;
+      subPeriods(md, "AD").forEach(function (ad) {
+        if ((markesh.indexOf(md.lord) >= 0 || markesh.indexOf(ad.lord) >= 0) && periodOverlaps(ad, input.asOfInstant, end)) {
+          windows.push(md.lord + "/" + ad.lord + " " + dashaDate(ad.start, input.timezone));
+        }
+      });
+    });
+    return windows.slice(0, 3).join("; ") || "No markesh AD in selected horizon";
+  }
+
+  function periodThemes(chart, lord) {
+    if (!lord) return { good: "-", bad: "-" };
+    return {
+      good: lord.strength.positives.slice(0, 3).join("; ") || lord.functionalRole,
+      bad: lord.strength.concerns.slice(0, 3).join("; ") || (lord.afflictions.slice(0, 2).join("; ") || "No major caution")
+    };
+  }
+
+  function chartSummarySection(chart, analysis, input) {
+    var currentStack = analysis.timing.currentStack.map(function (p) { return p.level + " " + p.lord; }).join(" / ");
+    var coreRows = [
+      ["Ascendant", fmtDeg(chart.ascendant.lon)],
+      ["Moon", fmtDeg(chart.planetsByName.Moon.lon) + " / " + chart.planetsByName.Moon.nakshatra + " pada " + chart.planetsByName.Moon.pada],
+      ["Rahu/Ketu", fmtDeg(chart.planetsByName.Rahu.lon) + " / " + fmtDeg(chart.planetsByName.Ketu.lon)]
+    ];
+    if (chart.ascendant.override) coreRows.splice(1, 0, ["D1 Asc override", ascendantOverrideSummary(chart)]);
+    var html = '<section id="viewA-summary" class="section"><div class="section-head"><div><p class="eyebrow">Report Data</p><h3>Chart Summary</h3></div><span class="small-pill">' + escapeHtml(chart.ayanamshaLabel || "Selected ayanamsha") + ' + mean nodes</span></div><div class="report-grid three">';
+    html += metricBox("Birth data", [
+      ["Chart number", input.chartNumber || "-"],
+      ["Birth", formatInTimezone(input.birthInstant, input.timezone)],
+      ["Place", (input.birthPlace ? input.birthPlace + " - " : "") + coordinateText(input.latitude, input.longitude)],
+      ["Ayanamsha", analysisNumber(chart.ayanamsa) + " " + (chart.ayanamshaLabel || "Lahiri") + " approx."]
+    ]);
+    html += metricBox("Core chart", coreRows);
+    html += metricBox("Vimshottari", [
+      ["Birth balance", chart.vimshottari.balanceLord + " " + chart.vimshottari.balanceYears.toFixed(2) + " years"],
+      ["Current", currentStack || "Outside generated timeline"],
+      ["Dasha table range", formatInTimezone(input.birthInstant, input.timezone) + " to " + formatInTimezone(dashaDisplayRangeEnd(chart, input), input.timezone)]
+    ]);
+    html += "</div></section>";
+    return html;
+  }
+
+  function allVargaChartsSection(chart, externalVarga, topicDivision) {
+    var html = '<section id="viewA-vargas" class="section"><div class="section-head"><div><p class="eyebrow">Divisional Charts</p><h3>North Indian Chart Set</h3></div><span class="small-pill">D-1 to D-60</span></div>';
+    html += '<div class="report-grid varga-chart-grid">';
+    [1, 9].concat(vargaDivisions().filter(function (division) { return division !== 1 && division !== 9; })).forEach(function (division) {
+      var varga = tableVarga(chart, division);
+      html += chartBox("D-" + division + " " + vargaName(division), varga.ascendant.sign, varga.planets, { featured: division === 1 || division === 9, division: division, rootChart: chart, showAscDegree: true, ascDegree: varga.ascendant.deg });
+      if (division === 9) {
+        html += bhavaChalitSripatiPanel(chart);
+        html += sudarshanChakraPanel(chart);
+      }
+    });
+    if (externalVarga && externalVarga.division === topicDivision) {
+      html += chartBox((externalVarga.source || "Manual import") + " D-" + topicDivision, externalVarga.ascendant.sign, externalVarga.planets, { division: topicDivision, showAscDegree: Number.isFinite(externalVarga.ascendant.deg), ascDegree: externalVarga.ascendant.deg });
+    }
+    html += "</div>";
+    html += commentaryBox("Divisional Chart Commentary", "This chart data report keeps the computed D-1 and divisional chart placements in a technical dossier, so raw chart facts can be checked clearly.");
+    html += "</section>";
+    return html;
+  }
+
+  function topD1D9ChartsSection(chart) {
+    var d1 = tableVarga(chart, 1);
+    var d9 = tableVarga(chart, 9);
+    return '<section id="viewA-d1-d9-top" class="section top-chart-section"><div class="section-head"><div><p class="eyebrow">Primary Charts</p><h3>D-1 And D-9 Quick Reference</h3></div><span class="small-pill">Top reference</span></div>' +
+      '<div class="report-grid top-chart-grid">' +
+      chartBox("D-1 Rashi", d1.ascendant.sign, d1.planets, { featured: true, division: 1, rootChart: chart, showAscDegree: true, ascDegree: d1.ascendant.deg }) +
+      chartBox("D-9 Navamsha", d9.ascendant.sign, d9.planets, { featured: true, division: 9, rootChart: chart, showAscDegree: true, ascDegree: d9.ascendant.deg }) +
+      '</div></section>';
+  }
+
+  function bhavaChalitSripatiPanel(chart) {
+    var shifted = bhavaChalitSripatiPlanets(chart);
+    var moved = shifted.filter(function (p) { return p.house !== p.rashiHouse; });
+    return '<div class="bhava-chalit-panel"><div class="section-head compact-section-head"><div><p class="eyebrow">Bhava Chalit</p><h3>Bhava Chalit (Sripati)</h3></div><span class="small-pill">Before Sudarshan</span></div><div class="report-grid two bhava-chalit-grid">' +
+      chartBox("Bhava Chalit (Sripati)", chart.ascendant.sign, shifted, { division: 1, rootChart: chart, showAscDegree: true, ascDegree: chart.ascendant.deg }) +
+      '<div class="panel-box"><h3>Sripati House Shift Notes</h3><div class="table-wrap compact-table"><table><thead><tr><th>Planet</th><th>Rashi house</th><th>Chalit bhava</th><th>Reading use</th></tr></thead><tbody>' +
+      shifted.map(function (p) {
+        var changed = p.house !== p.rashiHouse;
+        return '<tr' + (changed ? ' class="current-row"' : "") + '><td><strong class="' + planetCssClass(p.name) + '">' + escapeHtml(planetShort(p.name)) + '</strong></td><td>' + escapeHtml(String(p.rashiHouse)) + '</td><td>' + escapeHtml(String(p.house)) + '</td><td>' + escapeHtml(changed ? "Judge house result from chalit bhava; keep sign dignity from Rashi." : "Same as Rashi placement for house result.") + '</td></tr>';
+      }).join("") +
+      '</tbody></table></div><p class="fine-print">' + (moved.length ? moved.length + " planet(s) shift bhava in this chart." : "No planets shift bhava by this Chalit reference.") + ' Chalit is used for bhava result refinement; sign, dignity, nakshatra and varga judgement still come from the natal Rashi and divisional charts.</p></div></div></div>';
+  }
+
+  function bhavaChalitSripatiPlanets(chart) {
+    return chart.planets.map(function (p) {
+      var copy = Object.assign({}, p);
+      copy.rashiHouse = p.house;
+      copy.house = sripatiBhavaHouse(chart.ascendant.lon, p.lon);
+      return copy;
+    });
+  }
+
+  function sripatiBhavaHouse(ascLon, planetLon) {
+    var firstBhavaStart = normalize(ascLon - 15);
+    return Math.floor(normalize(planetLon - firstBhavaStart) / 30) + 1;
+  }
+
+  function sudarshanChakraPanel(chart) {
+    var moon = chart.planetsByName.Moon;
+    var sun = chart.planetsByName.Sun;
+    return '<div class="sudarshan-panel"><div class="section-head compact-section-head"><div><p class="eyebrow">Sudarshan Chakra</p><h3>Lagna, Chandra And Surya Reference</h3></div><span class="small-pill">After D-9</span></div><div class="report-grid three sudarshan-grid">' +
+      chartBox("Sudarshan Lagna", chart.ascendant.sign, chart.planets, { division: 1, rootChart: chart, showAscDegree: true, ascDegree: chart.ascendant.deg }) +
+      chartBox("Sudarshan Chandra", moon.sign, transitPlanetsForAsc(chart.planets, moon.sign), { division: 1, rootChart: chart }) +
+      chartBox("Sudarshan Surya", sun.sign, transitPlanetsForAsc(chart.planets, sun.sign), { division: 1, rootChart: chart }) +
+      '</div><p class="fine-print">Sudarshan view repeats the same D-1 planets from Lagna, Moon and Sun so concrete houses, mental experience and authority/status indications can be compared together.</p></div>';
+  }
+
+  function caveatsSection(analysis) {
+    var html = '<section class="section"><div class="section-head"><div><p class="eyebrow">Caveats</p><h3>Self-Check</h3></div></div>';
+    html += '<div class="note-list">' + METHODOLOGY_LIMITS.map(function (note) { return '<div class="rule-row warning"><strong>Coverage note</strong><br>' + escapeHtml(note) + "</div>"; }).join("") + "</div>";
+    html += commentaryBox("Self-Check Commentary", selfCheckCommentary(analysis));
+    html += '<p class="fine-print">This is a traditional astrology workbench for interpretive use. Health and longevity sections are not medical, legal, or safety advice. Production use should add a high-precision ephemeris, verified source tables, and human review.</p>';
+    html += "</section>";
+    return html;
+  }
+
+  function interpretationWorkflowShell() {
+    return '<section class="section ai-report"><div class="section-head"><div><p class="eyebrow">Interpretation Workflow</p><h3>Use With ChatGPT Plus</h3></div><span class="small-pill">No API credits needed</span></div><div class="report-grid"><div class="panel-box"><h3>1. Send Computed Facts To ChatGPT</h3><p class="muted">The app has computed the chart, vargas, rules, dasha and timing. Use this prompt in your normal ChatGPT Plus chat for the interpretative brain.</p><div class="actions"><button type="button" id="copyChatGptPromptBtn">Generate ChatGPT Prompt</button><button type="button" id="openChatGptBtn">Open ChatGPT</button></div><label class="prompt-label">Prompt package<textarea id="chatGptPromptBox" class="prompt-box" rows="8" readonly></textarea></label></div><div class="panel-box"><h3>2. Bring ChatGPT Answer Back</h3><p class="muted">Paste ChatGPTâ€™s interpretation here to keep the client report in one place.</p><label class="prompt-label">ChatGPT interpretation<textarea id="chatGptResponseBox" class="prompt-box" rows="8"></textarea></label><div class="actions"><button type="button" id="useChatGptResponseBtn">Use pasted interpretation</button><button type="button" id="aiRetryBtn">Optional API generate</button></div></div></div><div id="externalInterpretationBody" class="ai-body"><div class="step-commentary"><strong>ChatGPT Plus workflow ready</strong><p>Copy the prompt, paste it into ChatGPT Plus, then paste the response back here. This combines this appâ€™s computation with ChatGPTâ€™s interpretation without API billing.</p></div></div><div id="aiInterpretationBody" class="ai-body hidden"></div></section>';
+  }
+
+  function wireInterpretationWorkflow(chart, topicVarga, analysis, input, externalVarga) {
+    lastChatGptPrompt = buildChatGptPrompt(chart, topicVarga, analysis, input, externalVarga);
+    var promptBox = document.getElementById("chatGptPromptBox");
+    var copyPrompt = document.getElementById("copyChatGptPromptBtn");
+    var openChatGpt = document.getElementById("openChatGptBtn");
+    var useResponse = document.getElementById("useChatGptResponseBtn");
+    var apiGenerate = document.getElementById("aiRetryBtn");
+    if (promptBox) promptBox.value = lastChatGptPrompt;
+    if (copyPrompt) {
+      copyPrompt.addEventListener("click", function () {
+        copyText(lastChatGptPrompt);
+        copyPrompt.textContent = "Prompt copied";
+        setTimeout(function () { copyPrompt.textContent = "Generate ChatGPT Prompt"; }, 1500);
+      });
+    }
+    if (openChatGpt) {
+      openChatGpt.addEventListener("click", function () {
+        window.open("https://chatgpt.com/", "_blank", "noopener");
+      });
+    }
+    if (useResponse) {
+      useResponse.addEventListener("click", function () {
+        var responseBox = document.getElementById("chatGptResponseBox");
+        var output = document.getElementById("externalInterpretationBody");
+        var text = responseBox ? responseBox.value.trim() : "";
+        if (!output) return;
+        if (!text) {
+          output.innerHTML = '<div class="rule-row warning"><strong>No interpretation pasted</strong><br>Paste ChatGPTâ€™s answer first, then click Use pasted interpretation.</div>';
+          return;
+        }
+        output.innerHTML = '<div class="ai-markdown">' + markdownToHtml(text) + "</div>";
+        lastPlainReports.chartData += "\n\nChatGPT Interpretation:\n" + text;
+        lastPlainReport = lastPlainReports.chartData;
+      });
+    }
+    if (apiGenerate) {
+      apiGenerate.addEventListener("click", function () {
+        requestAiInterpretation(chart, topicVarga, analysis, input, externalVarga);
+      });
+    }
+  }
+
+  async function requestAiInterpretation(chart, topicVarga, analysis, input, externalVarga) {
+    var body = document.getElementById("aiInterpretationBody");
+    if (!body) return;
+    body.classList.remove("hidden");
+    if (!serverApisAvailable()) {
+      body.innerHTML = '<div class="rule-row warning"><strong>Server API unavailable</strong><br>Standalone iPhone/PWA mode keeps the chart engine local. Use the ChatGPT Plus copy/paste workflow for interpretation, or run <code>node dev-server.js</code> on a trusted machine for the optional API endpoint.</div>';
+      return;
+    }
+    body.innerHTML = '<div class="step-commentary"><strong>Writing interpretation</strong><p>Sending computed chart facts, rule hits, cross-checks and timing windows to the local AI endpoint.</p></div>';
+    try {
+      var response = await fetch("/api/interpretation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ summary: buildAiSummary(chart, topicVarga, analysis, input, externalVarga) })
+      });
+      var data = await response.json();
+      if (!response.ok) throw new Error(data.error || "AI interpretation failed.");
+      body.innerHTML = '<div class="ai-markdown">' + markdownToHtml(data.interpretation || "No interpretation returned.") + "</div>";
+    } catch (error) {
+      var message = error.message || "The local AI interpretation call failed.";
+      if (/quota|billing/i.test(message)) {
+        body.innerHTML = '<div class="rule-row warning"><strong>Action needed: OpenAI quota or billing is not active</strong><br>' + escapeHtml(message) + '<br><span class="fine-print">Enable billing/quota for the connected OpenAI Platform project, then click Regenerate. The deterministic report above is still available.</span></div>';
+      } else {
+        body.innerHTML = '<div class="rule-row warning"><strong>AI interpretation unavailable</strong><br>' + escapeHtml(message) + '<br><span class="fine-print">The deterministic report above is still available. Restart the server after code changes and confirm .env.local contains OPENAI_API_KEY.</span></div>';
+      }
+    }
+  }
+
+  function buildChatGptPrompt(chart, topicVarga, analysis, input, externalVarga) {
+    return [
+      "You are a senior Vedic astrologer writing a professional client report.",
+      "",
+      "Task:",
+      "Use the computed chart facts below to answer the client's exact question through the JKHNH phaladesh methodology. Do not recalculate the chart unless you find a clear contradiction. Interpret the promise, obstructions, divisional confirmation, dasha/transit timing and final conclusion.",
+      "",
+      "Important rules:",
+      "- Use the selected " + (chart.ayanamshaLabel || "Lahiri") + " sidereal context, mean Rahu/Ketu and Vimshottari as supplied.",
+      "- Follow the cadence: foundational profile, Bhava-Bhavesh-Karaka strength, Lagna plus Chandra reference, relevant varga refinement, yoga inventory, topic rules, dasha timing and final integration.",
+      "- D-1 gives the main trajectory; the relevant divisional chart refines the domain and must not invent a result absent in D-1.",
+      "- After each methodological step, state what is being construed for the asked question.",
+      "- Do not invent missing source-table checks.",
+      externalVarga ? "- Treat the manually imported divisional chart as authoritative for this topic only." : "- Use the computed divisional chart.",
+      "- If the evidence is mixed, give a conditional judgement rather than a forced yes/no.",
+      "- Keep the report pointwise, practical and suitable for a paying astrology client.",
+      "- Avoid medical/legal/death-date guarantees.",
+      "",
+      "Required output headings:",
+      "1. Direct Answer",
+      "2. Foundational Profile",
+      "3. Three-Pillar Topic Reading",
+      "4. Divisional Chart Confirmation",
+      "5. Yoga And House Support",
+      "6. Supporting Factors",
+      "7. Obstructions / Delay",
+      "8. Timing Windows",
+      "9. Final Conclusion",
+      "10. Caveats",
+      "",
+      "Computed facts:",
+      JSON.stringify(buildAiSummary(chart, topicVarga, analysis, input, externalVarga), null, 2)
+    ].join("\n");
+  }
+
+  function buildAiSummary(chart, topicVarga, analysis, input, externalVarga) {
+    return {
+      native: {
+        name: input.name,
+        chartNumber: input.chartNumber || "",
+        genderContext: input.gender,
+        question: input.question,
+        topic: analysis.cfg.label,
+        birth: formatInTimezone(input.birthInstant, input.timezone),
+        asOf: formatInTimezone(input.asOfInstant, input.timezone),
+        place: { city: input.birthPlace || "", coordinates: coordinateText(input.latitude, input.longitude), latitude: input.latitude, longitude: input.longitude },
+        ayanamsha: (chart.ayanamshaLabel || "Lahiri") + " approximation",
+        nodes: "Mean Rahu and Ketu",
+        dashaYear: "365.25 days"
+      },
+      deterministicJudgement: analysis.verdict,
+      chart: {
+        ascendant: fmtDeg(chart.ascendant.lon),
+        moon: fmtDeg(chart.planetsByName.Moon.lon) + " / " + chart.planetsByName.Moon.nakshatra + " pada " + chart.planetsByName.Moon.pada,
+        topicVarga: "D-" + analysis.cfg.dchart,
+        topicVargaAscendant: topicVarga.ascendant.signName,
+        topicVargaSource: externalVarga ? "Manual imported override" : "Computed",
+        importedVarga: externalVarga ? externalVarga.planets.map(function (p) {
+          return { planet: p.name, sign: p.signName, house: p.house };
+        }) : null,
+        planets: chart.planets.map(function (p) {
+          return {
+            planet: p.name,
+            longitude: fmtDeg(p.lon),
+            house: p.house,
+            equalHouse: p.equalHouse,
+            nakshatra: p.nakshatra,
+            pada: p.pada,
+            navamsa: p.navamsaSignName,
+            nature: p.naturalNature,
+            functionalRole: p.functionalRole,
+            dignity: p.dignity,
+            strength: p.strength.score + " " + p.strength.label,
+            afflictions: p.afflictions
+          };
+        })
+      },
+      relevantHouses: analysis.promise.houses.map(function (h) {
+        return {
+          house: h.house,
+          sign: h.signName,
+          lord: h.lord,
+          score: h.score,
+          verdict: h.label,
+          tenants: h.tenants.map(prop("name")),
+          aspects: h.aspecting.map(prop("name")),
+          positives: h.positives,
+          concerns: h.concerns
+        };
+      }),
+      promise: {
+        score: analysis.promise.score,
+        label: analysis.promise.label,
+        sambandhas: analysis.promise.sambandhas,
+        lords: analysis.promise.lords.map(function (p) { return p.name + " " + p.strength.score + " " + p.strength.label; }),
+        karakas: analysis.promise.karakas.map(function (p) { return p.name + " " + p.strength.score + " " + p.strength.label; })
+      },
+      crossChecks: analysis.cross,
+      activeYogas: analysis.yogas,
+      presentSupportiveRules: analysis.rules.filter(function (r) { return r.present && r.kind === "positive"; }).map(ruleSummary),
+      presentAdverseRules: analysis.rules.filter(function (r) { return r.present && r.kind === "negative"; }).map(ruleSummary),
+      sourceTableWarnings: analysis.rules.filter(function (r) { return r.kind === "warning"; }).map(ruleSummary),
+      timing: {
+        currentStack: analysis.timing.currentStack.map(function (p) {
+          return p.level + " " + p.lord + " from " + formatInTimezone(p.start, input.timezone) + " to " + formatInTimezone(p.end, input.timezone);
+        }),
+        activators: analysis.timing.activators,
+        candidateWindows: analysis.timing.candidates.slice(0, 6).map(function (c) {
+          return {
+            period: c.md + " MD / " + c.ad + " AD",
+            start: formatInTimezone(c.start, input.timezone),
+            end: formatInTimezone(c.end, input.timezone),
+            score: Math.round(c.score),
+            note: c.note
+          };
+        }),
+        currentTransitsFromMoon: analysis.timing.currentTransits
+      },
+      requiredOutputStyle: "Give a nuanced, pointwise, professional Vedic astrology interpretation. Explain what is promised, what is obstructed, what is conditional, and the best timing windows."
+    };
+  }
+
+  function ruleSummary(ruleItem) {
+    return {
+      id: ruleItem.id,
+      rule: ruleItem.text,
+      evidence: ruleItem.evidence
+    };
+  }
+
+  function markdownToHtml(markdown) {
+    var safe = escapeHtml(markdown || "");
+    safe = safe.replace(/^### (.*)$/gm, "<h4>$1</h4>");
+    safe = safe.replace(/^## (.*)$/gm, "<h3>$1</h3>");
+    safe = safe.replace(/^\- (.*)$/gm, "<li>$1</li>");
+    safe = safe.replace(/(<li>.*<\/li>)(\n<li>)/gs, "$1$2");
+    safe = safe.replace(/((?:<li>.*<\/li>\n?)+)/g, "<ul>$1</ul>");
+    safe = safe.replace(/\n{2,}/g, "</p><p>");
+    safe = safe.replace(/\n/g, "<br>");
+    if (!safe.startsWith("<h3") && !safe.startsWith("<p>")) safe = "<p>" + safe + "</p>";
+    return safe;
+  }
+
+  function mainAnswerBox(chart, topicVarga, analysis, input, externalVarga) {
+    var points = buildMainReportPoints(chart, topicVarga, analysis, input, externalVarga);
+    return '<section class="section main-report"><div class="section-head"><div><p class="eyebrow">Main Report</p><h3>Pointwise Answer To The Question</h3></div><span class="tag ' + verdictClass(analysis.verdict.confidence) + '">' + escapeHtml(analysis.verdict.confidence) + '</span></div><div class="answer-list">' + points.map(function (point, index) {
+      return '<div class="answer-point ' + point.kind + '"><span class="answer-index">' + (index + 1) + '</span><div><strong>' + escapeHtml(point.title) + '</strong><p>' + escapeHtml(point.body) + '</p></div></div>';
+    }).join("") + "</div></section>";
+  }
+
+  function buildMainReportPoints(chart, topicVarga, analysis, input, externalVarga) {
+    var cfg = analysis.cfg;
+    var positives = analysis.rules.filter(function (r) { return r.present && r.kind === "positive"; });
+    var negatives = analysis.rules.filter(function (r) { return r.present && r.kind === "negative"; });
+    var strongCross = analysis.cross.filter(function (c) { return c.score >= 62; }).length;
+    var moderateCross = analysis.cross.filter(function (c) { return c.score >= 48; }).length;
+    var dChartCheck = analysis.cross.find(function (c) { return c.label === "D-" + cfg.dchart; });
+    var topWindow = analysis.timing.candidates[0];
+    var windows = analysis.timing.candidates.slice(0, 3).map(function (c) {
+      return c.md + "/" + c.ad + " from " + formatInTimezone(c.start, input.timezone) + " to " + formatInTimezone(c.end, input.timezone);
+    }).join("; ");
+    var supportive = positives.slice(0, 5).map(function (r) { return r.id + ": " + r.text; }).join(" ");
+    var obstructive = negatives.slice(0, 4).map(function (r) { return r.id + ": " + r.text; }).join(" ");
+    return [
+      {
+        title: "Direct judgement",
+        kind: verdictClass(analysis.verdict.confidence),
+        body: "For the asked " + cfg.label.toLowerCase() + " question, the computed judgement is " + analysis.verdict.label + ". The net score is " + analysis.verdict.net + " with " + analysis.verdict.positiveHits + " supportive hits and " + analysis.verdict.negativeHits + " obstructing hits in the implemented rule set."
+      },
+      {
+        title: "Promise in the natal chart",
+        kind: strengthClass(analysis.promise.score),
+        body: "The event promise is " + analysis.promise.label.toLowerCase() + " at " + analysis.promise.score + "/100. Relevant house scores are: " + analysis.promise.houses.map(function (h) { return h.house + " " + h.signName + " " + h.score + "/" + h.label; }).join("; ") + "."
+      },
+      {
+        title: "Divisional confirmation",
+        kind: dChartCheck && dChartCheck.score >= 48 ? "good" : "mixed",
+        body: "Cross-check agreement is " + strongCross + " strong and " + moderateCross + " at least moderate out of D-1, Chandra lagna, Surya lagna and D-" + cfg.dchart + ". D-" + cfg.dchart + " ascendant is " + topicVarga.ascendant.signName + " (" + (externalVarga ? "manual imported override" : "computed") + ") and the selected D-chart promise is " + (dChartCheck ? dChartCheck.score + "/" + dChartCheck.labelScore : "not available") + "."
+      },
+      {
+        title: "Supporting factors",
+        kind: positives.length ? "good" : "mixed",
+        body: supportive || "No major positive combination fired strongly in the implemented rule set, so the judgement depends mainly on house and lord strength."
+      },
+      {
+        title: "Obstructions or delay factors",
+        kind: negatives.length ? "hard" : "good",
+        body: obstructive || "No major implemented adverse combination fired strongly. Remaining cautions are mainly from strength, affliction, and missing source-table checks."
+      },
+      {
+        title: "Timing",
+        kind: topWindow ? strengthClass(topWindow.score * 2) : "mixed",
+        body: topWindow ? "The strongest sampled timing windows are: " + windows + ". These are selected because Vimshottari activators overlap with supportive Jupiter/Saturn transit checks." : "No strong Vimshottari activation window was found within the selected horizon."
+      }
+    ];
+  }
+
+  function commentaryBox(title, body) {
+    return '<div class="step-commentary"><strong>' + escapeHtml(title) + '</strong><p>' + escapeHtml(body) + "</p></div>";
+  }
+
+  function stepOneCommentary(chart, topicVarga, analysis, externalVarga) {
+    var cfg = analysis.cfg;
+    var d24Note = cfg.dchart === 24 ? " D-24 is calculated using 1d15m divisions counted from Leo for odd signs and Cancer for even signs." : "";
+    return "The chart base is fixed as " + chart.ascendant.signName + " lagna with Moon in " + chart.planetsByName.Moon.signName + " / " + chart.planetsByName.Moon.nakshatra + ". For this question the relevant divisional chart is D-" + cfg.dchart + ", whose ascendant is " + topicVarga.ascendant.signName + (externalVarga ? " from the manual imported override" : " from calculation") + "." + d24Note + " This step constructs the technical ground; the later judgement is reliable only to the extent that D-1 and the relevant varga agree.";
+  }
+
+  function universalCommentary(chart, analysis) {
+    var relevant = dedupeBy(analysis.promise.lords.concat(analysis.promise.karakas), "name").sort(function (a, b) { return b.strength.score - a.strength.score; });
+    var strongest = relevant.slice(0, 3).map(function (p) { return p.name + " " + p.strength.score + "/" + p.strength.label; }).join(", ");
+    var weakest = relevant.slice().reverse().slice(0, 2).map(function (p) { return p.name + " " + p.strength.score + "/" + p.strength.label; }).join(", ");
+    var yogaText = analysis.yogas.length ? "Active yogas include " + analysis.yogas.slice(0, 4).map(prop("name")).join(", ") + "." : "No major implemented yoga dominates the question.";
+    return "The universal scan shows the most useful event significators as " + (strongest || "not clearly dominant") + ". The weaker or more sensitive factors are " + (weakest || "not clearly isolated") + ". " + yogaText + " This means the answer should be read through actual house/lord capacity, not through a single yoga alone.";
+  }
+
+  function eventCommentary(analysis) {
+    var positive = analysis.rules.filter(function (r) { return r.present && r.kind === "positive"; }).length;
+    var negative = analysis.rules.filter(function (r) { return r.present && r.kind === "negative"; }).length;
+    var warning = analysis.rules.filter(function (r) { return r.kind === "warning"; }).length;
+    var sambandha = analysis.promise.sambandhas.length ? " Sambandha found: " + analysis.promise.sambandhas.join(", ") + "." : " No strong implemented lord-karaka sambandha was found.";
+    return "The event-level promise is " + analysis.promise.label.toLowerCase() + " with " + positive + " supportive combinations and " + negative + " adverse combinations firing." + sambandha + " The construed result is therefore " + analysis.verdict.label + "; source-table warnings total " + warning + ", so those items remain marked for manual verification rather than being assumed.";
+  }
+
+  function timingCommentary(analysis, input) {
+    var current = analysis.timing.currentStack.map(function (p) { return p.level + " " + p.lord; }).join(" / ") || "no active stack found";
+    var first = analysis.timing.candidates[0];
+    if (!first) return "Current Vimshottari stack is " + current + ". None of the selected horizon windows crossed the required activation threshold, so timing should be widened or checked manually.";
+    return "Current Vimshottari stack is " + current + ". The strongest window is " + first.md + " MD / " + first.ad + " AD from " + formatInTimezone(first.start, input.timezone) + " to " + formatInTimezone(first.end, input.timezone) + ". This is construed as the best practical timing candidate because dasha activation and sampled transit support both contribute to the score.";
+  }
+
+  function selfCheckCommentary(analysis) {
+    var strong = analysis.cross.filter(function (c) { return c.score >= 62; }).length;
+    var moderate = analysis.cross.filter(function (c) { return c.score >= 48; }).length;
+    var warnings = analysis.rules.filter(function (r) { return r.kind === "warning"; }).length;
+    return "Self-check result: " + strong + " chart references are strong and " + moderate + " are at least moderate. If D-1, Moon and the relevant D-chart disagree, the methodology downgrades confidence; here the displayed confidence is already adjusted by the agreement count and by " + warnings + " source-table warnings.";
+  }
+
+  function metricBox(title, rows) {
+    return '<div class="panel-box"><h3>' + escapeHtml(title) + '</h3>' + rows.map(function (row) {
+      return '<div class="metric-row"><strong>' + escapeHtml(row[0]) + '</strong><span>' + escapeHtml(row[1]) + '</span></div>';
+    }).join("") + "</div>";
+  }
+
+  function chartBox(title, ascSign, planets, options) {
+    options = options || {};
+    var showAscDegree = Boolean(options.showAscDegree && Number.isFinite(Number(options.ascDegree)));
+    var byHouse = {};
+    planets.forEach(function (p) {
+      if (!byHouse[p.house]) byHouse[p.house] = [];
+      byHouse[p.house].push(p);
+    });
+    var labels = "";
+    var hitAreas = "";
+    for (var house = 1; house <= 12; house += 1) {
+      var pos = NORTH_CHART_POSITIONS[house];
+      var sign = normalizeSign(ascSign + house - 1);
+      hitAreas += '<circle class="north-house-hit" cx="' + pos.x + '" cy="' + pos.y + '" r="48" data-house="' + house + '" data-sign="' + sign + '" data-asc-sign="' + normalizeSign(ascSign) + '"></circle>';
+      // Show planetary degrees on every D-1 chart (Birth Chart, Gochara/Transit,
+       // Bhava Chalit, Sudarshan, Varshfal D-1). Higher divisions stay un-cluttered.
+       var showPlanetDegrees = (Number(options.division) === 1) || /^D-1\b/.test(title);
+       var planetLines = chartHousePlanetLines(byHouse[house] || [], showPlanetDegrees, house === 1 ? 4 : 5, options);
+      var totalLines = 1 + (house === 1 ? 1 : 0) + planetLines.length;
+      var lineGap = options.featured ? 15 : 14;
+      var startY = -((totalLines - 1) * lineGap) / 2;
+      var nextLine = 0;
+      labels += '<g class="north-house-label" data-house="' + house + '" data-sign="' + sign + '" data-asc-sign="' + normalizeSign(ascSign) + '" transform="translate(' + pos.x + " " + pos.y + ')">';
+      labels += '<text class="north-sign" text-anchor="middle" dominant-baseline="middle" y="' + (startY + nextLine * lineGap) + '"><tspan>' + (sign + 1) + "</tspan></text>";
+      nextLine += 1;
+      if (house === 1) {
+        var ascText = "As" + (showAscDegree ? " " + degreeMinuteLabel(Number(options.ascDegree)) : "");
+        labels += '<text class="north-planets planet-asc" y="' + (startY + nextLine * lineGap) + '" text-anchor="middle" dominant-baseline="middle">' + escapeHtml(ascText) + "</text>";
+        nextLine += 1;
+      }
+      planetLines.forEach(function (line, index) {
+        var fit = line.text.length > 9 ? ' textLength="94" lengthAdjust="spacingAndGlyphs"' : "";
+        labels += '<text class="north-planets ' + planetCssClass(line.name) + '" y="' + (startY + nextLine * lineGap) + '" text-anchor="middle" dominant-baseline="middle"' + fit + ">" + escapeHtml(line.text) + "</text>";
+        nextLine += 1;
+      });
+      labels += "</g>";
+    }
+    var planetSnapshot = planets.map(function (p) {
+      return { name: p.name, sign: Number(p.sign), house: Number(p.house), deg: Number(p.deg || 0), lon: Number(p.lon || 0), retrograde: Boolean(p.retrograde), combust: Boolean(p.combust) };
+    });
+    return '<div class="panel-box chart-panel' + (options.featured ? " chart-panel-featured" : "") + '"><div class="chart-title-strip">' + escapeHtml(title) + '</div><div class="chart-meta chart-meta-compact"><span class="small-pill">North Indian - Asc ' + (normalizeSign(ascSign) + 1) + '</span></div><svg class="north-chart" viewBox="0 0 400 400" role="img" aria-label="' + escapeHtml(title) + ' North Indian chart" data-chart-title="' + escapeHtml(title) + '" data-asc-sign="' + normalizeSign(ascSign) + '" data-chart-planets="' + escapeHtml(JSON.stringify(planetSnapshot)) + '"><rect class="north-paper" x="1" y="1" width="398" height="398"></rect><path d="M200 1 L399 200 L200 399 L1 200 Z"></path><path d="M1 1 L200 200 L1 399"></path><path d="M399 1 L200 200 L399 399"></path><path d="M1 1 L399 399"></path><path d="M399 1 L1 399"></path>' + hitAreas + labels + "</svg>" + (options.footerHtml || "") + "</div>";
+  }
+
+  function chartHousePlanetLines(planets, showDegrees, limit, options) {
+    var list = planets.slice(0, limit).map(function (planet) {
+      return { name: planet.name, text: chartPlanetLabel(planet, showDegrees, options) };
+    });
+    if (planets.length > limit) list.push({ name: "", text: "+" + (planets.length - limit) + " more" });
+    return list;
+  }
+
+  function chartPlanetLabel(planet, showDegrees, options) {
+    var markers = [];
+    if (planet.combust) markers.push("C");
+    if (isVargottamaInRenderedChart(planet, options)) markers.push("V");
+    return planetShort(planet.name) + (planet.retrograde ? "R" : "") + (showDegrees && Number.isFinite(planet.deg) ? " " + degreeMinuteLabel(planet.deg) : "") + (markers.length ? " " + markers.map(function (marker) { return "(" + marker + ")"; }).join(" ") : "");
+  }
+
+  function isVargottamaInRenderedChart(planet, options) {
+    if (!options || !options.rootChart || !planet || !planet.name) return false;
+    if (options.division === 1) return isD9Vargottama(options.rootChart, planet.name);
+    if (options.division && options.division > 1) {
+      var d1 = options.rootChart.planetsByName[planet.name];
+      return options.division === 9 && !!d1 && planet.sign === d1.sign;
+    }
+    return !!planet.vargottama;
+  }
+
+  function isD9Vargottama(chart, planetName) {
+    var d1 = chart && chart.planetsByName ? chart.planetsByName[planetName] : null;
+    if (!d1) return false;
+    return vargaSign(d1.lon, 9) === d1.sign;
+  }
+
+  function planetShort(name) {
+    return { Sun: "Su", Moon: "Mo", Mars: "Ma", Mercury: "Me", Jupiter: "Ju", Venus: "Ve", Saturn: "Sa", Rahu: "Ra", Ketu: "Ke", Muntha: "Mu" }[name] || name;
+  }
+
+  function degreeMinuteLabel(value) {
+    var deg = Math.floor(Math.abs(value));
+    var min = Math.round((Math.abs(value) - deg) * 60);
+    if (min === 60) {
+      deg += 1;
+      min = 0;
+    }
+    return pad(deg) + ":" + pad(min);
+  }
+
+  function planetCssClass(name) {
+    return "planet-" + String(name || "").toLowerCase();
+  }
+
+  function applyImportedVargaToAnalysis(analysis, importedVarga) {
+    if (!analysis || !analysis.cross || !importedVarga) return;
+    var label = "D-" + analysis.cfg.dchart;
+    var score = vargaPromise(importedVarga, analysis.cfg);
+    var replaced = false;
+    analysis.cross = analysis.cross.map(function (item) {
+      if (item.label !== label) return item;
+      replaced = true;
+      return {
+        label: item.label,
+        score: score,
+        labelScore: strengthLabel(score),
+        note: "Relevant divisional chart promise from " + (importedVarga.source || "imported reference") + "."
+      };
+    });
+    if (!replaced) {
+      analysis.cross.push({
+        label: label,
+        score: score,
+        labelScore: strengthLabel(score),
+        note: "Relevant divisional chart promise from " + (importedVarga.source || "imported reference") + "."
+      });
+    }
+    analysis.verdict = synthesizeVerdict(analysis.promise, analysis.rules, analysis.cross, analysis.topicKey);
+  }
+
+  function parseExternalVarga(text, division) {
+    if (!text) return null;
+    var normalized = text.replace(/[;,|]/g, "\n");
+    var chartMatch = normalized.match(/\bD\s*[-]?\s*(\d{1,2})\b/i);
+    if (chartMatch && Number(chartMatch[1]) !== division) return null;
+    var aliases = {
+      as: "Asc", asc: "Asc", lagna: "Asc",
+      su: "Sun", sun: "Sun",
+      mo: "Moon", moon: "Moon",
+      ma: "Mars", mar: "Mars", mars: "Mars",
+      me: "Mercury", mer: "Mercury", mercury: "Mercury",
+      ju: "Jupiter", jup: "Jupiter", jupiter: "Jupiter",
+      ve: "Venus", ven: "Venus", venus: "Venus",
+      sa: "Saturn", sar: "Saturn", sat: "Saturn", saturn: "Saturn",
+      ra: "Rahu", rahu: "Rahu",
+      ke: "Ketu", ketu: "Ketu"
+    };
+    var placements = {};
+    var pattern = /\b(Asc|As|Lagna|Su|Sun|Mo|Moon|MaR?|Mars|Me|Mer(?:cury)?|Ju|Jup(?:iter)?|Ve|Ven(?:us)?|SaR?|Sat(?:urn)?|Ra|Rahu|Ke|Ketu)\b\s*[:=\-]?\s*(Aries|Taurus|Gemini|Cancer|Leo|Virgo|Libra|Scorpio|Sagittarius|Capricorn|Aquarius|Pisces|Ari|Tau|Gem|Can|Leo|Vir|Lib|Sco|Sag|Cap|Aqu|Pis|1[0-2]|[1-9])\b/gi;
+    var match;
+    while ((match = pattern.exec(normalized)) !== null) {
+      var planet = aliases[match[1].toLowerCase()];
+      var sign = parseSignToken(match[2]);
+      if (planet && sign !== null) placements[planet] = sign;
+    }
+    if (placements.Asc === undefined) return null;
+    var ascSign = placements.Asc;
+    var planets = PLANETS.filter(function (name) { return placements[name] !== undefined; }).map(function (name) {
+      var sign = placements[name];
+      return {
+        name: name,
+        sign: sign,
+        signName: SIGNS[sign].name,
+        house: houseFromSign(ascSign, sign),
+        retrograde: false,
+        naturalNature: name === "Jupiter" || name === "Venus" || name === "Mercury" ? "Benefic" : "Mixed",
+        strength: { score: 50, label: "Imported" },
+        dignity: "Imported"
+      };
+    });
+    return {
+      division: division,
+      source: "Manual import",
+      ascendant: { sign: ascSign, signName: SIGNS[ascSign].name },
+      planets: planets,
+      planetsByName: indexBy(planets, "name")
+    };
+  }
+
+  function parseSignToken(token) {
+    var value = String(token).trim().toLowerCase();
+    if (/^\d+$/.test(value)) {
+      var num = Number(value);
+      return num >= 1 && num <= 12 ? num - 1 : null;
+    }
+    var aliases = {
+      ari: 0, aries: 0,
+      tau: 1, taurus: 1,
+      gem: 2, gemini: 2,
+      can: 3, cancer: 3,
+      leo: 4,
+      vir: 5, virgo: 5,
+      lib: 6, libra: 6,
+      sco: 7, scorpio: 7,
+      sag: 8, sagittarius: 8,
+      cap: 9, capricorn: 9,
+      aqu: 10, aquarius: 10,
+      pis: 11, pisces: 11
+    };
+    return aliases[value] !== undefined ? aliases[value] : null;
+  }
+
+  function wrapChartText(text, limit) {
+    if (!text) return [];
+    var words = text.split(/,\s*/);
+    var lines = [];
+    var current = "";
+    words.forEach(function (word) {
+      var next = current ? current + ", " + word : word;
+      if (next.length > limit && current) {
+        lines.push(current);
+        current = word;
+      } else {
+        current = next;
+      }
+    });
+    if (current) lines.push(current);
+    return lines;
+  }
+
+  function planetTable(chart) {
+    var rows = chart.planets.map(function (p) {
+      return "<tr><td><strong>" + p.name + "</strong></td><td>" + fmtDeg(p.lon) + "</td><td>" + p.house + " / " + p.equalHouse + "</td><td>" + p.nakshatra + " " + p.pada + "</td><td>" + p.naturalNature + "<br>" + p.functionalRole + "</td><td>" + p.dignity + "</td><td>" + p.strength.score + " " + p.strength.label + "</td><td>" + (p.afflictions.slice(0, 3).join("; ") || "None") + "</td></tr>";
+    }).join("");
+    return '<div class="table-wrap"><table><thead><tr><th>Planet</th><th>Sidereal longitude</th><th>House / Bhava</th><th>Nakshatra</th><th>Nature</th><th>Dignity</th><th>Strength</th><th>Affliction flags</th></tr></thead><tbody>' + rows + "</tbody></table></div>";
+  }
+
+  function referenceTablesSection(chart) {
+    return '<section id="viewA-references" class="section reference-tables"><div class="section-head"><div><p class="eyebrow">Reference Tables</p><h3>D-1 And Divisional Placements</h3></div><span class="small-pill">Report-ready details</span></div>' +
+      divisionalPlacementTables(chart) +
+      commentaryBox("Reference Table Commentary", "These tables state the raw chart facts used for interpretation: D-1 degree, condition, avastha and nakshatra context first, followed by Shodashvarga sign placements. Combust and retrograde markers remain attached to the natal planet while its divisional sign changes by varga.") +
+      "</section>";
+  }
+
+  function d1DetailsSection(chart) {
+    return '<section id="viewA-d1-details" class="section d1-details-section"><div class="section-head"><div><p class="eyebrow">D-1 Reference</p><h3>Ascendant And Planet Details</h3></div><span class="small-pill">Before vargas</span></div>' +
+      d1DetailedTable(chart) +
+      "</section>";
+  }
+
+  function sarvashtakavargaSection(chart) {
+    var data = samudayaAshtakavargaData(chart);
+    return '<section id="viewA-sav" class="section sav-section"><div class="section-head"><div><p class="eyebrow">Sarvashtakavarga</p><h3>Samudaya Ashtakavarga</h3></div><span class="small-pill">SAV</span></div>' +
+      '<div class="panel-box sav-panel"><div class="chart-title-strip">Samudaya Ashtakavarga</div><div class="table-wrap sav-table-wrap"><table class="sav-table"><thead><tr><th>Sign</th>' +
+      data.houseNumbers.map(function (house) { return "<th>" + house + "</th>"; }).join("") +
+      "<th></th></tr></thead><tbody>" +
+      samudayaRowHtml("Lagna", data.lagna, data.lagnaTotal, "sav-lagna") +
+      CLASSICAL_PLANETS.map(function (name) { return samudayaRowHtml(name, data.rows[name], data.rowTotals[name], "planet-" + name.toLowerCase()); }).join("") +
+      '<tr class="sav-total-row"><td></td>' + data.columnTotals.map(function (total) { return "<td>" + total + "</td>"; }).join("") + "<td>" + data.grandTotal + "</td></tr>" +
+      '</tbody></table></div><p class="fine-print">Rows show Lagna and seven classical graha BAV bindus by natal house. Bottom row is Sarvashtakavarga total.</p></div></section>';
+  }
+
+  function kpSection(chart) {
+    var kp = buildKpChart(chart);
+    var offsetSign = kp.offsetFromLahiri >= 0 ? "+" : "-";
+    return '<section id="viewA-kp" class="section kp-section"><div class="section-head"><div><p class="eyebrow">KP System</p><h3>KP Chart And Significations</h3></div><span class="small-pill">KP 2 Ayanamsa</span></div>' +
+      '<div class="report-grid kp-chart-grid">' +
+      chartBox("KP Chart", kp.ascendant.sign, kp.planets, { showAscDegree: true, ascDegree: kp.ascendant.deg }) +
+      metricBox("KP 2 Reference", [
+        ["Ayanamsa", analysisNumber(kp.ayanamsa)],
+        ["Offset from Lahiri", offsetSign + decimalToDms(Math.abs(kp.offsetFromLahiri))],
+        ["House system", kp.houseSystem],
+        ["Ascendant", kp.ascendant.signName + " " + decimalToDms(kp.ascendant.deg)],
+        ["Asc Star / Sub / Sub-Sub", kp.ascendant.kp.starLord + " / " + kp.ascendant.kp.subLord + " / " + kp.ascendant.kp.subSubLord]
+      ]) +
+      "</div>" +
+      kpPlanetarySignificationTable(kp) +
+      kpCuspSignificationTable(kp) +
+      '<p class="fine-print">This KP section uses KP 2 ayanamsa only here; the main VedNetra natal charts, vargas, dashas and reports continue to use Raman unless explicitly shown in this KP block.</p>' +
+      "</section>";
+  }
+
+  function shadbalaSection(chart) {
+    var rows = shadbalaRows(chart);
+    return '<section id="viewA-shadbala" class="section shadbala-section"><div class="section-head"><div><p class="eyebrow">Balas & Phalas</p><h3>Shadbala</h3></div><span class="small-pill">Six-fold strength</span></div>' +
+      '<div class="table-wrap"><table><thead><tr><th>Planet</th><th>Sthana</th><th>Dig</th><th>Kala</th><th>Cheshta</th><th>Naisargika</th><th>Drik</th><th>Total</th><th>Judgement</th></tr></thead><tbody>' +
+      rows.map(function (row) {
+        return "<tr><td><strong>" + escapeHtml(row.planet) + "</strong></td><td>" + row.sthana + "</td><td>" + row.dig + "</td><td>" + row.kala + "</td><td>" + row.cheshta + "</td><td>" + row.naisargika + "</td><td>" + row.drik + "</td><td><strong>" + row.total + "</strong></td><td>" + escapeHtml(row.judgement) + "</td></tr>";
+      }).join("") +
+      '</tbody></table></div><div class="panel-box shadbala-graph-panel"><h3>Shadbala Score Graph</h3>' +
+      rows.map(function (row) {
+        var percent = Math.round((row.total / 360) * 100);
+        return '<div class="strength-bar-row"><strong>' + escapeHtml(row.planet) + '</strong><div class="strength-track"><span style="width:' + clamp(percent, 0, 100) + '%"></span></div><em>' + row.total + " / 360</em></div>";
+      }).join("") +
+      '</div><p class="fine-print">Classical Shadbala is represented through six computational heads: positional, directional, temporal, motional, natural and aspectual strength. Rahu/Ketu continue to be judged through dispositor, dignity and house logic elsewhere.</p></section>';
+  }
+
+  function shadbalaRows(chart) {
+    return CLASSICAL_PLANETS.map(function (name) {
+      var p = chart.planetsByName[name];
+      var row = shadbalaForPlanet(chart, p);
+      row.planet = name;
+      row.total = Math.round(row.sthana + row.dig + row.kala + row.cheshta + row.naisargika + row.drik);
+      row.judgement = row.total >= 300 ? "Strong" : row.total >= 240 ? "Medium strong" : row.total >= 180 ? "Average" : row.total >= 135 ? "Weak" : "Very weak";
+      return row;
+    });
+  }
+
+  function shadbalaForPlanet(chart, planet) {
+    return {
+      sthana: Math.round(sthanaBala(chart, planet)),
+      dig: Math.round(digBala(planet)),
+      kala: Math.round(kalaBala(chart, planet)),
+      cheshta: Math.round(cheshtaBala(planet)),
+      naisargika: Math.round(naisargikaBala(planet.name)),
+      drik: Math.round(drikBala(chart, planet))
+    };
+  }
+
+  function sthanaBala(chart, planet) {
+    var dignityScore = { Exalted: 60, Moolatrikona: 55, "Own sign": 50, "Friendly sign": 42, "Neutral sign": 34, "Enemy sign": 24, Debilitated: 12 }[planet.dignity] || 30;
+    if ([1, 4, 5, 7, 9, 10].indexOf(planet.house) >= 0) dignityScore += 6;
+    if ([6, 8, 12].indexOf(planet.house) >= 0) dignityScore -= 8;
+    if (planet.navamsaSign === planet.sign) dignityScore += 6;
+    return clamp(dignityScore, 0, 60);
+  }
+
+  function digBala(planet) {
+    var ideal = { Sun: 10, Mars: 10, Moon: 4, Venus: 4, Jupiter: 1, Mercury: 1, Saturn: 7 }[planet.name] || 1;
+    var diff = Math.abs(((planet.house - ideal + 18) % 12) - 6);
+    return clamp((1 - diff / 6) * 60, 0, 60);
+  }
+
+  function kalaBala(chart, planet) {
+    var shifted = new Date(chart.date.getTime() + chart.timezone * 3600000);
+    var hour = shifted.getUTCHours() + shifted.getUTCMinutes() / 60;
+    var dayChart = hour >= 6 && hour < 18;
+    var dayPlanets = ["Sun", "Jupiter", "Venus"];
+    var nightPlanets = ["Moon", "Mars", "Saturn"];
+    var score = planet.name === "Mercury" ? 42 : dayPlanets.indexOf(planet.name) >= 0 ? (dayChart ? 55 : 32) : nightPlanets.indexOf(planet.name) >= 0 ? (dayChart ? 32 : 55) : 36;
+    if (planet.name === "Moon" && chart.moonStrength === "Bright") score += 5;
+    if (planet.name === "Sun" && dayChart) score += 3;
+    return clamp(score, 0, 60);
+  }
+
+  function cheshtaBala(planet) {
+    var score = planet.retrograde ? 60 : (planet.name === "Sun" || planet.name === "Moon" ? 35 : 32);
+    if (planet.combust) score -= 15;
+    return clamp(score, 0, 60);
+  }
+
+  function naisargikaBala(name) {
+    return { Sun: 60, Moon: 51, Venus: 43, Jupiter: 34, Mercury: 26, Mars: 17, Saturn: 9 }[name] || 30;
+  }
+
+  function drikBala(chart, planet) {
+    var aspects = planetsAspectingPlanet(chart, planet);
+    var conjunctions = chart.planets.filter(function (p) { return p.name !== planet.name && p.sign === planet.sign; });
+    var score = 30;
+    aspects.concat(conjunctions).forEach(function (p) {
+      score += p.naturalNature === "Benefic" ? 8 : -9;
+    });
+    return clamp(score, 0, 60);
+  }
+
+  function jaiminiSection(chart) {
+    var karakas7 = jaiminiKarakas(chart, false);
+    var karakas8 = jaiminiKarakas(chart, true);
+    return '<section id="viewA-jaimini" class="section jaimini-section"><div class="section-head"><div><p class="eyebrow">Jaimini</p><h3>Karakas, Rashi Drishti, Pada And Alternate Lagnas</h3></div><span class="small-pill">7 + 8 karaka</span></div>' +
+      '<div class="report-grid">' +
+      jaiminiKarakasTable("Karakas(7)", karakas7) +
+      jaiminiKarakasTable("Karakas(8)", karakas8) +
+      '</div>' +
+      jaiminiAspectTable(chart, karakas7, "Jaimini Karakas And Aspects 7") +
+      jaiminiAspectTable(chart, karakas8, "Jaimini Karakas And Aspects 8") +
+      '<div class="report-grid">' + padaTable(chart) + alternateLagnasTable(chart) + jeevaPanel(chart, karakas8) + "</div></section>";
+  }
+
+  function jaiminiKarakas(chart, includeRahu) {
+    var roles = includeRahu ? ["AK", "AmK", "BK", "MK", "PiK", "PK", "GK", "DK"] : ["AK", "AmK", "BK", "MK", "PK", "GK", "DK"];
+    var planets = CLASSICAL_PLANETS.concat(includeRahu ? ["Rahu"] : []).map(function (name) {
+      var p = chart.planetsByName[name];
+      var degree = name === "Rahu" ? 30 - p.deg : p.deg;
+      return { name: name, degree: degree, signName: p.signName, nakshatra: p.nakshatra };
+    }).sort(function (a, b) { return b.degree - a.degree; });
+    return roles.map(function (role, index) {
+      var item = planets[index];
+      return { role: role, planet: item.name, degree: item.degree, signName: item.signName, nakshatra: item.nakshatra };
+    });
+  }
+
+  function jaiminiKarakasTable(title, karakas) {
+    return '<div class="panel-box"><h3>' + escapeHtml(title) + '</h3><div class="table-wrap compact-table"><table><thead><tr><th>Karaka</th><th>Planet</th><th>Karaka degree</th><th>Sign / Nakshatra</th></tr></thead><tbody>' +
+      karakas.map(function (item) {
+        return "<tr><td><strong>" + escapeHtml(item.role) + "</strong></td><td>" + escapeHtml(item.planet) + "</td><td>" + escapeHtml(decimalToDms(item.degree)) + "</td><td>" + escapeHtml(item.signName + " / " + item.nakshatra) + "</td></tr>";
+      }).join("") +
+      "</tbody></table></div></div>";
+  }
+
+  function jaiminiAspectTable(chart, karakas, title) {
+    var byPlanet = {};
+    karakas.forEach(function (item) { byPlanet[item.planet] = item.role; });
+    var rows = chart.planets.filter(function (p) { return byPlanet[p.name]; }).map(function (p) {
+      var signs = jaiminiAspectedSigns(p.sign);
+      var aspectPlanets = chart.planets.filter(function (other) { return other.name !== p.name && signs.indexOf(other.sign) >= 0; });
+      return "<tr><td><strong>" + escapeHtml(byPlanet[p.name] + " " + p.name) + "</strong><br>" + escapeHtml(p.signName) + "</td><td>" + escapeHtml(signs.map(function (sign) { return (sign + 1) + " " + SIGNS[sign].name; }).join(", ")) + "</td><td>" + escapeHtml(aspectPlanets.map(function (other) { return other.name; }).join(", ") || "-") + "</td></tr>";
+    }).join("");
+    return '<div class="panel-box"><h3>' + escapeHtml(title) + '</h3><div class="table-wrap"><table><thead><tr><th>Karaka planet</th><th>Jaimini rashi drishti signs</th><th>Planets receiving rashi drishti</th></tr></thead><tbody>' + rows + "</tbody></table></div></div>";
+  }
+
+  function jaiminiAspectedSigns(sign) {
+    var modality = SIGNS[sign].modality;
+    if (modality === "Movable") {
+      return [1, 4, 7, 10].filter(function (target) { return target !== normalizeSign(sign + 1); });
+    }
+    if (modality === "Fixed") {
+      return [0, 3, 6, 9].filter(function (target) { return target !== normalizeSign(sign - 1); });
+    }
+    return [2, 5, 8, 11].filter(function (target) { return target !== sign; });
+  }
+
+  function padaTable(chart) {
+    var houses = [1, 2, 4, 5, 7, 9, 10, 11, 12];
+    return '<div class="panel-box"><h3>Pada / Arudha</h3><div class="table-wrap compact-table"><table><thead><tr><th>House</th><th>Arudha sign</th><th>Lord</th><th>Use</th></tr></thead><tbody>' +
+      houses.map(function (house) {
+        var pada = arudhaPada(chart, house);
+        return "<tr><td>H" + house + "</td><td><strong>" + escapeHtml((pada + 1) + " " + SIGNS[pada].name) + "</strong></td><td>" + escapeHtml(SIGNS[pada].lord) + "</td><td>" + escapeHtml(arudhaUseText(house)) + "</td></tr>";
+      }).join("") +
+      "</tbody></table></div></div>";
+  }
+
+  function arudhaPada(chart, house) {
+    var baseSign = houseSign(chart, house);
+    var lord = chart.planetsByName[SIGNS[baseSign].lord];
+    var distance = houseFromSign(baseSign, lord.sign) - 1;
+    var pada = normalizeSign(lord.sign + distance);
+    if (pada === baseSign || pada === normalizeSign(baseSign + 6)) pada = normalizeSign(pada + 9);
+    return pada;
+  }
+
+  function arudhaUseText(house) {
+    var uses = { 1: "public image", 2: "family/resources image", 4: "home image", 5: "creativity/children image", 7: "relationship image", 9: "fortune image", 10: "career image", 11: "gains image", 12: "loss/foreign image" };
+    return uses[house] || "arudha reference";
+  }
+
+  function alternateLagnasTable(chart) {
+    var alts = alternateLagnas(chart);
+    return '<div class="panel-box"><h3>Alt. Lagnas</h3><div class="table-wrap compact-table"><table><thead><tr><th>Lagna</th><th>Sign</th><th>Lord</th><th>Use</th></tr></thead><tbody>' +
+      alts.map(function (item) {
+        return "<tr><td><strong>" + escapeHtml(item.name) + "</strong></td><td>" + escapeHtml((item.sign + 1) + " " + SIGNS[item.sign].name) + "</td><td>" + escapeHtml(SIGNS[item.sign].lord) + "</td><td>" + escapeHtml(item.use) + "</td></tr>";
+      }).join("") +
+      "</tbody></table></div></div>";
+  }
+
+  function alternateLagnas(chart) {
+    var shifted = new Date(chart.date.getTime() + chart.timezone * 3600000);
+    var hours = shifted.getUTCHours() + shifted.getUTCMinutes() / 60 + shifted.getUTCSeconds() / 3600;
+    var sinceSunrise = ((hours - 6) % 24 + 24) % 24;
+    var ghatis = sinceSunrise * 2.5;
+    var sunSign = chart.planetsByName.Sun.sign;
+    return [
+      { name: "Bhava Lagna", sign: normalizeSign(sunSign + Math.floor(ghatis / 5)), use: "body, initiative and lived momentum" },
+      { name: "Hora Lagna", sign: normalizeSign(sunSign + Math.floor(ghatis / 2.5)), use: "wealth, resources and worldly drive" },
+      { name: "Ghatika Lagna", sign: normalizeSign(sunSign + Math.floor(ghatis / 0.5)), use: "power, authority and status" }
+    ];
+  }
+
+  function jeevaPanel(chart, karakas) {
+    var ak = karakas.find(function (item) { return item.role === "AK"; });
+    var jupiter = chart.planetsByName.Jupiter;
+    var lagnaLord = chart.planetsByName[lordOfHouse(chart, 1)];
+    return metricBox("Jeeva", [
+      ["Atmakaraka", ak ? ak.planet + " in " + ak.signName : "-"],
+      ["Jeeva karaka Jupiter", jupiter.signName + " H" + jupiter.house + " - " + planetPredictionStatus(chart, jupiter)],
+      ["Lagna lord as embodied jeeva", lagnaLord.name + " H" + lagnaLord.house + " - " + planetPredictionStatus(chart, lagnaLord)]
+    ]);
+  }
+
+  function marriageCompatibilityReportSection(chart, input) {
+    var partnerChart = partnerChartFromInput(input);
+    if (!partnerChart) {
+      return '<section id="viewA-compatibility" class="section compatibility-section"><div class="section-head"><div><p class="eyebrow">Compatibility</p><h3>Marriage Compatibility</h3></div><span class="small-pill">Partner optional</span></div>' +
+        compatibilityInlineInputPanel(input) +
+        '<div class="panel-box"><p>Would-be partner chart details are not supplied. Add the partner birth details here to generate partner D-1/D-9 charts, Ashtakoot, Dashkoot and full compatibility observations.</p></div></section>';
+    }
+    var match = compatibilityScore(chart, partnerChart, input);
+    var dashkoot = dashkootRows(chart, partnerChart);
+    var d1d9 = d1D9CompatibilityRows(chart, partnerChart);
+    var d9Native = makeVargaChart(chart, 9);
+    var d9Partner = makeVargaChart(partnerChart, 9);
+    return '<section id="viewA-compatibility" class="section compatibility-section"><div class="section-head"><div><p class="eyebrow">Compatibility</p><h3>Marriage Compatibility</h3></div><span class="small-pill">' + match.total + ' / 36</span></div>' +
+      compatibilityInlineInputPanel(input) +
+      '<div class="report-grid three">' +
+      metricBox("Native", compatibilityNativeRows(chart, input.name || "Native")) +
+      metricBox("Would-be partner", compatibilityNativeRows(partnerChart, input.partner.name || "Partner")) +
+      metricBox("Overall judgement", [["Ashtakoot", match.total + " / 36"], ["Ashtakoot verdict", match.verdict], ["Dashkoot support", dashkoot.filter(function (row) { return row.result === "Auspicious" || row.result === "Compatible" || row.result === "Strong"; }).length + " / " + dashkoot.length], ["D-1/D-9 verdict", d1D9CompatibilityVerdict(d1d9)], ["Rashi relation", match.rashiRelation]]) +
+      '</div>' +
+      '<div class="report-grid">' +
+      metricBox("Would-Be Partner Birth Details", compatibilityBirthDetailRows(input.partner, partnerChart)) +
+      metricBox("Partner D-9 Reference", compatibilityD9DetailRows(d9Partner)) +
+      '</div>' +
+      '<div class="report-grid varga-chart-grid compatibility-chart-grid">' +
+      chartBox("Native D-1", chart.ascendant.sign, chart.planets, { featured: true, division: 1, rootChart: chart, showAscDegree: true, ascDegree: chart.ascendant.deg }) +
+      chartBox("Would-be Partner D-1", partnerChart.ascendant.sign, partnerChart.planets, { featured: true, division: 1, rootChart: partnerChart, showAscDegree: true, ascDegree: partnerChart.ascendant.deg }) +
+      chartBox("Native D-9", d9Native.ascendant.sign, d9Native.planets, { featured: true, division: 9, rootChart: chart, showAscDegree: true, ascDegree: d9Native.ascendant.deg }) +
+      chartBox("Would-be Partner D-9", d9Partner.ascendant.sign, d9Partner.planets, { featured: true, division: 9, rootChart: partnerChart, showAscDegree: true, ascDegree: d9Partner.ascendant.deg }) +
+      '</div>' +
+      '<div class="panel-box"><h3>Ashtakoot Analysis</h3><div class="table-wrap"><table><thead><tr><th>Koota</th><th>Score</th><th>Maximum</th><th>Judgement</th><th>Basis</th></tr></thead><tbody>' +
+      match.kootas.map(function (row) {
+        return "<tr><td><strong>" + escapeHtml(row.name) + "</strong></td><td>" + row.score + "</td><td>" + row.max + "</td><td>" + escapeHtml(row.judgement) + "</td><td>" + escapeHtml(row.basis) + "</td></tr>";
+      }).join("") +
+      '</tbody></table></div></div>' +
+      dashkootPanel(dashkoot) +
+      d1D9CompatibilityPanel(d1d9) +
+      '<div class="report-grid">' + additionalKutasPanel(match.additional) + compatibilityObservationPanel(match.observations) + "</div></section>";
+  }
+
+  function compatibilityInlineInputPanel(input) {
+    var partner = input && input.partner ? input.partner : {};
+    var timezone = partner.timezone !== undefined ? partner.timezone : (input && input.timezone !== undefined ? input.timezone : 5.5);
+    return '<div class="panel-box compatibility-input-panel"><h3>Enter Would-Be Partner Chart Here</h3>' +
+      '<div class="compatibility-load-row">' +
+      '<label>Load would-be partner from saved charts<select id="compatPartnerSavedChart">' + savedChartPartnerOptions() + '</select></label>' +
+      '<button type="button" id="compatPartnerLoadSavedBtn">Load Saved Chart As Partner</button>' +
+      '</div>' +
+      '<div class="grid-2">' +
+      inlineInputField("Name", "compatPartnerName", partner.name || "", "text", "") +
+      '<label>Gender context<select id="compatPartnerGender">' +
+      inlineOption("unspecified", "Unspecified", partner.gender || "unspecified") +
+      inlineOption("male", "Male chart", partner.gender || "unspecified") +
+      inlineOption("female", "Female chart", partner.gender || "unspecified") +
+      '</select></label>' +
+      "</div>" +
+      '<div class="grid-2">' +
+      inlineInputField("Date", "compatPartnerBirthDate", partner.birthDate || "", "date", "") +
+      inlineInputField("Time", "compatPartnerBirthTime", partner.birthTime || "", "time", ' step="1"') +
+      "</div>" +
+      '<label>Place of birth city<input id="compatPartnerBirthPlace" list="cityOptions" value="' + escapeHtml(partner.birthPlace || "") + '" placeholder="Example: Chandigarh, India"></label>' +
+      '<div class="grid-3">' +
+      inlineInputField("Timezone", "compatPartnerTimezone", String(timezone), "number", ' step="0.25"') +
+      inlineInputField("Latitude", "compatPartnerLatitude", partner.latitude !== undefined ? coordinateDmsText(parseCoordinateInput(partner.latitude || 0)) : "", "text", ' placeholder="DD.MM.SS"') +
+      '<label>Lat direction<select id="compatPartnerLatitudeDirection">' + inlineOption("N", "N", partner.latitudeDirection || (Number(partner.latitude) < 0 ? "S" : "N")) + inlineOption("S", "S", partner.latitudeDirection || (Number(partner.latitude) < 0 ? "S" : "N")) + '</select></label>' +
+      "</div>" +
+      '<div class="grid-2">' +
+      inlineInputField("Longitude", "compatPartnerLongitude", partner.longitude !== undefined ? coordinateDmsText(parseCoordinateInput(partner.longitude || 0)) : "", "text", ' placeholder="DD.MM.SS"') +
+      '<label>Long direction<select id="compatPartnerLongitudeDirection">' + inlineOption("E", "E", partner.longitudeDirection || (Number(partner.longitude) < 0 ? "W" : "E")) + inlineOption("W", "W", partner.longitudeDirection || (Number(partner.longitude) < 0 ? "W" : "E")) + '</select></label>' +
+      "</div>" +
+      '<div class="actions compact-actions"><button type="button" id="compatPartnerGenerateBtn">Generate Compatibility</button><button type="button" id="compatPartnerClearBtn">Clear Partner Chart</button></div>' +
+      '<p id="compatPartnerStatus" class="fine-print">This section updates the partner chart used for Ashtakoot, Dashkoot and D-1/D-9 compatibility.</p></div>';
+  }
+
+  function savedChartPartnerOptions() {
+    var list = savedCharts && savedCharts.length ? savedCharts : readLocalSavedCharts();
+    if (!list.length) return '<option value="">No saved charts available</option>';
+    return '<option value="">Select saved chart</option>' + list.map(function (item) {
+      var input = item.input || {};
+      var label = item.title || input.name || input.nativeName || item.nativeName || "Saved chart";
+      return '<option value="' + escapeHtml(item.id || "") + '">' + escapeHtml(label) + "</option>";
+    }).join("");
+  }
+
+  function inlineInputField(label, id, value, type, attrs) {
+    return '<label>' + escapeHtml(label) + '<input id="' + escapeHtml(id) + '" type="' + escapeHtml(type || "text") + '" value="' + escapeHtml(value || "") + '"' + (attrs || "") + "></label>";
+  }
+
+  function inlineOption(value, label, selected) {
+    return '<option value="' + escapeHtml(value) + '"' + (String(value) === String(selected) ? " selected" : "") + ">" + escapeHtml(label) + "</option>";
+  }
+
+  function wireCompatibilityInlineControls() {
+    if (typeof document === "undefined") return;
+    var generateButton = document.getElementById("compatPartnerGenerateBtn");
+    var clearButton = document.getElementById("compatPartnerClearBtn");
+    var loadButton = document.getElementById("compatPartnerLoadSavedBtn");
+    var place = document.getElementById("compatPartnerBirthPlace");
+    if (place) {
+      place.addEventListener("change", applyCompatibilityInlinePlaceLookup);
+      place.addEventListener("blur", applyCompatibilityInlinePlaceLookup);
+    }
+    if (generateButton) {
+      generateButton.addEventListener("click", function () {
+        copyCompatibilityInlinePartnerToMain();
+        applyPartnerBirthPlaceLookup();
+        generate();
+      });
+    }
+    if (loadButton) {
+      loadButton.addEventListener("click", function () {
+        loadSavedChartAsCompatibilityPartner();
+      });
+    }
+    if (clearButton) {
+      clearButton.addEventListener("click", function () {
+        clearCompatibilityInlinePartner();
+        generate();
+      });
+    }
+  }
+
+  function loadSavedChartAsCompatibilityPartner() {
+    var select = document.getElementById("compatPartnerSavedChart");
+    var id = select ? select.value : "";
+    var chartRecord = id ? (savedCharts || []).concat(readLocalSavedCharts()).find(function (item) { return item && item.id === id; }) : null;
+    if (!chartRecord || !chartRecord.input) {
+      setCompatibilityInlineStatus("Select a saved chart first.", "warning");
+      return;
+    }
+    applySavedChartToCompatibilityInline(chartRecord.input);
+    copyCompatibilityInlinePartnerToMain();
+    setCompatibilityInlineStatus("Loaded " + (chartRecord.title || chartRecord.input.name || "saved chart") + " as would-be partner.", "good");
+    generate();
+  }
+
+  function applySavedChartToCompatibilityInline(input) {
+    setFieldValue("compatPartnerName", input.name || input.nativeName || "Partner");
+    setFieldValue("compatPartnerGender", input.gender || "unspecified");
+    setFieldValue("compatPartnerBirthDate", input.birthDate || "");
+    setFieldValue("compatPartnerBirthTime", normalizeTimeInput(input.birthTime || ""));
+    setFieldValue("compatPartnerBirthPlace", input.birthPlace || "");
+    setFieldValue("compatPartnerTimezone", input.timezone === undefined ? "5.5" : input.timezone);
+    setFieldValue("compatPartnerLatitude", input.latitude !== undefined ? coordinateDmsText(parseCoordinateInput(input.latitude || 0)) : "");
+    setFieldValue("compatPartnerLatitudeDirection", input.latitudeDirection || (Number(input.latitude) < 0 ? "S" : "N"));
+    setFieldValue("compatPartnerLongitude", input.longitude !== undefined ? coordinateDmsText(parseCoordinateInput(input.longitude || 0)) : "");
+    setFieldValue("compatPartnerLongitudeDirection", input.longitudeDirection || (Number(input.longitude) < 0 ? "W" : "E"));
+  }
+
+  function setCompatibilityInlineStatus(message, kind) {
+    var status = document.getElementById("compatPartnerStatus");
+    if (!status) return;
+    status.className = "fine-print saved-status" + (kind ? " " + kind : "");
+    status.textContent = message || "";
+  }
+
+  function applyCompatibilityInlinePlaceLookup() {
+    var place = document.getElementById("compatPartnerBirthPlace");
+    if (!place || !place.value.trim()) return;
+    var match = findCity(place.value);
+    if (!match) return;
+    setFieldValue("compatPartnerBirthPlace", match.name);
+    setFieldValue("compatPartnerTimezone", match.timezone);
+    setFieldValue("compatPartnerLatitude", coordinateDmsText(match.latitude));
+    setFieldValue("compatPartnerLatitudeDirection", match.latitude < 0 ? "S" : "N");
+    setFieldValue("compatPartnerLongitude", coordinateDmsText(match.longitude));
+    setFieldValue("compatPartnerLongitudeDirection", match.longitude < 0 ? "W" : "E");
+  }
+
+  function copyCompatibilityInlinePartnerToMain() {
+    [
+      ["compatPartnerName", "partnerName"],
+      ["compatPartnerGender", "partnerGender"],
+      ["compatPartnerBirthDate", "partnerBirthDate"],
+      ["compatPartnerBirthTime", "partnerBirthTime"],
+      ["compatPartnerBirthPlace", "partnerBirthPlace"],
+      ["compatPartnerTimezone", "partnerTimezone"],
+      ["compatPartnerLatitude", "partnerLatitude"],
+      ["compatPartnerLatitudeDirection", "partnerLatitudeDirection"],
+      ["compatPartnerLongitude", "partnerLongitude"],
+      ["compatPartnerLongitudeDirection", "partnerLongitudeDirection"]
+    ].forEach(function (pair) {
+      setFieldValue(pair[1], fieldValue(pair[0]));
+    });
+  }
+
+  function clearCompatibilityInlinePartner() {
+    ["compatPartnerName", "compatPartnerBirthDate", "compatPartnerBirthTime", "compatPartnerBirthPlace", "compatPartnerLatitude", "compatPartnerLongitude", "partnerName", "partnerBirthDate", "partnerBirthTime", "partnerBirthPlace", "partnerLatitude", "partnerLongitude"].forEach(function (id) {
+      setFieldValue(id, "");
+    });
+    setFieldValue("compatPartnerGender", "unspecified");
+    setFieldValue("partnerGender", "unspecified");
+    setFieldValue("compatPartnerTimezone", fieldValue("timezone") || "5.5");
+    setFieldValue("partnerTimezone", fieldValue("timezone") || "5.5");
+    setFieldValue("compatPartnerLatitudeDirection", "N");
+    setFieldValue("partnerLatitudeDirection", "N");
+    setFieldValue("compatPartnerLongitudeDirection", "E");
+    setFieldValue("partnerLongitudeDirection", "E");
+  }
+
+  function partnerChartFromInput(input) {
+    if (!input || !input.partner) return null;
+    return buildChart(input.partner.birthInstant, input.partner.latitude, input.partner.longitude, input.partner.timezone, { ayanamshaKey: input.ayanamshaKey || "raman" });
+  }
+
+  function compatibilityNativeRows(chart, label) {
+    var moon = chart.planetsByName.Moon;
+    return [
+      ["Chart", label],
+      ["Moon sign", moon.signName],
+      ["Nakshatra", moon.nakshatra + " pada " + moon.pada],
+      ["Lagna", chart.ascendant.signName + " " + decimalToDms(chart.ascendant.deg)]
+    ];
+  }
+
+  function compatibilityBirthDetailRows(partner, partnerChart) {
+    if (!partner) return [["Birth details", "Not supplied"]];
+    return [
+      ["Name", partner.name || "Partner"],
+      ["Gender context", partner.gender || "unspecified"],
+      ["Birth date/time", formatInTimezone(partner.birthInstant, partner.timezone)],
+      ["Birth place", partner.birthPlace || "Manual coordinates"],
+      ["Coordinates", coordinateText(partner.latitude, partner.longitude)],
+      ["Timezone", "UTC" + (partner.timezone >= 0 ? "+" : "") + partner.timezone],
+      ["D-1 Lagna", partnerChart.ascendant.signName + " " + decimalToDms(partnerChart.ascendant.deg)],
+      ["Moon nakshatra", partnerChart.planetsByName.Moon.nakshatra + " pada " + partnerChart.planetsByName.Moon.pada]
+    ];
+  }
+
+  function compatibilityD9DetailRows(d9Partner) {
+    return [
+      ["D-9 Lagna", d9Partner.ascendant.signName],
+      ["D-9 7th house", d9SeventhSummary(d9Partner)],
+      ["D-9 Venus", "H" + d9Partner.planetsByName.Venus.house + " in " + d9Partner.planetsByName.Venus.signName],
+      ["D-9 Jupiter", "H" + d9Partner.planetsByName.Jupiter.house + " in " + d9Partner.planetsByName.Jupiter.signName]
+    ];
+  }
+
+  function compatibilityScore(chartA, chartB, input) {
+    var moonA = chartA.planetsByName.Moon;
+    var moonB = chartB.planetsByName.Moon;
+    var kootas = [
+      varnaKoota(moonA, moonB),
+      vashyaKoota(moonA, moonB),
+      taraKoota(moonA, moonB),
+      yoniKoota(moonA, moonB),
+      grahaMaitriKoota(moonA, moonB),
+      ganaKoota(moonA, moonB),
+      bhakootKoota(moonA, moonB),
+      nadiKoota(moonA, moonB)
+    ];
+    var total = roundToHalf(kootas.reduce(function (sum, row) { return sum + row.score; }, 0));
+    return {
+      total: total,
+      verdict: total >= 28 ? "Strong" : total >= 22 ? "Workable" : total >= 18 ? "Conditional" : "Weak",
+      rashiRelation: moonSignDistanceText(moonA.sign, moonB.sign),
+      kootas: kootas,
+      additional: additionalKutas(chartA, chartB),
+      observations: compatibilityObservations(chartA, chartB, input)
+    };
+  }
+
+  function dashkootRows(chartA, chartB) {
+    var moonA = chartA.planetsByName.Moon;
+    var moonB = chartB.planetsByName.Moon;
+    var ashtakoot = {
+      Dina: taraKoota(moonA, moonB),
+      Gana: ganaKoota(moonA, moonB),
+      Yoni: yoniKoota(moonA, moonB),
+      Rashi: bhakootKoota(moonA, moonB),
+      RashiLord: grahaMaitriKoota(moonA, moonB),
+      Nadi: nadiKoota(moonA, moonB)
+    };
+    var additional = additionalKutas(chartA, chartB).reduce(function (out, row) {
+      out[row.name] = row;
+      return out;
+    }, {});
+    return [
+      dashkootFromKoota("Dina / Tara", ashtakoot.Dina, "Star-based health, luck and day-to-day flow."),
+      dashkootFromKoota("Gana", ashtakoot.Gana, "Temperament and behavioural compatibility."),
+      dashkootFromAdditional("Mahendra", additional.Mahendra, "Growth, protection and continuity."),
+      dashkootFromAdditional("Stree Deergha", additional["Stree Deergha"], "Longevity and comfort of married life."),
+      dashkootFromKoota("Yoni", ashtakoot.Yoni, "Physical, instinctive and intimate compatibility."),
+      dashkootFromKoota("Rashi / Bhakoot", ashtakoot.Rashi, "Moon sign emotional and family flow."),
+      dashkootFromKoota("Rashi Lord", ashtakoot.RashiLord, "Friendship between Moon sign lords."),
+      dashkootFromAdditional("Rajju", additional.Rajju, "Longevity and stability caution."),
+      dashkootFromAdditional("Vedha", additional.Vedha, "Obstruction or star-vedha check."),
+      dashkootFromKoota("Nadi", ashtakoot.Nadi, "Constitutional and progeny harmony.")
+    ];
+  }
+
+  function dashkootFromKoota(name, row, meaning) {
+    var ratio = row.max ? row.score / row.max : 0;
+    return {
+      name: name,
+      result: ratio >= 0.72 ? "Auspicious" : ratio >= 0.45 ? "Compatible" : "Inauspicious",
+      strength: row.score + " / " + row.max,
+      basis: row.basis + " - " + row.judgement,
+      meaning: meaning
+    };
+  }
+
+  function dashkootFromAdditional(name, row, meaning) {
+    return {
+      name: name,
+      result: row && row.result ? row.result : "-",
+      strength: row && row.result === "Auspicious" ? "Supportive" : "Caution",
+      basis: row ? row.basis : "-",
+      meaning: meaning
+    };
+  }
+
+  function dashkootPanel(rows) {
+    return '<div class="panel-box"><h3>Dashkoot Analysis</h3><div class="table-wrap"><table><thead><tr><th>Dashkoot factor</th><th>Result</th><th>Strength</th><th>Basis</th><th>Compatibility use</th></tr></thead><tbody>' +
+      rows.map(function (row) {
+        return "<tr><td><strong>" + escapeHtml(row.name) + "</strong></td><td>" + escapeHtml(row.result) + "</td><td>" + escapeHtml(row.strength) + "</td><td>" + escapeHtml(row.basis) + "</td><td>" + escapeHtml(row.meaning) + "</td></tr>";
+      }).join("") +
+      "</tbody></table></div></div>";
+  }
+
+  function d1D9CompatibilityRows(chartA, chartB) {
+    var d9A = makeVargaChart(chartA, 9);
+    var d9B = makeVargaChart(chartB, 9);
+    return [
+      d1D9Row("D-1 lagna relation", moonSignDistanceText(chartA.ascendant.sign, chartB.ascendant.sign), relationshipSupport(chartA.ascendant.sign, chartB.ascendant.sign), "Basic personality and life-direction fit."),
+      d1D9Row("D-1 Moon relation", moonSignDistanceText(chartA.planetsByName.Moon.sign, chartB.planetsByName.Moon.sign), relationshipSupport(chartA.planetsByName.Moon.sign, chartB.planetsByName.Moon.sign), "Emotional rhythm and domestic comfort."),
+      d1D9Row("D-1 7th house promise", "Native H7 " + chartA.houses[6].label + "; Partner H7 " + chartB.houses[6].label, average([chartA.houses[6].score, chartB.houses[6].score]) >= 55 ? "Supportive" : "Needs review", "Marriage promise from each natal chart."),
+      d1D9Row("D-1 7th lord condition", lordOfHouse(chartA, 7) + " " + planetPredictionStatus(chartA, chartA.planetsByName[lordOfHouse(chartA, 7)]) + "; " + lordOfHouse(chartB, 7) + " " + planetPredictionStatus(chartB, chartB.planetsByName[lordOfHouse(chartB, 7)]), seventhLordSupport(chartA, chartB), "Capacity of the marriage lord in both charts."),
+      d1D9Row("D-1 Venus/Jupiter support", "Native Venus " + planetPredictionStatus(chartA, chartA.planetsByName.Venus) + ", Jupiter " + planetPredictionStatus(chartA, chartA.planetsByName.Jupiter) + "; Partner Venus " + planetPredictionStatus(chartB, chartB.planetsByName.Venus) + ", Jupiter " + planetPredictionStatus(chartB, chartB.planetsByName.Jupiter), beneficMarriageSupport(chartA, chartB), "Relationship karaka support."),
+      d1D9Row("D-9 lagna relation", moonSignDistanceText(d9A.ascendant.sign, d9B.ascendant.sign), relationshipSupport(d9A.ascendant.sign, d9B.ascendant.sign), "Marriage dharma and post-marriage life fit."),
+      d1D9Row("D-9 7th house relation", d9SeventhSummary(d9A) + "; " + d9SeventhSummary(d9B), d9SeventhSupport(d9A, d9B), "Spouse/married-life refinement in Navamsha."),
+      d1D9Row("D-9 Venus/Jupiter placement", "Native D9 Venus H" + d9A.planetsByName.Venus.house + ", Jupiter H" + d9A.planetsByName.Jupiter.house + "; Partner D9 Venus H" + d9B.planetsByName.Venus.house + ", Jupiter H" + d9B.planetsByName.Jupiter.house, d9BeneficSupport(d9A, d9B), "Navamsha relationship grace and counsel."),
+      d1D9Row("D-1/D-9 combined note", compatibilityPracticalNote(chartA, chartB), "Synthesis", "Use this with Ashtakoot and Dashkoot, not in isolation.")
+    ];
+  }
+
+  function d1D9Row(factor, basis, support, use) {
+    return { factor: factor, basis: basis, support: support, use: use };
+  }
+
+  function d1D9CompatibilityPanel(rows) {
+    return '<div class="panel-box"><h3>D-1 And D-9 Compatibility Analysis</h3><div class="table-wrap"><table><thead><tr><th>Factor</th><th>Native + would-be partner basis</th><th>Support</th><th>Compatibility use</th></tr></thead><tbody>' +
+      rows.map(function (row) {
+        return "<tr><td><strong>" + escapeHtml(row.factor) + "</strong></td><td>" + escapeHtml(row.basis) + "</td><td>" + escapeHtml(row.support) + "</td><td>" + escapeHtml(row.use) + "</td></tr>";
+      }).join("") +
+      "</tbody></table></div></div>";
+  }
+
+  function d1D9CompatibilityVerdict(rows) {
+    var supportive = rows.filter(function (row) { return /support|strong|synthesis/i.test(row.support); }).length;
+    return supportive >= 6 ? "Strong" : supportive >= 4 ? "Workable" : "Needs review";
+  }
+
+  function relationshipSupport(signA, signB) {
+    var relation = moonSignDistance(signA, signB).label;
+    if (["1/1", "3/11", "4/10", "7/7"].indexOf(relation) >= 0) return "Supportive";
+    if (["2/12", "6/8"].indexOf(relation) >= 0) return "Needs review";
+    if (relation === "5/9") return "Dharmic but sensitive";
+    return "Average";
+  }
+
+  function seventhLordSupport(chartA, chartB) {
+    var lordA = chartA.planetsByName[lordOfHouse(chartA, 7)];
+    var lordB = chartB.planetsByName[lordOfHouse(chartB, 7)];
+    var score = average([lordA.strength.score, lordB.strength.score]);
+    return score >= 62 ? "Supportive" : score >= 48 ? "Average" : "Needs review";
+  }
+
+  function beneficMarriageSupport(chartA, chartB) {
+    var score = average([chartA.planetsByName.Venus.strength.score, chartA.planetsByName.Jupiter.strength.score, chartB.planetsByName.Venus.strength.score, chartB.planetsByName.Jupiter.strength.score]);
+    return score >= 62 ? "Strong" : score >= 48 ? "Average" : "Needs review";
+  }
+
+  function d9SeventhSummary(d9) {
+    var sign = normalizeSign(d9.ascendant.sign + 6);
+    var tenants = d9.planets.filter(function (p) { return p.house === 7; }).map(prop("name")).join(", ") || "no tenants";
+    return "D9 H7 " + SIGNS[sign].name + ", tenants " + tenants + ", lord " + SIGNS[sign].lord;
+  }
+
+  function d9SeventhSupport(d9A, d9B) {
+    var benefics = ["Jupiter", "Venus", "Moon", "Mercury"];
+    var score = 0;
+    [d9A, d9B].forEach(function (d9) {
+      d9.planets.filter(function (p) { return p.house === 7; }).forEach(function (p) {
+        score += benefics.indexOf(p.name) >= 0 ? 1 : -1;
+      });
+      var lord = d9.planetsByName[SIGNS[normalizeSign(d9.ascendant.sign + 6)].lord];
+      if (lord && [1, 4, 5, 7, 9, 10, 11].indexOf(lord.house) >= 0) score += 1;
+    });
+    return score >= 2 ? "Supportive" : score >= 0 ? "Average" : "Needs review";
+  }
+
+  function d9BeneficSupport(d9A, d9B) {
+    var goodHouses = [1, 4, 5, 7, 9, 10, 11];
+    var score = [d9A.planetsByName.Venus, d9A.planetsByName.Jupiter, d9B.planetsByName.Venus, d9B.planetsByName.Jupiter].filter(function (p) {
+      return p && goodHouses.indexOf(p.house) >= 0;
+    }).length;
+    return score >= 3 ? "Supportive" : score >= 2 ? "Average" : "Needs review";
+  }
+
+  function varnaKoota(a, b) {
+    var rank = { Brahmin: 4, Kshatriya: 3, Vaishya: 2, Shudra: 1 };
+    var va = moonVarna(a.sign);
+    var vb = moonVarna(b.sign);
+    var score = va === vb || rank[va] >= rank[vb] ? 1 : 0;
+    return kootaRow("Varna", score, 1, score ? "Compatible" : "Mismatch", va + " with " + vb);
+  }
+
+  function moonVarna(sign) {
+    if ([3, 7, 11].indexOf(sign) >= 0) return "Brahmin";
+    if ([0, 4, 8].indexOf(sign) >= 0) return "Kshatriya";
+    if ([1, 5, 9].indexOf(sign) >= 0) return "Vaishya";
+    return "Shudra";
+  }
+
+  function vashyaKoota(a, b) {
+    var va = vashyaGroup(a.sign);
+    var vb = vashyaGroup(b.sign);
+    var score = va === vb ? 2 : vashyaFriendly(va, vb) ? 1 : 0;
+    return kootaRow("Vashya", score, 2, score === 2 ? "Strong" : score ? "Average" : "Weak", va + " with " + vb);
+  }
+
+  function vashyaFriendly(a, b) {
+    var pair = [a, b].sort().join("-");
+    return ["Chatushpada-Manav", "Chatushpada-Jalachara", "Jalachara-Manav"].indexOf(pair) >= 0;
+  }
+
+  function vashyaGroup(sign) {
+    if ([2, 5, 6, 10].indexOf(sign) >= 0) return "Manav";
+    if ([0, 1, 8, 9].indexOf(sign) >= 0) return "Chatushpada";
+    if ([3, 11].indexOf(sign) >= 0) return "Jalachara";
+    if (sign === 4) return "Vanachara";
+    return "Keeta";
+  }
+
+  function taraKoota(a, b) {
+    var na = nakshatraIndex(a.lon);
+    var nb = nakshatraIndex(b.lon);
+    var score = (taraGood(na, nb) ? 1.5 : 0) + (taraGood(nb, na) ? 1.5 : 0);
+    return kootaRow("Tara", score, 3, score === 3 ? "Auspicious" : score ? "Mixed" : "Difficult", "Birth star count both ways");
+  }
+
+  function taraGood(from, to) {
+    var count = ((to - from + 27) % 27) + 1;
+    return [3, 5, 7].indexOf(count % 9 || 9) < 0;
+  }
+
+  function yoniKoota(a, b) {
+    var ya = yoniAnimal(nakshatraIndex(a.lon));
+    var yb = yoniAnimal(nakshatraIndex(b.lon));
+    var enemy = yoniEnemies().some(function (pair) { return pair.indexOf(ya) >= 0 && pair.indexOf(yb) >= 0; });
+    var score = ya === yb ? 4 : enemy ? 0 : 2;
+    return kootaRow("Yoni", score, 4, score === 4 ? "Strong attraction" : score ? "Neutral" : "Incompatible", ya + " with " + yb);
+  }
+
+  function yoniAnimal(index) {
+    return ["Horse", "Elephant", "Sheep", "Serpent", "Serpent", "Dog", "Cat", "Sheep", "Cat", "Rat", "Rat", "Cow", "Buffalo", "Tiger", "Buffalo", "Tiger", "Deer", "Deer", "Dog", "Monkey", "Mongoose", "Monkey", "Lion", "Horse", "Lion", "Cow", "Elephant"][index % 27];
+  }
+
+  function yoniEnemies() {
+    return [["Cow", "Tiger"], ["Elephant", "Lion"], ["Horse", "Buffalo"], ["Dog", "Deer"], ["Serpent", "Mongoose"], ["Monkey", "Sheep"], ["Cat", "Rat"]];
+  }
+
+  function grahaMaitriKoota(a, b) {
+    var la = SIGNS[a.sign].lord;
+    var lb = SIGNS[b.sign].lord;
+    var relation = mutualPlanetRelation(la, lb);
+    var score = relation === "Same" || relation === "Mutual friend" ? 5 : relation === "Friendly-neutral" ? 4 : relation === "Neutral" ? 3 : relation === "Mixed" ? 2 : 0;
+    return kootaRow("Graha Maitri", score, 5, relation, la + " with " + lb);
+  }
+
+  function mutualPlanetRelation(a, b) {
+    if (a === b) return "Same";
+    var ab = planetFriendType(a, b);
+    var ba = planetFriendType(b, a);
+    if (ab === "friend" && ba === "friend") return "Mutual friend";
+    if ((ab === "friend" && ba === "neutral") || (ab === "neutral" && ba === "friend")) return "Friendly-neutral";
+    if (ab === "neutral" && ba === "neutral") return "Neutral";
+    if (ab === "enemy" && ba === "enemy") return "Mutual enemy";
+    return "Mixed";
+  }
+
+  function planetFriendType(a, b) {
+    var data = FRIENDS[a] || { friend: [], neutral: [], enemy: [] };
+    if (data.friend.indexOf(b) >= 0) return "friend";
+    if (data.enemy.indexOf(b) >= 0) return "enemy";
+    return "neutral";
+  }
+
+  function ganaKoota(a, b) {
+    var ga = ganaGroup(nakshatraIndex(a.lon));
+    var gb = ganaGroup(nakshatraIndex(b.lon));
+    var score = ga === gb ? 6 : (ga === "Rakshasa" || gb === "Rakshasa") ? (ga === "Manushya" || gb === "Manushya" ? 1 : 0) : 5;
+    return kootaRow("Gana", score, 6, score === 6 ? "Same temperament" : score >= 5 ? "Compatible" : "Difficult", ga + " with " + gb);
+  }
+
+  function ganaGroup(index) {
+    var groups = ["Deva", "Manushya", "Rakshasa", "Manushya", "Deva", "Manushya", "Deva", "Deva", "Rakshasa", "Rakshasa", "Manushya", "Manushya", "Deva", "Rakshasa", "Deva", "Rakshasa", "Deva", "Rakshasa", "Rakshasa", "Manushya", "Manushya", "Deva", "Rakshasa", "Rakshasa", "Manushya", "Manushya", "Deva"];
+    return groups[index % 27];
+  }
+
+  function bhakootKoota(a, b) {
+    var distance = moonSignDistance(a.sign, b.sign);
+    var bad = ["2/12", "6/8", "5/9"].indexOf(distance.label) >= 0;
+    return kootaRow("Bhakoot", bad ? 0 : 7, 7, bad ? "Dosha" : "Compatible", distance.label + " rashi relation");
+  }
+
+  function nadiKoota(a, b) {
+    var na = nakshatraIndex(a.lon) % 3;
+    var nb = nakshatraIndex(b.lon) % 3;
+    var names = ["Adi", "Madhya", "Antya"];
+    return kootaRow("Nadi", na === nb ? 0 : 8, 8, na === nb ? "Same Nadi dosha" : "Compatible", names[na] + " with " + names[nb]);
+  }
+
+  function kootaRow(name, score, max, judgement, basis) {
+    return { name: name, score: roundToHalf(score), max: max, judgement: judgement, basis: basis };
+  }
+
+  function additionalKutas(chartA, chartB) {
+    var na = nakshatraIndex(chartA.planetsByName.Moon.lon);
+    var nb = nakshatraIndex(chartB.planetsByName.Moon.lon);
+    var distanceAB = ((nb - na + 27) % 27) + 1;
+    var distanceBA = ((na - nb + 27) % 27) + 1;
+    return [
+      { name: "Mahendra", result: [4, 7, 10, 13, 16, 19, 22, 25].indexOf(distanceAB) >= 0 ? "Auspicious" : "Inauspicious", basis: "Nakshatra distance " + distanceAB },
+      { name: "Stree Deergha", result: distanceAB >= 13 ? "Auspicious" : "Inauspicious", basis: "Bride-to-groom style star distance reference " + distanceAB },
+      { name: "Rajju", result: rajjuGroup(na) === rajjuGroup(nb) ? "Inauspicious" : "Auspicious", basis: rajjuGroup(na) + " with " + rajjuGroup(nb) },
+      { name: "Vedha", result: vedhaPair(na) === nb || vedhaPair(nb) === na ? "Inauspicious" : "Auspicious", basis: "Vedha star check both ways" },
+      { name: "Rashi Lord Harmony", result: grahaMaitriKoota(chartA.planetsByName.Moon, chartB.planetsByName.Moon).score >= 3 ? "Auspicious" : "Inauspicious", basis: mutualPlanetRelation(SIGNS[chartA.planetsByName.Moon.sign].lord, SIGNS[chartB.planetsByName.Moon.sign].lord) }
+    ].map(function (row) {
+      row.reverseBasis = "Reverse star distance " + distanceBA;
+      return row;
+    });
+  }
+
+  function additionalKutasPanel(rows) {
+    return '<div class="panel-box"><h3>5 Additional Kutas</h3><div class="table-wrap compact-table"><table><thead><tr><th>Kuta</th><th>Result</th><th>Basis</th></tr></thead><tbody>' +
+      rows.map(function (row) {
+        return "<tr><td><strong>" + escapeHtml(row.name) + "</strong></td><td>" + escapeHtml(row.result) + "</td><td>" + escapeHtml(row.basis) + "</td></tr>";
+      }).join("") +
+      "</tbody></table></div></div>";
+  }
+
+  function compatibilityObservationPanel(rows) {
+    return '<div class="panel-box"><h3>13 Compatibility Observations</h3><div class="table-wrap compact-table"><table><thead><tr><th>#</th><th>Observation</th><th>Result</th></tr></thead><tbody>' +
+      rows.map(function (row, index) {
+        return "<tr><td>" + (index + 1) + "</td><td><strong>" + escapeHtml(row.name) + "</strong></td><td>" + escapeHtml(row.result) + "</td></tr>";
+      }).join("") +
+      "</tbody></table></div></div>";
+  }
+
+  function compatibilityObservations(chartA, chartB, input) {
+    var aMars = mangalHouses(chartA);
+    var bMars = mangalHouses(chartB);
+    var a7 = chartA.houses[6];
+    var b7 = chartB.houses[6];
+    var aVenus = chartA.planetsByName.Venus;
+    var bVenus = chartB.planetsByName.Venus;
+    var aJupiter = chartA.planetsByName.Jupiter;
+    var bJupiter = chartB.planetsByName.Jupiter;
+    return [
+      { name: "Mangal dosha balance", result: (aMars.active === bMars.active ? "Balanced" : "Uneven") + " (" + aMars.text + "; " + bMars.text + ")" },
+      { name: "7th house strength", result: "Native " + a7.label + "; Partner " + b7.label },
+      { name: "7th lord strength", result: lordOfHouse(chartA, 7) + " " + planetPredictionStatus(chartA, chartA.planetsByName[lordOfHouse(chartA, 7)]) + "; " + lordOfHouse(chartB, 7) + " " + planetPredictionStatus(chartB, chartB.planetsByName[lordOfHouse(chartB, 7)]) },
+      { name: "Venus condition", result: "Native " + conditionText(aVenus) + " / " + aVenus.dignity + "; Partner " + conditionText(bVenus) + " / " + bVenus.dignity },
+      { name: "Jupiter condition", result: "Native " + conditionText(aJupiter) + " / " + aJupiter.dignity + "; Partner " + conditionText(bJupiter) + " / " + bJupiter.dignity },
+      { name: "Moon harmony", result: moonSignDistanceText(chartA.planetsByName.Moon.sign, chartB.planetsByName.Moon.sign) },
+      { name: "Nodal pressure on 1/7", result: nodalAxisPressure(chartA) + "; " + nodalAxisPressure(chartB) },
+      { name: "Saturn pressure on marriage axis", result: saturnMarriagePressure(chartA) + "; " + saturnMarriagePressure(chartB) },
+      { name: "Family house support", result: "Native H2 " + chartA.houses[1].label + "; Partner H2 " + chartB.houses[1].label },
+      { name: "Longevity of bond / 8th support", result: "Native H8 " + chartA.houses[7].label + "; Partner H8 " + chartB.houses[7].label },
+      { name: "Navamsha lagna relation", result: d9RelationText(chartA, chartB) },
+      { name: "Dasha synchronization", result: "Native current " + currentDashaCode(chartA, input) + "; Partner checked by natal promise and Moon matching" },
+      { name: "Overall practical note", result: compatibilityPracticalNote(chartA, chartB) }
+    ];
+  }
+
+  function mangalHouses(chart) {
+    var mars = chart.planetsByName.Mars;
+    var active = [1, 2, 4, 7, 8, 12].indexOf(mars.house) >= 0;
+    return { active: active, text: "Mars H" + mars.house + (active ? " active" : " not active") };
+  }
+
+  function nodalAxisPressure(chart) {
+    var rahu = chart.planetsByName.Rahu;
+    var ketu = chart.planetsByName.Ketu;
+    return (rahu.house === 1 || rahu.house === 7 || ketu.house === 1 || ketu.house === 7) ? "Nodes touch 1/7 axis" : "Nodes away from 1/7 axis";
+  }
+
+  function saturnMarriagePressure(chart) {
+    var saturn = chart.planetsByName.Saturn;
+    return (saturn.house === 7 || planetAspectsHouse(saturn, 7)) ? "Saturn influences H7" : "No direct Saturn H7 influence";
+  }
+
+  function d9RelationText(chartA, chartB) {
+    var d9a = makeVargaChart(chartA, 9);
+    var d9b = makeVargaChart(chartB, 9);
+    return "Native D9 " + d9a.ascendant.signName + "; Partner D9 " + d9b.ascendant.signName + "; " + moonSignDistanceText(d9a.ascendant.sign, d9b.ascendant.sign);
+  }
+
+  function currentDashaCode(chart, input) {
+    var stack = findDashaStack(chart.vimshottari.timeline, input.asOfInstant);
+    return stack.map(function (p) { return p.lord; }).join("-") || "-";
+  }
+
+  function compatibilityPracticalNote(chartA, chartB) {
+    var combined = average([chartA.houses[6].score, chartB.houses[6].score, chartA.planetsByName.Venus.strength.score, chartB.planetsByName.Venus.strength.score]);
+    return combined >= 62 ? "Marriage promise is supportive when dasha permits." : combined >= 48 ? "Workable with conscious adjustment and dasha support." : "Needs careful human review before final judgement.";
+  }
+
+  function rajjuGroup(index) {
+    return ["Pada", "Kati", "Nabhi", "Kantha", "Shiro"][index % 5];
+  }
+
+  function vedhaPair(index) {
+    return (index + 13) % 27;
+  }
+
+  function moonSignDistance(a, b) {
+    var forward = ((b - a + 12) % 12) + 1;
+    var reverse = ((a - b + 12) % 12) + 1;
+    return { forward: forward, reverse: reverse, label: forward + "/" + reverse };
+  }
+
+  function moonSignDistanceText(a, b) {
+    var distance = moonSignDistance(a, b);
+    return distance.label + " relation (" + SIGNS[a].name + " to " + SIGNS[b].name + ")";
+  }
+
+  function roundToHalf(value) {
+    return Math.round(Number(value) * 2) / 2;
+  }
+
+  function nakshatraIndex(lon) {
+    return Math.floor(normalize(lon) / NAK_SIZE) % 27;
+  }
+
+  function chakrasSection(chart) {
+    return '<section id="viewA-chakras" class="section chakras-section"><div class="section-head"><div><p class="eyebrow">Chakras</p><h3>Sarvatobhadra, Kota And Sanghatta Chakra</h3></div><span class="small-pill">Nakshatra chakras</span></div>' +
+      '<div class="report-grid">' + sarvatobhadraPanel(chart) + kotaChakraPanel(chart) + sanghattaChakraPanel(chart) + "</div></section>";
+  }
+
+  function sarvatobhadraPanel(chart) {
+    var names = sarvatobhadraNakshatras();
+    var rows = names.map(function (name, index) {
+      var occupants = chart.planets.filter(function (p) { return sarvatobhadraIndexForPlanet(p) === index; }).map(prop("name"));
+      var vedhaName = names[(index + 14) % names.length];
+      return "<tr><td><strong>" + (index + 1) + "</strong></td><td>" + escapeHtml(name) + "</td><td>" + escapeHtml(occupants.join(", ") || "-") + "</td><td>" + escapeHtml(vedhaName) + "</td></tr>";
+    }).join("");
+    return '<div class="panel-box"><h3>Sarvatobhadra Chakra</h3><div class="table-wrap compact-table"><table><thead><tr><th>#</th><th>Nakshatra</th><th>Graha occupying</th><th>Opposite vedha line</th></tr></thead><tbody>' + rows + "</tbody></table></div></div>";
+  }
+
+  function sarvatobhadraNakshatras() {
+    return ["Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra", "Punarvasu", "Pushya", "Ashlesha", "Magha", "Purva Phalguni", "Uttara Phalguni", "Hasta", "Chitra", "Swati", "Vishakha", "Anuradha", "Jyeshtha", "Mula", "Purva Ashadha", "Uttara Ashadha", "Abhijit", "Shravana", "Dhanishta", "Shatabhisha", "Purva Bhadrapada", "Uttara Bhadrapada", "Revati"];
+  }
+
+  function sarvatobhadraIndexForPlanet(planet) {
+    var index = nakshatraIndex(planet.lon);
+    return index <= 20 ? index : index + 1;
+  }
+
+  function kotaChakraPanel(chart) {
+    var moonIndex = nakshatraIndex(chart.planetsByName.Moon.lon);
+    var rings = ["Stambha", "Madhya", "Prakara", "Bahya"];
+    var rows = rings.map(function (ring) {
+      var planets = chart.planets.filter(function (p) { return kotaRing(moonIndex, nakshatraIndex(p.lon)) === ring; }).map(function (p) { return p.name + " (" + p.nakshatra + ")"; });
+      return "<tr><td><strong>" + escapeHtml(ring) + "</strong></td><td>" + escapeHtml(planets.join(", ") || "-") + "</td><td>" + escapeHtml(kotaRingMeaning(ring)) + "</td></tr>";
+    }).join("");
+    return '<div class="panel-box"><h3>Kota Chakra</h3><p class="fine-print">Reference star: ' + escapeHtml(chart.planetsByName.Moon.nakshatra) + '.</p><div class="table-wrap compact-table"><table><thead><tr><th>Fort ring</th><th>Planets falling there</th><th>Reading use</th></tr></thead><tbody>' + rows + "</tbody></table></div></div>";
+  }
+
+  function kotaRing(baseIndex, planetIndex) {
+    var relative = (planetIndex - baseIndex + 27) % 27;
+    if (relative <= 3) return "Stambha";
+    if (relative <= 10) return "Madhya";
+    if (relative <= 19) return "Prakara";
+    return "Bahya";
+  }
+
+  function kotaRingMeaning(ring) {
+    return { Stambha: "central pillar; direct vitality and core protection", Madhya: "inner fort; support and stabilization", Prakara: "wall zone; pressure and defence", Bahya: "outer zone; external events and exposure" }[ring] || "";
+  }
+
+  function sanghattaChakraPanel(chart) {
+    var groups = [0, 1, 2, 3, 4, 5, 6].map(function (group) {
+      var members = NAKSHATRAS.filter(function (_, index) { return index % 7 === group; });
+      var planets = chart.planets.filter(function (p) { return nakshatraIndex(p.lon) % 7 === group; }).map(prop("name"));
+      return "<tr><td><strong>Group " + (group + 1) + "</strong></td><td>" + escapeHtml(members.join(", ")) + "</td><td>" + escapeHtml(planets.join(", ") || "-") + "</td></tr>";
+    }).join("");
+    return '<div class="panel-box"><h3>Sanghatta Chakra</h3><div class="table-wrap compact-table"><table><thead><tr><th>Group</th><th>Nakshatra cluster</th><th>Grahas</th></tr></thead><tbody>' + groups + "</tbody></table></div></div>";
+  }
+
+  function kpPlanetarySignificationTable(kp) {
+    var rows = kp.planets.map(function (planet) {
+      return "<tr><td><strong>" + escapeHtml(planet.name) + "</strong></td><td>" + escapeHtml(kpLongitudeText(planet.lon)) + "</td><td>H" + planet.house + "</td><td>" + escapeHtml(planet.kp.starLord) + "</td><td>" + escapeHtml(planet.kp.subLord) + "</td><td>" + escapeHtml(planet.kp.subSubLord) + "</td><td>" + escapeHtml(kpPlanetSignificationText(kp, planet.name)) + "</td><td>" + escapeHtml(kpPlanetSignificationText(kp, planet.kp.starLord)) + "</td><td>" + escapeHtml(kpPlanetSignificationText(kp, planet.kp.subLord)) + "</td><td>" + escapeHtml(kpPlanetSignificationText(kp, planet.kp.subSubLord)) + "</td></tr>";
+    }).join("");
+    return '<div class="panel-box kp-table-panel"><h3>Planetary Significations Upto Sub-Sub Lord</h3><div class="table-wrap"><table class="kp-table"><thead><tr><th>Planet</th><th>KP Longitude</th><th>House</th><th>Star Lord</th><th>Sub Lord</th><th>Sub-Sub Lord</th><th>Planet Signifies</th><th>Star Lord Signifies</th><th>Sub Lord Signifies</th><th>Sub-Sub Lord Signifies</th></tr></thead><tbody>' + rows + "</tbody></table></div></div>";
+  }
+
+  function kpCuspSignificationTable(kp) {
+    var rows = kp.cusps.map(function (cusp) {
+      return "<tr><td><strong>H" + cusp.house + "</strong></td><td>" + escapeHtml(kpLongitudeText(cusp.lon)) + "</td><td>" + escapeHtml(cusp.signLord) + "</td><td>" + escapeHtml(cusp.kp.starLord) + "</td><td>" + escapeHtml(cusp.kp.subLord) + "</td><td>" + escapeHtml(cusp.kp.subSubLord) + "</td><td>H" + cusp.house + "</td><td>" + escapeHtml(kpPlanetSignificationText(kp, cusp.signLord)) + "</td><td>" + escapeHtml(kpPlanetSignificationText(kp, cusp.kp.starLord)) + "</td><td>" + escapeHtml(kpPlanetSignificationText(kp, cusp.kp.subLord)) + "</td><td>" + escapeHtml(kpPlanetSignificationText(kp, cusp.kp.subSubLord)) + "</td></tr>";
+    }).join("");
+    return '<div class="panel-box kp-table-panel"><h3>Cusp Significations Upto Sub-Sub Lord</h3><div class="table-wrap"><table class="kp-table"><thead><tr><th>Cusp</th><th>KP Longitude</th><th>Sign Lord</th><th>Star Lord</th><th>Sub Lord</th><th>Sub-Sub Lord</th><th>Cusp</th><th>Sign Lord Signifies</th><th>Star Lord Signifies</th><th>Sub Lord Signifies</th><th>Sub-Sub Lord Signifies</th></tr></thead><tbody>' + rows + "</tbody></table></div></div>";
+  }
+
+  function kpPlanetSignificationText(kp, planetName) {
+    var planet = kp.planetsByName[planetName];
+    if (!planet) return "-";
+    var parts = ["Occ H" + planet.house];
+    var owned = kpOwnedHouses(kp, planetName);
+    if (owned.length) parts.push("Own " + kpHouseList(owned));
+    if (planetName === "Rahu" || planetName === "Ketu") {
+      var dispositor = SIGNS[planet.sign].lord;
+      var dispositorOwned = kpOwnedHouses(kp, dispositor);
+      parts.push("Disp " + dispositor + (dispositorOwned.length ? " owns " + kpHouseList(dispositorOwned) : ""));
+    }
+    return parts.join("; ");
+  }
+
+  function kpOwnedHouses(kp, planetName) {
+    if (planetName === "Rahu" || planetName === "Ketu") return [];
+    return kp.cusps.filter(function (cusp) {
+      return cusp.signLord === planetName;
+    }).map(prop("house"));
+  }
+
+  function kpHouseList(houses) {
+    return houses.length ? houses.map(function (house) { return "H" + house; }).join(", ") : "-";
+  }
+
+  function kpLongitudeText(lon) {
+    var sign = signIndex(lon);
+    return SIGNS[sign].name + " " + decimalToDms(normalize(lon) - sign * 30);
+  }
+
+  function samudayaRowHtml(label, values, total, cls) {
+    return '<tr class="' + cls + '"><td>' + escapeHtml(label) + "</td>" + values.map(function (value) { return "<td>" + value + "</td>"; }).join("") + "<td>" + total + "</td></tr>";
+  }
+
+  function samudayaAshtakavargaData(chart) {
+    var bySign = sarvashtakavargaBySign(chart);
+    var houseSigns = chart.houses.map(prop("sign"));
+    var rows = {};
+    var rowTotals = {};
+    CLASSICAL_PLANETS.forEach(function (name) {
+      rows[name] = houseSigns.map(function (sign) { return bySign[sign].bav[name]; });
+      rowTotals[name] = rows[name].reduce(sum, 0);
+    });
+    var lagna = houseSigns.map(function (sign) { return lagnaAshtakavargaValue(chart, sign); });
+    var lagnaTotal = lagna.reduce(sum, 0);
+    var columnTotals = houseSigns.map(function (sign, index) {
+      return CLASSICAL_PLANETS.reduce(function (total, name) { return total + bySign[sign].bav[name]; }, 0);
+    });
+    return {
+      houseNumbers: chart.houses.map(prop("house")),
+      lagna: lagna,
+      lagnaTotal: lagnaTotal,
+      rows: rows,
+      rowTotals: rowTotals,
+      columnTotals: columnTotals,
+      grandTotal: columnTotals.reduce(sum, 0)
+    };
+  }
+
+  function lagnaAshtakavargaValue(chart, sign) {
+    var value = 0;
+    CLASSICAL_PLANETS.forEach(function (target) {
+      var relative = houseFromSign(chart.ascendant.sign, sign);
+      if (ashtakavargaRules()[target].Lagna.indexOf(relative) >= 0) value += 1;
+    });
+    return value;
+  }
+
+  function sum(total, value) {
+    return total + value;
+  }
+
+  function sarvashtakavargaRows(chart) {
+    var bySign = sarvashtakavargaBySign(chart);
+    return chart.houses.map(function (house) {
+      var sign = house.sign;
+      var bindu = bySign[sign].sav;
+      return {
+        house: house.house,
+        sign: house.signName,
+        bav: bySign[sign].bav,
+        bindu: bindu,
+        strength: bindu >= 32 ? "Strong" : bindu >= 25 ? "Average" : "Weak",
+        lord: house.lord,
+        tenants: house.tenants.map(prop("name")).join(", ") || "-"
+      };
+    });
+  }
+
+  function sarvashtakavargaBySign(chart) {
+    var rules = ashtakavargaRules();
+    return SIGNS.map(function (_, sign) {
+      var bav = {};
+      var sav = 0;
+      CLASSICAL_PLANETS.forEach(function (target) {
+        var total = 0;
+        Object.keys(rules[target]).forEach(function (contributor) {
+          var baseSign = contributor === "Lagna" ? chart.ascendant.sign : chart.planetsByName[contributor].sign;
+          var relative = houseFromSign(baseSign, sign);
+          if (rules[target][contributor].indexOf(relative) >= 0) total += 1;
+        });
+        bav[target] = total;
+        sav += total;
+      });
+      return { sign: sign, bav: bav, sav: sav };
+    });
+  }
+
+  function ashtakavargaRules() {
+    return {
+      Sun: {
+        Sun: [1, 2, 4, 7, 8, 9, 10, 11],
+        Moon: [3, 6, 10, 11],
+        Mars: [1, 2, 4, 7, 8, 9, 10, 11],
+        Mercury: [3, 5, 6, 9, 10, 11, 12],
+        Jupiter: [5, 6, 9, 11],
+        Venus: [6, 7, 12],
+        Saturn: [1, 2, 4, 7, 8, 9, 10, 11],
+        Lagna: [3, 4, 6, 10, 11, 12]
+      },
+      Moon: {
+        Sun: [3, 6, 7, 8, 10, 11],
+        Moon: [1, 3, 6, 7, 10, 11],
+        Mars: [2, 3, 5, 6, 9, 10, 11],
+        Mercury: [1, 3, 4, 5, 7, 8, 10, 11],
+        Jupiter: [1, 4, 7, 8, 10, 11, 12],
+        Venus: [3, 4, 5, 7, 9, 10, 11],
+        Saturn: [3, 5, 6, 11],
+        Lagna: [3, 6, 10, 11]
+      },
+      Mars: {
+        Sun: [3, 5, 6, 10, 11],
+        Moon: [3, 6, 11],
+        Mars: [1, 2, 4, 7, 8, 10, 11],
+        Mercury: [3, 5, 6, 11],
+        Jupiter: [6, 10, 11, 12],
+        Venus: [6, 8, 11, 12],
+        Saturn: [1, 4, 7, 8, 9, 10, 11],
+        Lagna: [1, 3, 6, 10, 11]
+      },
+      Mercury: {
+        Sun: [5, 6, 9, 11, 12],
+        Moon: [2, 4, 6, 8, 10, 11],
+        Mars: [1, 2, 4, 7, 8, 9, 10, 11],
+        Mercury: [1, 3, 5, 6, 9, 10, 11, 12],
+        Jupiter: [6, 8, 11, 12],
+        Venus: [1, 2, 3, 4, 5, 8, 9, 11],
+        Saturn: [1, 2, 4, 7, 8, 9, 10, 11],
+        Lagna: [1, 2, 4, 6, 8, 10, 11]
+      },
+      Jupiter: {
+        Sun: [1, 2, 3, 4, 7, 8, 9, 10, 11],
+        Moon: [2, 5, 7, 9, 11],
+        Mars: [1, 2, 4, 7, 8, 10, 11],
+        Mercury: [1, 2, 4, 5, 6, 9, 10, 11],
+        Jupiter: [1, 2, 3, 4, 7, 8, 10, 11],
+        Venus: [2, 5, 6, 9, 10, 11],
+        Saturn: [3, 5, 6, 12],
+        Lagna: [1, 2, 4, 5, 6, 7, 9, 10, 11]
+      },
+      Venus: {
+        Sun: [8, 11, 12],
+        Moon: [1, 2, 3, 4, 5, 8, 9, 11, 12],
+        Mars: [3, 5, 6, 9, 11, 12],
+        Mercury: [3, 5, 6, 9, 11],
+        Jupiter: [5, 8, 9, 10, 11],
+        Venus: [1, 2, 3, 4, 5, 8, 9, 10, 11],
+        Saturn: [3, 4, 5, 8, 9, 10, 11],
+        Lagna: [1, 2, 3, 4, 5, 8, 9, 11]
+      },
+      Saturn: {
+        Sun: [1, 2, 4, 7, 8, 10, 11],
+        Moon: [3, 6, 11],
+        Mars: [3, 5, 6, 10, 11, 12],
+        Mercury: [6, 8, 9, 10, 11, 12],
+        Jupiter: [5, 6, 11, 12],
+        Venus: [6, 11, 12],
+        Saturn: [3, 5, 6, 11],
+        Lagna: [1, 3, 4, 6, 10, 11]
+      }
+    };
+  }
+
+  // ===========================================================================
+  // Bhinnashtakavarga (per-planet bindu chart) + Prastarashtakavarga
+  // (8-contributor breakdown). Re-uses the existing ashtakavargaRules() table
+  // and chart.planetsByName / chart.ascendant.sign that buildChart populates.
+  // ===========================================================================
+
+  var BAV_CONTRIBUTORS = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Lagna"];
+  // Classical totals per target (used for sanity-display, not for compute):
+  var BAV_CLASSICAL_TOTALS = { Sun: 48, Moon: 49, Mars: 39, Mercury: 54, Jupiter: 56, Venus: 52, Saturn: 39 };
+
+  function prastaraBySignForTarget(chart, targetPlanet) {
+    var rulesForTarget = ashtakavargaRules()[targetPlanet];
+    return SIGNS.map(function (_, sign) {
+      var cells = BAV_CONTRIBUTORS.map(function (contributor) {
+        var baseSign = contributor === "Lagna"
+          ? chart.ascendant.sign
+          : chart.planetsByName[contributor].sign;
+        var relativeHouse = houseFromSign(baseSign, sign);
+        var has = rulesForTarget[contributor].indexOf(relativeHouse) >= 0;
+        return { contributor: contributor, has: has, relative: relativeHouse };
+      });
+      var total = 0;
+      for (var i = 0; i < cells.length; i++) if (cells[i].has) total += 1;
+      return { sign: sign, cells: cells, total: total };
+    });
+  }
+
+  function bhinnaTargetBlock(chart, targetPlanet) {
+    var prastara = prastaraBySignForTarget(chart, targetPlanet);
+    var houseNumbers = chart.houses.map(prop("house"));
+    var signOrder = chart.houses.map(prop("sign"));
+    var grandTotal = prastara.reduce(function (acc, cell) { return acc + cell.total; }, 0);
+    var classicalTotal = BAV_CLASSICAL_TOTALS[targetPlanet];
+
+    var summaryRowCells = signOrder.map(function (sign) {
+      return "<td>" + prastara[sign].total + "</td>";
+    }).join("");
+
+    var summaryHtml =
+      '<div class="panel-box bav-summary-panel">' +
+        '<div class="chart-title-strip">Bhinnashtakavarga &mdash; ' + escapeHtml(targetPlanet) + ' <span class="bav-total-pill">Total ' + grandTotal + ' / ' + classicalTotal + '</span></div>' +
+        '<div class="table-wrap sav-table-wrap">' +
+          '<table class="sav-table bav-summary-table">' +
+            '<thead><tr><th>House</th>' +
+              houseNumbers.map(function (h) { return "<th>" + h + "</th>"; }).join("") +
+              '<th>Total</th></tr></thead>' +
+            '<tbody>' +
+              '<tr class="bav-summary-row"><td>Bindus</td>' + summaryRowCells + '<td>' + grandTotal + '</td></tr>' +
+              '<tr class="bav-summary-row"><td>Sign</td>' + signOrder.map(function (s) { return "<td>" + signShort(s) + "</td>"; }).join("") + '<td></td></tr>' +
+            '</tbody>' +
+          '</table>' +
+        '</div>' +
+      '</div>';
+
+    var prastaraHeaderCells = houseNumbers.map(function (h) { return "<th>" + h + "</th>"; }).join("");
+    var prastaraRows = BAV_CONTRIBUTORS.map(function (contributor) {
+      var cls = contributor === "Lagna" ? "sav-lagna" : "planet-" + contributor.toLowerCase();
+      var contributorTotal = 0;
+      var rowCells = signOrder.map(function (sign) {
+        var cell = prastara[sign].cells.filter(function (c) { return c.contributor === contributor; })[0];
+        if (cell && cell.has) contributorTotal += 1;
+        return '<td class="' + (cell && cell.has ? "prastara-on" : "prastara-off") + '">' + (cell && cell.has ? "<span class=\"prastara-dot\">&#9679;</span>" : "&middot;") + '</td>';
+      }).join("");
+      return '<tr class="' + cls + '"><td><strong>' + escapeHtml(contributor) + '</strong></td>' + rowCells + '<td>' + contributorTotal + '</td></tr>';
+    }).join("");
+    var columnTotalsRow = '<tr class="sav-total-row"><td>Total</td>' +
+      signOrder.map(function (sign) { return '<td>' + prastara[sign].total + '</td>'; }).join("") +
+      '<td>' + grandTotal + '</td></tr>';
+
+    var prastaraHtml =
+      '<div class="panel-box bav-prastara-panel">' +
+        '<div class="chart-title-strip">Prastarashtakavarga &mdash; ' + escapeHtml(targetPlanet) + '</div>' +
+        '<div class="table-wrap sav-table-wrap">' +
+          '<table class="sav-table bav-prastara-table">' +
+            '<thead><tr><th>Contributor</th>' + prastaraHeaderCells + '<th>Total</th></tr></thead>' +
+            '<tbody>' + prastaraRows + columnTotalsRow + '</tbody>' +
+          '</table>' +
+        '</div>' +
+        '<p class="fine-print">Each &#9679; marks one bindu contributed to that house. Rows: eight contributors (seven grahas + Lagna). Columns: 12 houses from natal Asc. Bottom row is the per-house BAV total = sum of all bindus from the eight contributors.</p>' +
+      '</div>';
+
+    return summaryHtml + prastaraHtml;
+  }
+
+  function bhinnaAshtakavargaSection(chart) {
+    var targets = CLASSICAL_PLANETS; // Sun..Saturn
+    var blocks = targets.map(function (planet) { return bhinnaTargetBlock(chart, planet); }).join("");
+    return '<section id="viewA-bav" class="section bav-section">' +
+      '<div class="section-head"><div><p class="eyebrow">Ashtakavarga</p><h3>Bhinnashtakavarga &amp; Prastara</h3></div><span class="small-pill">7 planets &times; (BAV + Prastara)</span></div>' +
+      '<p class="fine-print bav-intro">For each of the seven classical grahas, the upper table is the per-house Bhinnashtakavarga (BAV bindus contributed by all eight contributors). The lower 8&times;12 grid is the Prastarashtakavarga &mdash; which of the eight contributors gave a bindu to which house. The eight contributors are Sun, Moon, Mars, Mercury, Jupiter, Venus, Saturn and Lagna. Classical totals: Sun&nbsp;48, Moon&nbsp;49, Mars&nbsp;39, Mercury&nbsp;54, Jupiter&nbsp;56, Venus&nbsp;52, Saturn&nbsp;39.</p>' +
+      blocks +
+      '</section>';
+  }
+
+  function fullDashaSection(chart, input, preservedState) {
+    var defaultFrom = preservedState && preservedState.rangeFrom ? preservedState.rangeFrom : dateInputValue(input.birthInstant, input.timezone);
+    var defaultTo = preservedState && preservedState.rangeTo ? preservedState.rangeTo : dateInputValue(dashaDisplayRangeEnd(chart, input), input.timezone);
+    var rangeStart = localDateTimeToUtc(defaultFrom, "00:00:00", Number(input.timezone));
+    var rangeEnd = localDateTimeToUtc(defaultTo || defaultFrom, "23:59:59", Number(input.timezone));
+    if (rangeEnd < rangeStart) {
+      defaultFrom = dateInputValue(input.birthInstant, input.timezone);
+      defaultTo = dateInputValue(dashaDisplayRangeEnd(chart, input), input.timezone);
+      rangeStart = input.birthInstant;
+      rangeEnd = dashaDisplayRangeEnd(chart, input);
+    }
+    return '<section id="viewA-dasha" class="section"><div class="section-head"><div><p class="eyebrow">Vimshottari Dasha</p><h3>Dasha Explorer</h3></div><span class="small-pill">120 year cycle</span></div>' +
+      '<div class="panel-box dasha-range-controls"><div class="grid-3"><label>From<input id="dashaRangeFrom" type="date" value="' + escapeHtml(defaultFrom) + '"></label><label>To<input id="dashaRangeTo" type="date" value="' + escapeHtml(defaultTo) + '"></label><label class="button-label">Update range<button type="button" id="dashaRangeUpdateBtn" class="primary-action">Update Dasha</button></label></div><p class="fine-print">Select a From and To date to restrict the dasha explorer. If To is left blank, VedNetra uses the From date for a single-day dasha reference.</p></div>' +
+      '<div id="dashaExplorerMount">' + dashaExplorerPanelHtml(chart, input, rangeStart, rangeEnd) + '</div>' +
+      "</section>";
+  }
+
+  function dashaExplorerPanelHtml(chart, input, rangeStart, rangeEnd) {
+    var tree = fullDashaTree(chart, input, rangeStart, rangeEnd);
+    var rowCount = dashaRowsInRange(chart, rangeStart, rangeEnd).length;
+    return '<div class="panel-box dasha-panel"><div class="dasha-titlebar"><strong>Vimshottari</strong><span class="small-pill">' + tree.length + ' MD periods</span></div><p class="fine-print">Default view shows MD only. Open MD to see MD-AD, open AD to see MD-AD-PD, open PD to see Sookshma, and open a Sookshma row to see Prana Dasha. Tool range: selected date range. Downloaded reports include dasha rows from birth through report date plus 5 years only. Year length: 365.25 days; balance is calculated by Moon degree in birth nakshatra.</p><div class="dasha-group-list dasha-tree">' +
+      tree.map(function (md) { return dashaMdHtml(md, input); }).join("") +
+      '</div><p class="fine-print">Total Sookshma rows in range: ' + rowCount + ". Prana rows are generated only when a Sookshma row is opened, so the table remains usable.</p></div>" +
+      commentaryBox("Dasha Table Commentary", "This hierarchical table is source timing data: MD is visible first, then each level can be expanded down to Sookshma and Prana for detailed timing reference.");
+  }
+
+  function fullDashaTree(chart, input, rangeStart, rangeEnd) {
+    return fullDashaTreeFromRows(rangeStart && rangeEnd ? dashaRowsInRange(chart, rangeStart, rangeEnd) : fullDashaRows(chart, input));
+  }
+
+  function fullDashaTreeFromRows(rows) {
+    var map = {};
+    var tree = [];
+    rows.forEach(function (row) {
+      var mdKey = row.mdKey || row.md + "|" + row.mdStart.getTime() + "|" + row.mdEnd.getTime();
+      if (!map[mdKey]) {
+        map[mdKey] = { lord: row.md, start: row.mdStart, end: row.mdEnd, ads: [], adMap: {} };
+        tree.push(map[mdKey]);
+      }
+      var md = map[mdKey];
+      updateRange(md, row.mdStart, row.mdEnd);
+      var adKey = row.adKey || row.ad + "|" + row.adStart.getTime() + "|" + row.adEnd.getTime();
+      if (!md.adMap[adKey]) {
+        md.adMap[adKey] = { lord: row.ad, md: row.md, start: row.adStart, end: row.adEnd, pds: [], pdMap: {} };
+        md.ads.push(md.adMap[adKey]);
+      }
+      var ad = md.adMap[adKey];
+      updateRange(ad, row.adStart, row.adEnd);
+      var pdKey = row.pdKey || row.pd + "|" + row.pdStart.getTime() + "|" + row.pdEnd.getTime();
+      if (!ad.pdMap[pdKey]) {
+        ad.pdMap[pdKey] = { lord: row.pd, md: row.md, ad: row.ad, start: row.pdStart, end: row.pdEnd, sds: [] };
+        ad.pds.push(ad.pdMap[pdKey]);
+      }
+      var pd = ad.pdMap[pdKey];
+      updateRange(pd, row.pdStart, row.pdEnd);
+      pd.sds.push(row);
+    });
+    return tree;
+  }
+
+  function updateRange(group, start, end) {
+    if (start < group.start) group.start = start;
+    if (end > group.end) group.end = end;
+  }
+
+  function dashaStateKey(level, md, ad, pd, sd) {
+    return [level, md, ad, pd, sd].filter(Boolean).join("|");
+  }
+
+  function dashaMdHtml(md, input) {
+    return '<details class="dasha-group dasha-md" data-dasha-key="' + escapeHtml(dashaStateKey("MD", md.lord)) + '"><summary><strong>' + escapeHtml(md.lord) + '</strong>' + dashaSummarySpan(md.start, md.end, input.timezone) + dashaLevelButtons("MD") + '</summary><div class="dasha-nested">' +
+      md.ads.map(function (ad) { return dashaAdHtml(md, ad, input); }).join("") +
+      "</div></details>";
+  }
+
+  function dashaAdHtml(md, ad, input) {
+    return '<details class="dasha-group dasha-ad" data-dasha-key="' + escapeHtml(dashaStateKey("AD", md.lord, ad.lord)) + '"><summary><strong>' + escapeHtml(dashaCode(md.lord, ad.lord)) + '</strong>' + dashaSummarySpan(ad.start, ad.end, input.timezone) + dashaLevelButtons("AD") + '</summary><div class="dasha-nested">' +
+      ad.pds.map(function (pd) { return dashaPdHtml(md, ad, pd, input); }).join("") +
+      "</div></details>";
+  }
+
+  function dashaPdHtml(md, ad, pd, input) {
+    return '<details class="dasha-group dasha-pd" data-dasha-key="' + escapeHtml(dashaStateKey("PD", md.lord, ad.lord, pd.lord)) + '"><summary><strong>' + escapeHtml(dashaCode(md.lord, ad.lord, pd.lord)) + '</strong>' + dashaSummarySpan(pd.start, pd.end, input.timezone) + dashaLevelButtons("PD") + '</summary><div class="dasha-sd-list">' +
+      pd.sds.map(function (row, rowIndex) {
+        return dashaSdHtml(row, rowIndex, input);
+      }).join("") + "</div></details>";
+  }
+
+  function dashaSdHtml(row, rowIndex, input) {
+    return '<details class="dasha-group dasha-sd" data-dasha-key="' + escapeHtml(dashaStateKey("SD", row.md, row.ad, row.pd, row.sd)) + '" data-md="' + escapeHtml(row.md) + '" data-ad="' + escapeHtml(row.ad) + '" data-pd="' + escapeHtml(row.pd) + '" data-sd="' + escapeHtml(row.sd) + '" data-start="' + row.start.getTime() + '" data-end="' + row.end.getTime() + '">' +
+      '<summary><strong>' + escapeHtml((rowIndex + 1) + ". " + dashaCode(row.md, row.ad, row.pd, row.sd)) + '</strong>' + dashaSummarySpan(row.start, row.end, input.timezone) + dashaLevelButtons("SD") + '</summary>' +
+      '<div class="dasha-prana-body"><p class="fine-print">Open to generate Prana Dasha rows for this Sookshma period.</p></div></details>';
+  }
+
+  function dashaLevelButtons(level) {
+    return "";
+  }
+
+  function renderPranaRowsForDetails(details, timezone) {
+    if (!details || details.dataset.pranaRendered === "1") return;
+    var body = details.querySelector(".dasha-prana-body");
+    if (!body) return;
+    var md = details.getAttribute("data-md") || "";
+    var ad = details.getAttribute("data-ad") || "";
+    var pd = details.getAttribute("data-pd") || "";
+    var sd = details.getAttribute("data-sd") || "";
+    var start = new Date(Number(details.getAttribute("data-start")));
+    var end = new Date(Number(details.getAttribute("data-end")));
+    if (!sd || !isFinite(start.getTime()) || !isFinite(end.getTime())) return;
+    var pranas = subPeriods({ lord: sd, start: start, end: end }, "PR");
+    body.innerHTML = '<div class="dasha-prana-head"><strong>Prana</strong>' + dashaLevelButtons("PR") + '</div><div class="table-wrap dasha-prana-table-wrap"><table class="dasha-prana-table"><thead><tr><th>#</th><th>MD-AD-PD-SD-PR</th><th>Start</th><th>To</th></tr></thead><tbody>' +
+      pranas.map(function (pr, index) {
+        return "<tr><td>" + (index + 1) + "</td><td>" + escapeHtml(dashaCode(md, ad, pd, sd, pr.lord)) + "</td><td>" + escapeHtml(dashaDate(pr.start, timezone)) + "</td><td>" + escapeHtml(dashaDate(pr.end, timezone)) + "</td></tr>";
+      }).join("") + "</tbody></table></div>";
+    details.dataset.pranaRendered = "1";
+    setTimeout(wireDashaGroupControls, 0);
+  }
+
+  function dashaSummarySpan(start, end, timezone) {
+    return '<span><b>' + escapeHtml(dashaDate(start, timezone)) + "</b><em>To</em><b>" + escapeHtml(dashaDate(end, timezone)) + "</b></span>";
+  }
+
+  function fullDashaGroups(chart, input) {
+    var grouped = [];
+    var map = {};
+    fullDashaRows(chart, input).forEach(function (row) {
+      var key = row.mdKey + "|" + row.adKey + "|" + row.pdKey;
+      if (!map[key]) {
+        map[key] = { md: row.md, ad: row.ad, pd: row.pd, start: row.start, end: row.end, rows: [] };
+        grouped.push(map[key]);
+      }
+      map[key].rows.push(row);
+      if (row.start < map[key].start) map[key].start = row.start;
+      if (row.end > map[key].end) map[key].end = row.end;
+    });
+    return grouped;
+  }
+
+  function dashaCode(md, ad, pd, sd, pr) {
+    return [md, ad, pd, sd, pr].filter(Boolean).map(function (lord) { return lord.slice(0, 2); }).join("-");
+  }
+
+  function dashaDate(date, tzHours) {
+    var shifted = new Date(date.getTime() + tzHours * 3600000);
+    return pad(shifted.getUTCDate()) + "-" + pad(shifted.getUTCMonth() + 1) + "-" + shifted.getUTCFullYear();
+  }
+
+  function dashaDisplayRangeEnd(chart, input) {
+    return addDays(input.birthInstant, 120 * 365.25);
+  }
+
+  function dashaReportRangeEnd(input) {
+    var reportDate = input && input.reportCreatedAt instanceof Date ? input.reportCreatedAt : (input && input.asOfInstant instanceof Date ? input.asOfInstant : new Date());
+    return addDays(reportDate, 5 * 365.25);
+  }
+
+  function wireDashaGroupControls() {
+    if (typeof document === "undefined" || !document.querySelectorAll) return;
+    wireDashaRangeControls();
+    Array.prototype.slice.call(document.querySelectorAll("[data-dasha-action]")).forEach(function (button) {
+      if (button.dataset.dashaControlWired === "1") return;
+      button.dataset.dashaControlWired = "1";
+      button.addEventListener("click", function () {
+        var action = button.getAttribute("data-dasha-action");
+        var groups = Array.prototype.slice.call(document.querySelectorAll(".dasha-group"));
+        if (action === "collapse") groups.forEach(function (group) { group.open = false; });
+        if (action === "expand" || action === "expand-all") groups.forEach(function (group) {
+          if (!group.classList.contains("dasha-sd")) group.open = true;
+        });
+        if (action === "expand-md") {
+          groups.forEach(function (group) { group.open = false; });
+        }
+        if (action === "first" && groups[0]) {
+          groups.forEach(function (group) { group.open = false; });
+          groups[0].open = true;
+          groups[0].scrollIntoView({ block: "nearest" });
+        }
+        if (action === "last" && groups.length) {
+          groups.forEach(function (group) { group.open = false; });
+          groups[groups.length - 1].open = true;
+          groups[groups.length - 1].scrollIntoView({ block: "nearest" });
+        }
+      });
+    });
+    Array.prototype.slice.call(document.querySelectorAll(".dasha-sd")).forEach(function (details) {
+      if (details.dataset.pranaToggleWired === "1") return;
+      details.dataset.pranaToggleWired = "1";
+      details.addEventListener("toggle", function () {
+        if (!details.open) closeDashaDescendants(details);
+        if (details.open) renderPranaRowsForDetails(details, lastReportInput ? lastReportInput.timezone : 5.5);
+      });
+    });
+    Array.prototype.slice.call(document.querySelectorAll(".dasha-group")).forEach(function (details) {
+      if (details.dataset.dashaToggleWired === "1") return;
+      details.dataset.dashaToggleWired = "1";
+      details.addEventListener("toggle", function () {
+        if (!details.open) closeDashaDescendants(details);
+      });
+    });
+    Array.prototype.slice.call(document.querySelectorAll("[data-dasha-level-action]")).forEach(function (button) {
+      if (button.dataset.dashaLevelWired === "1") return;
+      button.dataset.dashaLevelWired = "1";
+      button.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        var action = button.getAttribute("data-dasha-level-action");
+        if (button.closest(".dasha-prana-head")) {
+          var pranaParent = button.closest(".dasha-sd");
+          if (!pranaParent) return;
+          if (action === "expand") {
+            pranaParent.open = true;
+            renderPranaRowsForDetails(pranaParent, lastReportInput ? lastReportInput.timezone : 5.5);
+          } else {
+            pranaParent.open = false;
+          }
+          return;
+        }
+        var group = button.closest(".dasha-group");
+        if (!group) return;
+        if (action === "expand") {
+          closeDashaDescendants(group);
+          group.open = true;
+          if (group.classList.contains("dasha-sd")) renderPranaRowsForDetails(group, lastReportInput ? lastReportInput.timezone : 5.5);
+        } else {
+          group.open = false;
+          closeDashaDescendants(group);
+        }
+      });
+    });
+  }
+
+  function closeDashaDescendants(group) {
+    if (!group || !group.querySelectorAll) return;
+    Array.prototype.slice.call(group.querySelectorAll(".dasha-group")).forEach(function (child) {
+      child.open = false;
+    });
+  }
+
+  function wireDashaRangeControls() {
+    var button = document.getElementById("dashaRangeUpdateBtn");
+    var fromField = document.getElementById("dashaRangeFrom");
+    var toField = document.getElementById("dashaRangeTo");
+    var mount = document.getElementById("dashaExplorerMount");
+    if (!button || !fromField || !toField || !mount || button.dataset.dashaRangeWired === "1") return;
+    button.dataset.dashaRangeWired = "1";
+    fromField.addEventListener("change", function () {
+      if (!toField.value) toField.value = fromField.value;
+    });
+    button.addEventListener("click", function () {
+      try {
+        if (!fromField.value) throw new Error("Select a From date.");
+        if (!toField.value) toField.value = fromField.value;
+        var input = lastReportInput || readInput();
+        var chart = lastReportChart;
+        if (!chart) throw new Error("Generate the report first.");
+        var start = localDateTimeToUtc(fromField.value, "00:00:00", Number(input.timezone));
+        var end = localDateTimeToUtc(toField.value, "23:59:59", Number(input.timezone));
+        if (end < start) throw new Error("To date must be same as or later than From date.");
+        mount.innerHTML = dashaExplorerPanelHtml(chart, input, start, end);
+        wireDashaGroupControls();
+        enhanceReportTableTopControls();
+      } catch (error) {
+        alertUser(error.message || "Could not update dasha range.");
+      }
+    });
+  }
+
+  function fullDashaRows(chart, input) {
+    var rangeStart = input.birthInstant;
+    var rangeEnd = dashaDisplayRangeEnd(chart, input);
+    return dashaRowsInRange(chart, rangeStart, rangeEnd);
+  }
+
+  function reportDashaRows(chart, input) {
+    return dashaRowsInRange(chart, input.birthInstant, dashaReportRangeEnd(input));
+  }
+
+  function dashaRowsInRange(chart, rangeStart, rangeEnd) {
+    var rows = [];
+    chart.vimshottari.timeline.forEach(function (md) {
+      if (!periodOverlaps(md, rangeStart, rangeEnd)) return;
+      var mdStart = clippedPeriodStart(md, rangeStart);
+      var mdEnd = clippedPeriodEnd(md, rangeEnd);
+      var mdKey = periodKey("MD", md);
+      subPeriods(md, "AD").forEach(function (ad) {
+        if (!periodOverlaps(ad, rangeStart, rangeEnd)) return;
+        var adStart = clippedPeriodStart(ad, rangeStart);
+        var adEnd = clippedPeriodEnd(ad, rangeEnd);
+        var adKey = periodKey("AD", ad);
+        subPeriods(ad, "PD").forEach(function (pd) {
+          if (!periodOverlaps(pd, rangeStart, rangeEnd)) return;
+          var pdStart = clippedPeriodStart(pd, rangeStart);
+          var pdEnd = clippedPeriodEnd(pd, rangeEnd);
+          var pdKey = periodKey("PD", pd);
+          subPeriods(pd, "SD").forEach(function (sd) {
+            if (!periodOverlaps(sd, rangeStart, rangeEnd)) return;
+            rows.push({
+              md: md.lord,
+              ad: ad.lord,
+              pd: pd.lord,
+              sd: sd.lord,
+              mdStart: mdStart,
+              mdEnd: mdEnd,
+              mdKey: mdKey,
+              adStart: adStart,
+              adEnd: adEnd,
+              adKey: adKey,
+              pdStart: pdStart,
+              pdEnd: pdEnd,
+              pdKey: pdKey,
+              start: new Date(Math.max(sd.start.getTime(), rangeStart.getTime())),
+              end: new Date(Math.min(sd.end.getTime(), rangeEnd.getTime()))
+            });
+          });
+        });
+      });
+    });
+    return rows;
+  }
+
+  function periodKey(level, period) {
+    return level + "|" + period.lord + "|" + period.start.getTime() + "|" + period.end.getTime();
+  }
+
+  function clippedPeriodStart(period, rangeStart) {
+    return new Date(Math.max(period.start.getTime(), rangeStart.getTime()));
+  }
+
+  function clippedPeriodEnd(period, rangeEnd) {
+    return new Date(Math.min(period.end.getTime(), rangeEnd.getTime()));
+  }
+
+  function periodOverlaps(period, start, end) {
+    return period.start < end && period.end > start;
+  }
+
+  function d1DetailedTable(chart) {
+    var rows = [d1AscRow(chart)].concat(chart.planets.map(function (p) {
+      return {
+        factor: p.name,
+        zodiac: p.signName,
+        degrees: decimalToDms(p.deg),
+        condition: conditionText(p),
+        avastha: baaladiAvastha(p.deg, p.sign),
+        pushkara: isPushkaraNavamsa(p.lon) ? "Yes" : "-",
+        exaltDebil: exaltDebilText(p),
+        nakshatra: p.nakshatra,
+        pada: "Pada " + p.pada,
+        lord: p.nakLord
+      };
+    }));
+    return '<div class="panel-box d1-details-table-panel"><h3>D-1 Ascendant And Planet Details</h3><div class="table-wrap"><table><thead><tr><th>D1 Asc / Planet</th><th>Zodiac</th><th>Degrees</th><th>Condition</th><th>Avastha</th><th>Pushkara Navamsha</th><th>Exalt/Debil</th><th>Nakshatra</th><th>Nakshatra Pada</th><th>Nakshatra Lord</th></tr></thead><tbody>' +
+      rows.map(function (row) {
+        return "<tr><td><strong>" + escapeHtml(row.factor) + "</strong></td><td>" + escapeHtml(row.zodiac) + "</td><td>" + escapeHtml(row.degrees) + "</td><td>" + escapeHtml(row.condition) + "</td><td>" + escapeHtml(row.avastha) + "</td><td>" + escapeHtml(row.pushkara) + "</td><td>" + escapeHtml(row.exaltDebil) + "</td><td>" + escapeHtml(row.nakshatra) + "</td><td>" + escapeHtml(row.pada) + "</td><td>" + escapeHtml(row.lord) + "</td></tr>";
+      }).join("") + '</tbody></table></div><p class="fine-print">Pushkara Navamsha shows Yes when the placement falls in Pushkara Navamsha.</p></div>';
+  }
+
+  function d1AscRow(chart) {
+    var nak = nakshatraInfo(chart.ascendant.lon);
+    return {
+      factor: "Asc",
+      zodiac: chart.ascendant.signName,
+      degrees: decimalToDms(chart.ascendant.deg),
+      condition: "-",
+      avastha: "-",
+      pushkara: isPushkaraNavamsa(chart.ascendant.lon) ? "Yes" : "-",
+      exaltDebil: "-",
+      nakshatra: nak.name,
+      pada: "Pada " + nak.pada,
+      lord: nak.lord
+    };
+  }
+
+  function exaltDebilText(planet) {
+    if (!planet || (planet.dignity !== "Exalted" && planet.dignity !== "Debilitated")) return "-";
+    return planet.dignity;
+  }
+
+  function isPushkaraNavamsa(lon) {
+    var sign = signIndex(lon);
+    var deg = normalize(lon) - sign * 30;
+    var part = Math.floor(deg / (30 / 9)) + 1;
+    var element = SIGNS[sign].element;
+    if (element === "Fire") return part === 7 || part === 9;
+    if (element === "Earth") return part === 3 || part === 5;
+    if (element === "Air") return part === 6 || part === 8;
+    if (element === "Water") return part === 1 || part === 3;
+    return false;
+  }
+
+  function divisionalPlacementTables(chart) {
+    var rows = vargaDivisions().map(function (division) {
+      var varga = tableVarga(chart, division);
+      return "<tr><td><strong>D-" + division + "</strong><br>" + escapeHtml(vargaName(division)) + "</td><td>" + escapeHtml(varga.ascendant.signName) + "</td>" +
+        PLANETS.map(function (name) {
+          var p = varga.planets.find(function (planet) { return planet.name === name; });
+          return "<td>" + escapeHtml(p ? p.signName + conditionSuffix(p) : "-") + "</td>";
+        }).join("") + "</tr>";
+    }).join("");
+    return '<div class="panel-box"><h3>Divisional Chart Zodiac Placements</h3><div class="table-wrap"><table><thead><tr><th>Divisional chart</th><th>Asc</th>' +
+      PLANETS.map(function (name) { return "<th>" + name + "</th>"; }).join("") +
+      "</tr></thead><tbody>" + rows + "</tbody></table></div><p class=\"fine-print\">Condition markers: R = retrograde, C = combust, RC = both. Ascendant has no combust/retrograde condition.</p></div>";
+  }
+
+  function tableVarga(chart, division) {
+    if (division === 1) {
+      return {
+        source: "Computed",
+        division: 1,
+        ascendant: { sign: chart.ascendant.sign, signName: chart.ascendant.signName, deg: chart.ascendant.deg },
+        planets: chart.planets,
+        planetsByName: chart.planetsByName
+      };
+    }
+    var varga = makeVargaChart(chart, division);
+    varga.source = "Computed";
+    return varga;
+  }
+
+  function conditionText(p) {
+    var flags = [];
+    if (p.retrograde) flags.push("Retrograde");
+    if (p.combust) flags.push("Combust");
+    return flags.join(" / ") || "Normal";
+  }
+
+  function conditionSuffix(p) {
+    var flags = [];
+    if (p.retrograde) flags.push("R");
+    if (p.combust) flags.push("C");
+    return flags.length ? " (" + flags.join("") + ")" : "";
+  }
+
+  function baaladiAvastha(deg, sign) {
+    var odd = isOddSign(sign);
+    if (odd) {
+      if (deg < 6) return "Bala";
+      if (deg < 12) return "Kumara";
+      if (deg < 18) return "Yuva";
+      if (deg < 24) return "Vriddha";
+      return "Mrita";
+    }
+    if (deg < 6) return "Mrita";
+    if (deg < 12) return "Vriddha";
+    if (deg < 18) return "Yuva";
+    if (deg < 24) return "Kumara";
+    return "Bala";
+  }
+
+  function vargaDivisions() {
+    return [1, 2, 3, 4, 7, 9, 10, 12, 16, 20, 24, 27, 30, 40, 45, 60];
+  }
+
+  function vargaName(division) {
+    var names = {
+      1: "Rashi",
+      2: "Hora",
+      3: "Dreshkana",
+      4: "Chaturthamsha",
+      5: "Panchamsha",
+      6: "Shashthamsha",
+      7: "Saptamsha",
+      8: "Ashtamsha",
+      9: "Navamsha",
+      10: "Dashamsha",
+      11: "Rudramsha",
+      12: "Dwadashamsha",
+      16: "Shodashamsha",
+      20: "Vimshamsha",
+      24: "Chaturvimshamsha",
+      27: "Saptavimshamsha",
+      30: "Trimshamsha",
+      40: "Khavedamsha",
+      45: "Akshavedamsha",
+      60: "Shashtiamsha"
+    };
+    return names[division] || "Varga";
+  }
+
+  function houseTable(chart) {
+    var rows = chart.houses.map(function (h) {
+      return "<tr><td><strong>" + h.house + "</strong><br>" + h.signName + "</td><td>" + h.lord + "</td><td>" + (h.tenants.map(prop("name")).join(", ") || "-") + "</td><td>" + (h.aspecting.map(prop("name")).join(", ") || "-") + "</td><td>" + h.score + " " + h.label + "</td></tr>";
+    }).join("");
+    return '<div class="panel-box"><h3>House Judgement</h3><div class="table-wrap"><table><thead><tr><th>House</th><th>Lord</th><th>Tenants</th><th>Aspects</th><th>Verdict</th></tr></thead><tbody>' + rows + "</tbody></table></div></div>";
+  }
+
+  function yogaBox(yogas) {
+    if (!yogas.length) return '<div class="panel-box"><h3>Yoga Inventory</h3><p class="muted">No major implemented yoga triggered strongly.</p></div>';
+    return '<div class="panel-box"><h3>Yoga Inventory</h3><div class="note-list">' + yogas.map(function (y) {
+      return '<div class="rule-row present"><strong>' + escapeHtml(y.name) + '</strong><br>' + escapeHtml(y.effect) + "</div>";
+    }).join("") + "</div></div>";
+  }
+
+  function promiseBox(analysis) {
+    var p = analysis.promise;
+    var html = '<div class="report-grid three">';
+    html += '<div class="panel-box"><h3>Promise Score</h3><div class="scorebar"><span style="width:' + p.score + '%"></span></div><p><strong>' + p.score + "/100</strong> - " + p.label + "</p></div>";
+    html += '<div class="panel-box"><h3>Relevant Houses</h3>' + p.houses.map(function (h) { return '<div class="metric-row"><strong>' + h.house + " " + h.signName + '</strong><span>' + h.score + " " + h.label + "</span></div>"; }).join("") + "</div>";
+    html += '<div class="panel-box"><h3>Sambandha</h3><p>' + escapeHtml(p.sambandhas.join(", ") || "No strong lord-karaka sambandha among implemented checks.") + "</p></div>";
+    html += "</div>";
+    return html;
+  }
+
+  function crossCheckBox(cross) {
+    return '<div class="panel-box"><h3>Moon, Sun, Navamsa, D-Chart Agreement</h3><div class="report-grid three">' + cross.map(function (c) {
+      return '<div><div class="metric-row"><strong>' + escapeHtml(c.label) + '</strong><span>' + c.score + " " + c.labelScore + '</span></div><p class="fine-print">' + escapeHtml(c.note) + "</p></div>";
+    }).join("") + "</div></div>";
+  }
+
+  function rulesBox(rules) {
+    var important = rules.filter(function (r) { return r.present || r.kind === "warning"; }).slice(0, 40);
+    var absent = rules.filter(function (r) { return !r.present && r.kind !== "warning"; }).slice(0, 12);
+    var html = '<div class="panel-box"><h3>Rule Trace</h3><div class="rule-list">';
+    html += important.concat(absent).map(function (r) {
+      var cls = r.kind === "warning" ? "warning" : r.present ? (r.kind === "negative" ? "negative" : "present") : "absent";
+      return '<div class="rule-row ' + cls + '"><strong>' + escapeHtml(r.id) + " - " + escapeHtml(r.present ? "Present" : r.kind === "warning" ? "Source needed" : "Absent") + '</strong><br>' + escapeHtml(r.text) + '<br><span class="fine-print">' + escapeHtml(r.evidence) + "</span></div>";
+    }).join("");
+    html += "</div></div>";
+    return html;
+  }
+
+  function timingBox(chart, analysis, input) {
+    var stack = analysis.timing.currentStack;
+    var html = '<div class="report-grid">';
+    html += '<div class="panel-box"><h3>Current Period</h3>' + stack.map(function (p) {
+      return '<div class="metric-row"><strong>' + p.level + " " + p.lord + '</strong><span>' + formatInTimezone(p.start, input.timezone) + " to " + formatInTimezone(p.end, input.timezone) + "</span></div>";
+    }).join("") + '<p class="fine-print">Activators: ' + escapeHtml(analysis.timing.activators.join(", ")) + "</p></div>";
+    html += '<div class="panel-box"><h3>Current Gochara From Moon</h3>' + analysis.timing.currentTransits.map(function (t) {
+      return '<div class="metric-row"><strong>' + t.name + " in " + t.sign + '</strong><span>House ' + t.moonHouse + " from Moon; " + (t.goodFromMoon ? "favourable" : "challenging") + "</span></div>";
+    }).join("") + "</div>";
+    html += "</div>";
+    html += '<div class="panel-box"><h3>Candidate Windows</h3>';
+    if (!analysis.timing.candidates.length) {
+      html += '<p class="muted">No high-activation Vimshottari windows found in the selected horizon.</p>';
+    } else {
+      html += '<div class="period-list">' + analysis.timing.candidates.map(function (c) {
+        return '<div class="period-row"><strong>' + c.md + " MD / " + c.ad + " AD</strong><span class=\"tag " + strengthClass(c.score * 2) + "\">Score " + Math.round(c.score) + '</span><br>' + formatInTimezone(c.start, input.timezone) + " to " + formatInTimezone(c.end, input.timezone) + '<br><span class="fine-print">' + escapeHtml(c.note) + "</span></div>";
+      }).join("") + "</div>";
+    }
+    html += "</div>";
+    return html;
+  }
+
+  function chartDataPlainReport(chart, analysis, input) {
+    var lines = [];
+    lines.push("VedNetra - Chart Data Report");
+    lines.push("Native: " + nativeReportName(input));
+    lines.push("Birth: " + input.birthDate + " " + input.birthTime + (input.birthPlace ? " at " + input.birthPlace : ""));
+    lines.push("Coordinates: " + coordinateText(input.latitude, input.longitude) + " UTC" + (input.timezone >= 0 ? "+" : "") + input.timezone);
+    lines.push("Ayanamsha: " + analysisNumber(chart.ayanamsa) + " " + (chart.ayanamshaLabel || "Lahiri") + " approx.");
+    if (chart.ascendant.override) lines.push("D1 Asc override: " + ascendantOverrideSummary(chart));
+    lines.push("Dasha report range: " + formatInTimezone(input.birthInstant, input.timezone) + " to " + formatInTimezone(dashaReportRangeEnd(input), input.timezone));
+    var panchang = panchangInfo(chart, input);
+    lines.push("Birth Panchang: " + panchang.vara + ", " + panchang.tithi + " (" + panchang.paksha + "), " + panchang.nakshatra + " pada " + panchang.pada + ", " + panchang.yoga + " yoga, " + panchang.karana + " karana");
+    var transitInput = transitInputFromReportInput(input, chart.ascendant.sign);
+    var transit = buildTransitChartFromInput(transitInput);
+    lines.push("Transit Chart: " + transitInput.date + " " + transitInput.time + " at " + ((transitInput.place ? transitInput.place + " " : "") + coordinateText(transitInput.latitude, transitInput.longitude)) + "; Asc " + transit.ascendant.signName + " " + decimalToDms(transit.ascendant.deg));
+    lines.push("Transit Planets: " + PLANETS.map(function (name) {
+      var p = transit.planetsByName[name];
+      return name + " " + p.signName + " " + decimalToDms(p.deg);
+    }).join(", "));
+    lines.push("");
+    lines.push("D-1 Details:");
+    lines.push("Asc: " + chart.ascendant.signName + " " + decimalToDms(chart.ascendant.deg));
+    chart.planets.forEach(function (p) {
+      lines.push(p.name + ": " + p.signName + " " + decimalToDms(p.deg) + ", " + conditionText(p) + ", " + baaladiAvastha(p.deg, p.sign) + ", Pushkara " + (isPushkaraNavamsa(p.lon) ? "Yes" : "-") + ", " + exaltDebilText(p) + ", " + p.nakshatra + " pada " + p.pada + ", lord " + p.nakLord);
+    });
+    lines.push("");
+    lines.push("Divisional Placements:");
+    vargaDivisions().forEach(function (division) {
+      var varga = tableVarga(chart, division);
+      lines.push("D-" + division + " " + vargaName(division) + " Asc " + varga.ascendant.signName + "; " + PLANETS.map(function (name) {
+        var p = varga.planets.find(function (planet) { return planet.name === name; });
+        return name + " " + (p ? p.signName + conditionSuffix(p) : "-");
+      }).join(", "));
+    });
+    lines.push("");
+    lines.push("Shadbala:");
+    shadbalaRows(chart).forEach(function (row) {
+      lines.push(row.planet + ": Sthana " + row.sthana + ", Dig " + row.dig + ", Kala " + row.kala + ", Cheshta " + row.cheshta + ", Naisargika " + row.naisargika + ", Drik " + row.drik + ", Total " + row.total + " - " + row.judgement);
+    });
+    lines.push("");
+    lines.push("Jaimini:");
+    lines.push("Karakas(7): " + jaiminiKarakas(chart, false).map(function (item) { return item.role + " " + item.planet; }).join(", "));
+    lines.push("Karakas(8): " + jaiminiKarakas(chart, true).map(function (item) { return item.role + " " + item.planet; }).join(", "));
+    lines.push("Pada: " + [1, 2, 4, 5, 7, 9, 10, 11, 12].map(function (house) { var pada = arudhaPada(chart, house); return "H" + house + " " + SIGNS[pada].name; }).join(", "));
+    lines.push("");
+    lines.push("Marriage Compatibility:");
+    var partnerChart = partnerChartFromInput(input);
+    if (partnerChart) {
+      var match = compatibilityScore(chart, partnerChart, input);
+      lines.push("Partner: " + input.partner.name + "; Ashtakoota " + match.total + "/36 - " + match.verdict + "; " + match.rashiRelation);
+      compatibilityBirthDetailRows(input.partner, partnerChart).forEach(function (row) {
+        lines.push("Partner " + row[0] + ": " + row[1]);
+      });
+      compatibilityD9DetailRows(makeVargaChart(partnerChart, 9)).forEach(function (row) {
+        lines.push("Partner " + row[0] + ": " + row[1]);
+      });
+      match.kootas.forEach(function (row) {
+        lines.push(row.name + ": " + row.score + "/" + row.max + " - " + row.judgement + " (" + row.basis + ")");
+      });
+      lines.push("Dashkoot:");
+      dashkootRows(chart, partnerChart).forEach(function (row) {
+        lines.push(row.name + ": " + row.result + " - " + row.basis);
+      });
+      lines.push("D-1 And D-9 Compatibility:");
+      d1D9CompatibilityRows(chart, partnerChart).forEach(function (row) {
+        lines.push(row.factor + ": " + row.support + " - " + row.basis);
+      });
+    } else {
+      lines.push("Partner birth details not supplied.");
+    }
+    lines.push("");
+    lines.push("Chakras:");
+    lines.push("Sarvatobhadra occupied stars: " + chart.planets.map(function (p) { return p.name + " " + p.nakshatra; }).join(", "));
+    lines.push("Kota Chakra Moon reference: " + chart.planetsByName.Moon.nakshatra);
+    lines.push("Sanghatta Moon group: Group " + ((nakshatraIndex(chart.planetsByName.Moon.lon) % 7) + 1));
+    lines.push("");
+    lines.push("Vimshottari export rows are limited to birth through report date plus 5 years. The on-screen tool keeps the full 120-year tree.");
+    return lines.join("\n");
+  }
+
+  function predictivePlainReport(chart, input) {
+    var lines = [];
+    lines.push("VedNetra - Predictive Report");
+    lines.push("Native: " + nativeReportName(input));
+    lines.push("Reference date: " + formatInTimezone(input.asOfInstant, input.timezone));
+    lines.push("");
+    lines.push("Planet Relations:");
+    [
+      ["Conjunctions", "conjunction"],
+      ["Mutual Aspects", "mutualAspect"],
+      ["Planets In Each Other's Zodiac Sign", "signExchange"],
+      ["Planets In Each Other's Nakshatra", "nakshatraExchange"],
+      ["Planets In Same Nakshatra", "sameNakshatra"]
+    ].forEach(function (item) {
+      var rows = relationRows(chart, item[1]);
+      lines.push(item[0] + ": " + (rows.length ? rows.map(function (row) { return row.pair + " - " + row.detail; }).join("; ") : "None found"));
+    });
+    lines.push("");
+    lines.push("Lordships:");
+    [
+      ["Trine Lords", [1, 5, 9]],
+      ["Kendra Lords", [1, 4, 7, 10]],
+      ["Trik Lords", [6, 8, 12]]
+    ].forEach(function (group) {
+      lines.push(group[0] + ": " + group[1].map(function (house) {
+        var lord = lordOfHouse(chart, house);
+        return "H" + house + " " + SIGNS[houseSign(chart, house)].name + " lord " + lord;
+      }).join("; "));
+    });
+    lines.push("");
+    lines.push("Most Frequently Asked Queries' Pillars:");
+    frequentQueriesPlainLines(chart, input).forEach(function (line) { lines.push(line); });
+    lines.push("");
+    lines.push("SWOT Analysis:");
+    for (var house = 1; house <= 12; house += 1) {
+      var swot = swotHouseAnalysis(chart, house);
+      lines.push(swot.area + " - " + swot.houseTheme);
+      lines.push("House Analysis: " + plainBulletPoints(swot.housePoints));
+      lines.push("House Lord Analysis: " + plainBulletPoints(swot.lordPoints));
+    }
+    lines.push("");
+    lines.push("Current Dasha: next six months");
+    sixMonthDashaRows(chart, input).forEach(function (row) {
+      lines.push(row.status + " " + dashaCode(row.md, row.ad, row.pd, row.sd) + " " + dashaDate(row.start, input.timezone) + " to " + dashaDate(row.end, input.timezone));
+      lines.push("Dasha theme: " + planetTheme(chart, row.md));
+      lines.push("Antra: " + planetRoleAgainst(chart, row.ad, [row.md]));
+      lines.push("Pratyantra: " + planetRoleAgainst(chart, row.pd, [row.md, row.ad]));
+      lines.push("Sookshma: " + planetRoleAgainst(chart, row.sd, [row.md, row.ad, row.pd]));
+    });
+    return lines.join("\n");
+  }
+
+  function frequentQueriesPlainLines(chart, input) {
+    var out = [];
+    FREQUENT_QUERY_PILLARS.forEach(function (cfg, index) {
+      var item = analyzeFrequentQueryPillar(chart, input, cfg);
+      out.push((index + 1) + ". " + cfg.label + ": " + pillarVerdict(item.promiseScore, cfg) + " (" + item.promiseScore + "/100)");
+      out.push("   Native age/context: " + item.lifeStage.age + " years; normal window " + item.lifeStage.windowText + "; " + item.lifeStage.modeText);
+      out.push("   Houses: " + cfg.houses.map(function (h) { return "H" + h + " " + houseMeaning(h); }).join("; ") + "; D-" + cfg.dchart + " " + vargaName(cfg.dchart));
+      out.push("   Mandatory steps: " + item.methodologyRows.map(function (row) { return row.step + " " + row.factor + " - " + row.construction; }).join("; "));
+      out.push("   Weighted factors: " + item.factorRows.slice(0, 4).map(function (row) { return row.factor + " " + row.score + "/100"; }).join("; "));
+      out.push("   Past/already-happened timing: " + (item.pastTiming.slice(0, 3).map(function (row) { return dashaCode(row.md, row.ad, row.pd) + " " + dashaDate(row.start, input.timezone) + " to " + dashaDate(row.end, input.timezone); }).join("; ") || item.lifeStage.pastNote));
+      if (item.pastTiming[0]) out.push("   Past timing precision: " + item.pastTiming[0].precision);
+      out.push("   Future/continuing timing: " + (item.futureTiming.slice(0, 3).map(function (row) { return dashaCode(row.md, row.ad, row.pd) + " " + dashaDate(row.start, input.timezone) + " to " + dashaDate(row.end, input.timezone); }).join("; ") || item.lifeStage.futureNote));
+      if (item.futureTiming[0]) out.push("   Future timing precision: " + item.futureTiming[0].precision);
+      out.push("   Transit: " + item.transitSummary + (Number.isFinite(item.transitScore) ? " (" + item.transitScore + "/100)" : ""));
+    });
+    return out;
+  }
+
+  function plainBulletPoints(points) {
+    return points.map(function (point) {
+      return (point.header ? point.header + ": " : "") + (point.detail || String(point));
+    }).join(" ");
+  }
+
+  function copyReport() {
+    if (!lastPlainReport) return;
+    copyText(lastPlainReport);
+  }
+
+  async function downloadSelectedReport() {
+    var reportType = document.getElementById("reportDownloadType").value;
+    var format = document.getElementById("reportDownloadFormat").value;
+    await downloadCurrentReport(format, reportType);
+  }
+
+  async function downloadCurrentReport(format, reportType) {
+    if (typeof reportType === "boolean") reportType = reportType ? "summary" : "detailed";
+    reportType = reportType || "vednetra";
+    if (reportType === "vednetra") {
+      var options = await showVedNetraReportOptionsDialog();
+      if (!options) return;
+      downloadVedNetraReport(format, options);
+      return;
+    }
+    if (!lastPlainReport) {
+      alertUser("Generate a report first, then download it.");
+      return;
+    }
+    var cleanMode = reportType === "summary";
+    var filenameBase = reportDownloadFilenameBase() + (cleanMode ? "_Summary" : "_Detailed");
+    if (format === "csv") {
+      downloadBlob(filenameBase + ".csv", "text/csv;charset=utf-8", tablesToCsv({ clean: cleanMode }));
+      return;
+    }
+    if (format === "xls") {
+      downloadBlob(filenameBase + ".xls", "application/vnd.ms-excel;charset=utf-8", tablesToExcel({ clean: cleanMode }));
+      return;
+    }
+    var text = exportTextReport({ clean: cleanMode });
+    if (format === "pdf") {
+      downloadBlob(filenameBase + ".pdf", "application/pdf", makeSimplePdf(text));
+      return;
+    }
+    downloadBlob(filenameBase + ".txt", "text/plain;charset=utf-8", text);
+  }
+
+  function downloadVedNetraReport(format, options) {
+    try {
+      var input = lastReportInput || readInput();
+      var ramanInput = Object.assign({}, input, { ayanamshaKey: "raman", reportCreatedAt: new Date() });
+      var chart = lastReportChart && lastReportChart.ayanamshaKey === "raman" ? lastReportChart :
+        buildChart(ramanInput.birthInstant, ramanInput.latitude, ramanInput.longitude, ramanInput.timezone, {
+          ascendantOverride: ramanInput.ascendantOverride,
+          ayanamshaKey: "raman"
+        });
+      var text = buildVedNetraReportText(chart, ramanInput, options || {});
+      lastPlainReport = text;
+      lastPlainReports.chartData = text;
+      lastReportInput = ramanInput;
+      lastReportChart = chart;
+      renderVedNetraReportPreview(text, ramanInput);
+      var filenameBase = reportDownloadFilenameBase() + "_VedNetra_Report";
+      if (format === "csv") {
+        downloadBlob(filenameBase + ".csv", "text/csv;charset=utf-8", vedNetraReportTextToCsv(text));
+        alertUser("VedNetra Report generated. CSV download has started.");
+        return;
+      }
+      if (format === "xls") {
+        downloadBlob(filenameBase + ".xls", "application/vnd.ms-excel;charset=utf-8", vedNetraReportTextToExcel(text));
+        alertUser("VedNetra Report generated. Excel download has started.");
+        return;
+      }
+      if (format === "pdf") {
+        downloadBlob(filenameBase + ".pdf", "application/pdf", makeSimplePdf(text));
+        alertUser("VedNetra Report generated. PDF download has started.");
+        return;
+      }
+      downloadBlob(filenameBase + ".txt", "text/plain;charset=utf-8", text);
+      alertUser("VedNetra Report generated. TXT download has started.");
+    } catch (error) {
+      console.error(error);
+      alertUser("VedNetra Report could not be built: " + (error && error.message ? error.message : error));
+    }
+  }
+
+  function renderVedNetraReportPreview(text, input) {
+    var empty = document.getElementById("emptyState");
+    var report = document.getElementById("report");
+    if (!report) return;
+    if (empty) empty.classList.add("hidden");
+    report.classList.remove("hidden");
+    var preview = text.length > 80000 ? text.slice(0, 80000) + "\n\n[Preview truncated on screen. Download file contains the complete VedNetra Report.]" : text;
+    report.innerHTML = '<div id="chartDataReportView" class="report-view vednetra-report-preview-view">' +
+      reportHeaderHtml("VedNetra", "VedNetra Report", nativeReportName(input), "Structured Raman-ayanamsha report with requested Varshfal, transit and dasha ranges", "Download ready") +
+      '<section id="viewA-vednetra-report-preview" class="section"><div class="section-head"><div><p class="eyebrow">Generated Report</p><h3>VedNetra Report Preview</h3></div><span class="small-pill">Download started</span></div>' +
+      '<div class="panel-box"><pre class="vednetra-report-preview-text">' + escapeHtml(preview) + '</pre></div></section></div>';
+    currentReportView = "chartData";
+  }
+
+  function showVedNetraReportOptionsDialog() {
+    return new Promise(function (resolve) {
+      var existing = document.querySelector(".vednetra-report-options-layer");
+      if (existing) existing.remove();
+      var defaults = vedNetraDefaultReportOptions();
+      var layer = document.createElement("div");
+      layer.className = "vednetra-report-options-layer";
+      layer.innerHTML =
+        '<div class="vednetra-report-options-dialog" role="dialog" aria-modal="true" aria-labelledby="vednetraReportOptionsTitle">' +
+          '<div class="vednetra-report-options-head"><div><p class="eyebrow">Report Parameters</p><h3 id="vednetraReportOptionsTitle">VedNetra Report</h3></div><button type="button" data-vednetra-cancel>Cancel</button></div>' +
+          '<p class="muted">Specify period-sensitive details before the report is built. Static natal sections are included automatically.</p>' +
+          '<div class="vednetra-report-options-grid">' +
+            '<label class="vednetra-wide">Varshfal calendar years (max 7)<textarea id="vednetraVarshfalYears" rows="5" placeholder="2026&#10;2027&#10;2028&#10;2029&#10;2030&#10;2031&#10;2032">' + escapeHtml(defaults.varshfalYears) + '</textarea></label>' +
+            '<label>Relevant life area for Varshfal<select id="vednetraLifeArea">' + vedNetraLifeAreaOptions(defaults.lifeArea) + '</select></label>' +
+            '<label class="vednetra-wide">Transit charts / snapshots<textarea id="vednetraTransitList" rows="4" placeholder="2026-05-31 12:00:00&#10;2026-06-15 18:30:00">' + escapeHtml(defaults.transitList) + '</textarea></label>' +
+            '<label class="vednetra-wide">Dasha ranges<textarea id="vednetraDashaRanges" rows="4" placeholder="2026-05-31 to 2031-05-31&#10;2031-06-01 to 2036-06-01">' + escapeHtml(defaults.dashaRanges) + '</textarea></label>' +
+            '<label>Forward dasha coverage<select id="vednetraDashaYears"><option value="5">5 years</option><option value="6">6 years</option><option value="7" selected>7 years</option></select></label>' +
+            '<label>Notes for analyst<textarea id="vednetraAnalystNotes" rows="3" placeholder="Optional period focus, event question, or instruction"></textarea></label>' +
+          '</div>' +
+          '<div class="vednetra-report-options-actions"><button type="button" data-vednetra-cancel>Cancel</button><button type="button" class="primary" data-vednetra-build>Build Report</button></div>' +
+        '</div>';
+      document.body.appendChild(layer);
+      function close(value) {
+        layer.remove();
+        resolve(value);
+      }
+      layer.querySelectorAll("[data-vednetra-cancel]").forEach(function (button) {
+        button.addEventListener("click", function () { close(null); });
+      });
+      layer.addEventListener("click", function (event) {
+        if (event.target === layer) close(null);
+      });
+      layer.querySelector("[data-vednetra-build]").addEventListener("click", function () {
+        var dashaYears = Number(layer.querySelector("#vednetraDashaYears").value) || 7;
+        close({
+          varshfalYears: parseVedNetraYears(layer.querySelector("#vednetraVarshfalYears").value),
+          lifeArea: layer.querySelector("#vednetraLifeArea").value,
+          transitEntries: parseVedNetraTransitEntries(layer.querySelector("#vednetraTransitList").value, defaults.transitDate, defaults.transitTime),
+          dashaRanges: parseVedNetraDashaRanges(layer.querySelector("#vednetraDashaRanges").value, defaults.dashaStart, defaults.dashaEnd),
+          dashaForwardYears: clamp(dashaYears, 5, 7),
+          analystNotes: layer.querySelector("#vednetraAnalystNotes").value.trim()
+        });
+      });
+      var firstInput = layer.querySelector("input, select, textarea, button");
+      if (firstInput && firstInput.focus) firstInput.focus();
+    });
+  }
+
+  function vedNetraDefaultReportOptions() {
+    var input = lastReportInput || {};
+    var timezone = Number(input.timezone || 5.5);
+    var reference = input.asOfInstant instanceof Date ? input.asOfInstant : new Date();
+    var start = input.asOfDate || dateInputValue(reference, timezone);
+    var end = dateInputValue(addDays(localDateTimeToUtc(start, "00:00:00", timezone), 7 * 365.25), timezone);
+    var year = Number(start.slice(0, 4)) || new Date().getFullYear();
+    return {
+      varshfalYears: String(year),
+      lifeArea: "general",
+      transitDate: start,
+      transitTime: input.asOfTime || timeInputValue(reference, timezone),
+      dashaStart: start,
+      dashaEnd: end,
+      transitList: start + " " + (input.asOfTime || timeInputValue(reference, timezone)),
+      dashaRanges: start + " to " + end
+    };
+  }
+
+  function vedNetraLifeAreaOptions(selected) {
+    return vedNetraLifeAreas().map(function (item) {
+      return '<option value="' + escapeHtml(item.key) + '"' + (item.key === selected ? " selected" : "") + ">" + escapeHtml(item.label) + "</option>";
+    }).join("");
+  }
+
+  function vedNetraLifeAreas() {
+    return [
+      { key: "general", label: "General", house: 1, karaka: "Sun" },
+      { key: "education", label: "Education", house: 4, karaka: "Mercury" },
+      { key: "higherEducation", label: "Higher education", house: 9, karaka: "Jupiter" },
+      { key: "profession", label: "Profession", house: 10, karaka: "Saturn" },
+      { key: "marriage", label: "Marriage", house: 7, karaka: "Venus" },
+      { key: "children", label: "Children", house: 5, karaka: "Jupiter" },
+      { key: "property", label: "House / property", house: 4, karaka: "Mars" },
+      { key: "disease", label: "Disease / treatment", house: 6, karaka: "Saturn" },
+      { key: "inheritance", label: "Inheritance", house: 8, karaka: "Saturn" },
+      { key: "court", label: "Court cases", house: 6, karaka: "Mars" },
+      { key: "wealth", label: "Wealth", house: 2, karaka: "Jupiter" },
+      { key: "reputation", label: "Reputation", house: 10, karaka: "Sun" }
+    ];
+  }
+
+  function parseVedNetraYears(value) {
+    return String(value || "").split(/[^0-9]+/).map(function (part) { return Number(part); })
+      .filter(function (year) { return year >= 1800 && year <= 2200; }).slice(0, 7);
+  }
+
+  function parseVedNetraTransitEntries(value, fallbackDate, fallbackTime) {
+    var entries = [];
+    var text = String(value || "");
+    var pattern = /(\d{4}-\d{2}-\d{2})(?:[ T,]+(\d{1,2}:\d{2}(?::\d{2})?))?/g;
+    var match;
+    while ((match = pattern.exec(text))) {
+      entries.push({ date: match[1], time: normalizeTimeInput(match[2] || fallbackTime || "00:00:00") });
+    }
+    if (!entries.length) entries.push({ date: fallbackDate, time: normalizeTimeInput(fallbackTime || "00:00:00") });
+    return entries.slice(0, 12);
+  }
+
+  function parseVedNetraDashaRanges(value, fallbackStart, fallbackEnd) {
+    var ranges = [];
+    var text = String(value || "");
+    var pattern = /(\d{4}-\d{2}-\d{2})\s*(?:to|through|until|[-–—])\s*(\d{4}-\d{2}-\d{2})/gi;
+    var match;
+    while ((match = pattern.exec(text))) {
+      ranges.push({ start: match[1], end: match[2] });
+    }
+    if (!ranges.length) ranges.push({ start: fallbackStart, end: fallbackEnd });
+    return ranges.slice(0, 12);
+  }
+
+  function buildVedNetraReportText(chart, input, options) {
+    options = options || {};
+    var out = [];
+    var shadbala = shadbalaRows(chart);
+    out.push("VEDNETRA REPORT");
+    out.push("Classical Jyotish dossier for AI-ready and teacher-ready analysis");
+    out.push("Generated: " + reportDateTime(new Date(), input.timezone));
+    out.push("Report rule: Raman ayanamsha, Whole Sign houses, Vimshottari dasha, Graha Drishti.");
+    if (options.analystNotes) out.push("Analyst notes: " + options.analystNotes);
+    out.push("");
+    appendVedNetraSystemConfig(out, chart);
+    appendVedNetraNativeDetails(out, chart, input);
+    appendVedNetraLagnaBlock(out, chart);
+    appendVedNetraD1PlanetTable(out, chart);
+    appendVedNetraHouseSummary(out, chart);
+    appendVedNetraVargaPlacements(out, chart);
+    appendVedNetraShadbala(out, shadbala);
+    appendVedNetraJaimini(out, chart);
+    appendVedNetraAshtakavarga(out, chart);
+    appendVedNetraDasha(out, chart, input, options);
+    appendVedNetraYogas(out, chart, input);
+    appendVedNetraTransits(out, chart, input, options);
+    appendVedNetraArudha(out, chart);
+    appendVedNetraAlternateLagnas(out, chart);
+    appendVedNetraRelations(out, chart, shadbala);
+    appendVedNetraMoonChart(out, chart, shadbala);
+    appendVedNetraBhavaChalit(out, chart);
+    appendVedNetraNakshatraReference(out, chart, shadbala);
+    appendVedNetraFunctionalRoles(out, chart);
+    appendVedNetraNaturalKarakas(out);
+    appendVedNetraBhavatBhavam(out);
+    appendVedNetraVarshfal(out, chart, input, options);
+    appendVedNetraFlags(out, chart, shadbala);
+    appendVedNetraReportSettings(out);
+    appendVedNetraExcludedTables(out);
+    return out.join("\n");
+  }
+
+  function appendVedNetraSystemConfig(out, chart) {
+    sectionLine(out, "MODULE 0 - SYSTEM CONFIGURATION");
+    tableLines(out, "Hardcoded defaults", ["Field", "Value"], [
+      ["Ayanamsha", "Raman - " + decimalToDms(chart.ayanamsa)],
+      ["House system", "Whole Sign"],
+      ["Dasha system", "Vimshottari only; 365.25 day year"],
+      ["Chart basis", "Rashi D1 for house placements"],
+      ["Aspect system", "Parashari Graha Drishti"],
+      ["Planet set", PLANETS.join(", ")],
+      ["Combustion", "BPHS orbs with deep combustion tier"],
+      ["Avastha", "Odd/even sign Baaladi degree rule"]
+    ]);
+  }
+
+  function appendVedNetraNativeDetails(out, chart, input) {
+    sectionLine(out, "MODULE 1 - NATIVE DETAILS");
+    var place = String(input.birthPlace || "").split(",").map(function (part) { return part.trim(); });
+    tableLines(out, "Native header", ["Field", "Value"], [
+      ["Name", input.name || "Native"],
+      ["Date of birth", reportDate(input.birthInstant, input.timezone)],
+      ["Time of birth", timeInputValue(input.birthInstant, input.timezone)],
+      ["Time zone", "UTC" + (input.timezone >= 0 ? "+" : "") + input.timezone],
+      ["Birth city", place[0] || input.birthPlace || "-"],
+      ["Birth state / province", place[1] || "-"],
+      ["Birth country", place[2] || "-"],
+      ["Latitude", String(input.latitude)],
+      ["Longitude", String(input.longitude)],
+      ["Altitude", "Not supplied"],
+      ["Ayanamsha", "Raman"],
+      ["Ayanamsha value", decimalToDms(chart.ayanamsa)],
+      ["Local Mean Time correction", "No manual LMT correction supplied"],
+      ["Daylight Saving Time", "No manual DST flag supplied"],
+      ["Julian Day Number", chart.jd.toFixed(5)]
+    ]);
+  }
+
+  function appendVedNetraLagnaBlock(out, chart) {
+    sectionLine(out, "MODULE 2 - LAGNA BLOCK");
+    var nak = nakshatraInfo(chart.ascendant.lon);
+    tableLines(out, "Ascendant reference", ["Field", "Value"], [
+      ["Lagna sign", chart.ascendant.signName],
+      ["Lagna sign number", chart.ascendant.sign + 1],
+      ["Lagna degree", decimalToDms(chart.ascendant.deg)],
+      ["Bhava Chalit chart", chart.ascendant.deg >= 28 ? "Required because Lagna is 28 degrees or later" : "Not triggered by Lagna degree"],
+      ["Lagna Nakshatra", nak.name],
+      ["Lagna Nakshatra number", nak.index + 1],
+      ["Lagna Nakshatra Pada", nak.pada],
+      ["Lagna Nakshatra Lord", nak.lord],
+      ["Lagna absolute longitude", decimalToDms(chart.ascendant.lon)]
+    ]);
+  }
+
+  function appendVedNetraD1PlanetTable(out, chart) {
+    sectionLine(out, "MODULE 3 - D1 PLANET DATA TABLE");
+    tableLines(out, "D1 planets", ["Planet", "Abbr", "Sign", "Sign #", "House", "Degree", "Abs longitude", "Motion", "Avastha", "Dignity", "Exalted", "Debilitated", "Neechabhanga", "NB type", "NB strength", "Combustion", "Sun distance", "Nakshatra", "Nak #", "Pada", "Nak lord", "D9 sign"], chart.planets.map(function (p) {
+      var combustion = combustionReport(chart, p);
+      var nb = neechabhangaReport(chart, p);
+      return [p.name, planetAbbr(p.name), p.signName, p.sign + 1, p.house, decimalToDms(p.deg), decimalToDms(p.lon), p.retrograde ? "R" : "D", baaladiAvastha(p.deg, p.sign), dignitySpec(p), p.dignity === "Exalted" ? "Yes" : "No", p.dignity === "Debilitated" ? "Yes" : "No", nb.flag, nb.type, nb.strength, combustion.status, combustion.distance, p.nakshatra, nakshatraIndex(p.lon) + 1, p.pada, p.nakLord, p.navamsaSignName];
+    }));
+  }
+
+  function appendVedNetraHouseSummary(out, chart) {
+    sectionLine(out, "MODULE 4 - HOUSE-WISE PLANET SUMMARY");
+    var savBySign = sarvashtakavargaBySign(chart);
+    tableLines(out, "House summary", ["House", "Sign", "Lord", "Planets placed", "Graha Drishti received", "SAV bindus"], chart.houses.map(function (h) {
+      return ["H" + h.house, h.signName, h.lord, h.tenants.map(prop("name")).join(", ") || "Empty", planetsAspectingHouse(chart, h.house).map(prop("name")).join(", ") || "-", savBySign[h.sign].sav];
+    }));
+  }
+
+  function appendVedNetraVargaPlacements(out, chart) {
+    sectionLine(out, "MODULE 5 - DIVISIONAL CHART PLACEMENTS");
+    var divisions = vedNetraVargaDivisions();
+    var points = ["Lagna"].concat(PLANETS);
+    tableLines(out, "All required Vargas", ["Point"].concat(divisions.map(function (d) { return "D" + d + " " + vargaName(d); })), points.map(function (point) {
+      return [point].concat(divisions.map(function (division) {
+        var varga = tableVarga(chart, division);
+        if (point === "Lagna") return signShort(varga.ascendant.sign);
+        var p = varga.planetsByName[point];
+        return p ? signShort(p.sign) : "-";
+      }));
+    }));
+  }
+
+  function appendVedNetraShadbala(out, rows) {
+    sectionLine(out, "MODULE 6 - SHADBALA TABLE");
+    tableLines(out, "Shadbala", ["Planet", "Sthana", "Dig", "Kala", "Cheshta", "Naisargika", "Drik", "Total", "Ishta", "Kashta", "Ratio", "Judgement", "Flags"], rows.map(function (row) {
+      var required = requiredShadbala(row.planet);
+      return [row.planet, row.sthana, row.dig, row.kala, row.cheshta + " (" + cheshtaType(row) + ")", row.naisargika, row.drik, row.total, ishtaPhala(row), kashtaPhala(row), (row.total / required).toFixed(2), vedNetraShadbalaJudgement(row.total), shadbalaFlags(row).join("; ") || "-"];
+    }));
+  }
+
+  function appendVedNetraJaimini(out, chart) {
+    sectionLine(out, "MODULE 7 - JAIMINI KARAKAS AND RASHI DRISHTI");
+    [false, true].forEach(function (includeRahu) {
+      tableLines(out, includeRahu ? "8-karaka system" : "7-karaka system", ["Karaka", "Planet", "Degree", "Sign", "D9 sign"], jaiminiKarakas(chart, includeRahu).map(function (item) {
+        var p = chart.planetsByName[item.planet];
+        return [item.role, item.planet, decimalToDms(item.degree), item.signName, p ? p.navamsaSignName : "-"];
+      }));
+    });
+    tableLines(out, "Jaimini Rashi Drishti fixed table", ["Sign", "Aspected signs"], SIGNS.map(function (sign, index) {
+      return [sign.name, jaiminiAspectedSigns(index).map(function (target) { return SIGNS[target].name; }).join(", ")];
+    }));
+  }
+
+  function appendVedNetraAshtakavarga(out, chart) {
+    sectionLine(out, "MODULE 8 - ASHTAKAVARGA TABLES");
+    var rows = sarvashtakavargaBySign(chart);
+    tableLines(out, "Sarvashtakavarga", ["House", "Sign", "SAV", "Flag"], chart.houses.map(function (h) {
+      var item = rows[h.sign];
+      return ["H" + h.house, h.signName, item.sav, item.sav >= 30 ? "Strong" : item.sav < 25 ? "Weak house warning" : "Average"];
+    }));
+    CLASSICAL_PLANETS.forEach(function (planet) {
+      tableLines(out, planet + " Bhinnashtakavarga", ["House", "Sign", "Bindus", "Flag"], chart.houses.map(function (h) {
+        var bindu = rows[h.sign].bav[planet];
+        return ["H" + h.house, h.signName, bindu, bindu < 4 ? "Weak for " + planet + " matters" : "-"];
+      }));
+    });
+  }
+
+  function appendVedNetraDasha(out, chart, input, options) {
+    sectionLine(out, "MODULE 9 - VIMSHOTTARI DASHA");
+    var ref = input.asOfInstant || new Date();
+    var currentMd = activePeriod(chart.vimshottari.timeline, ref);
+    var currentAd = currentMd ? activePeriod(subPeriods(currentMd, "AD"), ref) : null;
+    var currentPd = currentAd ? activePeriod(subPeriods(currentAd, "PD"), ref) : null;
+    var currentSd = currentPd ? activePeriod(subPeriods(currentPd, "SD"), ref) : null;
+    tableLines(out, "Mahadasha summary", ["MD lord", "Start", "End", "Duration", "Flag"], chart.vimshottari.timeline.map(function (md) {
+      return [md.lord, reportDate(md.start, input.timezone), reportDate(md.end, input.timezone), durationText(md.start, md.end), md === currentMd ? "Current" : "-"];
+    }));
+    var adRows = [];
+    if (currentMd) adRows = adRows.concat(subPeriods(currentMd, "AD"));
+    var nextMdIndex = chart.vimshottari.timeline.indexOf(currentMd) + 1;
+    if (nextMdIndex > 0 && chart.vimshottari.timeline[nextMdIndex]) adRows = adRows.concat(subPeriods(chart.vimshottari.timeline[nextMdIndex], "AD").slice(0, 2));
+    tableLines(out, "Antardasha under current MD plus next MD preview", ["MD", "AD", "Start", "End", "Duration", "Flag"], adRows.map(function (ad) {
+      return [ad.parent || (currentMd && currentMd.lord) || "-", ad.lord, reportDate(ad.start, input.timezone), reportDate(ad.end, input.timezone), durationText(ad.start, ad.end), ad === currentAd ? "Current" : "-"];
+    }));
+    tableLines(out, "Current Pratyantardasha", ["MD", "AD", "PD", "Start", "End", "Duration", "Flag"], (currentAd ? subPeriods(currentAd, "PD") : []).map(function (pd) {
+      return [currentMd ? currentMd.lord : "-", currentAd ? currentAd.lord : "-", pd.lord, reportDate(pd.start, input.timezone), reportDate(pd.end, input.timezone), durationText(pd.start, pd.end), pd === currentPd ? "Current" : "-"];
+    }));
+    tableLines(out, "Current Sookshma Dasha", ["MD", "AD", "PD", "SD", "Start", "End", "Duration", "Flag"], (currentPd ? subPeriods(currentPd, "SD") : []).map(function (sd) {
+      return [currentMd ? currentMd.lord : "-", currentAd ? currentAd.lord : "-", currentPd ? currentPd.lord : "-", sd.lord, reportDateTime(sd.start, input.timezone), reportDateTime(sd.end, input.timezone), durationText(sd.start, sd.end), sd === currentSd ? "Current" : "-"];
+    }));
+    var dashaRanges = options.dashaRanges && options.dashaRanges.length ? options.dashaRanges : [{
+      start: options.dashaStart || dateInputValue(ref, input.timezone),
+      end: options.dashaEnd || dateInputValue(addDays(ref, clamp(Number(options.dashaForwardYears) || 7, 5, 7) * 365.25), input.timezone)
+    }];
+    dashaRanges.forEach(function (range, index) {
+      var rangeStart = localDateTimeToUtc(range.start, "00:00:00", input.timezone);
+      var rangeEnd = localDateTimeToUtc(range.end, "23:59:59", input.timezone);
+      if (rangeEnd < rangeStart) {
+        var temp = rangeStart;
+        rangeStart = rangeEnd;
+        rangeEnd = temp;
+      }
+      tableLines(out, "Requested MD-AD-PD-SD range " + (index + 1) + " (" + reportDate(rangeStart, input.timezone) + " to " + reportDate(rangeEnd, input.timezone) + ")", ["Code", "Start", "End"], dashaRowsInRange(chart, rangeStart, rangeEnd).slice(0, 160).map(function (row) {
+        return [dashaCode(row.md, row.ad, row.pd, row.sd), reportDateTime(row.start, input.timezone), reportDateTime(row.end, input.timezone)];
+      }));
+    });
+  }
+
+  function appendVedNetraYogas(out, chart, input) {
+    sectionLine(out, "MODULE 10 - YOGAS TABLE");
+    var yogas = scanYogas(chart);
+    tableLines(out, "Computed yogas", ["Yoga", "Category", "Planets", "Houses", "Condition", "Strength", "Status", "Fructification", "Notes"], (yogas.length ? yogas : [{ name: "No major implemented yoga", category: "Reference", planets: [], effect: "Continue judging house, lord, karaka, varga and dasha.", evidence: "-", strength: "-" }]).map(function (yoga) {
+      var planets = yoga.planets || [];
+      var houses = planets.map(function (name) { return chart.planetsByName[name] ? "H" + chart.planetsByName[name].house : ""; }).filter(Boolean).join(", ") || "-";
+      var weakened = planets.some(function (name) { var p = chart.planetsByName[name]; return p && (p.combust || p.dignity === "Debilitated"); });
+      return [yoga.name, yoga.category || "Other", planets.join(", ") || "-", houses, yoga.effect || yoga.evidence || "-", yoga.strength || "-", weakened ? "Dormant / weakened" : "Active", yogaWindow(chart, input, yoga), yoga.evidence || "-"];
+    }));
+  }
+
+  function appendVedNetraTransits(out, natalChart, input, options) {
+    sectionLine(out, "MODULE 11 - TRANSIT TABLE");
+    var entries = options.transitEntries && options.transitEntries.length ? options.transitEntries : [{
+      date: input.asOfDate || dateInputValue(new Date(), input.timezone),
+      time: input.asOfTime || "00:00:00"
+    }];
+    entries.forEach(function (entry, index) {
+      var transitInstant = localDateTimeToUtc(entry.date, entry.time || "00:00:00", Number(input.timezone));
+      var transitChart = buildChart(transitInstant, input.latitude, input.longitude, input.timezone, { ayanamshaKey: "raman" });
+      appendVedNetraTransitTable(out, natalChart, transitChart, transitInstant, input, index + 1);
+    });
+  }
+
+  function appendVedNetraTransitTable(out, natalChart, transitChart, transitInstant, input, index) {
+    tableLines(out, "Transit snapshot " + index + " - " + reportDateTime(transitInstant, input.timezone), ["Planet", "Sign", "Sign #", "Natal house", "Degree", "Abs longitude", "Motion", "Nakshatra", "Pada", "Nak lord", "Combustion", "Transit date", "Over natal position", "Over Lagna", "Over Moon"], transitChart.planets.map(function (p) {
+      var natal = natalChart.planetsByName[p.name];
+      return [p.name, p.signName, p.sign + 1, houseFromSign(natalChart.ascendant.sign, p.sign), decimalToDms(p.deg), decimalToDms(p.lon), p.retrograde ? "R" : "D", p.nakshatra, p.pada, p.nakLord, combustionReport(transitChart, p).status, reportDateTime(transitInstant, input.timezone), natal && angleDistance(p.lon, natal.lon) <= 1 ? "Yes" : "No", p.sign === natalChart.ascendant.sign ? "Yes" : "No", p.sign === natalChart.planetsByName.Moon.sign ? "Yes" : "No"];
+    }));
+  }
+
+  function appendVedNetraArudha(out, chart) {
+    sectionLine(out, "MODULE 12 - ARUDHA / PADA TABLE");
+    tableLines(out, "Arudha padas", ["Arudha", "Calculation basis", "Result sign", "Result house", "Occupants"], Array.from({ length: 12 }, function (_, index) {
+      var house = index + 1;
+      var padaSign = arudhaPada(chart, house);
+      var lord = lordOfHouse(chart, house);
+      var lordPlanet = chart.planetsByName[lord];
+      var occupants = chart.planets.filter(function (p) { return p.sign === padaSign; }).map(prop("name")).join(", ") || "-";
+      return [(house === 1 ? "Arudha Lagna / " : house === 7 ? "Darapada / " : house === 12 ? "Upapada Lagna / " : "") + "A" + house, "H" + house + " lord " + lord + " in H" + (lordPlanet ? lordPlanet.house : "-") + "; counted same distance", SIGNS[padaSign].name, houseFromSign(chart.ascendant.sign, padaSign), occupants];
+    }));
+  }
+
+  function appendVedNetraAlternateLagnas(out, chart) {
+    sectionLine(out, "MODULE 13 - ALTERNATE LAGNAS TABLE");
+    var alts = alternateLagnas(chart);
+    var ak = jaiminiKarakas(chart, false).find(function (item) { return item.role === "AK"; });
+    var akPlanet = ak && chart.planetsByName[ak.planet];
+    var rows = alts.map(function (item) {
+      return [item.name, SIGNS[item.sign].name, item.sign + 1, item.deg !== undefined ? decimalToDms(item.deg) : "-", item.use || "-"];
+    });
+    if (akPlanet) rows.push(["Karakamsha", akPlanet.navamsaSignName, akPlanet.navamsaSign + 1, "-", "Atmakaraka " + akPlanet.name + " in D9"]);
+    ["Shree Lagna", "Indu Lagna", "Varnada Lagna", "Pranapada Lagna"].forEach(function (name) {
+      if (!rows.some(function (row) { return row[0] === name; })) rows.push([name, "Not available", "-", "-", "Placeholder for manual cross-check"]);
+    });
+    tableLines(out, "Alternate Lagnas", ["Lagna", "Sign", "Sign #", "Degree", "Use"], rows);
+  }
+
+  function appendVedNetraRelations(out, chart, shadbala) {
+    sectionLine(out, "MODULE 14 - PLANET RELATIONS");
+    tableLines(out, "Conjunctions", ["House", "Planet 1", "Planet 2", "Degree difference", "Classification"], conjunctionRows(chart));
+    tableLines(out, "Mutual aspects", ["Planet A", "Planet B", "Aspect type", "Separation", "Orb"], mutualAspectRows(chart));
+    tableLines(out, "Parivartana", ["Planet A", "A sign", "Planet B", "B sign", "Houses", "Type"], parivartanaRows(chart));
+    tableLines(out, "Same Nakshatra", ["Nakshatra", "Planets", "Practical note"], sameNakshatraRows(chart));
+    tableLines(out, "House lord placements", ["House", "Sign", "Lord", "Lord placed", "Condition", "Avastha", "Shadbala"], Array.from({ length: 12 }, function (_, index) {
+      var house = index + 1;
+      var lord = lordOfHouse(chart, house);
+      var p = chart.planetsByName[lord];
+      var bala = shadbala.find(function (row) { return row.planet === lord; });
+      return ["H" + house, SIGNS[houseSign(chart, house)].name, lord, p ? "H" + p.house : "-", p ? dignitySpec(p) : "-", p ? baaladiAvastha(p.deg, p.sign) : "-", bala ? bala.total : "-"];
+    }));
+  }
+
+  function appendVedNetraMoonChart(out, chart, shadbala) {
+    sectionLine(out, "MODULE 15 - MOON CHART / CHANDRA LAGNA PARALLEL");
+    var moonSign = chart.planetsByName.Moon.sign;
+    var rows = [["Ascendant", chart.ascendant.signName, "H1", houseFromSign(moonSign, chart.ascendant.sign), "-"]];
+    chart.planets.forEach(function (p) {
+      var lord = chart.planetsByName[SIGNS[p.sign].lord];
+      rows.push([p.name, p.signName, "H" + p.house, "H" + houseFromSign(moonSign, p.sign), lord ? "H" + houseFromSign(moonSign, lord.sign) : "-"]);
+    });
+    tableLines(out, "Chandra Lagna recalculation", ["Point", "Sign", "D1 house", "Moon-chart house", "Sign lord's Moon-chart house"], rows);
+  }
+
+  function appendVedNetraBhavaChalit(out, chart) {
+    if (chart.ascendant.deg < 28) return;
+    sectionLine(out, "MODULE 16 - BHAVA CHALIT CHART");
+    tableLines(out, "BHAVA CHALIT CHART - Lagna degree is " + decimalToDms(chart.ascendant.deg) + " - this chart is required", ["Planet", "D1 Rashi house", "Bhava Chalit house", "Shift flag", "Analyst note"], bhavaChalitSripatiPlanets(chart).map(function (p) {
+      return [p.name, "H" + p.house, "H" + p.bhavaHouse, p.house === p.bhavaHouse ? "Same house" : "Shifted from H" + p.house + " to H" + p.bhavaHouse, "Judge the shifted bhava separately from sign-based ownership."];
+    }));
+  }
+
+  function appendVedNetraNakshatraReference(out, chart, shadbala) {
+    sectionLine(out, "MODULE 17 - NAKSHATRA REFERENCE");
+    var rows = [{
+      name: "Lagna",
+      lon: chart.ascendant.lon,
+      p: null
+    }].concat(chart.planets.map(function (p) { return { name: p.name, lon: p.lon, p: p }; })).map(function (item) {
+      var nak = nakshatraInfo(item.lon);
+      var ruler = chart.planetsByName[nak.lord];
+      var bala = shadbala.find(function (row) { return row.planet === nak.lord; });
+      var p = item.p || {};
+      return [item.name, nak.name, nak.index + 1, nak.lord, ruler ? ruler.signName : "-", ruler ? "H" + ruler.house : "-", ruler ? dignitySpec(ruler) : "-", ruler ? baaladiAvastha(ruler.deg, ruler.sign) : "-", bala ? bala.total : "-", ruler ? combustionReport(chart, ruler).status : "-", ruler && ruler.retrograde ? "R" : "D", nak.pada, SIGNS[vargaSign(item.lon, 9)].name, padaCompatibility(p, vargaSign(item.lon, 9))];
+    });
+    tableLines(out, "Nakshatra chain", ["Point", "Nakshatra", "Nak #", "Ruler", "Ruler sign", "Ruler house", "Ruler dignity", "Ruler avastha", "Ruler shadbala", "Ruler combustion", "Ruler motion", "Pada", "Pada D9 sign", "Pada compatibility"], rows);
+  }
+
+  function appendVedNetraFunctionalRoles(out, chart) {
+    sectionLine(out, "MODULE 18 - FUNCTIONAL BENEFIC / MALEFIC TABLE");
+    tableLines(out, "Functional roles for Lagna", ["Planet", "Lordships", "Classification", "Reason", "Trik lord", "Yogakaraka", "Maraka"], PLANETS.map(function (name) {
+      var p = chart.planetsByName[name];
+      var lordships = p.lordships || [];
+      var trik = lordships.some(function (h) { return [6, 8, 12].indexOf(h) >= 0; });
+      var yogakaraka = lordships.some(function (h) { return [1, 5, 9].indexOf(h) >= 0; }) && lordships.some(function (h) { return [1, 4, 7, 10].indexOf(h) >= 0; });
+      var maraka = lordships.some(function (h) { return [2, 7].indexOf(h) >= 0; });
+      return [name, lordships.map(function (h) { return "H" + h; }).join(", ") || "Nodal", trik ? "Functional Malefic" : (yogakaraka ? "Functional Benefic" : p.functionalRole || "Neutral"), trik ? "Lords a Trik house; per VedNetra rule this overrides mixed lordship." : (yogakaraka ? "Owns both kendra and trikona houses." : "Judge through lordship mix, dignity and sambandha."), trik ? "Yes" : "No", yogakaraka ? "Yes" : "No", maraka ? "Yes" : "No"];
+    }));
+  }
+
+  function appendVedNetraNaturalKarakas(out) {
+    sectionLine(out, "MODULE 19 - KARAKAS NATURAL SIGNIFICATORS");
+    tableLines(out, "Reference karakas", ["Life area", "Primary karaka", "Secondary karaka", "Primary house", "Bhavat Bhavam", "Decisive Varga"], naturalKarakaReferenceRows());
+  }
+
+  function appendVedNetraBhavatBhavam(out) {
+    sectionLine(out, "MODULE 20 - BHAVAT BHAVAM TABLE");
+    tableLines(out, "Cross-house reference", ["Primary house", "Bhavat Bhavam", "Interpretation note"], Array.from({ length: 12 }, function (_, index) {
+      var house = index + 1;
+      var bhavat = ((house + house - 2) % 12) + 1;
+      return ["H" + house + " " + houseMeaning(house), "H" + bhavat, "The " + houseMeaning(house) + " matter is reinforced or disturbed by H" + bhavat + " as the same house counted from itself."];
+    }));
+  }
+
+  function appendVedNetraVarshfal(out, chart, input, options) {
+    sectionLine(out, "MODULE 21 - VARSHFAL SOLAR RETURN MODULE");
+    var years = options.varshfalYears || [];
+    if (!years.length) {
+      out.push("No Varshfal year was requested in the pop-up form.");
+      return;
+    }
+    var lifeArea = vedNetraLifeAreas().find(function (item) { return item.key === options.lifeArea; }) || vedNetraLifeAreas()[0];
+    years.forEach(function (year) {
+      var runningYear = varshfalRunningYearForCalendarYear(input, year);
+      var result = computeVarshfal(chart, input, runningYear);
+      var vf = result.varshfal;
+      sectionLine(out, "Varshfal " + year + " - running year " + runningYear);
+      tableLines(out, "VF header", ["Field", "Value"], [
+        ["Calendar year requested", year],
+        ["Solar Return date/time", reportDateTime(result.returnInstant, input.timezone)],
+        ["Location", input.birthPlace || coordinateText(input.latitude, input.longitude)],
+        ["VF Lagna", vf.ascendant.signName + " " + decimalToDms(vf.ascendant.deg)],
+        ["Muntha", SIGNS[result.munthaSign].name + " in H" + result.munthaHouse],
+        ["Varshesh", weekdayLord(result.returnInstant, input.timezone)],
+        ["Relevant life area", lifeArea.label + " / H" + lifeArea.house],
+        ["Relevant house in VF", "H" + lifeArea.house + " " + SIGNS[houseSign(vf, lifeArea.house)].name],
+        ["Relevant karaka in VF", lifeArea.karaka + " in H" + (vf.planetsByName[lifeArea.karaka] ? vf.planetsByName[lifeArea.karaka].house : "-")]
+      ]);
+      tableLines(out, "VF D1 planets", ["Planet", "Sign", "House", "Degree", "Motion", "Avastha", "Dignity", "Combustion", "Nakshatra", "Pada", "Nak lord"], vf.planets.map(function (p) {
+        return [p.name, p.signName, "H" + p.house, decimalToDms(p.deg), p.retrograde ? "R" : "D", baaladiAvastha(p.deg, p.sign), dignitySpec(p), combustionReport(vf, p).status, p.nakshatra, p.pada, p.nakLord];
+      }));
+      [9, 10, 7, 4].forEach(function (division) {
+        var varga = makeVarshfalVarga(result, division);
+        tableLines(out, "VF D" + division + " " + vargaName(division) + " placements", ["Point", "Sign", "House"], ["Lagna"].concat(PLANETS, ["Muntha"]).map(function (name) {
+          if (name === "Lagna") return [name, varga.ascendant.signName, "H1"];
+          var p = varga.planetsWithMuntha.find(function (item) { return item.name === name; });
+          return [name, p ? p.signName : "-", p ? "H" + p.house : "-"];
+        }));
+      });
+      tableLines(out, "VF yogas", ["Yoga", "Category", "Planets", "Strength"], scanYogas(vf).map(function (yoga) {
+        return [yoga.name, yoga.category, (yoga.planets || []).join(", ") || "-", yoga.strength || "-"];
+      }));
+      tableLines(out, "VF Muntha house content", ["Muntha house", "Occupants"], [[result.munthaHouse, vf.planets.filter(function (p) { return p.house === result.munthaHouse; }).map(prop("name")).join(", ") || "Empty"]]);
+    });
+  }
+
+  function appendVedNetraFlags(out, chart, shadbala) {
+    sectionLine(out, "MODULE 22 - SPECIAL COMPUTATION FLAGS");
+    var flags = [];
+    if (chart.ascendant.deg >= 28) flags.push("Bhava Chalit Warning: Lagna degree = " + decimalToDms(chart.ascendant.deg) + " - Bhava Chalit chart required.");
+    if (chart.ayanamshaKey !== "raman") flags.push("Ayanamsha Alert: report requires Raman; current chart key is " + chart.ayanamshaKey + ".");
+    shadbala.forEach(function (row) {
+      if (row.dig <= 0) flags.push("Zero Dig Bala Alert: " + row.planet + " has Dig Bala = 0.");
+      if (row.drik <= 0) flags.push("Zero or Negative Drik Bala Alert: " + row.planet + " has Drik Bala = " + row.drik + ".");
+      if (row.total < 150) flags.push("Weak Shadbala Alert: " + row.planet + " total = " + row.total + ".");
+    });
+    chart.planets.forEach(function (p) {
+      if (baaladiAvastha(p.deg, p.sign) === "Mrita") flags.push("Mrita Avastha Alert: " + p.name + " is in Mrita Avastha.");
+      if (combustionReport(chart, p).status.indexOf("Deeply") === 0) flags.push("Deeply Combust Alert: " + p.name + " is deeply combust.");
+      var nb = neechabhangaReport(chart, p);
+      if (nb.flag === "Yes") flags.push("Neechabhanga Alert: " + p.name + " type: " + nb.type + ", strength: " + nb.strength + ".");
+      if (p.retrograde) flags.push("Retrograde Alert: " + p.name + " is retrograde.");
+    });
+    parivartanaRows(chart).forEach(function (row) {
+      flags.push("Parivartana Alert: " + row[0] + " and " + row[2] + " exchange " + row[4] + " - " + row[5] + ".");
+    });
+    sameNakshatraRows(chart).forEach(function (row) {
+      flags.push("Same Nakshatra Alert: " + row[1] + " share " + row[0] + ".");
+    });
+    PLANETS.forEach(function (name) {
+      var p = chart.planetsByName[name];
+      var lordships = p.lordships || [];
+      if (lordships.some(function (h) { return [1, 5, 9].indexOf(h) >= 0; }) && lordships.some(function (h) { return [1, 4, 7, 10].indexOf(h) >= 0; })) flags.push("Yogakaraka Alert: " + name + " lords " + lordships.map(function (h) { return "H" + h; }).join(", ") + ".");
+      if (lordships.some(function (h) { return [6, 8, 12].indexOf(h) >= 0; })) flags.push("Trik Lord Alert: " + name + " lords " + lordships.map(function (h) { return "H" + h; }).join(", ") + ".");
+    });
+    tableLines(out, "Automated alerts", ["#", "Flag"], (flags.length ? flags : ["No special alerts triggered."]).map(function (flag, index) { return [index + 1, flag]; }));
+  }
+
+  function appendVedNetraReportSettings(out) {
+    sectionLine(out, "MODULE 23 - REPORT CONFIGURATION SETTINGS");
+    tableLines(out, "Export settings", ["Setting", "Value"], [
+      ["Ayanamsha", "Raman"],
+      ["House system", "Whole sign"],
+      ["Planet engine", "VedNetra offline ephemeris; production can be cross-certified with Swiss Ephemeris"],
+      ["Precision", "Degrees to seconds where available"],
+      ["Date format", "DD/MM/YYYY"],
+      ["Time format", "HH:MM:SS"],
+      ["Report formats", "TXT, CSV, Excel-compatible XLS, PDF"],
+      ["Plain text structure", "Pipe-delimited tables"],
+      ["Conditional modules", "Bhava Chalit only when Lagna >= 28 degrees; Varshfal only for requested years"],
+      ["Completeness", "Every required module is represented; unavailable inputs are explicitly marked"]
+    ]);
+  }
+
+  function appendVedNetraExcludedTables(out) {
+    sectionLine(out, "MODULE 24 - TABLES EXCLUDED BY DEFAULT");
+    tableLines(out, "Excluded noise tables", ["Table", "Reason"], [
+      ["Sub Hora lord table", "Not required for this analysis framework"],
+      ["Ephemeris for reference date", "Transit table is sufficient"],
+      ["Sarvatobhadra Chakra", "Not used in this framework"],
+      ["Kota Chakra", "Not used in this framework"],
+      ["Sanghatta Chakra", "Not used in this framework"],
+      ["Separate Sookshma-only pages", "Sookshma appears inside Module 9"],
+      ["Panchang for reference date", "Not needed for natal analysis"]
+    ]);
+  }
+
+  function sectionLine(out, title) {
+    out.push("");
+    out.push("============================================================");
+    out.push(title);
+    out.push("============================================================");
+  }
+
+  function tableLines(out, title, headers, rows) {
+    out.push("");
+    out.push(title);
+    out.push(headers.map(reportCell).join(" | "));
+    out.push(headers.map(function () { return "---"; }).join(" | "));
+    if (!rows || !rows.length) {
+      out.push(["-", "No computed rows available"].concat(headers.slice(2).map(function () { return "-"; })).slice(0, headers.length).join(" | "));
+      return;
+    }
+    rows.forEach(function (row) {
+      out.push(row.map(reportCell).join(" | "));
+    });
+  }
+
+  function reportCell(value) {
+    return String(value === undefined || value === null || value === "" ? "-" : value).replace(/\s+/g, " ").replace(/\|/g, "/").trim();
+  }
+
+  function reportDate(date, tzHours) {
+    var shifted = new Date(date.getTime() + Number(tzHours || 0) * 3600000);
+    return pad(shifted.getUTCDate()) + "/" + pad(shifted.getUTCMonth() + 1) + "/" + shifted.getUTCFullYear();
+  }
+
+  function reportDateTime(date, tzHours) {
+    return reportDate(date, tzHours) + " " + timeInputValue(date, Number(tzHours || 0));
+  }
+
+  function planetAbbr(name) {
+    return { Sun: "Su", Moon: "Mo", Mars: "Ma", Mercury: "Me", Jupiter: "Ju", Venus: "Ve", Saturn: "Sa", Rahu: "Ra", Ketu: "Ke" }[name] || name.slice(0, 2);
+  }
+
+  function dignitySpec(planet) {
+    return { Exalted: "Uccha", Moolatrikona: "Mooltrikona", "Own sign": "Swakshetra", "Friendly sign": "Mitra", "Neutral sign": "Sama", "Enemy sign": "Shatru", Debilitated: "Neecha" }[planet && planet.dignity] || (planet && planet.dignity) || "-";
+  }
+
+  function combustionReport(chart, planet) {
+    if (!planet || planet.name === "Sun" || planet.name === "Rahu" || planet.name === "Ketu") return { status: "Not applicable", distance: "-" };
+    var sun = chart.planetsByName.Sun;
+    var distance = angleDistance(planet.lon, sun.lon);
+    var orb = { Moon: 12, Mars: 17, Mercury: planet.retrograde ? 12 : 14, Jupiter: 11, Venus: planet.retrograde ? 8 : 10, Saturn: 15 }[planet.name] || 0;
+    var deep = { Moon: 6, Mars: 8, Mercury: 3, Jupiter: 5, Venus: 4, Saturn: 7 }[planet.name] || 0;
+    return {
+      status: distance <= deep ? "Deeply Combust (Ati-Dagdha)" : distance <= orb ? "Combust" : "Not Combust",
+      distance: decimalToDms(distance)
+    };
+  }
+
+  function neechabhangaReport(chart, planet) {
+    if (!planet || planet.dignity !== "Debilitated") return { flag: "No", type: "-", strength: "-" };
+    if (!neechabhanga(chart, planet)) return { flag: "No", type: "-", strength: "-" };
+    var debSign = DEBILITATION[planet.name];
+    var exaltSign = EXALTATION[planet.name];
+    var debLord = SIGNS[debSign].lord;
+    var exaltLord = SIGNS[exaltSign].lord;
+    var debLordPlanet = chart.planetsByName[debLord];
+    var exaltLordPlanet = chart.planetsByName[exaltLord];
+    var moonHouse = chart.planetsByName.Moon.house;
+    var types = [];
+    if (debLordPlanet && kendraFrom(1, debLordPlanet.house)) types.push("Debilitation lord in Kendra from Lagna");
+    if (debLordPlanet && kendraFrom(moonHouse, debLordPlanet.house)) types.push("Debilitation lord in Kendra from Moon");
+    if (exaltLordPlanet && kendraFrom(1, exaltLordPlanet.house)) types.push("Exaltation lord in Kendra from Lagna");
+    if (exaltLordPlanet && kendraFrom(moonHouse, exaltLordPlanet.house)) types.push("Exaltation lord in Kendra from Moon");
+    if (kendraFrom(1, planet.house)) types.push("Debilitated planet itself in Kendra");
+    return { flag: "Yes", type: types.join("; ") || "Cancellation factors present", strength: types.length >= 3 ? "Very Strong" : types.length === 2 ? "Strong" : "Moderate" };
+  }
+
+  function requiredShadbala(name) {
+    return { Sun: 390, Moon: 360, Mars: 300, Mercury: 420, Jupiter: 390, Venus: 330, Saturn: 300 }[name] || 300;
+  }
+
+  function vedNetraShadbalaJudgement(total) {
+    if (total < 150) return "Weak";
+    if (total < 200) return "Below Average";
+    if (total < 250) return "Average";
+    return "Strong";
+  }
+
+  function shadbalaFlags(row) {
+    var flags = [];
+    if (row.dig <= 0) flags.push("Directional weakness - zero Dig Bala");
+    if (row.drik <= 0) flags.push("Under malefic aspect pressure");
+    if (row.total < 150) flags.push("Weak total Shadbala");
+    return flags;
+  }
+
+  function cheshtaType(row) {
+    return row.cheshta >= 55 ? "Vakra/high" : row.cheshta <= 20 ? "Manda/low" : "Sama/medium";
+  }
+
+  function ishtaPhala(row) {
+    return Math.max(0, Math.round((row.sthana + row.dig + row.naisargika) / 3));
+  }
+
+  function kashtaPhala(row) {
+    return Math.max(0, Math.round(60 - ishtaPhala(row)));
+  }
+
+  function activePeriod(periods, date) {
+    return periods.find(function (period) { return period.start <= date && period.end >= date; }) || null;
+  }
+
+  function durationText(start, end) {
+    var days = Math.max(1, Math.round((end.getTime() - start.getTime()) / DAY_MS));
+    if (days >= 365) return (days / 365.25).toFixed(2) + " years";
+    if (days >= 30) return Math.floor(days / 30.4375) + " months " + Math.round(days % 30.4375) + " days";
+    if (days >= 2) return days + " days";
+    return Math.round((end.getTime() - start.getTime()) / 3600000) + " hours";
+  }
+
+  function vedNetraVargaDivisions() {
+    return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 16, 20, 24, 27, 30, 40, 45, 60];
+  }
+
+  function conjunctionRows(chart) {
+    var rows = [];
+    planetPairs(chart).forEach(function (pair) {
+      var a = pair[0], b = pair[1];
+      if (a.sign !== b.sign) return;
+      var diff = angleDistance(a.lon, b.lon);
+      rows.push(["H" + a.house, a.name, b.name, decimalToDms(diff), diff < 3 ? "Tight conjunction" : diff <= 8 ? "Moderate conjunction" : "Wide conjunction"]);
+    });
+    return rows;
+  }
+
+  function mutualAspectRows(chart) {
+    var rows = [];
+    planetPairs(chart).forEach(function (pair) {
+      var a = pair[0], b = pair[1];
+      if (!planetAspectsHouse(a, b.house) || !planetAspectsHouse(b, a.house)) return;
+      rows.push([a.name, b.name, aspectNameToHouse(a, b.house) + " / " + aspectNameToHouse(b, a.house), decimalToDms(angleDistance(a.lon, b.lon)), "Whole-sign aspect"]);
+    });
+    return rows;
+  }
+
+  function parivartanaRows(chart) {
+    var rows = [];
+    planetPairs(chart).forEach(function (pair) {
+      var a = pair[0], b = pair[1];
+      if (SIGNS[a.sign].lord !== b.name || SIGNS[b.sign].lord !== a.name) return;
+      var houses = "H" + a.house + " <-> H" + b.house;
+      rows.push([a.name, a.signName, b.name, b.signName, houses, parivartanaType(a.house, b.house)]);
+    });
+    return rows;
+  }
+
+  function parivartanaType(aHouse, bHouse) {
+    var trik = [6, 8, 12];
+    var dharmaKendra = [1, 4, 5, 7, 9, 10];
+    if (trik.indexOf(aHouse) >= 0 || trik.indexOf(bHouse) >= 0) return "Dainya Parivartana";
+    if (dharmaKendra.indexOf(aHouse) >= 0 && dharmaKendra.indexOf(bHouse) >= 0) return "Maha Parivartana";
+    return "Kahala Parivartana";
+  }
+
+  function sameNakshatraRows(chart) {
+    var groups = {};
+    chart.planets.forEach(function (p) {
+      if (!groups[p.nakshatra]) groups[p.nakshatra] = [];
+      groups[p.nakshatra].push(p.name);
+    });
+    return Object.keys(groups).filter(function (nak) { return groups[nak].length > 1; }).map(function (nak) {
+      return [nak, groups[nak].join(", "), "When one is activated by dasha, the other often co-activates."];
+    });
+  }
+
+  function padaCompatibility(planet, navamsaSign) {
+    if (!planet || !planet.name) return "Neutral";
+    if (EXALTATION[planet.name] === navamsaSign || SIGNS[navamsaSign].lord === planet.name) return "Strengthens";
+    if (DEBILITATION[planet.name] === navamsaSign) return "Weakens";
+    var lord = SIGNS[navamsaSign].lord;
+    if (((FRIENDS[planet.name] || {}).friend || []).indexOf(lord) >= 0) return "Strengthens";
+    return "Neutral";
+  }
+
+  function naturalKarakaReferenceRows() {
+    return [
+      ["Self / vitality", "Sun", "Lagna lord", "H1", "H1", "D1"],
+      ["Wealth", "Jupiter", "Venus / H2 lord", "H2", "H3", "D2"],
+      ["Siblings", "Mars", "H3 lord", "H3", "H5", "D3"],
+      ["Mother / property", "Moon", "Venus / Mars", "H4", "H7", "D4"],
+      ["Children", "Jupiter", "H5 lord", "H5", "H9", "D7"],
+      ["Enemies / disease", "Saturn", "Mars", "H6", "H11", "D6"],
+      ["Spouse / partnership", "Venus", "Jupiter", "H7", "H1", "D9"],
+      ["Death / transformation", "Saturn", "Ketu", "H8", "H3", "D8"],
+      ["Father / dharma", "Sun", "Jupiter", "H9", "H5", "D12"],
+      ["Career / status", "Saturn", "Sun / Mercury", "H10", "H7", "D10"],
+      ["Gains", "Jupiter", "H11 lord", "H11", "H9", "D11"],
+      ["Loss / liberation", "Ketu", "Saturn", "H12", "H11", "D20"],
+      ["Education", "Mercury", "Jupiter", "H4", "H7", "D24"],
+      ["Foreign travel", "Rahu", "Moon", "H12", "H11", "D4 / D9"],
+      ["Mental health", "Moon", "Mercury", "H4", "H7", "D30"],
+      ["Spirituality", "Ketu", "Jupiter", "H9 / H12", "H5 / H11", "D20"]
+    ];
+  }
+
+  function varshfalRunningYearForCalendarYear(input, year) {
+    var birthYear = Number(String(input.birthDate || dateInputValue(input.birthInstant, input.timezone)).slice(0, 4));
+    return clamp(Math.round(Number(year) - birthYear + 1), 1, 121);
+  }
+
+  function weekdayLord(date, tzHours) {
+    var shifted = new Date(date.getTime() + Number(tzHours || 0) * 3600000);
+    return ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"][shifted.getUTCDay()];
+  }
+
+  function vedNetraReportTextToCsv(text) {
+    return text.split(/\r?\n/).map(function (line) {
+      var cells = line.indexOf("|") >= 0 ? line.split("|").map(function (cell) { return cell.trim(); }) : [line];
+      return cells.map(csvCell).join(",");
+    }).join("\r\n");
+  }
+
+  function vedNetraReportTextToExcel(text) {
+    var html = '<html><head><meta charset="utf-8"><style>body{font-family:Calibri,Arial,sans-serif;}table{border-collapse:collapse;margin:10px 0;}td,th{border:1px solid #c9b46a;padding:5px 8px;}th{background:#fff0c2;color:#17213f;}h3{color:#17213f;}</style></head><body>';
+    text.split(/\r?\n/).forEach(function (line) {
+      if (!line) {
+        html += "<br>";
+      } else if (line.indexOf("===") === 0) {
+        return;
+      } else if (line.indexOf("MODULE ") === 0 || line.indexOf("Varshfal ") === 0) {
+        html += "<h3>" + escapeHtml(line) + "</h3>";
+      } else if (line.indexOf("|") >= 0) {
+        html += "<table><tr>" + line.split("|").map(function (cell) { return "<td>" + escapeHtml(cell.trim()) + "</td>"; }).join("") + "</tr></table>";
+      } else {
+        html += "<p>" + escapeHtml(line) + "</p>";
+      }
+    });
+    return html + "</body></html>";
+  }
+
+  function reportDownloadFilenameBase() {
+    var input = lastReportInput || {};
+    var chartNumber = input.chartNumber || fieldValue("chartNumber") || "1";
+    var createdAt = input.reportCreatedAt instanceof Date ? input.reportCreatedAt : new Date();
+    var timezone = Number.isFinite(Number(input.timezone)) ? Number(input.timezone) : 5.5;
+    var createdDate = dateInputValue(createdAt, timezone);
+    var name = input.name || fieldValue("nativeName") || "Native";
+    return [safeFilenamePart("Chart " + chartNumber), createdDate, safeFilenamePart(name)].join("_");
+  }
+
+  function safeFilenamePart(value) {
+    return String(value || "")
+      .replace(/[^A-Za-z0-9 _.-]/g, "")
+      .replace(/\s+/g, "_")
+      .replace(/_+/g, "_")
+      .replace(/^_+|_+$/g, "") || "Native";
+  }
+
+  function exportTextReport(options) {
+    options = options || {};
+    var parts = reportPlainSectionsForExport(options);
+    var roots = reportRootsForExport();
+    if (!roots.length) return parts.join("\n\n") || lastPlainReport;
+    roots.forEach(function (root) {
+      var tables = root.querySelectorAll ? Array.prototype.slice.call(root.querySelectorAll("table")).filter(function (table) { return !isDashaTable(table); }) : [];
+      tables.forEach(function (table, index) {
+        var tableNumber = index + 1;
+        if (options.clean && isCleanDownloadExcludedTable(table, tableNumber)) return;
+        parts.push("");
+        parts.push("TABLE " + tableNumber + ": " + nearestPanelTitle(table));
+        Array.prototype.slice.call(table.rows).forEach(function (row) {
+          var cells = Array.prototype.slice.call(row.cells).map(function (cell) {
+            return cleanCellText(cell.innerText || cell.textContent || "");
+          });
+          parts.push(cells.join(" | "));
+        });
+      });
+    });
+    appendReportDashaText(parts);
+    return parts.join("\n");
+  }
+
+  function tablesToCsv(options) {
+    options = options || {};
+    var lines = [];
+    reportRootsForExport().forEach(function (root) {
+      var tables = root.querySelectorAll ? Array.prototype.slice.call(root.querySelectorAll("table")).filter(function (table) { return !isDashaTable(table); }) : [];
+      tables.forEach(function (table, index) {
+        var tableNumber = index + 1;
+        if (options.clean && isCleanDownloadExcludedTable(table, tableNumber)) return;
+        var title = "TABLE " + tableNumber + ": " + (nearestPanelTitle(table) || "Report table");
+        lines.push([title].map(csvCell).join(","));
+        Array.prototype.slice.call(table.rows).forEach(function (row) {
+          var cells = Array.prototype.slice.call(row.cells).map(function (cell) {
+            return csvCell(cleanCellText(cell.innerText || cell.textContent || ""));
+          });
+          lines.push(cells.join(","));
+        });
+        lines.push("");
+      });
+    });
+    appendReportDashaCsv(lines);
+    return lines.join("\r\n");
+  }
+
+  function tablesToExcel(options) {
+    options = options || {};
+    var html = ['<!doctype html><html><head><meta charset="utf-8"><style>body{font-family:Arial,sans-serif;} table{border-collapse:collapse;margin-bottom:18px;} th,td{border:1px solid #9fb88c;padding:5px 7px;vertical-align:top;} th{background:#edf6e5;font-weight:bold;} h2{color:#1d5b38;} h3{color:#285f3d;}</style></head><body>'];
+    html.push("<h2>VedNetra " + (options.clean ? "Summary Report" : "Detailed Report") + "</h2>");
+    reportPlainSectionsForExport(options).join("\n").split(/\r?\n/).filter(Boolean).slice(0, 120).forEach(function (line) {
+      html.push("<div>" + escapeHtml(line) + "</div>");
+    });
+    reportRootsForExport().forEach(function (root) {
+      var tables = root.querySelectorAll ? Array.prototype.slice.call(root.querySelectorAll("table")).filter(function (table) { return !isDashaTable(table); }) : [];
+      tables.forEach(function (table, index) {
+        var tableNumber = index + 1;
+        if (options.clean && isCleanDownloadExcludedTable(table, tableNumber)) return;
+        html.push("<h3>TABLE " + tableNumber + ": " + escapeHtml(nearestPanelTitle(table) || "Report table") + "</h3>");
+        html.push("<table>");
+        Array.prototype.slice.call(table.rows).forEach(function (row) {
+          html.push("<tr>" + Array.prototype.slice.call(row.cells).map(function (cell) {
+            var tag = cell.tagName && cell.tagName.toLowerCase() === "th" ? "th" : "td";
+            return "<" + tag + ">" + escapeHtml(cleanCellText(cell.innerText || cell.textContent || "")) + "</" + tag + ">";
+          }).join("") + "</tr>");
+        });
+        html.push("</table>");
+      });
+    });
+    appendReportDashaExcel(html);
+    html.push("</body></html>");
+    return html.join("");
+  }
+
+  function isDashaTable(table) {
+    var current = table;
+    while (current && current !== document.body) {
+      if (current.classList && current.classList.contains && current.classList.contains("dasha-panel")) return true;
+      current = current.parentNode;
+    }
+    return false;
+  }
+
+  function appendReportDashaText(parts) {
+    if (!lastReportChart || !lastReportInput) return;
+    parts.push("");
+    parts.push("TABLE: Vimshottari Dasha Report Range");
+    parts.push("MD-AD-PD-SD | Start | To");
+    reportDashaRows(lastReportChart, lastReportInput).forEach(function (row) {
+      parts.push([dashaCode(row.md, row.ad, row.pd, row.sd), dashaDate(row.start, lastReportInput.timezone), dashaDate(row.end, lastReportInput.timezone)].join(" | "));
+    });
+  }
+
+  function appendReportDashaCsv(lines) {
+    if (!lastReportChart || !lastReportInput) return;
+    lines.push([csvCell("Vimshottari Dasha Report Range")].join(","));
+    lines.push(["MD-AD-PD-SD", "Start", "To"].map(csvCell).join(","));
+    reportDashaRows(lastReportChart, lastReportInput).forEach(function (row) {
+      lines.push([dashaCode(row.md, row.ad, row.pd, row.sd), dashaDate(row.start, lastReportInput.timezone), dashaDate(row.end, lastReportInput.timezone)].map(csvCell).join(","));
+    });
+    lines.push("");
+  }
+
+  function appendReportDashaExcel(html) {
+    if (!lastReportChart || !lastReportInput) return;
+    html.push("<h3>Vimshottari Dasha Report Range</h3><table><tr><th>MD-AD-PD-SD</th><th>Start</th><th>To</th></tr>");
+    reportDashaRows(lastReportChart, lastReportInput).forEach(function (row) {
+      html.push("<tr><td>" + escapeHtml(dashaCode(row.md, row.ad, row.pd, row.sd)) + "</td><td>" + escapeHtml(dashaDate(row.start, lastReportInput.timezone)) + "</td><td>" + escapeHtml(dashaDate(row.end, lastReportInput.timezone)) + "</td></tr>");
+    });
+    html.push("</table>");
+  }
+
+  function reportPlainSectionsForExport(options) {
+    options = options || {};
+    var parts = [];
+    if (lastPlainReports.chartData) {
+      parts.push("VEDNETRA REPORT");
+      parts.push(options.clean ? cleanPlainReportText(lastPlainReports.chartData) : lastPlainReports.chartData);
+    }
+    if (!parts.length && lastPlainReport) parts.push(options.clean ? cleanPlainReportText(lastPlainReport) : lastPlainReport);
+    return parts;
+  }
+
+  function cleanPlainReportText(text) {
+    var lines = String(text || "").split(/\r?\n/);
+    var excludedHeadings = {
+      "Marriage Compatibility:": true,
+      "Most Frequently Asked Queries' Pillars:": true,
+      "SWOT Analysis:": true,
+      "Current Dasha: next six months": true
+    };
+    var stopHeadings = {
+      "Chakras:": true,
+      "Predictive Analysis:": true,
+      "VedNetra - Predictive Report": true,
+      "Planet Relations:": true,
+      "Lordships:": true
+    };
+    var cleaned = [];
+    var skipping = false;
+    lines.forEach(function (line) {
+      var trimmed = line.trim();
+      if (excludedHeadings[trimmed]) {
+        skipping = true;
+        return;
+      }
+      if (skipping && (stopHeadings[trimmed] || /^[A-Za-z0-9].*:$/.test(trimmed))) {
+        skipping = false;
+      }
+      if (!skipping) cleaned.push(line);
+    });
+    return cleaned.join("\n").replace(/\n{3,}/g, "\n\n").trim();
+  }
+
+  function isCleanDownloadExcludedTable(table, tableNumber) {
+    if (tableNumber === 26 || (tableNumber >= 28 && tableNumber <= 169)) return true;
+    return isInsideExcludedCleanSection(table);
+  }
+
+  function isInsideExcludedCleanSection(node) {
+    var current = node;
+    while (current && current !== document.body) {
+      if (current.id === "viewA-compatibility" || current.id === "viewA-faq-pillars") return true;
+      if (current.classList && current.classList.contains) {
+        if (current.classList.contains("swot-panel")) return true;
+        if (current.classList.contains("faq-pillar-list")) return true;
+        if (current.classList.contains("compatibility-section")) return true;
+      }
+      if (current.classList && current.classList.contains && current.classList.contains("section")) {
+        var heading = current.querySelector && current.querySelector("h3");
+        var eyebrow = current.querySelector && current.querySelector(".eyebrow");
+        var headingText = heading ? cleanCellText(heading.innerText || heading.textContent || "") : "";
+        var eyebrowText = eyebrow ? cleanCellText(eyebrow.innerText || eyebrow.textContent || "") : "";
+        if (headingText === "D-1 Houses And House Lords" || headingText.indexOf("Next Six Months") >= 0) return true;
+        if (eyebrowText === "SWOT Analysis" || eyebrowText === "Most Frequently Asked Queries" || eyebrowText === "Current Dasha") return true;
+      }
+      current = current.parentNode;
+    }
+    return false;
+  }
+
+  function reportRootsForExport() {
+    if (typeof document === "undefined") return [];
+    if (!document.querySelector) {
+      var fallback = document.getElementById("report");
+      return fallback ? [fallback] : [];
+    }
+    return ["chartDataReportView"].map(function (id) {
+      return document.getElementById(id);
+    }).filter(Boolean);
+  }
+
+  function activeReportRoot() {
+    if (typeof document === "undefined") return null;
+    if (!document.querySelector) return document.getElementById("report");
+    var target = document.getElementById("chartDataReportView");
+    return target || document.getElementById("report");
+  }
+
+  function nearestPanelTitle(node) {
+    var current = node;
+    while (current && current !== document.body) {
+      if (current.classList && current.classList.contains("panel-box")) {
+        var heading = current.querySelector("h3");
+        if (heading) return cleanCellText(heading.innerText || heading.textContent || "");
+      }
+      if (current.classList && current.classList.contains("section")) {
+        var sectionHeading = current.querySelector("h3");
+        if (sectionHeading) return cleanCellText(sectionHeading.innerText || sectionHeading.textContent || "");
+      }
+      current = current.parentNode;
+    }
+    return "Report table";
+  }
+
+  function cleanCellText(value) {
+    return String(value || "").replace(/\s+/g, " ").trim();
+  }
+
+  function csvCell(value) {
+    return '"' + String(value || "").replace(/"/g, '""') + '"';
+  }
+
+  function downloadBlob(filename, mimeType, content) {
+    var blob = content instanceof Blob ? content : new Blob([content], { type: mimeType });
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  function makeSimplePdf(text) {
+    var lines = wrapPdfLines(asPdfText(text), 96);
+    var pages = [];
+    var pageSize = 54;
+    for (var i = 0; i < lines.length; i += pageSize) pages.push(lines.slice(i, i + pageSize));
+    if (!pages.length) pages.push(["No report content."]);
+    var objects = [];
+    objects.push("<< /Type /Catalog /Pages 2 0 R >>");
+    var kids = pages.map(function (_, index) { return (4 + index * 2) + " 0 R"; }).join(" ");
+    objects.push("<< /Type /Pages /Kids [" + kids + "] /Count " + pages.length + " >>");
+    objects.push("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>");
+    pages.forEach(function (pageLines, index) {
+      var pageObj = 4 + index * 2;
+      var streamObj = pageObj + 1;
+      objects.push("<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents " + streamObj + " 0 R >>");
+      var stream = "BT\n/F1 9 Tf\n11 TL\n50 760 Td\n" + pageLines.map(function (line) {
+        return "(" + pdfEscape(line) + ") Tj\nT*";
+      }).join("\n") + "\nET";
+      objects.push("<< /Length " + byteLength(stream) + " >>\nstream\n" + stream + "\nendstream");
+    });
+    return new Blob([buildPdf(objects)], { type: "application/pdf" });
+  }
+
+  function wrapPdfLines(text, maxChars) {
+    var lines = [];
+    String(text || "").split(/\r?\n/).forEach(function (line) {
+      var current = "";
+      line.split(/\s+/).forEach(function (word) {
+        if (!word) return;
+        var next = current ? current + " " + word : word;
+        if (next.length > maxChars && current) {
+          lines.push(current);
+          current = word;
+        } else {
+          current = next;
+        }
+      });
+      lines.push(current || "");
+    });
+    return lines;
+  }
+
+  function asPdfText(value) {
+    return String(value || "")
+      .replace(/[^\x09\x0A\x0D\x20-\x7E]/g, " ")
+      .replace(/\t/g, "  ");
+  }
+
+  function pdfEscape(value) {
+    return String(value || "").replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
+  }
+
+  function buildPdf(objects) {
+    var pdf = "%PDF-1.4\n";
+    var offsets = [0];
+    objects.forEach(function (object, index) {
+      offsets.push(byteLength(pdf));
+      pdf += (index + 1) + " 0 obj\n" + object + "\nendobj\n";
+    });
+    var xref = byteLength(pdf);
+    pdf += "xref\n0 " + (objects.length + 1) + "\n0000000000 65535 f \n";
+    for (var i = 1; i < offsets.length; i += 1) {
+      pdf += String(offsets[i]).padStart(10, "0") + " 00000 n \n";
+    }
+    pdf += "trailer\n<< /Size " + (objects.length + 1) + " /Root 1 0 R >>\nstartxref\n" + xref + "\n%%EOF";
+    return pdf;
+  }
+
+  function byteLength(value) {
+    return unescape(encodeURIComponent(value)).length;
+  }
+
+  function alertUser(message) {
+    if (typeof window !== "undefined" && typeof window.alert === "function") window.alert(message);
+  }
+
+  // Non-blocking toast — safe to call while in fullscreen (no modal dialog)
+  function showToast(message, durationMs) {
+    var dur = durationMs || 3200;
+    var existing = document.getElementById("vednetra-toast");
+    if (existing) existing.remove();
+    var toast = document.createElement("div");
+    toast.id = "vednetra-toast";
+    toast.className = "vednetra-toast";
+    toast.textContent = message;
+    toast.setAttribute("role", "status");
+    toast.setAttribute("aria-live", "polite");
+    document.body.appendChild(toast);
+    // Trigger animation
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { toast.classList.add("vednetra-toast-visible"); });
+    });
+    setTimeout(function () {
+      toast.classList.remove("vednetra-toast-visible");
+      setTimeout(function () { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 400);
+    }, dur);
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text);
+      return;
+    }
+    var helper = document.createElement ? document.createElement("textarea") : null;
+    if (!helper) return;
+    helper.value = text;
+    helper.setAttribute("readonly", "");
+    helper.style.position = "fixed";
+    helper.style.left = "-9999px";
+    document.body.appendChild(helper);
+    helper.select();
+    document.execCommand("copy");
+    document.body.removeChild(helper);
+  }
+
+  function verdictClass(confidence) {
+    if (confidence === "Definite" || confidence === "Likely") return "good";
+    if (confidence === "Unlikely" || confidence === "Uncertain") return "hard";
+    return "mixed";
+  }
+
+  function strengthClass(score) {
+    if (score >= 68) return "good";
+    if (score >= 45) return "mixed";
+    return "hard";
+  }
+
+  function analysisNumber(value) {
+    return value.toFixed(4) + " deg";
+  }
+
+  function planetEvidence(p) {
+    return p.name + " in house " + p.house + ", " + p.signName + ", " + p.dignity + ", score " + p.strength.score + ", afflictions: " + (p.afflictions ? (p.afflictions.join("; ") || "none") : "none");
+  }
+
+  function tenantsEvidence(chart, house) {
+    var tenants = chart.planets.filter(function (p) { return p.house === house; });
+    return tenants.length ? tenants.map(function (p) { return p.name + " (" + p.naturalNature + ")"; }).join(", ") : "No tenants.";
+  }
+
+  function hasBeneficAspectOnHouse(chart, house) {
+    return planetsAspectingHouse(chart, house).some(isBenefic);
+  }
+
+  function hasMaleficAspectOnHouse(chart, house) {
+    return planetsAspectingHouse(chart, house).some(isMalefic);
+  }
+
+  function isBenefic(p) { return p.naturalNature === "Benefic"; }
+  function isMalefic(p) { return p.naturalNature === "Malefic"; }
+  function isDusthana(h) { return [6, 8, 12].indexOf(h) >= 0; }
+  function isKendraTrine(h) { return [1, 4, 5, 7, 9, 10].indexOf(h) >= 0; }
+  function isOddSign(sign) { return sign % 2 === 0; }
+
+  function badMutualRelation(signA, signB) {
+    var d = houseFromSign(signA, signB);
+    return [2, 6, 8, 12].indexOf(d) >= 0;
+  }
+
+  function marriageDelayPair(chart) {
+    var pairs = [["Saturn", "Mars"], ["Venus", "Moon"], ["Venus", "Sun"], ["Sun", "Saturn"]];
+    return pairs.some(function (pair) {
+      return hasSambandha(chart, pair[0], pair[1]) && ([7].indexOf(chart.planetsByName[pair[0]].house) >= 0 || [7].indexOf(chart.planetsByName[pair[1]].house) >= 0 || hasSambandha(chart, pair[0], lordOfHouse(chart, 7)) || hasSambandha(chart, pair[1], "Venus"));
+    });
+  }
+
+  function separativeInfluenceOnMarriage(chart) {
+    var sep = ["Sun", "Saturn", "Rahu", lordOfHouse(chart, 12)];
+    var lord7 = lordOfHouse(chart, 7);
+    return sep.some(function (name) {
+      var p = chart.planetsByName[name];
+      return p && (p.house === 7 || planetAspectsHouse(p, 7) || hasSambandha(chart, name, lord7) || hasSambandha(chart, name, "Venus"));
+    });
+  }
+
+  function exchange(chart, aName, bName) {
+    var a = chart.planetsByName[aName];
+    var b = chart.planetsByName[bName];
+    return a && b && SIGNS[a.sign].lord === b.name && SIGNS[b.sign].lord === a.name;
+  }
+
+  function medicalCareerSignature(chart) {
+    var tenthSign = houseSign(chart, 10);
+    return [5, 7, 11].indexOf(tenthSign) >= 0 ||
+      hasSambandha(chart, "Sun", "Mars") ||
+      hasSambandha(chart, "Mars", "Saturn") ||
+      planetAspectsHouse(chart.planetsByName.Rahu, 10);
+  }
+
+  function businessSignature(chart) {
+    var upper = chart.planets.filter(function (p) { return p.house >= 7 && p.house <= 12; }).length;
+    var fireAir = chart.planets.filter(function (p) { return ["Fire", "Air"].indexOf(SIGNS[p.sign].element) >= 0; }).length;
+    return upper >= 5 || fireAir >= 5;
+  }
+
+  function serviceSignature(chart) {
+    return chart.houses[5].score >= 50 &&
+      (chart.planetsByName.Sun.strength.score >= 52 || chart.planetsByName.Mercury.strength.score >= 52 || chart.planetsByName.Saturn.strength.score >= 52);
+  }
+
+  function strongestPlanetInHouse(chart, house) {
+    var tenants = chart.planets.filter(function (p) { return p.house === house; });
+    if (!tenants.length) return null;
+    tenants.sort(function (a, b) { return b.strength.score - a.strength.score; });
+    return tenants[0];
+  }
+
+  function chartWithBase(chart, baseSign) {
+    return {
+      ascendant: { sign: baseSign },
+      planetsByName: chart.planetsByName,
+      planets: chart.planets.map(function (p) {
+        var clone = Object.assign({}, p);
+        clone.house = houseFromSign(baseSign, p.sign);
+        return clone;
+      })
+    };
+  }
+
+  function areFriends(a, b) {
+    var rel = FRIENDS[a];
+    return rel && rel.friend.indexOf(b) >= 0;
+  }
+
+  function lifespanPairClass(signA, signB) {
+    var a = SIGNS[signA].modality;
+    var b = SIGNS[signB].modality;
+    if ((a === "Movable" && b === "Movable") || (a === "Common" && b === "Fixed") || (a === "Fixed" && b === "Common")) return "Long";
+    if ((a === "Movable" && b === "Fixed") || (a === "Fixed" && b === "Movable") || (a === "Common" && b === "Common")) return "Medium";
+    return "Short";
+  }
+
+  function kendraFrom(houseA, houseB) {
+    return [1, 4, 7, 10].indexOf(houseFromSign(houseA - 1, houseB - 1)) >= 0;
+  }
+
+  function neechabhanga(chart, p) {
+    var debSign = p.sign;
+    var debLord = chart.planetsByName[SIGNS[debSign].lord];
+    var exaltLord = chart.planetsByName[SIGNS[EXALTATION[p.name]].lord];
+    return (debLord && isKendraTrine(debLord.house)) || (exaltLord && isKendraTrine(exaltLord.house)) || hasBeneficAspectOnHouse(chart, p.house);
+  }
+
+  function kalasarpa(chart) {
+    var rahu = chart.planetsByName.Rahu.lon;
+    var ketu = chart.planetsByName.Ketu.lon;
+    var classical = CLASSICAL_PLANETS.map(function (name) { return chart.planetsByName[name].lon; });
+    function inArc(start, end, lon) {
+      var span = normalize(end - start);
+      var pos = normalize(lon - start);
+      return pos <= span;
+    }
+    return classical.every(function (lon) { return inArc(rahu, ketu, lon); }) || classical.every(function (lon) { return inArc(ketu, rahu, lon); });
+  }
+
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
+  function average(values) {
+    var clean = values.filter(function (v) { return Number.isFinite(v); });
+    if (!clean.length) return 0;
+    return clean.reduce(function (sum, value) { return sum + value; }, 0) / clean.length;
+  }
+
+  function dedupe(values) {
+    return values.filter(function (value, index) { return values.indexOf(value) === index; });
+  }
+
+  function dedupeBy(values, key) {
+    var seen = {};
+    return values.filter(function (value) {
+      if (seen[value[key]]) return false;
+      seen[value[key]] = true;
+      return true;
+    });
+  }
+
+  function indexBy(values, key) {
+    return values.reduce(function (acc, item) {
+      acc[item[key]] = item;
+      return acc;
+    }, {});
+  }
+
+  function prop(name) {
+    return function (object) { return object[name]; };
+  }
+
+  function computePayloadForApi(payload) {
+    var birthInstant = localDateTimeToUtc(payload.birthDate, payload.birthTime, Number(payload.timezone));
+    var asOfInstant = localDateTimeToUtc(payload.asOfDate || payload.birthDate, payload.asOfTime || payload.birthTime, Number(payload.timezone));
+    var topicKey = inferTopic(payload.topic || "general", payload.question || "");
+    var latitude = payload.latitudeDirection ? signedCoordinate(payload.latitude, payload.latitudeDirection, "S") : Number(payload.latitude);
+    var longitude = payload.longitudeDirection ? signedCoordinate(payload.longitude, payload.longitudeDirection, "W") : Number(payload.longitude);
+    var ascendantOverride = ascendantOverrideFromPayload(payload);
+    var apiAyanamshaKey = normalizeAyanamshaKey(payload.ayanamshaKey || payload.ayanamsha || "raman");
+    var chart = buildChart(birthInstant, latitude, longitude, Number(payload.timezone), { ascendantOverride: ascendantOverride, ayanamshaKey: apiAyanamshaKey });
+    var transitChart = buildChart(asOfInstant, latitude, longitude, Number(payload.timezone), { ayanamshaKey: apiAyanamshaKey });
+    var input = {
+      name: payload.name || "Native",
+      chartNumber: payload.chartNumber || "",
+      gender: payload.gender || "unspecified",
+      ayanamshaKey: apiAyanamshaKey,
+      birthDate: payload.birthDate,
+      birthTime: normalizeTimeInput(payload.birthTime),
+      birthPlace: payload.birthPlace || "",
+      timezone: Number(payload.timezone),
+      latitude: latitude,
+      longitude: longitude,
+      latitudeDirection: latitude < 0 ? "S" : "N",
+      longitudeDirection: longitude < 0 ? "W" : "E",
+      ascOverrideDegree: payload.ascOverrideDegree || payload.ascendantOverrideDegree || "",
+      ascendantOverride: ascendantOverride,
+      topic: payload.topic || topicKey,
+      question: payload.question || "",
+      asOfDate: payload.asOfDate || payload.birthDate,
+      asOfTime: payload.asOfTime || payload.birthTime,
+      horizonYears: Number(payload.horizonYears || 10),
+      birthInstant: birthInstant,
+      asOfInstant: asOfInstant,
+      externalChartData: payload.externalChartData || ""
+    };
+    chart.input = input;
+    var analysis = analyzeEvent(chart, transitChart, EVENT_CONFIGS[topicKey], topicKey, input);
+    return {
+      engine: {
+        name: "VedNetra Node engine",
+        ayanamsa: ayanamshaLabel(apiAyanamshaKey),
+        nodes: "Mean Rahu/Ketu",
+        dashaYearDays: 365.25,
+        precision: "calibrated-low-precision-fallback",
+        note: "This endpoint runs the shared app engine on the Node server. Install a Swiss Ephemeris-backed adapter later for certification-grade longitudes."
+      },
+      input: {
+        name: input.name,
+        chartNumber: input.chartNumber,
+        ayanamshaKey: input.ayanamshaKey,
+        birthDate: input.birthDate,
+        birthTime: input.birthTime,
+        birthPlace: input.birthPlace,
+        timezone: input.timezone,
+        latitude: Math.abs(input.latitude),
+        latitudeDirection: input.latitudeDirection,
+        longitude: Math.abs(input.longitude),
+        longitudeDirection: input.longitudeDirection,
+        ascOverrideDegree: input.ascOverrideDegree,
+        ascendantOverrideApplied: Boolean(chart.ascendant.override),
+        topic: topicKey,
+        question: input.question,
+        asOfDate: input.asOfDate,
+        asOfTime: input.asOfTime
+      },
+      chart: serializeChartForApi(chart),
+      vargas: buildVargaSet(chart),
+      analysis: {
+        verdict: analysis.verdict,
+        promise: { score: analysis.promise.score, label: analysis.promise.label },
+        currentDashaStack: analysis.timing.currentStack.map(function (p) {
+          return { level: p.level, lord: p.lord, start: p.start.toISOString(), end: p.end.toISOString() };
+        })
+      },
+      validation: {
+        warnings: [
+          "The independent local engine uses calibrated low-precision planetary formulae with explicit varga rules.",
+          "Sripati bhava is represented as validation metadata until a full high-precision backend adapter is added."
+        ]
+      }
+    };
+  }
+
+  function serializeChartForApi(chart) {
+    return {
+      jd: chart.jd,
+      date: chart.date instanceof Date ? chart.date.toISOString() : chart.date,
+      ayanamsa: chart.ayanamsa,
+      ascendant: serializePlacement(chart.ascendant),
+      planets: chart.planets.map(serializePlacement),
+      vimshottari: {
+        balanceLord: chart.vimshottari.balanceLord,
+        balanceYears: chart.vimshottari.balanceYears,
+        balanceDays: chart.vimshottari.balanceDays,
+        birthNakshatra: chart.vimshottari.birthNakshatra,
+        timeline: chart.vimshottari.timeline.map(function (period) {
+          return { level: period.level, lord: period.lord, start: period.start.toISOString(), end: period.end.toISOString() };
+        })
+      },
+      houses: chart.houses.map(function (house) {
+        return {
+          house: house.house,
+          sign: house.sign,
+          signName: house.signName,
+          lord: house.lord,
+          score: house.score,
+          label: house.label
+        };
+      })
+    };
+  }
+
+  function buildVargaSet(chart) {
+    return vargaDivisions().reduce(function (out, division) {
+      var varga = division === 1 ? {
+        division: 1,
+        ascendant: { sign: chart.ascendant.sign, signName: chart.ascendant.signName },
+        planets: chart.planets
+      } : makeVargaChart(chart, division);
+      out["D" + division] = {
+        division: division,
+        ascendant: varga.ascendant,
+        planets: varga.planets.map(function (p) {
+          return {
+            name: p.name,
+            sign: p.sign,
+            signName: p.signName,
+            house: p.house
+          };
+        })
+      };
+      return out;
+    }, {});
+  }
+
+  function serializePlacement(placement) {
+    return {
+      name: placement.name || "Asc",
+      lon: placement.lon,
+      sign: placement.sign,
+      signName: placement.signName,
+      degreeInSign: placement.deg,
+      computedLon: placement.computedLon,
+      computedSign: placement.computedSign,
+      computedDegreeInSign: placement.computedDeg,
+      override: Boolean(placement.override),
+      overrideSource: placement.overrideSource,
+      house: placement.house,
+      retrograde: Boolean(placement.retrograde),
+      nakshatra: placement.nakshatra,
+      nakLord: placement.nakLord,
+      pada: placement.pada
+    };
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  var coreApi = {
+    SIGNS: SIGNS,
+    PLANETS: PLANETS,
+    EVENT_CONFIGS: EVENT_CONFIGS,
+    buildChart: buildChart,
+    enrichChart: enrichChart,
+    makeVargaChart: makeVargaChart,
+    analyzeEvent: analyzeEvent,
+    localDateTimeToUtc: localDateTimeToUtc,
+    formatInTimezone: formatInTimezone,
+    findDashaStack: findDashaStack,
+    subPeriods: subPeriods,
+    vargaSign: vargaSign,
+    vargaDegree: vargaDegree,
+    buildKpChart: buildKpChart,
+    kp2Ayanamsa: kp2Ayanamsa,
+    fmtDeg: fmtDeg,
+    signShort: signShort,
+    signIndex: signIndex,
+    houseFromSign: houseFromSign,
+    buildVedNetraReportText: buildVedNetraReportText,
+    parseVedNetraTransitEntries: parseVedNetraTransitEntries,
+    parseVedNetraDashaRanges: parseVedNetraDashaRanges,
+    serializeChart: serializeChartForApi,
+    computePayload: computePayloadForApi
+  };
+  if (typeof window !== "undefined") window.VedicCore = coreApi;
+  if (typeof globalThis !== "undefined") globalThis.VedicCore = coreApi;
+}());
