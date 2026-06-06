@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
   "use strict";
 
   var DEG = Math.PI / 180;
@@ -9,7 +9,7 @@
   var LAHIRI_CHITRAPAKSHA_OFFSET = 0.0051784474;
   // KP 2 is isolated from the Lahiri engine; adjust this one offset if matching a specific KP software table.
   var KP2_LAHIRI_OFFSET_DEG = -0.1;
-  var MAX_FOCUS_SECTIONS = 5;
+  var MAX_FOCUS_SECTIONS = 8;
   var pinnedFocusSections = [];
   var activeChartDataSectionId = "viewA-output-library";
   var AYANAMSHA_OPTIONS = {
@@ -489,6 +489,7 @@
   var lastReportAnalysis = null;
   var timeToolTimer = null;
   var timeToolPickList = [];
+  var chartSetupActionMode = "";
   var SAVED_CHARTS_STORAGE_KEY = "vedicPredictiveWorkbench.savedCharts.v1";
   var CUSTOM_LOCATIONS_STORAGE_KEY = "vedicPredictiveWorkbench.customLocations.v1";
   var DEFAULT_LOCATION_STORAGE_KEY = "vedicPredictiveWorkbench.defaultLocation.v1";
@@ -521,6 +522,7 @@
   // ===========================================================================
   var pendingSectionRenders = new Map();
   var navAliasToPendingId = new Map();
+  var VEDNETRA_DIALOG_SELECTOR = ".panel-focus-popup, .time-tool-popup, .house-result-layer, .house-context-layer, .worksheet-controls-overlay, .vednetra-report-options-layer, .chart-setup-dialog";
 
   if (typeof document !== "undefined") {
     document.addEventListener("DOMContentLoaded", function () {
@@ -528,6 +530,8 @@
       document.getElementById("birthForm").addEventListener("submit", function (event) {
         event.preventDefault();
         generate({ preserveActiveSection: false, refreshFocusPopups: true });
+        closeChartSetupDialog();
+        showVargaSectionAfterChartChange();
       });
       document.getElementById("printBtn").addEventListener("click", function () { window.print(); });
       document.getElementById("copyBtn").addEventListener("click", copyReport);
@@ -537,10 +541,16 @@
       wireSavedChartControls();
       wireChartStartControls();
       wireChartDataNavControls();
+      wireChartSetupDialogControls();
       wireChartInputToggle();
+      wireIndependentWorkspaceScroll();
+      wireDialogStackingControls();
       wireTimeToolControls();
       wireHouseContextMenuControls();
       wireFocusModeControls();
+      wirePartAFullScreenControl();
+      updatePartAIdentityStrip();
+      wireButtonInteractionPolish();
       wireMobileAccessInfo();
       registerServiceWorker();
     });
@@ -572,6 +582,7 @@
     if (inputLayoutBar) inputLayoutBar.classList.remove("hidden");
     if (chartDataView) chartDataView.classList.remove("hidden");
     lastPlainReport = lastPlainReports.chartData || lastPlainReport;
+    updatePartAIdentityStrip();
   }
 
   function syncReportBodyClasses() {
@@ -587,8 +598,7 @@
     Array.prototype.slice.call(document.querySelectorAll("[data-chart-input-toggle]")).forEach(function (button) {
       if (button._chartInputToggleWired) return;
       button.addEventListener("click", function () {
-        document.body.classList.toggle("chart-input-collapsed");
-        syncChartInputToggleState();
+        toggleInputPanel();
       });
       button._chartInputToggleWired = true;
     });
@@ -610,7 +620,17 @@
     var width = "";
     try { width = localStorage.getItem("vednetraChartInputWidthPx") || ""; } catch (_err) {}
     var numericWidth = Number(width);
-    if (width !== "" && Number.isFinite(numericWidth)) setChartInputWidth(numericWidth);
+    // The Hide/Show-input buttons have been removed from the UI. If the user
+    // previously collapsed the panel, we MUST restore it on load — otherwise
+    // there's no way back to enter birth data.
+    if (numericWidth <= 140 || !Number.isFinite(numericWidth)) {
+      var last = 0;
+      try { last = Number(localStorage.getItem("vednetraChartInputWidthLastPx")) || 0; } catch (_e) {}
+      numericWidth = last > 140 ? last : 380;
+    }
+    setChartInputWidth(numericWidth);
+    // Make absolutely sure the body class is also cleared on every load
+    document.body.classList.remove("chart-input-collapsed");
   }
 
   function adjustChartInputWidth(direction) {
@@ -629,10 +649,39 @@
     var workspace = document.querySelector(".workspace");
     if (!workspace || !workspace.style) return;
     var clamped = clampChartInputWidth(Number(width), workspace);
-    workspace.style.setProperty("--chart-input-width", Math.round(clamped) + "px");
+    if (clamped > 140) {
+      try { localStorage.setItem("vednetraChartInputWidthLastPx", String(Math.round(clamped))); } catch (_errLast) {}
+    }
+    var widthPx = Math.round(clamped) + "px";
+    workspace.style.setProperty("--chart-input-width", widthPx);
+    // Also propagate to the root so body::before (backdrop bar) can read it
+    if (document.documentElement && document.documentElement.style) {
+      document.documentElement.style.setProperty("--chart-input-width", widthPx);
+    }
     try { localStorage.setItem("vednetraChartInputWidthPx", String(Math.round(clamped))); } catch (_err) {}
     document.body.classList.toggle("chart-input-collapsed", clamped <= 0);
+    syncChartInputRestoreHandle();
     syncChartInputToggleState();
+  }
+
+  // Single source of truth for showing / hiding the input panel.
+  // Used by BOTH the original "Hide/Show input" button and the worksheet topbar button.
+  function toggleInputPanel() {
+    var isCollapsing = !document.body.classList.contains("chart-input-collapsed");
+    if (isCollapsing) {
+      var ws = document.querySelector(".workspace");
+      if (ws) {
+        var cur = parseFloat(getComputedStyle(ws).getPropertyValue("--chart-input-width"));
+        if (cur > 140) {
+          try { localStorage.setItem("vednetraChartInputWidthLastPx", String(Math.round(cur))); } catch (_e) {}
+        }
+      }
+      setChartInputWidth(0);
+    } else {
+      var last = 0;
+      try { last = Number(localStorage.getItem("vednetraChartInputWidthLastPx")) || 0; } catch (_e) {}
+      setChartInputWidth(last > 140 ? last : 380);
+    }
   }
 
   function clampChartInputWidth(width, workspace) {
@@ -642,7 +691,7 @@
     var max = Math.max(160, Math.min(total - 360, total * 0.78));
     if (total < 720) max = total;
     var next = Math.min(Math.max(Number(width) || 0, min), max);
-    return next < 48 ? 0 : next;
+    return next < 140 ? 0 : next;
   }
 
   function wireChartInputResizeHandle() {
@@ -650,8 +699,14 @@
     var workspace = document.querySelector(".workspace");
     if (!handle || !workspace || handle._chartInputResizeWired) return;
     handle._chartInputResizeWired = true;
+    handle.addEventListener("click", function (event) {
+      if (!document.body.classList.contains("chart-input-collapsed")) return;
+      event.preventDefault();
+      restoreChartInputPanel();
+    });
     handle.addEventListener("pointerdown", function (event) {
       if ((event.button || 0) !== 0) return;
+      var collapsedAtStart = document.body.classList.contains("chart-input-collapsed");
       var rect = workspace.getBoundingClientRect();
       document.body.classList.add("chart-input-resizing");
       if (handle.setPointerCapture && event.pointerId !== undefined) {
@@ -667,11 +722,207 @@
         document.removeEventListener("pointercancel", done);
       }
       event.preventDefault();
-      move(event);
+      if (!collapsedAtStart) move(event);
       document.addEventListener("pointermove", move);
       document.addEventListener("pointerup", done);
       document.addEventListener("pointercancel", done);
     });
+    syncChartInputRestoreHandle();
+  }
+
+  function restoreChartInputPanel() {
+    var last = 0;
+    try { last = Number(localStorage.getItem("vednetraChartInputWidthLastPx")) || 0; } catch (_e) {}
+    setChartInputWidth(last > 140 ? last : 380);
+    document.body.classList.remove("chart-input-collapsed");
+    syncChartInputRestoreHandle();
+  }
+
+  function syncChartInputRestoreHandle() {
+    var handle = document.getElementById("chartInputResizeHandle");
+    if (!handle || !document.body || !document.body.classList) return;
+    var collapsed = document.body.classList.contains("chart-input-collapsed");
+    handle.classList.toggle("is-restore-tab", collapsed);
+    handle.setAttribute("aria-label", collapsed ? "Show input section" : "Drag to resize input section");
+    handle.setAttribute("title", collapsed ? "Show input section" : "Drag to resize input section");
+  }
+
+  function wireDialogStackingControls() {
+    if (typeof document === "undefined" || document._vednetraDialogStackingWired) return;
+    document._vednetraDialogStackingWired = true;
+    document.addEventListener("pointerdown", function (event) {
+      var target = event.target && event.target.closest ? event.target.closest(VEDNETRA_DIALOG_SELECTOR) : null;
+      if (target && !target.classList.contains("hidden")) bringDialogToFront(target, true);
+    }, true);
+    document.addEventListener("mousedown", function (event) {
+      var target = event.target && event.target.closest ? event.target.closest(VEDNETRA_DIALOG_SELECTOR) : null;
+      if (target && !target.classList.contains("hidden")) bringDialogToFront(target, true);
+    }, true);
+    document.addEventListener("click", function (event) {
+      var toggle = event.target && event.target.closest ? event.target.closest("#worksheetControlsToggleBtn") : null;
+      if (toggle && !event.defaultPrevented) {
+        event.preventDefault();
+        toggleWorksheetOverlayFallback();
+      }
+    });
+    window.addEventListener("resize", function () {
+      Array.prototype.slice.call(document.querySelectorAll(VEDNETRA_DIALOG_SELECTOR)).forEach(function (layer) {
+        if (!layer.classList.contains("hidden")) ensureDialogFullyVisible(layer);
+      });
+    });
+  }
+
+  function toggleWorksheetOverlayFallback() {
+    var overlay = document.getElementById("worksheetControlsOverlay");
+    if (!overlay) return;
+    var section = document.getElementById("viewA-worksheets");
+    var mount = document.getElementById("worksheetCanvasMount");
+    if (overlay.classList.contains("is-open")) {
+      overlay.classList.remove("is-open");
+      overlay.setAttribute("aria-hidden", "true");
+      if (section && overlay.parentNode === document.body) section.insertBefore(overlay, mount || null);
+      return;
+    }
+    if (overlay.parentNode !== document.body) document.body.appendChild(overlay);
+    overlay.classList.add("is-open");
+    overlay.setAttribute("aria-hidden", "false");
+    bringDialogToFront(overlay, true);
+  }
+
+  function bringDialogToFront(layer, ensureVisible) {
+    if (!layer || !layer.style) return;
+    window.__vednetraDialogZIndex = Math.max(window.__vednetraDialogZIndex || 10000, 10000) + 1;
+    Array.prototype.slice.call(document.querySelectorAll(VEDNETRA_DIALOG_SELECTOR)).forEach(function (item) {
+      if (item === layer) item.classList.add("vednetra-dialog-front");
+      else item.classList.remove("vednetra-dialog-front");
+    });
+    layer.style.setProperty("z-index", String(window.__vednetraDialogZIndex), "important");
+    if (ensureVisible !== false) {
+      window.setTimeout(function () { ensureDialogFullyVisible(layer); }, 0);
+    }
+  }
+
+  function dialogMovableElement(layer) {
+    if (!layer || !layer.querySelector) return layer;
+    return layer.matches && layer.matches(".panel-focus-popup") ? layer :
+      layer.querySelector(".time-tool-panel, .house-result-panel, .house-context-menu, .worksheet-controls-overlay-box, .vednetra-report-options-dialog") || layer;
+  }
+
+  function ensureDialogFullyVisible(layer) {
+    if (typeof window === "undefined" || !layer || layer.classList.contains("hidden")) return;
+    var target = dialogMovableElement(layer);
+    if (!target || !target.getBoundingClientRect) return;
+    var viewportWidth = (window.visualViewport && window.visualViewport.width) || window.innerWidth || 1280;
+    var viewportHeight = (window.visualViewport && window.visualViewport.height) || window.innerHeight || 720;
+    var margin = 8;
+    var rect = target.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+
+    if (target !== layer) {
+      target.style.maxWidth = "calc(100vw - 16px)";
+      target.style.maxHeight = "calc(100dvh - 16px)";
+    }
+    if (rect.width > viewportWidth - margin * 2) {
+      target.style.width = Math.max(260, viewportWidth - margin * 2) + "px";
+    }
+    if (rect.height > viewportHeight - margin * 2) {
+      target.style.height = Math.max(220, viewportHeight - margin * 2) + "px";
+      target.style.overflow = "auto";
+    }
+
+    rect = target.getBoundingClientRect();
+    var nextLeft = rect.left;
+    var nextTop = rect.top;
+    if (rect.right > viewportWidth - margin) nextLeft -= rect.right - viewportWidth + margin;
+    if (rect.left < margin) nextLeft = margin;
+    if (rect.bottom > viewportHeight - margin) nextTop -= rect.bottom - viewportHeight + margin;
+    if (rect.top < margin) nextTop = margin;
+
+    if (Math.abs(nextLeft - rect.left) > 1 || Math.abs(nextTop - rect.top) > 1) {
+      layer.classList.add("is-floating");
+      target.style.left = Math.round(nextLeft) + "px";
+      target.style.top = Math.round(nextTop) + "px";
+      target.style.right = "auto";
+      target.style.bottom = "auto";
+      if (target === layer) {
+        layer.style.left = Math.round(nextLeft) + "px";
+        layer.style.top = Math.round(nextTop) + "px";
+        layer.style.right = "auto";
+        layer.style.bottom = "auto";
+      }
+    }
+  }
+
+  function wireIndependentWorkspaceScroll() {
+    if (typeof window === "undefined" || typeof document === "undefined" || document._vednetraIndependentScrollWired) return;
+    document._vednetraIndependentScrollWired = true;
+    var lastTouchY = null;
+
+    function enabled() {
+      return window.matchMedia &&
+        window.matchMedia("(min-width: 1081px)").matches &&
+        document.body &&
+        !document.body.classList.contains("focus-mode") &&
+        !document.body.classList.contains("chart-input-collapsed");
+    }
+
+    function scrollPanelForPoint(x, y) {
+      var input = document.querySelector(".input-panel");
+      var output = document.querySelector(".output-panel");
+      if (!input || !output) return null;
+      var hit = document.elementFromPoint ? document.elementFromPoint(x, y) : null;
+      if (hit && hit.closest) {
+        var directPanel = hit.closest(".input-panel, .output-panel");
+        if (directPanel === input || directPanel === output) return directPanel;
+        if (hit.closest(VEDNETRA_DIALOG_SELECTOR)) return null;
+      }
+      var inputRect = input.getBoundingClientRect();
+      var outputRect = output.getBoundingClientRect();
+      if (x >= inputRect.left && x <= inputRect.right && y >= inputRect.top && y <= inputRect.bottom) return input;
+      if (x >= outputRect.left && x <= outputRect.right && y >= outputRect.top && y <= outputRect.bottom) return output;
+      if (x > inputRect.right) return output;
+      return null;
+    }
+
+    function consumeVerticalScroll(panel, deltaY) {
+      if (!panel || !deltaY) return false;
+      var maxTop = Math.max(0, panel.scrollHeight - panel.clientHeight);
+      if (maxTop <= 0) return false;
+      var nextTop = Math.min(maxTop, Math.max(0, panel.scrollTop + deltaY));
+      panel.scrollTop = nextTop;
+      return true;
+    }
+
+    document.addEventListener("wheel", function (event) {
+      if (!enabled() || !event.deltaY) return;
+      var panel = scrollPanelForPoint(event.clientX, event.clientY);
+      if (!panel) return;
+      event.preventDefault();
+      consumeVerticalScroll(panel, event.deltaY);
+    }, { capture: true, passive: false });
+
+    document.addEventListener("touchstart", function (event) {
+      if (!enabled() || !event.touches || !event.touches.length) return;
+      lastTouchY = event.touches[0].clientY;
+    }, { capture: true, passive: true });
+
+    document.addEventListener("touchmove", function (event) {
+      if (!enabled() || !event.touches || !event.touches.length || lastTouchY === null) return;
+      var touch = event.touches[0];
+      var panel = scrollPanelForPoint(touch.clientX, touch.clientY);
+      if (!panel) {
+        lastTouchY = touch.clientY;
+        return;
+      }
+      var deltaY = lastTouchY - touch.clientY;
+      lastTouchY = touch.clientY;
+      event.preventDefault();
+      consumeVerticalScroll(panel, deltaY);
+    }, { capture: true, passive: false });
+
+    document.addEventListener("touchend", function () {
+      lastTouchY = null;
+    }, { capture: true, passive: true });
   }
 
   function wireTimeToolControls() {
@@ -686,6 +937,7 @@
       open.addEventListener("click", function () {
       popup.classList.remove("hidden");
       positionFloatingPanelInViewport(popup);
+      bringDialogToFront(popup, true);
       syncTimeToolDisplay();
     });
     });
@@ -694,6 +946,7 @@
       popup.classList.add("hidden");
     });
     popup.addEventListener("click", function (event) {
+      bringDialogToFront(popup, false);
       if (event.target === popup) popup.classList.add("hidden");
       var button = event.target && event.target.closest ? event.target.closest("[data-time-tool-step]") : null;
       if (!button) return;
@@ -851,13 +1104,20 @@
   }
 
   function refreshTimeToolTarget(fields) {
-    if (fields.type === "transit-controls") {
+    if (fields.type === "transit-controls" || fields.type === "as-of") {
       var asOfDate = document.getElementById("asOfDate");
       var asOfTime = document.getElementById("asOfTime");
       if (asOfDate) asOfDate.value = fields.dateField.value;
       if (asOfTime) asOfTime.value = normalizeTimeInput(fields.timeField.value);
+      // ── KEY FIX: also push the new date/time directly into the worksheet
+      // transit fields BEFORE generate() reads them via collectWorksheetInteractiveState.
+      // This ensures the worksheet transit chart re-renders with the Time Tool's date.
+      var wsDate = document.getElementById("worksheetTransitDate");
+      var wsTime = document.getElementById("worksheetTransitTime");
+      if (wsDate && fields.dateField.value) wsDate.value = fields.dateField.value;
+      if (wsTime && fields.timeField.value) wsTime.value = normalizeTimeInput(fields.timeField.value);
       generate({ preserveActiveSection: true, refreshFocusPopups: true, preserveInteractiveState: true, timeToolSyncTarget: "transit" });
-      setTimeToolStatus("Transit/as-of time refreshed across charts, dashas and focus panels.");
+      setTimeToolStatus("Transit/as-of time refreshed across charts, dashas, worksheet and focus panels.");
       return;
     }
     generate({ preserveActiveSection: true, refreshFocusPopups: true, preserveInteractiveState: true, timeToolSyncTarget: fields.type === "as-of" ? "transit" : "birth" });
@@ -934,6 +1194,13 @@
     if (status) status.textContent = text;
   }
 
+  // Returns the minimum Y position floating panels are allowed to occupy.
+  // Dialogs sit above the fixed header stack, so they can use the full viewport
+  // while still keeping a small margin for the drag handle.
+  function floatingPanelMinTop() {
+    return 8;
+  }
+
   function makeFloatingPanelDraggable(container, handleSelector) {
     if (!container || container._floatingDragWired) return;
     var handle = container.querySelector(handleSelector);
@@ -941,6 +1208,7 @@
     if (!handle || !panel) return;
     handle.addEventListener("pointerdown", function (event) {
       if (event.target && event.target.closest && event.target.closest("button, select, input, textarea")) return;
+      bringDialogToFront(container, false);
       var rect = panel.getBoundingClientRect();
       container.classList.add("is-floating");
       panel.style.left = rect.left + "px";
@@ -951,10 +1219,11 @@
       var startY = event.clientY;
       var startLeft = rect.left;
       var startTop = rect.top;
+      var minTop = floatingPanelMinTop();
       handle.setPointerCapture(event.pointerId);
       function move(moveEvent) {
         var nextLeft = clamp(startLeft + moveEvent.clientX - startX, 4, Math.max(4, window.innerWidth - panel.offsetWidth - 4));
-        var nextTop = clamp(startTop + moveEvent.clientY - startY, 4, Math.max(4, window.innerHeight - panel.offsetHeight - 4));
+        var nextTop = clamp(startTop + moveEvent.clientY - startY, minTop, Math.max(minTop, window.innerHeight - panel.offsetHeight - 4));
         panel.style.left = nextLeft + "px";
         panel.style.top = nextTop + "px";
       }
@@ -980,13 +1249,15 @@
     if (!panel) return;
     if (container.classList.contains("is-floating") && panel.style.left && x === undefined) return;
     var rect = panel.getBoundingClientRect();
+    var minTop = floatingPanelMinTop();
     var left = x === undefined ? window.innerWidth - rect.width - 18 : x;
-    var top = y === undefined ? 18 : y;
+    var top = y === undefined ? minTop : y;
     container.classList.add("is-floating");
     panel.style.left = clamp(left, 4, Math.max(4, window.innerWidth - rect.width - 4)) + "px";
-    panel.style.top = clamp(top, 4, Math.max(4, window.innerHeight - rect.height - 4)) + "px";
+    panel.style.top = clamp(top, minTop, Math.max(minTop, window.innerHeight - rect.height - 4)) + "px";
     panel.style.right = "auto";
     panel.style.bottom = "auto";
+    bringDialogToFront(container, true);
   }
 
   function wireHouseContextMenuControls() {
@@ -1213,8 +1484,6 @@
   function wireFocusModeControls() {
     var rail = document.getElementById("focusModeRail");
     var tab = rail ? rail.querySelector(".focus-rail-tab") : null;
-    var enter = document.getElementById("enterFocusModeBtn");
-    var exit = document.getElementById("exitFocusModeBtn");
     var generateButton = document.getElementById("railGenerateReportBtn");
     var downloadButton = document.getElementById("railDownloadReportBtn");
     var refreshTargetsButton = document.getElementById("railRefreshFocusTargetsBtn");
@@ -1222,7 +1491,9 @@
     var openD1DetailsButton = document.getElementById("railOpenD1DetailsFocusBtn");
     var openDashaButton = document.getElementById("railOpenDashaFocusBtn");
     var sectionSelect = document.getElementById("railSectionFocusSelect");
+    var openSectionButton = document.getElementById("railOpenSectionFocusBtn");
     var addSectionButton = document.getElementById("railAddSectionFocusBtn");
+    var tilePanelsButton = document.getElementById("railTileFocusPanelsBtn");
     var pinnedSections = document.getElementById("railPinnedSections");
     if (tab && rail) {
       tab.setAttribute("aria-expanded", "false");
@@ -1233,44 +1504,100 @@
         if (open) refreshRailFocusTargets(false);
       });
     }
-    if (enter) enter.addEventListener("click", function () {
-      if (rail) rail.classList.remove("is-open");
-      enterFocusMode();
-    });
-    if (exit) exit.addEventListener("click", function () {
-      if (rail) rail.classList.remove("is-open");
-      exitFocusMode();
-    });
     if (generateButton) generateButton.addEventListener("click", function () {
       if (rail) rail.classList.add("is-open", "show-download-options");
       generate();
       setTimeout(function () { refreshRailFocusTargets(false); }, 0);
+      closeFocusRailPanel();
     });
     if (downloadButton) downloadButton.addEventListener("click", function () {
       var reportType = document.getElementById("railReportDownloadType");
       var format = document.getElementById("railReportDownloadFormat");
       downloadCurrentReport(format ? format.value : "pdf", reportType ? reportType.value : "vednetra");
+      closeFocusRailPanel();
     });
-    if (refreshTargetsButton) refreshTargetsButton.addEventListener("click", function () { refreshRailFocusTargets(true); });
-    if (openChartButton) openChartButton.addEventListener("click", openSelectedRailChartFocus);
-    if (openD1DetailsButton) openD1DetailsButton.addEventListener("click", openRailD1DetailsFocus);
-    if (openDashaButton) openDashaButton.addEventListener("click", openRailDashaFocus);
-    if (addSectionButton) addSectionButton.addEventListener("click", addSelectedRailSectionFocus);
+    if (refreshTargetsButton) refreshTargetsButton.addEventListener("click", function () { refreshRailFocusTargets(true); closeFocusRailPanel(); });
+    if (openChartButton) openChartButton.addEventListener("click", function () { openSelectedRailChartFocus(); closeFocusRailPanel(); });
+    if (openD1DetailsButton) openD1DetailsButton.addEventListener("click", function () { openRailD1DetailsFocus(); closeFocusRailPanel(); });
+    if (openDashaButton) openDashaButton.addEventListener("click", function () { openRailDashaFocus(); closeFocusRailPanel(); });
+    if (openSectionButton) openSectionButton.addEventListener("click", function () { openSelectedRailSectionFocus(); closeFocusRailPanel(); });
+    if (addSectionButton) addSectionButton.addEventListener("click", function () { addSelectedRailSectionFocus(); closeFocusRailPanel(); });
+    if (tilePanelsButton) tilePanelsButton.addEventListener("click", function () { tileOpenPanelFocusPopups(null, true); closeFocusRailPanel(); });
     if (pinnedSections) {
       pinnedSections.addEventListener("click", function (event) {
         var open = event.target && event.target.closest ? event.target.closest("[data-focus-section-open]") : null;
         var remove = event.target && event.target.closest ? event.target.closest("[data-focus-section-remove]") : null;
-        if (open) openRailSectionFocus(open.getAttribute("data-focus-section-open"));
-        if (remove) removeRailSectionFocus(remove.getAttribute("data-focus-section-remove"));
+        if (open) { openRailSectionFocus(open.getAttribute("data-focus-section-open")); closeFocusRailPanel(); }
+        if (remove) { removeRailSectionFocus(remove.getAttribute("data-focus-section-remove")); closeFocusRailPanel(); }
       });
     }
     if (sectionSelect) refreshRailFocusTargets(false);
     document.addEventListener("fullscreenchange", function () {
       if (!document.fullscreenElement) document.body.classList.remove("focus-mode");
+      syncPartAFullScreenButton();
     });
     document.addEventListener("keydown", function (event) {
       if (event.key === "Escape" && document.body.classList.contains("focus-mode")) exitFocusMode();
     });
+  }
+
+  function wirePartAFullScreenControl() {
+    var button = document.getElementById("partAFullScreenBtn");
+    if (!button || button.dataset.fullScreenWired === "1") return;
+    button.dataset.fullScreenWired = "1";
+    button.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (document.body.classList.contains("focus-mode") || document.fullscreenElement) {
+        exitFocusMode();
+      } else {
+        openViewAInFullScreen();
+      }
+      syncPartAFullScreenButton();
+    });
+    syncPartAFullScreenButton();
+  }
+
+  function syncPartAFullScreenButton() {
+    var button = document.getElementById("partAFullScreenBtn");
+    if (!button) return;
+    var active = document.body.classList.contains("focus-mode") || Boolean(document.fullscreenElement);
+    button.textContent = active ? "Exit Full Screen" : "Full Screen";
+    button.setAttribute("aria-pressed", active ? "true" : "false");
+    button.classList.toggle("active", active);
+    updatePartAIdentityStrip();
+  }
+
+  function updatePartAIdentityStrip(inputOverride) {
+    var strip = document.getElementById("partAIdentityStrip");
+    if (!strip) return;
+    var summary = strip.querySelector(".part-a-native-summary");
+    var input = inputOverride || lastReportInput || readLooseInputSummary();
+    if (summary) summary.innerHTML = partAIdentitySummaryHtml(input);
+  }
+
+  function readLooseInputSummary() {
+    return {
+      name: fieldValue("nativeName") || "Native",
+      chartNumber: fieldValue("chartNumber") || "",
+      birthDate: fieldValue("birthDate") || "",
+      birthTime: normalizeTimeInput(fieldValue("birthTime") || ""),
+      birthPlace: fieldValue("birthPlace") || "",
+      ayanamshaKey: fieldValue("ayanamsha") || ""
+    };
+  }
+
+  function partAIdentitySummaryHtml(input) {
+    input = input || {};
+    var name = input.name || "Native";
+    var chartNumber = input.chartNumber ? "Chart " + input.chartNumber : "Chart";
+    var ayanamsha = input.ayanamshaKey ? ayanamshaLabel(input.ayanamshaKey) : "";
+    var birth = [input.birthDate || "-", input.birthTime || "-"].filter(Boolean).join(" ");
+    var place = input.birthPlace || "Place not set";
+    return '<span><strong>' + escapeHtml(chartNumber) + ' - ' + escapeHtml(name) + '</strong></span>' +
+      '<span>Birth: ' + escapeHtml(birth) + '</span>' +
+      '<span>Place: ' + escapeHtml(place) + '</span>' +
+      (ayanamsha ? '<span>Ayanamsha: ' + escapeHtml(ayanamsha) + '</span>' : "");
   }
 
   function enterFocusMode() {
@@ -1280,13 +1607,49 @@
       return;
     }
     document.body.classList.add("focus-mode");
+    syncPartAFullScreenButton();
     if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(function () {});
     }
   }
 
+  function wireButtonInteractionPolish() {
+    if (document.body.dataset.buttonPolishWired === "1") return;
+    document.body.dataset.buttonPolishWired = "1";
+    function nearestButton(event) {
+      return event.target && event.target.closest ? event.target.closest("button") : null;
+    }
+    document.addEventListener("pointerdown", function (event) {
+      var button = nearestButton(event);
+      if (!button || button.disabled) return;
+      button.classList.add("button-pressed");
+    });
+    ["pointerup", "pointercancel", "pointerleave", "blur"].forEach(function (eventName) {
+      document.addEventListener(eventName, function (event) {
+        var button = nearestButton(event);
+        if (button) button.classList.remove("button-pressed");
+      }, true);
+    });
+    document.addEventListener("click", function (event) {
+      var button = nearestButton(event);
+      if (!button || button.disabled) return;
+      button.classList.remove("button-pressed");
+      button.classList.add("button-clicked");
+      window.setTimeout(function () { button.classList.remove("button-clicked"); }, 220);
+    }, true);
+  }
+
+  function openViewAInFullScreen() {
+    showReportView("chartData");
+    enterFocusMode();
+    setTimeout(function () {
+      refreshRailFocusTargets(false);
+    }, 0);
+  }
+
   function exitFocusMode() {
     document.body.classList.remove("focus-mode");
+    syncPartAFullScreenButton();
     if (document.exitFullscreen && document.fullscreenElement) {
       document.exitFullscreen().catch(function () {});
     }
@@ -1386,7 +1749,7 @@
       return;
     }
     if (pinnedFocusSections.length >= MAX_FOCUS_SECTIONS) {
-      alertUser("Maximum 5 focus sections can be added at a time. Remove one section first.");
+      alertUser("Maximum " + MAX_FOCUS_SECTIONS + " focus sections can be added at a time. Remove one section first.");
       return;
     }
     pinnedFocusSections.push(id);
@@ -1406,7 +1769,7 @@
     sections.forEach(function (section) { labels[section.id] = section.label; });
     pinnedFocusSections = pinnedFocusSections.filter(function (id) { return labels[id]; }).slice(0, MAX_FOCUS_SECTIONS);
     if (!pinnedFocusSections.length) {
-      mount.innerHTML = '<p class="fine-print">Add up to 5 sections.</p>';
+      mount.innerHTML = '<p class="fine-print">Add up to ' + MAX_FOCUS_SECTIONS + ' sections.</p>';
       return;
     }
     mount.innerHTML = pinnedFocusSections.map(function (id) {
@@ -1425,10 +1788,23 @@
     openPanelFocusPopupFromSource(source, sectionFocusKind(source));
   }
 
+  function openSelectedRailSectionFocus() {
+    refreshRailSectionFocusOptions();
+    var select = document.getElementById("railSectionFocusSelect");
+    var id = select ? select.value : "";
+    if (!id) {
+      alertUser("Generate a report first, then select a section to open.");
+      return;
+    }
+    openRailSectionFocus(id);
+  }
+
   function sectionFocusKind(source) {
     if (!source) return "section";
-    if (source.querySelector && source.querySelector(".dasha-panel")) return "dasha";
-    if (source.querySelector && source.querySelector(".d1-details-table-panel")) return "table";
+    if (source.id === "viewA-dasha") return "dasha";
+    if (source.id === "viewA-d1-details") return "table";
+    if (source.classList && source.classList.contains("dasha-panel")) return "dasha";
+    if (source.classList && source.classList.contains("d1-details-table-panel")) return "table";
     return "section";
   }
 
@@ -1436,6 +1812,20 @@
     var ribbon = document.getElementById("chartDataNavRibbon");
     if (!ribbon) return;
     ribbon.addEventListener("click", function (event) {
+      var setupActionButton = event.target && event.target.closest ? event.target.closest("[data-chart-setup-action]") : null;
+      if (setupActionButton && ribbon.contains(setupActionButton)) {
+        event.preventDefault();
+        runChartSetupRibbonAction(setupActionButton.getAttribute("data-chart-setup-action"));
+        closeChartDataNavCategories();
+        return;
+      }
+      var setupButton = event.target && event.target.closest ? event.target.closest("[data-chart-setup-open]") : null;
+      if (setupButton && ribbon.contains(setupButton)) {
+        event.preventDefault();
+        openChartSetupDialog("new");
+        closeChartDataNavCategories();
+        return;
+      }
       var categoryButton = event.target && event.target.closest ? event.target.closest("[data-nav-category-toggle]") : null;
       if (categoryButton && ribbon.contains(categoryButton)) {
         toggleChartDataNavCategory(categoryButton);
@@ -1444,14 +1834,113 @@
       var button = event.target && event.target.closest ? event.target.closest("[data-view-a-target]") : null;
       if (!button) return;
       var targetId = button.getAttribute("data-view-a-target");
-      showSingleChartDataSection(targetId, { skipScroll: true });
+      showSingleChartDataSection(targetId);
+      closeChartDataNavCategories();
     });
     var select = document.getElementById("chartDataNavSelect");
     if (select) {
       select.addEventListener("change", function () {
-        showSingleChartDataSection(select.value, { skipScroll: true });
+        if (String(select.value || "").indexOf("__chartSetup") === 0) {
+          runChartSetupMobileAction(select.value);
+          return;
+        }
+        showSingleChartDataSection(select.value);
+        closeChartDataNavCategories();
       });
     }
+  }
+
+  function runChartSetupMobileAction(value) {
+    var map = {
+      __chartSetupNew: "new",
+      __chartSetupSelect: "select",
+      __chartSetupModify: "modify",
+      __chartSetupDelete: "delete",
+      __chartSetupDownload: "download",
+      __chartSetup: "new"
+    };
+    runChartSetupRibbonAction(map[value] || "new");
+  }
+
+  function runChartSetupRibbonAction(action) {
+    if (action === "download") {
+      closeChartSetupDialog();
+      downloadSelectedReport();
+      return;
+    }
+    openChartSetupDialog(action || "new");
+  }
+
+  function wireChartSetupDialogControls() {
+    var dialog = document.getElementById("chartSetupDialog");
+    if (!dialog || dialog.dataset.chartSetupWired === "1") return;
+    dialog.dataset.chartSetupWired = "1";
+    Array.prototype.slice.call(document.querySelectorAll("[data-chart-setup-open]")).forEach(function (button) {
+      button.addEventListener("click", function (event) {
+        event.preventDefault();
+        openChartSetupDialog("new");
+      });
+    });
+    var closeButton = document.getElementById("chartSetupCloseBtn");
+    if (closeButton) closeButton.addEventListener("click", closeChartSetupDialog);
+    dialog.addEventListener("click", function (event) {
+      if (event.target === dialog) closeChartSetupDialog();
+    });
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && !dialog.classList.contains("hidden")) closeChartSetupDialog();
+    });
+  }
+
+  function openChartSetupDialog(action) {
+    var dialog = document.getElementById("chartSetupDialog");
+    if (!dialog) return;
+    prepareChartSetupDialogAction(action || chartSetupActionMode || "new");
+    dialog.classList.remove("hidden");
+    document.body.classList.add("chart-setup-dialog-open");
+    bringDialogToFront(dialog, true);
+    updatePartAIdentityStrip();
+    setTimeout(function () {
+      var first = document.getElementById("newChartModeBtn") || dialog.querySelector("input, select, textarea, button");
+      if (first && first.focus) first.focus();
+      ensureDialogFullyVisible(dialog);
+    }, 0);
+  }
+
+  function closeChartSetupDialog() {
+    var dialog = document.getElementById("chartSetupDialog");
+    if (!dialog) return;
+    dialog.classList.add("hidden");
+    document.body.classList.remove("chart-setup-dialog-open");
+  }
+
+  function prepareChartSetupDialogAction(action) {
+    chartSetupActionMode = action || "new";
+    if (chartSetupActionMode === "new") {
+      setChartStartMode("new");
+      prepareNewChartEntry({ skipFocus: true, skipScroll: true });
+      setChartStartStatus("New chart ready. Review or change details, then click Generate report.");
+      return;
+    }
+    setChartStartMode("existing");
+    var select = document.getElementById("savedChartSelect");
+    if (chartSetupActionMode === "select") {
+      setChartStartStatus("Select a saved chart, then click Load. VedNetra will open the chart and close this setup box.");
+    } else if (chartSetupActionMode === "modify") {
+      setChartStartStatus("Select a saved chart, click Load, modify details, then click Generate report or Save chart.");
+    } else if (chartSetupActionMode === "delete") {
+      setChartStartStatus("Select a saved chart, then click Delete. This setup box will close after deletion.");
+    }
+    if (select && select.focus) setTimeout(function () { select.focus(); }, 0);
+  }
+
+  function closeChartDataNavCategories() {
+    var ribbon = document.getElementById("chartDataNavRibbon");
+    if (!ribbon || !ribbon.querySelectorAll) return;
+    Array.prototype.slice.call(ribbon.querySelectorAll(".nav-category")).forEach(function (item) {
+      item.classList.remove("nav-category-open");
+      var toggle = item.querySelector("[data-nav-category-toggle]");
+      if (toggle) toggle.setAttribute("aria-expanded", "false");
+    });
   }
 
   function setChartDataNavActive(activeButton, targetId) {
@@ -1462,7 +1951,10 @@
       button.classList.toggle("active", active);
     });
     var select = document.getElementById("chartDataNavSelect");
-    if (select && (targetId || activeButton)) select.value = targetId || activeButton.getAttribute("data-view-a-target");
+    if (select && (targetId || activeButton)) {
+      var nextValue = targetId || activeButton.getAttribute("data-view-a-target");
+      if (nextValue && select.querySelector('option[value="' + nextValue + '"]')) select.value = nextValue;
+    }
     openChartDataCategoryForTarget(targetId || (activeButton && activeButton.getAttribute("data-view-a-target")));
   }
 
@@ -1507,10 +1999,11 @@
     if (primary) {
       expandReportSection(primary);
       if (!opts.skipScroll && primary.scrollIntoView) {
-        primary.scrollIntoView({ behavior: "smooth", block: "start" });
+        scrollChartDataSectionIntoView(primary);
       }
     }
     setChartDataNavActive(null, targetId);
+    if (!opts.keepCategoryOpen) closeChartDataNavCategories();
     refreshRailFocusTargets(false);
   }
 
@@ -1601,8 +2094,17 @@
     var exportButton = document.getElementById("exportChartsBtn");
     var importButton = document.getElementById("importChartsBtn");
     var importFile = document.getElementById("importChartsFile");
-    if (save) save.addEventListener("click", function () { saveCurrentChart(false); });
-    if (saveAsNew) saveAsNew.addEventListener("click", function () { saveCurrentChart(true); });
+    if (save) save.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      saveCurrentChart(false);
+    });
+    if (saveAsNew) saveAsNew.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      if (document.body.classList.contains("focus-mode")) exitFocusMode();
+      saveCurrentChart(true);
+    });
     if (load) load.addEventListener("click", loadSelectedChart);
     if (remove) remove.addEventListener("click", deleteSelectedChart);
     if (exportButton) exportButton.addEventListener("click", exportSavedChartLibrary);
@@ -1637,7 +2139,8 @@
     if (existingPanel) existingPanel.classList.toggle("hidden", mode !== "existing");
   }
 
-  function prepareNewChartEntry() {
+  function prepareNewChartEntry(options) {
+    var opts = options || {};
     assignNextChartNumber(true);
     var defaultLocation = readDefaultLocation();
     var tz = Number(defaultLocation.timezone || fieldValue("timezone") || 5.5);
@@ -1667,8 +2170,8 @@
     setFieldValue("horizon", "10");
     var nativeSection = document.getElementById("nativeSection");
     var nameField = document.getElementById("nativeName");
-    if (nativeSection && nativeSection.scrollIntoView) nativeSection.scrollIntoView({ behavior: "smooth", block: "start" });
-    if (nameField && nameField.focus) nameField.focus();
+    if (!opts.skipScroll && nativeSection && nativeSection.scrollIntoView) nativeSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (!opts.skipFocus && nameField && nameField.focus) nameField.focus();
     setChartStartStatus("New chart ready. Fill the native details below, then enter birth details and generate the report.");
   }
 
@@ -1714,10 +2217,22 @@
       if (existing && !confirmChartUpdate(existing)) return;
       var chartRecord = savedChartFromInput(input, existing);
       if (forceNew || !existing) chartRecord.id = makeSavedChartId();
+      if (forceNew) {
+        generate();
+        showReportView("chartData");
+        refreshRailFocusTargets(false);
+      }
       await persistSavedChart(chartRecord);
       await refreshSavedCharts(chartRecord.id);
       setSavedChartStatus("Saved " + chartRecord.title + ".", "good");
-      alertUser("Chart Saved.");
+      // Use non-blocking toast so it never interrupts or exits fullscreen
+      showToast("✓ Chart saved: " + chartRecord.title);
+      var setupDialog = document.getElementById("chartSetupDialog");
+      if (setupDialog && !setupDialog.classList.contains("hidden")) {
+        generate();
+        closeChartSetupDialog();
+        showVargaSectionAfterChartChange();
+      }
     } catch (error) {
       setSavedChartStatus(error.message || "Could not save chart.", "warning");
     }
@@ -1865,6 +2380,39 @@
     applySavedInputToForm(chartRecord.input);
     setSavedChartStatus("Loaded " + (chartRecord.title || "saved chart") + " with Raman ayanamsha.", "good");
     generate();
+    showReportView("chartData");
+    refreshRailFocusTargets(false);
+    if (chartSetupActionMode !== "modify") {
+      closeChartSetupDialog();
+      showVargaSectionAfterChartChange();
+    } else {
+      setChartStartStatus("Loaded saved chart for modification. Update details, then click Generate report or Save chart.");
+      var nativeSection = document.getElementById("nativeSection");
+      if (nativeSection && nativeSection.scrollIntoView) nativeSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
+  function showVargaSectionAfterChartChange() {
+    window.setTimeout(function () {
+      showSingleChartDataSection("viewA-vargas", { skipScroll: false });
+    }, 0);
+  }
+
+  function scrollChartDataSectionIntoView(section) {
+    if (!section) return;
+    window.setTimeout(function () {
+      var rect = section.getBoundingClientRect();
+      var offset = document.body.classList.contains("focus-mode") ? 176 : 190;
+      var scroller = section.closest ? section.closest(".output-panel") : null;
+      if (scroller && getComputedStyle(scroller).overflowY !== "visible" && scroller.scrollHeight > scroller.clientHeight + 4) {
+        var scrollerRect = scroller.getBoundingClientRect();
+        var nextTop = scroller.scrollTop + rect.top - scrollerRect.top - offset;
+        scroller.scrollTo({ top: Math.max(0, nextTop), behavior: "smooth" });
+        return;
+      }
+      var top = window.pageYOffset + rect.top - offset;
+      window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    }, 60);
   }
 
   async function deleteSelectedChart() {
@@ -1891,6 +2439,10 @@
       }
       await refreshSavedCharts();
       setSavedChartStatus("Deleted saved chart.", "good");
+      var setupDialog = document.getElementById("chartSetupDialog");
+      if (setupDialog && !setupDialog.classList.contains("hidden")) {
+        closeChartSetupDialog();
+      }
     } catch (error) {
       setSavedChartStatus(error.message || "Could not delete saved chart.", "warning");
     }
@@ -2534,23 +3086,29 @@
     if (typeof document === "undefined" || !document.querySelector) return null;
     var section = document.querySelector("#chartDataReportView #viewA-worksheets");
     if (!section) return null;
-    var select = section.querySelector("#worksheetTemplateSelect");
-    var components = Array.prototype.slice.call(section.querySelectorAll("[data-worksheet-component]")).filter(function (box) {
+    var scope = worksheetControlScope(section);
+    var select = (scope && scope.querySelector ? scope.querySelector("#worksheetTemplateSelect") : null) || section.querySelector("#worksheetTemplateSelect");
+    var components = Array.prototype.slice.call((scope || section).querySelectorAll("[data-worksheet-component]")).filter(function (box) {
       return box.checked;
     }).map(function (box) { return box.getAttribute("data-worksheet-component"); });
     return {
       templateKey: select ? select.value : "birth-i",
       components: components,
-      varshfalYear: fieldValueIn(section, "worksheetVarshfalYear"),
-      varshfalYearsText: fieldValueIn(section, "worksheetVarshfalYears"),
-      varshfalDivision: fieldValueIn(section, "worksheetVarshfalDivision"),
-      varshfalDivisionsText: fieldValueIn(section, "worksheetVarshfalDivisions"),
-      transitDate: fieldValueIn(section, "worksheetTransitDate"),
-      transitTime: fieldValueIn(section, "worksheetTransitTime"),
-      transitDivision: fieldValueIn(section, "worksheetTransitDivision"),
-      dashaFrom: fieldValueIn(section, "worksheetDashaFrom"),
-      dashaTo: fieldValueIn(section, "worksheetDashaTo")
+      varshfalYear: fieldValueIn(scope, "worksheetVarshfalYear"),
+      varshfalYearsText: fieldValueIn(scope, "worksheetVarshfalYears"),
+      varshfalDivision: fieldValueIn(scope, "worksheetVarshfalDivision"),
+      varshfalDivisionsText: fieldValueIn(scope, "worksheetVarshfalDivisions"),
+      transitDate: fieldValueIn(scope, "worksheetTransitDate"),
+      transitTime: fieldValueIn(scope, "worksheetTransitTime"),
+      transitDivision: fieldValueIn(scope, "worksheetTransitDivision"),
+      dashaFrom: fieldValueIn(scope, "worksheetDashaFrom"),
+      dashaTo: fieldValueIn(scope, "worksheetDashaTo")
     };
+  }
+
+  function worksheetControlScope(section) {
+    var overlay = typeof document !== "undefined" ? document.getElementById("worksheetControlsOverlay") : null;
+    return overlay || section;
   }
 
   function fieldValueIn(scope, id) {
@@ -4453,6 +5011,7 @@
       { id: "viewA-shadbala",       label: "Shadbala",          render: function () { return shadbalaSection(chart); } },
       { id: "viewA-jaimini",        label: "Jaimini",           render: function () { return jaiminiSection(chart); } },
       { id: "viewA-compatibility",  label: "Compatibility",     render: function () { return marriageCompatibilityReportSection(chart, input); }, wire: wireCompatibilityInlineControls },
+      { id: "viewA-horary",         label: "Horary",            render: function () { return horarySection(chart, input); }, wire: function () { wireHoraryControls(chart, input); } },
       { id: "viewA-chakras",        label: "Chakras",           render: function () { return chakrasSection(chart); } },
       { id: "viewA-dasha",          label: "Dasha",             render: function () { return fullDashaSection(chart, input, interactiveState.dasha); }, wire: wireDashaGroupControls },
       { id: "viewA-sav",            label: "Sarvashtakavarga",  render: function () { return sarvashtakavargaSection(chart); } },
@@ -4483,7 +5042,8 @@
     initialHtml += '</div>';
     report.innerHTML = initialHtml;
 
-    lastReportInput = Object.assign({}, input, { reportCreatedAt: new Date() });
+      lastReportInput = Object.assign({}, input, { reportCreatedAt: new Date() });
+      updatePartAIdentityStrip(lastReportInput);
     lastReportChart = chart;
     lastReportAnalysis = analysis;
     // Plain-text reports are needed for copy/download â€” they don't touch the DOM and
@@ -4688,20 +5248,38 @@
     var worksheetState = worksheetStateDefaults(chart, input, preservedState);
     var selected = worksheetTemplateByKey(worksheetState.templateKey || "birth-i");
     var selectedComponents = worksheetState.components && worksheetState.components.length ? worksheetState.components : selected.components;
-    return '<section id="viewA-worksheets" class="section worksheets-section"><div class="section-head"><div><p class="eyebrow">Worksheets</p><h3>Template-Based Working Pages</h3></div><span class="small-pill">Custom layouts</span></div>' +
-      '<div class="panel-box worksheet-controls"><div class="grid-2"><label>Worksheet template<select id="worksheetTemplateSelect">' +
-      worksheetTemplates().map(function (template) { return '<option value="' + escapeHtml(template.key) + '"' + (template.key === selected.key ? " selected" : "") + ">" + escapeHtml(template.label) + "</option>"; }).join("") +
-      '</select></label><label class="button-label">Create worksheet<button type="button" id="worksheetApplyTemplateBtn" class="primary-action">Apply template</button></label></div>' +
-      '<div class="worksheet-flex-controls"><div class="grid-3"><label>Dasha from<input id="worksheetDashaFrom" type="date" value="' + escapeHtml(worksheetState.dashaFrom) + '"></label><label>Dasha to<input id="worksheetDashaTo" type="date" value="' + escapeHtml(worksheetState.dashaTo) + '"></label><label>Transit time<input id="worksheetTransitTime" type="text" inputmode="numeric" value="' + escapeHtml(worksheetState.transitTime) + '"></label></div>' +
-      '<div class="grid-3"><label>Transit date<input id="worksheetTransitDate" type="date" value="' + escapeHtml(worksheetState.transitDate) + '"></label><label>Transit chart<select id="worksheetTransitDivision">' + transitDivisionOptions(worksheetState.transitDivision) + '</select></label><label>Varshfal varga(s)<input id="worksheetVarshfalDivisions" type="text" value="' + escapeHtml(worksheetState.varshfalDivisionsText) + '" placeholder="9 or 9,10"></label></div>' +
-      '<label class="worksheet-varshfal-years-label">Varshfal years / ages<textarea id="worksheetVarshfalYears" rows="4">' + escapeHtml(worksheetState.varshfalYearsText) + '</textarea></label>' +
-      '<input id="worksheetVarshfalYear" type="hidden" value="' + escapeHtml(String(worksheetState.varshfalYear)) + '">' +
-      '<input id="worksheetVarshfalDivision" type="hidden" value="' + escapeHtml(String(worksheetState.varshfalDivision)) + '">' +
-      '<p class="fine-print">Add one age/running year per line. The display shows Age (From DD/MM/YYYY to DD/MM/YYYY). Varshfal D-1 and selected Varshfal varga charts repeat side by side for all listed years.</p></div>' +
-      '<div class="worksheet-component-grid">' + worksheetComponents().map(function (component) {
-        var checked = selectedComponents.indexOf(component.key) >= 0 ? " checked" : "";
-        return '<label class="check-row worksheet-check"><input type="checkbox" data-worksheet-component="' + escapeHtml(component.key) + '"' + checked + '><span>' + escapeHtml(component.label) + "</span></label>";
-      }).join("") + '</div><p class="fine-print">Use a sample template, or choose Blank custom worksheet and tick only the charts, tables and dashas you want on the working page.</p></div>' +
+    return '<section id="viewA-worksheets" class="section worksheets-section">' +
+      '<div class="worksheet-topbar">' +
+        '<button type="button" id="worksheetControlsToggleBtn" class="worksheet-cfg-btn" title="Configure worksheet">⚙ Configure</button>' +
+        '<span class="worksheet-topbar-label" id="worksheetTopbarLabel">' + escapeHtml(selected.label) + '</span>' +
+        '<div class="worksheet-topbar-actions">' +
+          '<button type="button" class="ws-util-btn" id="wsTimeToolBtn" title="Open Time Tool">⏱ Time Tool</button>' +
+          '<button type="button" class="ws-util-btn" id="wsToggleInputBtn" title="Show / Hide input panel">⇄ Input</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="worksheet-controls-overlay" id="worksheetControlsOverlay" role="dialog" aria-modal="true" aria-label="Worksheet configuration">' +
+        '<div class="worksheet-controls-overlay-box">' +
+          '<div class="worksheet-controls-overlay-head">' +
+            '<strong>Worksheet Configuration</strong>' +
+            '<button type="button" id="worksheetControlsCloseBtn" class="worksheet-cfg-close-btn" aria-label="Close configuration">✕ Close</button>' +
+          '</div>' +
+          '<div class="worksheet-controls-overlay-body">' +
+            '<div class="grid-2"><label>Worksheet template<select id="worksheetTemplateSelect">' +
+            worksheetTemplates().map(function (template) { return '<option value="' + escapeHtml(template.key) + '"' + (template.key === selected.key ? " selected" : "") + ">" + escapeHtml(template.label) + "</option>"; }).join("") +
+            '</select></label><label class="button-label">Apply<button type="button" id="worksheetApplyTemplateBtn" class="primary-action">Apply &amp; Close</button></label></div>' +
+            '<div class="worksheet-flex-controls"><div class="grid-3"><label>Dasha from<input id="worksheetDashaFrom" type="date" value="' + escapeHtml(worksheetState.dashaFrom) + '"></label><label>Dasha to<input id="worksheetDashaTo" type="date" value="' + escapeHtml(worksheetState.dashaTo) + '"></label><label>Transit time<input id="worksheetTransitTime" type="text" inputmode="numeric" value="' + escapeHtml(worksheetState.transitTime) + '"></label></div>' +
+            '<div class="grid-3"><label>Transit date<input id="worksheetTransitDate" type="date" value="' + escapeHtml(worksheetState.transitDate) + '"></label><label>Transit chart<select id="worksheetTransitDivision">' + transitDivisionOptions(worksheetState.transitDivision) + '</select></label><label>Varshfal varga(s)<input id="worksheetVarshfalDivisions" type="text" value="' + escapeHtml(worksheetState.varshfalDivisionsText) + '" placeholder="9 or 9,10"></label></div>' +
+            '<label class="worksheet-varshfal-years-label">Varshfal years / ages<textarea id="worksheetVarshfalYears" rows="3">' + escapeHtml(worksheetState.varshfalYearsText) + '</textarea></label>' +
+            '<input id="worksheetVarshfalYear" type="hidden" value="' + escapeHtml(String(worksheetState.varshfalYear)) + '">' +
+            '<input id="worksheetVarshfalDivision" type="hidden" value="' + escapeHtml(String(worksheetState.varshfalDivision)) + '">' +
+            '<p class="fine-print">One running year/age per line. Varshfal charts repeat for all listed years.</p></div>' +
+            '<div class="worksheet-component-grid">' + worksheetComponents().map(function (component) {
+              var checked = selectedComponents.indexOf(component.key) >= 0 ? " checked" : "";
+              return '<label class="check-row worksheet-check"><input type="checkbox" data-worksheet-component="' + escapeHtml(component.key) + '"' + checked + '><span>' + escapeHtml(component.label) + "</span></label>";
+            }).join("") + '</div><p class="fine-print">Tick only the panels you want, then click Apply &amp; Close.</p>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
       '<div id="worksheetCanvasMount">' + worksheetCanvasHtml(chart, input, selected.key, selectedComponents, worksheetState) + "</div></section>";
   }
 
@@ -4732,7 +5310,31 @@
     var select = document.getElementById("worksheetTemplateSelect");
     var apply = document.getElementById("worksheetApplyTemplateBtn");
     var mount = document.getElementById("worksheetCanvasMount");
+    var overlay = document.getElementById("worksheetControlsOverlay");
+    var toggleBtn = document.getElementById("worksheetControlsToggleBtn");
+    var closeBtn = document.getElementById("worksheetControlsCloseBtn");
+    var topbarLabel = document.getElementById("worksheetTopbarLabel");
     if (!select || !apply || !mount) return;
+    if (section) {
+      section._worksheetChart = chart;
+      section._worksheetInput = input;
+    }
+
+    function openOverlay() {
+      if (overlay) {
+        if (overlay.parentNode !== document.body) document.body.appendChild(overlay);
+        overlay.classList.add("is-open");
+        overlay.setAttribute("aria-hidden", "false");
+        bringDialogToFront(overlay, true);
+      }
+    }
+    function closeOverlay() {
+      if (overlay) {
+        overlay.classList.remove("is-open");
+        overlay.setAttribute("aria-hidden", "true");
+        if (section && overlay.parentNode === document.body) section.insertBefore(overlay, mount || null);
+      }
+    }
     function setChecksForTemplate() {
       var template = worksheetTemplateByKey(select.value);
       Array.prototype.slice.call((section || document).querySelectorAll("[data-worksheet-component]")).forEach(function (box) {
@@ -4744,41 +5346,136 @@
         return box.checked;
       }).map(function (box) { return box.getAttribute("data-worksheet-component"); });
     }
-    function applyWorksheet() {
+    // closeAfter: only true when explicitly applied via the Apply button.
+    // Configuration changes are intentionally applied only on Apply. Rebuilding
+    // the worksheet on every blur/change can remove controls while the user is
+    // still editing and has caused freezes on dense worksheets.
+    function applyWorksheet(closeAfter) {
       var state = worksheetStateFromControls(section, chart, input);
       mount.innerHTML = worksheetCanvasHtml(chart, input, state.templateKey, state.components, state);
       wireDashaGroupControls();
       enhanceReportTableTopControls();
+      wireWorksheetPanelResize(section);
+      if (closeAfter === true) closeOverlay();
+      if (topbarLabel && select) topbarLabel.textContent = select.options[select.selectedIndex] ? select.options[select.selectedIndex].text : "";
     }
-    select.addEventListener("change", function () {
-      setChecksForTemplate();
-      applyWorksheet();
+    if (toggleBtn && toggleBtn.dataset.worksheetToggleWired !== "1") {
+      toggleBtn.dataset.worksheetToggleWired = "1";
+      toggleBtn.addEventListener("click", function (event) {
+        event.preventDefault();
+        if (overlay && overlay.classList.contains("is-open")) closeOverlay(); else openOverlay();
+      });
+    }
+    if (closeBtn && closeBtn.dataset.worksheetCloseWired !== "1") {
+      closeBtn.dataset.worksheetCloseWired = "1";
+      closeBtn.addEventListener("click", closeOverlay);
+    }
+
+    // ── Utility buttons in the worksheet topbar ──────────────────────────────
+    // Call the underlying functions DIRECTLY (not via .click() proxies, which
+    // can fail silently if the source button's listener wasn't bound yet).
+    var wsTimeToolBtn = document.getElementById("wsTimeToolBtn");
+    var wsToggleInputBtn = document.getElementById("wsToggleInputBtn");
+    if (wsTimeToolBtn) wsTimeToolBtn.addEventListener("click", function (e) {
+      e.preventDefault(); e.stopPropagation();
+      var popup = document.getElementById("timeToolPopup");
+      if (!popup) return;
+      popup.classList.remove("hidden");
+      if (typeof positionFloatingPanelInViewport === "function") positionFloatingPanelInViewport(popup);
+      if (typeof bringDialogToFront === "function") bringDialogToFront(popup, true);
+      if (typeof syncTimeToolDisplay === "function") syncTimeToolDisplay();
     });
-    apply.addEventListener("click", applyWorksheet);
-    ["worksheetDashaFrom", "worksheetDashaTo", "worksheetTransitDate", "worksheetTransitTime", "worksheetTransitDivision", "worksheetVarshfalYears", "worksheetVarshfalDivisions"].forEach(function (id) {
-      var field = document.getElementById(id);
-      if (field) {
-        field.addEventListener("change", applyWorksheet);
-        if (field.tagName === "TEXTAREA" || field.tagName === "INPUT") field.addEventListener("blur", applyWorksheet);
+    if (wsToggleInputBtn) wsToggleInputBtn.addEventListener("click", function (e) {
+      e.preventDefault(); e.stopPropagation();
+      toggleInputPanel();
+    });
+    // Close overlay when clicking backdrop
+    if (overlay && overlay.dataset.worksheetOverlayWired !== "1") {
+      overlay.dataset.worksheetOverlayWired = "1";
+      overlay.addEventListener("click", function (e) { if (e.target === overlay) closeOverlay(); });
+    }
+    // Esc key closes overlay
+    if (section && section.dataset.worksheetEscWired !== "1") {
+      section.dataset.worksheetEscWired = "1";
+      document.addEventListener("keydown", function (e) { if (e.key === "Escape" && overlay && overlay.classList.contains("is-open")) closeOverlay(); });
+    }
+    if (select.dataset.worksheetSelectWired !== "1") {
+      select.dataset.worksheetSelectWired = "1";
+      select.addEventListener("change", function () { setChecksForTemplate(); });
+    }
+    // Apply button: re-render AND close the dialog
+    if (apply.dataset.worksheetApplyWired !== "1") {
+      apply.dataset.worksheetApplyWired = "1";
+      apply.addEventListener("click", function () { applyWorksheet(true); });
+    }
+    // Start with overlay closed
+    closeOverlay();
+    // Wire drag-resize handles for all worksheet panels
+    wireWorksheetPanelResize(section);
+  }
+
+  function wireWorksheetPanelResize(section) {
+    if (!section) return;
+    var grid = section.querySelector(".worksheet-grid");
+    if (!grid) return;
+    // Inject a custom drag handle into each direct child panel
+    Array.prototype.slice.call(grid.children).forEach(function (panel) {
+      if (panel.querySelector(".ws-drag-handle")) return; // already wired
+      var handle = document.createElement("div");
+      handle.className = "ws-drag-handle";
+      handle.title = "Drag to resize panel";
+      handle.innerHTML = '<span aria-hidden="true">&#x2922;</span>';
+      panel.appendChild(handle);
+
+      var startX, startY, startW, startH;
+      function onPointerDown(e) {
+        e.preventDefault();
+        handle.setPointerCapture(e.pointerId);
+        startX = e.clientX; startY = e.clientY;
+        var rect = panel.getBoundingClientRect();
+        startW = rect.width; startH = rect.height;
+        document.body.classList.add("ws-resizing");
       }
+      function onPointerMove(e) {
+        if (!document.body.classList.contains("ws-resizing")) return;
+        var newW = Math.max(200, startW + (e.clientX - startX));
+        var newH = Math.max(160, startH + (e.clientY - startY));
+        // Lock out of flex-grow/shrink so width applies directly
+        panel.style.flex   = "0 0 auto";
+        panel.style.width  = newW + "px";
+        panel.style.height = newH + "px";
+      }
+      function onPointerUp() {
+        document.body.classList.remove("ws-resizing");
+      }
+      handle.addEventListener("pointerdown", onPointerDown);
+      handle.addEventListener("pointermove", onPointerMove);
+      handle.addEventListener("pointerup", onPointerUp);
+      // Double-click handle → reset to default size
+      handle.addEventListener("dblclick", function () {
+        panel.style.flex   = "";
+        panel.style.width  = "";
+        panel.style.height = "";
+      });
     });
   }
 
   function worksheetStateFromControls(section, chart, input) {
+    var scope = worksheetControlScope(section);
     var base = worksheetStateDefaults(chart, input, {
-      templateKey: fieldValueIn(section, "worksheetTemplateSelect"),
-      components: Array.prototype.slice.call((section || document).querySelectorAll("[data-worksheet-component]")).filter(function (box) {
+      templateKey: fieldValueIn(scope, "worksheetTemplateSelect"),
+      components: Array.prototype.slice.call((scope || section || document).querySelectorAll("[data-worksheet-component]")).filter(function (box) {
         return box.checked;
       }).map(function (box) { return box.getAttribute("data-worksheet-component"); }),
-      varshfalYear: fieldValueIn(section, "worksheetVarshfalYear"),
-      varshfalYearsText: fieldValueIn(section, "worksheetVarshfalYears"),
-      varshfalDivision: fieldValueIn(section, "worksheetVarshfalDivision"),
-      varshfalDivisionsText: fieldValueIn(section, "worksheetVarshfalDivisions"),
-      transitDate: fieldValueIn(section, "worksheetTransitDate"),
-      transitTime: fieldValueIn(section, "worksheetTransitTime"),
-      transitDivision: fieldValueIn(section, "worksheetTransitDivision"),
-      dashaFrom: fieldValueIn(section, "worksheetDashaFrom"),
-      dashaTo: fieldValueIn(section, "worksheetDashaTo")
+      varshfalYear: fieldValueIn(scope, "worksheetVarshfalYear"),
+      varshfalYearsText: fieldValueIn(scope, "worksheetVarshfalYears"),
+      varshfalDivision: fieldValueIn(scope, "worksheetVarshfalDivision"),
+      varshfalDivisionsText: fieldValueIn(scope, "worksheetVarshfalDivisions"),
+      transitDate: fieldValueIn(scope, "worksheetTransitDate"),
+      transitTime: fieldValueIn(scope, "worksheetTransitTime"),
+      transitDivision: fieldValueIn(scope, "worksheetTransitDivision"),
+      dashaFrom: fieldValueIn(scope, "worksheetDashaFrom"),
+      dashaTo: fieldValueIn(scope, "worksheetDashaTo")
     });
     if (!base.dashaTo) base.dashaTo = base.dashaFrom;
     return base;
@@ -5130,8 +5827,11 @@
             moduleItem("Tithi Pravesh", "pending"),
             moduleItem("Tithi Pravesh(L)", "pending"),
             moduleItem("Muhurta", "partial", "viewA-transit"),
-            moduleItem("Prashna", "pending"),
-            moduleItem("Krishnamurti chart(Prashna)", "pending"),
+            moduleItem("Prashna", "ready", "viewA-horary"),
+            moduleItem("Shatpanchashika Horary", "ready", "viewA-horary"),
+            moduleItem("KP Horary (249 numbers)", "ready", "viewA-horary"),
+            moduleItem("KCIL Horary (2193 numbers)", "ready", "viewA-horary"),
+            moduleItem("Krishnamurti chart(Prashna)", "ready", "viewA-horary"),
             moduleItem("Sunrise", "partial", "viewA-panchang")
           ] }
         ]
@@ -5330,7 +6030,41 @@
     layer.dataset.focusSectionId = section ? section.id : "";
     layer.dataset.focusSourceId = source && source.id ? source.id : "";
     populatePanelFocusPopupLayer(layer, source, kind, title);
+    tileOpenPanelFocusPopups(layer);
     bringPanelFocusPopupToFront(layer);
+  }
+
+  function tileOpenPanelFocusPopups(preferredLayer, force) {
+    if (typeof window === "undefined" || typeof document === "undefined") return;
+    var layers = Array.prototype.slice.call(document.querySelectorAll(".panel-focus-popup:not(.hidden)"));
+    if (!layers.length) return;
+    var gap = 10;
+    var railReserve = 58;
+    var topStart = document.body.classList.contains("focus-mode") ? 158 : 24;
+    var availableWidth = Math.max(320, (window.innerWidth || 1280) - railReserve - gap * 2);
+    var availableHeight = Math.max(280, (window.innerHeight || 800) - topStart - gap);
+    var columns = availableWidth >= 1320 ? 3 : (availableWidth >= 820 ? 2 : 1);
+    var panelWidth = Math.floor((availableWidth - gap * (columns - 1)) / columns);
+    panelWidth = Math.max(300, Math.min(panelWidth, 470));
+    var rowsVisible = Math.max(1, Math.floor(availableHeight / 245));
+    var panelHeight = Math.floor((availableHeight - gap * Math.max(0, rowsVisible - 1)) / rowsVisible);
+    panelHeight = Math.max(230, Math.min(panelHeight, 360));
+    layers.forEach(function (layer, index) {
+      if (!force && layer.dataset.userPositioned === "1" && layer !== preferredLayer) return;
+      var col = index % columns;
+      var row = Math.floor(index / columns);
+      var overflowStep = Math.max(0, row - rowsVisible + 1);
+      var left = gap + col * (panelWidth + gap) + overflowStep * 18;
+      var top = topStart + Math.min(row, rowsVisible - 1) * (panelHeight + gap) + overflowStep * 18;
+      layer.style.left = Math.round(left) + "px";
+      layer.style.top = Math.round(top) + "px";
+      layer.style.right = "auto";
+      layer.style.bottom = "auto";
+      layer.style.width = Math.round(panelWidth) + "px";
+      layer.style.height = Math.round(panelHeight) + "px";
+      layer.classList.add("is-multi-tiled");
+      if (force) delete layer.dataset.userPositioned;
+    });
   }
 
   function populatePanelFocusPopupLayer(layer, source, kind, title) {
@@ -5364,7 +6098,6 @@
     var body = layer.querySelector(".panel-focus-popup-body");
     body.innerHTML = "";
     body.appendChild(clone);
-    closeFocusRailPanel();
     layer.classList.remove("hidden");
     if (kind === "dasha") setTimeout(wireDashaGroupControls, 0);
     if (clone.querySelector && clone.querySelector("#varshfalUpdateBtn") && lastReportChart && lastReportInput) {
@@ -5415,6 +6148,9 @@
     rail.classList.remove("is-open");
     var tab = rail.querySelector(".focus-rail-tab");
     if (tab) tab.setAttribute("aria-expanded", "false");
+    if (document.activeElement && rail.contains(document.activeElement) && document.activeElement.blur) {
+      document.activeElement.blur();
+    }
   }
 
   function panelFocusTitle(source, kind) {
@@ -5458,9 +6194,7 @@
   }
 
   function bringPanelFocusPopupToFront(layer) {
-    if (!layer || !layer.style) return;
-    window.__vednetraFocusZIndex = Math.max(window.__vednetraFocusZIndex || 3000, 3000) + 1;
-    layer.style.zIndex = String(window.__vednetraFocusZIndex);
+    bringDialogToFront(layer, true);
   }
 
   function setupPanelFocusPopupMotion(layer) {
@@ -5471,6 +6205,7 @@
     head.addEventListener("pointerdown", function (event) {
       if ((event.button || 0) !== 0) return;
       if (event.target && event.target.closest && event.target.closest("button, select, input, textarea, a")) return;
+      bringDialogToFront(layer, false);
       var rect = layer.getBoundingClientRect();
       var startX = event.clientX;
       var startY = event.clientY;
@@ -5481,6 +6216,7 @@
       layer.style.right = "auto";
       layer.style.bottom = "auto";
       layer.classList.add("is-dragging");
+      layer.dataset.userPositioned = "1";
       if (head.setPointerCapture && event.pointerId !== undefined) {
         try { head.setPointerCapture(event.pointerId); } catch (err) {}
       }
@@ -5488,13 +6224,14 @@
         var nextLeft = startLeft + moveEvent.clientX - startX;
         var nextTop = startTop + moveEvent.clientY - startY;
         var current = layer.getBoundingClientRect();
-        var maxLeft = Math.max(0, window.innerWidth - Math.min(90, current.width));
-        var maxTop = Math.max(0, window.innerHeight - Math.min(54, current.height));
-        layer.style.left = Math.min(Math.max(nextLeft, -current.width + 90), maxLeft) + "px";
-        layer.style.top = Math.min(Math.max(nextTop, 0), maxTop) + "px";
+        var maxLeft = Math.max(8, window.innerWidth - current.width - 8);
+        var maxTop = Math.max(8, window.innerHeight - current.height - 8);
+        layer.style.left = Math.min(Math.max(nextLeft, 8), maxLeft) + "px";
+        layer.style.top = Math.min(Math.max(nextTop, 8), maxTop) + "px";
       }
       function done() {
         layer.classList.remove("is-dragging");
+        ensureDialogFullyVisible(layer);
         document.removeEventListener("pointermove", move);
         document.removeEventListener("pointerup", done);
         document.removeEventListener("pointercancel", done);
@@ -5515,6 +6252,7 @@
     var body = layer.querySelector(".panel-focus-popup-body");
     if (body) body.innerHTML = "";
     if (layer.parentNode) layer.parentNode.removeChild(layer);
+    tileOpenPanelFocusPopups();
   }
 
   function nativeReportName(input) {
@@ -8669,7 +9407,10 @@
       var pos = NORTH_CHART_POSITIONS[house];
       var sign = normalizeSign(ascSign + house - 1);
       hitAreas += '<circle class="north-house-hit" cx="' + pos.x + '" cy="' + pos.y + '" r="48" data-house="' + house + '" data-sign="' + sign + '" data-asc-sign="' + normalizeSign(ascSign) + '"></circle>';
-      var planetLines = chartHousePlanetLines(byHouse[house] || [], /^D-1\b/.test(title), house === 1 ? 4 : 5, options);
+      // Show planetary degrees on every D-1 chart (Birth Chart, Gochara/Transit,
+       // Bhava Chalit, Sudarshan, Varshfal D-1). Higher divisions stay un-cluttered.
+       var showPlanetDegrees = (Number(options.division) === 1) || /^D-1\b/.test(title);
+       var planetLines = chartHousePlanetLines(byHouse[house] || [], showPlanetDegrees, house === 1 ? 4 : 5, options);
       var totalLines = 1 + (house === 1 ? 1 : 0) + planetLines.length;
       var lineGap = options.featured ? 15 : 14;
       var startY = -((totalLines - 1) * lineGap) / 2;
@@ -8890,6 +9631,198 @@
       CLASSICAL_PLANETS.map(function (name) { return samudayaRowHtml(name, data.rows[name], data.rowTotals[name], "planet-" + name.toLowerCase()); }).join("") +
       '<tr class="sav-total-row"><td></td>' + data.columnTotals.map(function (total) { return "<td>" + total + "</td>"; }).join("") + "<td>" + data.grandTotal + "</td></tr>" +
       '</tbody></table></div><p class="fine-print">Rows show Lagna and seven classical graha BAV bindus by natal house. Bottom row is Sarvashtakavarga total.</p></div></section>';
+  }
+
+  function horarySection(chart, input) {
+    var kpNumber = horaryFieldNumber("horaryKpNumber", 1, 1, 249);
+    var kcilNumber = horaryFieldNumber("horaryKcilNumber", 1, 1, 2193);
+    var question = typeof document !== "undefined" && document.getElementById("horaryQuestionText") ? document.getElementById("horaryQuestionText").value : "";
+    return '<section id="viewA-horary" class="section horary-section"><div class="section-head"><div><p class="eyebrow">Horary</p><h3>Prashna / Horary Systems</h3></div><span class="small-pill">3 methods</span></div>' +
+      '<div class="panel-box horary-control-panel"><h3>Horary Inputs</h3><div class="grid-3">' +
+      '<label>Question / matter<textarea id="horaryQuestionText" rows="3" placeholder="Optional: write the Prashna question here">' + escapeHtml(question) + '</textarea></label>' +
+      '<label>KP Horary number<input id="horaryKpNumber" type="number" min="1" max="249" value="' + escapeHtml(String(kpNumber)) + '"></label>' +
+      '<label>KCIL Horary number<input id="horaryKcilNumber" type="number" min="1" max="2193" value="' + escapeHtml(String(kcilNumber)) + '"></label>' +
+      '</div><div class="actions compact-actions"><button type="button" id="horaryUpdateBtn" class="primary-action">Update Horary</button></div>' +
+      '<p class="fine-print">Horary uses the chart reference/as-of time and place. KP Horary uses 1-249 number mapping; KCIL Horary uses 1-2193 number mapping for finer sub-sub reference.</p></div>' +
+      '<div id="horaryDynamicMount">' + horaryDynamicHtml(chart, input, kpNumber, kcilNumber, question) + '</div></section>';
+  }
+
+  function wireHoraryControls(chart, input) {
+    var section = document.getElementById("viewA-horary");
+    if (!section || section.dataset.horaryWired === "1") return;
+    section.dataset.horaryWired = "1";
+    var mount = section.querySelector("#horaryDynamicMount");
+    var kp = section.querySelector("#horaryKpNumber");
+    var kcil = section.querySelector("#horaryKcilNumber");
+    var question = section.querySelector("#horaryQuestionText");
+    function update() {
+      if (!mount) return;
+      mount.innerHTML = horaryDynamicHtml(chart, input, horaryFieldNumber("horaryKpNumber", kp ? kp.value : 1, 1, 249), horaryFieldNumber("horaryKcilNumber", kcil ? kcil.value : 1, 1, 2193), question ? question.value : "");
+      enhanceReportTableTopControls();
+    }
+    var button = section.querySelector("#horaryUpdateBtn");
+    if (button) button.addEventListener("click", update);
+    [kp, kcil].forEach(function (field) {
+      if (field) field.addEventListener("change", update);
+    });
+  }
+
+  function horaryFieldNumber(id, fallback, min, max) {
+    var value = fallback;
+    if (typeof document !== "undefined") {
+      var field = document.getElementById(id);
+      if (field && field.value !== "") value = field.value;
+    }
+    return clamp(Math.round(Number(value) || Number(fallback) || min), min, max);
+  }
+
+  function horaryDynamicHtml(chart, input, kpNumber, kcilNumber, question) {
+    var referenceInput = horaryReferenceInput(input);
+    var prashnaChart = buildChart(referenceInput.birthInstant, referenceInput.latitude, referenceInput.longitude, referenceInput.timezone, {
+      ayanamshaKey: referenceInput.ayanamshaKey || input.ayanamshaKey || "raman"
+    });
+    return '<div class="report-grid horary-grid">' +
+      shatpanchashikaHoraryPanel(prashnaChart, referenceInput, question) +
+      kpHoraryPanel(horaryNumberRecord(kpNumber, 249, prashnaChart), prashnaChart) +
+      kcilHoraryPanel(horaryNumberRecord(kcilNumber, 2193, prashnaChart), prashnaChart) +
+      '</div>';
+  }
+
+  function horaryReferenceInput(input) {
+    var timezone = Number(input.timezone || 5.5);
+    var reference = input.asOfInstant instanceof Date && !isNaN(input.asOfInstant.getTime()) ? input.asOfInstant : new Date();
+    var date = input.asOfDate || dateInputValue(reference, timezone);
+    var time = normalizeTimeInput(input.asOfTime || timeInputValue(reference, timezone));
+    return Object.assign({}, input, {
+      birthDate: date,
+      birthTime: time,
+      birthInstant: localDateTimeToUtc(date, time, timezone),
+      timezone: timezone
+    });
+  }
+
+  function shatpanchashikaHoraryPanel(prashnaChart, input, question) {
+    var moon = prashnaChart.planetsByName.Moon;
+    var weekdayLordName = weekdayLord(input.birthInstant, input.timezone);
+    var horaLordName = horaLord(weekdayLordName, Math.floor(timeToMinutes(input.birthTime) / 60));
+    return '<div class="panel-box horary-method-panel worksheet-span-all"><h3>1. Shatpanchashika Horary</h3><div class="report-grid">' +
+      chartBox("Shatpanchashika Prashna D-1", prashnaChart.ascendant.sign, prashnaChart.planets, { showAscDegree: true, ascDegree: prashnaChart.ascendant.deg }) +
+      metricBox("Prashna Reference", [
+        ["Question", question || "Not entered"],
+        ["Date / time", formatInTimezone(input.birthInstant, input.timezone)],
+        ["Place", (input.birthPlace || input.place || "Reference place") + " - " + coordinateText(input.latitude, input.longitude)],
+        ["Ascendant", prashnaChart.ascendant.signName + " " + decimalToDms(prashnaChart.ascendant.deg)],
+        ["Lagna lord", SIGNS[prashnaChart.ascendant.sign].lord],
+        ["Moon", moon.signName + " " + decimalToDms(moon.deg) + ", " + moon.nakshatra + " pada " + moon.pada],
+        ["Day / Hora lord", weekdayLordName + " / " + horaLordName]
+      ]) +
+      '</div><p class="fine-print">Use this as the Prashna foundation: lagna, lagna lord, Moon, day/hora lord, relevant house and the house lord should be judged together.</p></div>';
+  }
+
+  function horaryNumberRecord(number, maxNumber, prashnaChart) {
+    var safe = clamp(Math.round(Number(number) || 1), 1, maxNumber);
+    var lon = normalize((safe - 0.5) * 360 / maxNumber);
+    var sign = signIndex(lon);
+    var nak = nakshatraInfo(lon);
+    var kp = kpLordInfo(lon);
+    return {
+      number: safe,
+      maxNumber: maxNumber,
+      lon: lon,
+      sign: sign,
+      signName: SIGNS[sign].name,
+      nak: nak,
+      kp: kp,
+      house: houseFromSign(prashnaChart.ascendant.sign, sign),
+      signLord: SIGNS[sign].lord
+    };
+  }
+
+  function kpHoraryPanel(record, prashnaChart) {
+    return horaryNumberPanel("2. KP Horary (249 Numbers Based)", "KP 249", record, prashnaChart, "KP 249 number gives the horary seed. Judge star lord, sub lord and sub-sub lord with the relevant cusp/house significations.");
+  }
+
+  function kcilHoraryPanel(record, prashnaChart) {
+    return horaryNumberPanel("3. KCIL Horary (2193 Numbers Based)", "KCIL 2193", record, prashnaChart, "KCIL 2193 gives a finer horary seed for sub-sub level scrutiny. Use it with the same house, star, sub and sub-sub logic.");
+  }
+
+  function horaryNumberPanel(title, tag, record, prashnaChart, note) {
+    var rashiChart = horaryRashiChartFromRecord(prashnaChart, record);
+    var significatorChart = horaryKpChartFromRecord(prashnaChart, record, tag);
+    return '<div class="horary-method-block worksheet-span-all"><div class="panel-box horary-method-panel"><h3>' + escapeHtml(title) + '</h3><span class="small-pill">' + escapeHtml(tag) + '</span>' +
+      '<div class="table-wrap compact-table"><table><thead><tr><th>Factor</th><th>Computed reference</th></tr></thead><tbody>' +
+      "<tr><td>Horary number</td><td>" + record.number + " / " + record.maxNumber + "</td></tr>" +
+      "<tr><td>Seed longitude</td><td>" + escapeHtml(kpLongitudeText(record.lon)) + "</td></tr>" +
+      "<tr><td>Sign / house from Prashna lagna</td><td>" + escapeHtml(record.signName + " H" + record.house) + "</td></tr>" +
+      "<tr><td>Sign lord</td><td>" + escapeHtml(record.signLord) + "</td></tr>" +
+      "<tr><td>Nakshatra / pada</td><td>" + escapeHtml(record.nak.name + " pada " + record.nak.pada) + "</td></tr>" +
+      "<tr><td>Star lord</td><td>" + escapeHtml(record.kp.starLord) + "</td></tr>" +
+      "<tr><td>Sub lord</td><td>" + escapeHtml(record.kp.subLord) + "</td></tr>" +
+      "<tr><td>Sub-sub lord</td><td>" + escapeHtml(record.kp.subSubLord) + "</td></tr>" +
+      '</tbody></table></div><p class="fine-print">' + escapeHtml(note) + '</p></div>' +
+      '<div class="report-grid kp-chart-grid">' +
+      chartBox(tag + " Horary Chart", significatorChart.ascendant.sign, significatorChart.planets, { showAscDegree: true, ascDegree: significatorChart.ascendant.deg }) +
+      chartBox(tag + " Rashi Chart", rashiChart.ascendant.sign, rashiChart.planets, { showAscDegree: true, ascDegree: rashiChart.ascendant.deg }) +
+      metricBox(tag + " Horary Reference", [
+        ["Selected ascendant", record.signName + " " + decimalToDms(record.lon - record.sign * 30)],
+        ["Horary star / sub / sub-sub", record.kp.starLord + " / " + record.kp.subLord + " / " + record.kp.subSubLord],
+        ["Cusp method", significatorChart.houseSystem],
+        ["Planet source", "Reference date, time and place"]
+      ]) +
+      "</div>" +
+      kpPlanetarySignificationTable(significatorChart) +
+      kpCuspSignificationTable(significatorChart) +
+      "</div>";
+  }
+
+  function horaryRashiChartFromRecord(prashnaChart, record) {
+    var planets = prashnaChart.planets.map(function (planet) {
+      var copy = Object.assign({}, planet);
+      copy.house = houseFromSign(record.sign, copy.sign);
+      copy.equalHouse = copy.house;
+      return copy;
+    });
+    return Object.assign({}, prashnaChart, {
+      ascendant: Object.assign({}, prashnaChart.ascendant, {
+        lon: record.lon,
+        sign: record.sign,
+        signName: record.signName,
+        deg: record.lon - record.sign * 30,
+        house: 1,
+        kp: record.kp
+      }),
+      planets: planets,
+      planetsByName: indexBy(planets, "name")
+    });
+  }
+
+  function horaryKpChartFromRecord(prashnaChart, record, tag) {
+    var kp = buildKpChart(prashnaChart);
+    var lonByHouse = {};
+    for (var house = 1; house <= 12; house += 1) {
+      lonByHouse[house] = normalize(record.lon + (house - 1) * 30);
+    }
+    var cusps = kpCuspObjects(lonByHouse);
+    var planets = kp.planets.map(function (planet) {
+      var copy = Object.assign({}, planet);
+      copy.house = kpHouseFromCusps(copy.lon, cusps) || houseFromSign(record.sign, copy.sign);
+      copy.equalHouse = houseFromSign(record.sign, copy.sign);
+      return copy;
+    });
+    return Object.assign({}, kp, {
+      houseSystem: tag + " selected-number equal cusps",
+      ascendant: {
+        lon: record.lon,
+        sign: record.sign,
+        signName: record.signName,
+        deg: record.lon - record.sign * 30,
+        house: 1,
+        kp: record.kp
+      },
+      cusps: cusps,
+      planets: planets,
+      planetsByName: indexBy(planets, "name")
+    });
   }
 
   function kpSection(chart) {
@@ -10905,6 +11838,7 @@
           '<div class="vednetra-report-options-actions"><button type="button" data-vednetra-cancel>Cancel</button><button type="button" class="primary" data-vednetra-build>Build Report</button></div>' +
         '</div>';
       document.body.appendChild(layer);
+      bringDialogToFront(layer, true);
       function close(value) {
         layer.remove();
         resolve(value);
@@ -10913,6 +11847,7 @@
         button.addEventListener("click", function () { close(null); });
       });
       layer.addEventListener("click", function (event) {
+        bringDialogToFront(layer, false);
         if (event.target === layer) close(null);
       });
       layer.querySelector("[data-vednetra-build]").addEventListener("click", function () {
@@ -12001,6 +12936,28 @@
 
   function alertUser(message) {
     if (typeof window !== "undefined" && typeof window.alert === "function") window.alert(message);
+  }
+
+  // Non-blocking toast — safe to call while in fullscreen (no modal dialog)
+  function showToast(message, durationMs) {
+    var dur = durationMs || 3200;
+    var existing = document.getElementById("vednetra-toast");
+    if (existing) existing.remove();
+    var toast = document.createElement("div");
+    toast.id = "vednetra-toast";
+    toast.className = "vednetra-toast";
+    toast.textContent = message;
+    toast.setAttribute("role", "status");
+    toast.setAttribute("aria-live", "polite");
+    document.body.appendChild(toast);
+    // Trigger animation
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () { toast.classList.add("vednetra-toast-visible"); });
+    });
+    setTimeout(function () {
+      toast.classList.remove("vednetra-toast-visible");
+      setTimeout(function () { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 400);
+    }, dur);
   }
 
   function copyText(text) {

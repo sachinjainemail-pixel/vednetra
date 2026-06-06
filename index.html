@@ -14,15 +14,25 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <img id="mainScreenLogo" class="main-screen-logo" src="icon.svg" alt="VedNetra logo" aria-hidden="true">
   <main class="shell">
-    <section class="workspace">
-      <aside class="input-panel">
+    <div id="chartSetupDialog" class="chart-setup-dialog hidden" role="dialog" aria-modal="false" aria-labelledby="chartSetupDialogTitle">
+      <div class="chart-setup-dialog-panel">
+        <div class="chart-setup-dialog-head">
+          <img class="chart-setup-head-logo" src="icon.svg" alt="VedNetra logo" decoding="async">
+          <div>
+            <p class="eyebrow">Workspace</p>
+            <h2 id="chartSetupDialogTitle">Chart Setup</h2>
+          </div>
+          <button type="button" id="chartSetupCloseBtn" class="dialog-close-btn" aria-label="Close chart setup">Close</button>
+        </div>
+        <aside class="input-panel">
         <div class="brand-row">
-          <img class="app-logo" src="icon.svg" alt="" aria-hidden="true">
+          <img class="app-logo" src="icon.svg" alt="VedNetra logo">
           <div>
             <h1 class="brand-title">VedNetra</h1>
           </div>
-          <span class="status-pill">Advanced v84</span>
+          <span class="status-pill">V.01</span>
         </div>
 
         <form id="birthForm" autocomplete="off">
@@ -159,7 +169,7 @@
           <input id="partnerLongitude" name="partnerLongitude" type="hidden" value="">
           <input id="partnerLongitudeDirection" name="partnerLongitudeDirection" type="hidden" value="E">
 
-          <div class="actions">
+            <div class="actions">
             <button type="submit" class="primary-action">Generate report</button>
             <button type="button" id="saveChartBtn">Save chart</button>
             <button type="button" id="saveChartAsNewBtn">Save as new</button>
@@ -200,13 +210,25 @@
             <div id="mobileAccessStatus" class="device-access fine-print">Checking local access URLs...</div>
           </fieldset>
         </form>
-      </aside>
+        </aside>
+      </div>
+    </div>
 
-      <button type="button" id="chartInputResizeHandle" class="chart-input-resize-handle" aria-label="Drag to resize input section" title="Drag to resize input section"></button>
+    <section class="workspace">
       <section class="output-panel" aria-live="polite">
-        <div id="chartDataNavRibbon" class="chart-data-nav hidden" aria-label="View A sections">
-          <div class="nav-category nav-category-open">
-            <button type="button" class="nav-category-title" data-nav-category-toggle aria-expanded="true">Workspace</button>
+        <div id="chartDataNavRibbon" class="chart-data-nav" aria-label="View A sections">
+          <div class="nav-category">
+            <button type="button" class="nav-category-title" data-nav-category-toggle aria-expanded="false">Chart Setup</button>
+            <div class="nav-category-actions">
+              <button type="button" data-chart-setup-action="new">New Chart</button>
+              <button type="button" data-chart-setup-action="select">Select Existing Chart</button>
+              <button type="button" data-chart-setup-action="modify">Modify Existing Chart</button>
+              <button type="button" data-chart-setup-action="delete">Delete Existing Chart</button>
+              <button type="button" data-chart-setup-action="download">Download Report</button>
+            </div>
+          </div>
+          <div class="nav-category">
+            <button type="button" class="nav-category-title" data-nav-category-toggle aria-expanded="false">Workspace</button>
             <div class="nav-category-actions">
               <button type="button" data-view-a-target="viewA-output-library">Library</button>
               <button type="button" data-view-a-target="viewA-worksheets">Worksheets</button>
@@ -248,12 +270,20 @@
             <button type="button" class="nav-category-title" data-nav-category-toggle aria-expanded="false">Relationship &amp; Prediction</button>
             <div class="nav-category-actions">
               <button type="button" data-view-a-target="viewA-compatibility">Compatibility</button>
+              <button type="button" data-view-a-target="viewA-horary">Horary</button>
               <button type="button" data-view-a-target="viewA-faq-pillars">Query Pillars</button>
               <button type="button" data-view-a-target="viewA-predictive">Predictive</button>
             </div>
           </div>
           <label class="mobile-drilldown-label">Section
             <select id="chartDataNavSelect" class="mobile-drilldown-select" aria-label="Select View A section">
+              <optgroup label="Chart Setup">
+                <option value="__chartSetupNew">New Chart</option>
+                <option value="__chartSetupSelect">Select Existing Chart</option>
+                <option value="__chartSetupModify">Modify Existing Chart</option>
+                <option value="__chartSetupDelete">Delete Existing Chart</option>
+                <option value="__chartSetupDownload">Download Report</option>
+              </optgroup>
               <optgroup label="Workspace">
                 <option value="viewA-output-library">Library</option>
                 <option value="viewA-worksheets">Worksheets</option>
@@ -283,6 +313,7 @@
               </optgroup>
               <optgroup label="Relationship &amp; Prediction">
                 <option value="viewA-compatibility">Compatibility</option>
+                <option value="viewA-horary">Horary</option>
                 <option value="viewA-faq-pillars">Query Pillars</option>
                 <option value="viewA-predictive">Predictive</option>
               </optgroup>
@@ -292,6 +323,14 @@
         <div id="chartInputLayoutBar" class="chart-input-layout-bar hidden">
           <button type="button" class="input-toggle-btn" data-chart-input-toggle aria-pressed="false">Hide input</button>
           <button type="button" class="input-toggle-btn time-tool-layout-btn" data-time-tool-open>Time Tool</button>
+          <div id="partAIdentityStrip" class="part-a-identity-strip" aria-live="polite">
+            <div class="part-a-brand-mini">
+              <img src="icon.svg" alt="" aria-hidden="true">
+              <strong>VedNetra</strong>
+            </div>
+            <div class="part-a-native-summary">Generate a chart to show native birth details.</div>
+          </div>
+          <button type="button" id="partAFullScreenBtn" class="input-toggle-btn part-a-fullscreen-btn" aria-pressed="false">Full Screen</button>
         </div>
         <div id="emptyState" class="empty-state">
           <h2>Ready for chart analysis</h2>
@@ -300,10 +339,9 @@
         <article id="report" class="report hidden"></article>
       </section>
     </section>
-    <div id="focusModeRail" class="focus-mode-rail" aria-label="Full screen tools">
-      <button type="button" class="focus-rail-tab" aria-label="Open full screen tools">Focus</button>
+    <div id="focusModeRail" class="focus-mode-rail" aria-label="Multi view tools">
+      <button type="button" class="focus-rail-tab" aria-label="Open multi view tools">Multi View</button>
       <div class="focus-rail-panel">
-        <button type="button" id="enterFocusModeBtn">Full screen</button>
         <button type="button" id="railGenerateReportBtn">Generate report</button>
         <div class="focus-reference-options">
           <label>Chart focus
@@ -317,6 +355,21 @@
         </div>
         <button type="button" id="railOpenD1DetailsFocusBtn">Open D-1 details</button>
         <button type="button" id="railOpenDashaFocusBtn">Open Vimshottari dasha</button>
+        <div class="focus-section-options">
+          <label>Open section
+            <select id="railSectionFocusSelect">
+              <option value="">Generate report first</option>
+            </select>
+          </label>
+          <div class="focus-reference-actions">
+            <button type="button" id="railOpenSectionFocusBtn">Open section</button>
+            <button type="button" id="railAddSectionFocusBtn">Pin section</button>
+          </div>
+          <button type="button" id="railTileFocusPanelsBtn">Tile windows</button>
+          <div id="railPinnedSections" class="focus-pinned-sections">
+            <p class="fine-print">Pin sections for quick multi-view access.</p>
+          </div>
+        </div>
       </div>
         <div class="focus-download-options">
           <label>Report
@@ -336,7 +389,6 @@
           </label>
           <button type="button" id="railDownloadReportBtn">Download</button>
         </div>
-        <button type="button" id="exitFocusModeBtn">Exit full screen</button>
       </div>
     </div>
 
@@ -367,23 +419,24 @@
           <div class="time-tool-row"><span>10 Seconds</span><button type="button" data-time-tool-step="ten-seconds" data-time-tool-direction="-1">-</button><button type="button" data-time-tool-step="ten-seconds" data-time-tool-direction="1">+</button></div>
           <div class="time-tool-row"><span>Seconds</span><button type="button" data-time-tool-step="second" data-time-tool-direction="-1">-</button><button type="button" data-time-tool-step="second" data-time-tool-direction="1">+</button></div>
         </div>
-        <div class="time-tool-mode" role="radiogroup" aria-label="Time changing mode">
+        <!-- Hidden inputs retained so existing JS code paths don't break when reading state -->
+        <div class="time-tool-mode" role="radiogroup" aria-label="Time changing mode" hidden>
           <label><input type="radio" name="timeToolMode" value="manual" checked> Stop (Manual)</label>
           <label><input type="radio" name="timeToolMode" value="realtime"> Realtime</label>
           <label><input type="radio" name="timeToolMode" value="animate"> Animate</label>
         </div>
-        <label class="time-tool-edit-label">
+        <label class="time-tool-edit-label" hidden>
           <span class="sr-only">Edit action</span>
           <select id="timeToolEditMode">
             <option value="date">Edit Date</option>
             <option value="now">Set Current Time</option>
           </select>
         </label>
-        <div id="timeToolCurrentDisplay" class="time-tool-current">-</div>
-        <button type="button" id="timeToolAddPickBtn">Add to pick list</button>
-        <button type="button" id="timeToolRemovePickBtn">Remove from Picklist</button>
-        <button type="button" id="timeToolHelpBtn">Help</button>
-        <p id="timeToolStatus" class="fine-print">Manual mode. Use +/- to change time and refresh charts.</p>
+        <div id="timeToolCurrentDisplay" class="time-tool-current" hidden>-</div>
+        <button type="button" id="timeToolAddPickBtn" hidden>Add to pick list</button>
+        <button type="button" id="timeToolRemovePickBtn" hidden>Remove from Picklist</button>
+        <button type="button" id="timeToolHelpBtn" hidden>Help</button>
+        <p id="timeToolStatus" class="fine-print" hidden>Manual mode. Use +/- to change time and refresh charts.</p>
       </div>
     </div>
   </main>

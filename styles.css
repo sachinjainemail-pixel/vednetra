@@ -1,23 +1,23 @@
 :root {
-  --bg: #f4faef;
-  --panel: #fffdf7;
-  --ink: #1f2528;
-  --muted: #65716a;
-  --line: #cbdcbc;
-  --accent: #2f9a62;
-  --accent-strong: #227247;
-  --amber: #b96b18;
-  --plum: #8b5f96;
-  --blue: #3f77a8;
-  --rose: #b85a79;
-  --danger: #ad4646;
-  --good: #2b8554;
-  --paper: #fff9ec;
-  --mint-panel: #f3fbef;
-  --sky-panel: #f2f8ff;
-  --rose-panel: #fff5f7;
-  --gold-panel: #fff8e6;
-  --shadow: 0 18px 50px rgba(45, 64, 34, 0.12);
+  --bg: #ede5d0;
+  --panel: #fdf8ee;
+  --ink: #181c32;
+  --muted: #5a6078;
+  --line: #c8a84e;
+  --accent: #8a5c12;
+  --accent-strong: #58390a;
+  --amber: #c27418;
+  --plum: #6e4488;
+  --blue: #1a3868;
+  --rose: #8c3450;
+  --danger: #882828;
+  --good: #1a6438;
+  --paper: #fff7e2;
+  --mint-panel: #f2ede0;
+  --sky-panel: #e8eef8;
+  --rose-panel: #f5eae0;
+  --gold-panel: #faf2d8;
+  --shadow: 0 18px 50px rgba(24, 15, 4, 0.16);
 }
 
 * {
@@ -28,9 +28,23 @@ body {
   margin: 0;
   color: var(--ink);
   background:
-    linear-gradient(135deg, rgba(244, 250, 239, 0.95), rgba(242, 248, 255, 0.82) 48%, rgba(255, 248, 230, 0.8)),
+    linear-gradient(135deg, rgba(237, 229, 208, 0.97) 0%, rgba(232, 238, 248, 0.72) 50%, rgba(250, 242, 216, 0.88) 100%),
     var(--bg);
   font: 15px/1.5 "Segoe UI", Arial, sans-serif;
+}
+
+.main-screen-logo {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 9010;
+  width: clamp(66px, 8vw, 112px);
+  height: clamp(66px, 8vw, 112px);
+  object-fit: contain;
+  opacity: 0.18;
+  pointer-events: none;
+  filter: drop-shadow(0 10px 22px rgba(24, 15, 4, 0.26)) saturate(1.12);
+  mix-blend-mode: multiply;
 }
 
 .shell {
@@ -40,9 +54,9 @@ body {
 
 .workspace {
   display: grid;
-  grid-template-columns: minmax(0, var(--chart-input-width, min(33vw, 420px))) 22px minmax(0, 1fr);
+  grid-template-columns: minmax(0, var(--chart-input-width, min(30vw, 400px))) 22px minmax(0, 1fr);
   gap: 0;
-  max-width: 1600px;
+  max-width: 100%;
   margin: 0 auto;
 }
 
@@ -56,9 +70,9 @@ body.chart-input-width-large .workspace {
 
 .input-panel,
 .output-panel {
-  background: linear-gradient(180deg, rgba(255, 253, 247, 0.96), rgba(249, 255, 246, 0.94));
+  background: linear-gradient(180deg, rgba(253, 248, 238, 0.98), rgba(250, 244, 228, 0.95));
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 10px;
   box-shadow: var(--shadow);
 }
 
@@ -111,6 +125,53 @@ body.chart-input-width-large .workspace {
   content: none;
 }
 
+.chart-input-resize-handle.is-restore-tab,
+body.chart-input-collapsed .chart-input-resize-handle {
+  display: block !important;
+  position: sticky;
+  top: 18px;
+  z-index: 9100;
+  align-self: stretch;
+  width: 34px;
+  min-width: 34px;
+  min-height: calc(100vh - 44px);
+  border: 1px solid rgba(200, 168, 78, 0.75);
+  border-radius: 10px;
+  background: linear-gradient(180deg, #fffaf0, #ead59d);
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(24, 15, 4, 0.18);
+}
+
+.chart-input-resize-handle.is-restore-tab::before,
+body.chart-input-collapsed .chart-input-resize-handle::before {
+  content: attr(data-restore-label);
+  position: sticky;
+  top: calc(50vh - 82px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 164px;
+  margin: calc(50vh - 96px) auto 0;
+  border: 1px solid rgba(9, 13, 39, 0.82);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #30345c 0%, #0c102b 100%);
+  color: #fff2c1;
+  box-shadow: 0 10px 22px rgba(18, 18, 45, 0.24);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.chart-input-resize-handle.is-restore-tab:hover::before,
+body.chart-input-collapsed .chart-input-resize-handle:hover::before {
+  background: linear-gradient(180deg, #3b406d 0%, #111735 100%);
+}
+
 body.chart-input-resizing,
 body.chart-input-resizing * {
   cursor: col-resize !important;
@@ -123,16 +184,16 @@ body.chart-input-resizing * {
 }
 
 .top-chart-grid {
-  grid-template-columns: repeat(2, minmax(360px, 1fr));
+  grid-template-columns: repeat(2, minmax(min(340px, 100%), 1fr));
   align-items: start;
 }
 
 .top-chart-section .chart-panel {
-  min-height: 560px;
+  min-height: auto;
 }
 
 .top-chart-section .north-chart {
-  min-height: 500px;
+  min-height: auto;
 }
 
 .brand-row,
@@ -155,9 +216,9 @@ body.chart-input-resizing * {
   align-items: center;
   margin: -20px -20px 18px;
   padding: 20px 20px 14px;
-  background: linear-gradient(180deg, rgba(255, 253, 247, 0.99), rgba(255, 253, 247, 0.94));
-  border-bottom: 1px solid rgba(215, 181, 106, 0.38);
-  backdrop-filter: blur(10px);
+  background: linear-gradient(180deg, rgba(253, 248, 238, 0.99), rgba(250, 244, 225, 0.96));
+  border-bottom: 2px solid rgba(200, 168, 78, 0.55);
+  backdrop-filter: blur(12px);
 }
 
 .app-logo {
@@ -183,7 +244,7 @@ body.chart-input-resizing * {
 .brand-title {
   position: relative;
   margin-bottom: 0;
-  background: linear-gradient(95deg, #052e32 0%, #0f766e 30%, #c48222 55%, #6b3f86 76%, #052e32 100%);
+  background: linear-gradient(95deg, #1a1e3a 0%, #8a5c12 28%, #c8a030 50%, #6e4488 72%, #1a1e3a 100%);
   background-size: 220% 100%;
   -webkit-background-clip: text;
   background-clip: text;
@@ -193,7 +254,7 @@ body.chart-input-resizing * {
   font-style: italic;
   font-weight: 900;
   line-height: 1;
-  text-shadow: 0 10px 24px rgba(7, 59, 64, 0.16);
+  text-shadow: 0 10px 24px rgba(26, 20, 4, 0.18);
   animation: vednetra-title-shimmer 6s ease-in-out infinite;
 }
 
@@ -204,7 +265,7 @@ body.chart-input-resizing * {
   height: 3px;
   margin-top: 7px;
   border-radius: 999px;
-  background: linear-gradient(90deg, rgba(5, 46, 50, 0), #c48222, rgba(5, 46, 50, 0));
+  background: linear-gradient(90deg, rgba(26, 30, 58, 0), #c8a030, rgba(26, 30, 58, 0));
   transform-origin: center;
   animation: vednetra-title-line 4.8s ease-in-out infinite;
 }
@@ -284,7 +345,7 @@ h4 {
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 3px 10px;
-  background: #f2fbeb;
+  background: linear-gradient(180deg, #fdf6e0, #f5e8be);
   color: var(--muted);
   font-size: 12px;
   font-weight: 700;
@@ -314,7 +375,7 @@ fieldset {
   padding: 14px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: rgba(255, 253, 247, 0.72);
+  background: rgba(253, 248, 238, 0.75);
 }
 
 fieldset:nth-of-type(4n+1) {
@@ -357,10 +418,10 @@ select,
 textarea {
   width: 100%;
   min-height: 40px;
-  border: 1px solid #c5d6b6;
+  border: 1px solid #c4a254;
   border-radius: 6px;
   padding: 9px 10px;
-  background: #fffefa;
+  background: #fffbf0;
   color: var(--ink);
   font: inherit;
 }
@@ -373,7 +434,7 @@ input:focus,
 select:focus,
 textarea:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+  box-shadow: 0 0 0 3px rgba(138, 92, 18, 0.15);
   outline: 0;
 }
 
@@ -405,14 +466,14 @@ textarea:focus {
 .report-download-panel {
   margin-top: 12px;
   padding: 12px;
-  border: 1px solid #c8ddb8;
+  border: 1px solid #c8a84e;
   border-radius: 8px;
-  background: linear-gradient(135deg, #f7fbef, #fff8e6);
+  background: linear-gradient(135deg, #fdf6e0, #f8eec8);
 }
 
 .report-download-head {
   margin-bottom: 8px;
-  color: #285f3d;
+  color: #58390a;
   font-size: 13px;
   font-weight: 800;
 }
@@ -430,8 +491,8 @@ textarea:focus {
 }
 
 .chart-start-section {
-  border-color: #a9d58f;
-  background: linear-gradient(180deg, #f7fbef, #fffdf4);
+  border-color: #c8a84e;
+  background: linear-gradient(180deg, #fdf6e0, #faf0d0);
 }
 
 .chart-mode-actions {
@@ -492,10 +553,10 @@ textarea:focus {
 
 button {
   min-height: 40px;
-  border: 1px solid #b8d4aa;
+  border: 1px solid #c4a254;
   border-radius: 6px;
   padding: 8px 13px;
-  background: #fffdf4;
+  background: linear-gradient(180deg, #fdf8ee, #f5eccc);
   color: var(--ink);
   font: inherit;
   font-weight: 800;
@@ -583,18 +644,19 @@ button:hover {
 
 .chart-data-nav {
   position: sticky;
-  top: 68px;
-  z-index: 4;
+  top: 0;           /* stick to very top of the output panel — always in view */
+  z-index: 20;      /* above worksheet content */
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 8px;
-  max-width: 1180px;
-  margin: -8px auto 16px;
-  padding: 8px;
-  border: 1px solid #d8e6c5;
-  border-radius: 8px;
-  background: rgba(247, 251, 239, 0.95);
-  backdrop-filter: blur(8px);
+  max-width: none;
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border: 1px solid rgba(200, 168, 78, 0.65);
+  border-radius: 0 0 10px 10px;  /* flat top (touches panel edge), rounded bottom */
+  background: linear-gradient(180deg, rgba(26, 28, 50, 0.97), rgba(20, 22, 44, 0.96));
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
 }
 
 .chart-data-nav.hidden {
@@ -611,10 +673,10 @@ button:hover {
   min-height: 34px;
   margin: 0;
   padding: 7px 10px;
-  border: 1px solid #d5b66c;
+  border: 1px solid rgba(200, 168, 78, 0.45);
   border-radius: 7px;
-  background: linear-gradient(180deg, #fffaf0, #f9efd6);
-  color: #70531c;
+  background: linear-gradient(180deg, rgba(42, 38, 68, 0.9), rgba(32, 28, 58, 0.95));
+  color: #d4a840;
   font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.14em;
@@ -622,7 +684,7 @@ button:hover {
   text-align: center;
   text-transform: uppercase;
   white-space: normal;
-  box-shadow: 0 4px 10px rgba(86, 55, 9, 0.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.28);
 }
 
 .nav-category-actions {
@@ -633,15 +695,15 @@ button:hover {
   display: none;
   flex-direction: column;
   flex-wrap: nowrap;
-  gap: 6px;
+  gap: 5px;
   width: max-content;
   min-width: min(220px, calc(100vw - 32px));
   max-width: min(320px, calc(100vw - 32px));
   padding: 8px;
-  border: 1px solid rgba(215, 181, 106, 0.68);
+  border: 1px solid rgba(200, 168, 78, 0.55);
   border-radius: 8px;
-  background: rgba(255, 246, 223, 0.98);
-  box-shadow: 0 12px 26px rgba(86, 55, 9, 0.18);
+  background: linear-gradient(180deg, rgba(22, 24, 44, 0.99), rgba(18, 20, 40, 0.98));
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.42);
 }
 
 .nav-category-open .nav-category-actions {
@@ -649,9 +711,9 @@ button:hover {
 }
 
 .nav-category-open .nav-category-title {
-  border-color: #111832;
-  background: #111832;
-  color: #fffaf0;
+  border-color: #c8a030;
+  background: linear-gradient(180deg, #8a5c12, #58390a);
+  color: #ffe8a0;
 }
 
 .nav-category:nth-of-type(4) .nav-category-actions,
@@ -666,22 +728,37 @@ button:hover {
   min-width: 0;
   justify-content: flex-start;
   text-align: left;
+  border-color: rgba(200, 168, 78, 0.3);
+  background: rgba(40, 36, 64, 0.6);
+  color: #d0c0a0;
+}
+
+.nav-category-actions button:hover {
+  border-color: rgba(200, 168, 78, 0.65);
+  background: rgba(138, 92, 18, 0.45);
+  color: #ffd880;
 }
 
 .chart-data-nav button {
   min-height: 31px;
   padding: 5px 9px;
-  border-color: #b8d4aa;
-  background: #fffefa;
-  color: #26342b;
+  border-color: rgba(200, 168, 78, 0.35);
+  background: rgba(40, 36, 64, 0.7);
+  color: #d0c0a0;
   font-size: 12px;
   white-space: nowrap;
 }
 
+.chart-data-nav button:hover {
+  border-color: rgba(200, 168, 78, 0.65);
+  background: rgba(138, 92, 18, 0.4);
+  color: #ffd880;
+}
+
 .chart-data-nav button.active {
-  border-color: var(--accent-strong);
-  background: #e8f6df;
-  color: #1d5b38;
+  border-color: #c8a030;
+  background: linear-gradient(180deg, #8a5c12, #6a4208);
+  color: #ffe888;
 }
 
 #chartDataReportView [id^="viewA-"] {
@@ -705,10 +782,10 @@ button:hover {
   gap: 12px;
   margin-bottom: 10px;
   padding: 7px 12px 7px 8px;
-  border: 1px solid rgba(196, 138, 43, 0.32);
+  border: 1px solid rgba(200, 168, 78, 0.45);
   border-radius: 999px;
-  background: linear-gradient(95deg, rgba(243, 251, 239, 0.96), rgba(255, 248, 230, 0.9), rgba(242, 248, 255, 0.88));
-  box-shadow: 0 12px 28px rgba(45, 64, 34, 0.1);
+  background: linear-gradient(95deg, rgba(253, 248, 238, 0.98), rgba(250, 242, 216, 0.95), rgba(232, 238, 248, 0.9));
+  box-shadow: 0 12px 28px rgba(24, 15, 4, 0.12);
 }
 
 .report-brand-logo {
@@ -720,7 +797,7 @@ button:hover {
 
 .report-brand-title {
   margin: 0;
-  background: linear-gradient(95deg, #052e32, #0f766e 35%, #c48222 62%, #6b3f86);
+  background: linear-gradient(95deg, #1a1e3a, #8a5c12 35%, #c8a030 62%, #6e4488);
   background-size: 180% 100%;
   -webkit-background-clip: text;
   background-clip: text;
@@ -730,7 +807,7 @@ button:hover {
   font-style: italic;
   font-weight: 900;
   line-height: 1;
-  text-shadow: 0 8px 18px rgba(7, 59, 64, 0.12);
+  text-shadow: 0 8px 18px rgba(24, 15, 4, 0.12);
 }
 
 .section {
@@ -766,7 +843,7 @@ button:hover {
 }
 
 .chart-panel-featured .north-chart {
-  max-width: 560px;
+  max-width: min(640px, 100%);
 }
 
 .sudarshan-panel {
@@ -825,7 +902,7 @@ button:hover {
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 14px;
-  background: rgba(255, 253, 247, 0.92);
+  background: rgba(253, 248, 238, 0.94);
 }
 
 .panel-box:nth-child(4n+1) {
@@ -895,9 +972,9 @@ button:hover {
 }
 
 .table-top-button {
-  border: 1px solid rgba(112, 142, 82, 0.42);
-  background: #f4fbef;
-  color: #2f5b2f;
+  border: 1px solid rgba(200, 168, 78, 0.42);
+  background: #fdf5e0;
+  color: #5a3a0a;
   border-radius: 999px;
   padding: 6px 11px;
   font-size: 12px;
@@ -989,8 +1066,8 @@ button:hover {
   display: grid;
   gap: 2px;
   overflow-x: auto;
-  border: 1px solid #9fd074;
-  background: #f7fbef;
+  border: 1px solid #c8a84e;
+  background: #fefbec;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -1003,19 +1080,19 @@ button:hover {
 }
 
 .dasha-panel {
-  background: #fffff2 !important;
+  background: #fefbec !important;
 }
 
 .dasha-titlebar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border: 1px solid #91c86b;
+  border: 1px solid #c8a84e;
   border-radius: 8px 8px 0 0;
-  padding: 2px 5px;
-  background: linear-gradient(90deg, #fffff2, #eefbdc);
-  color: #1e481f;
-  font: 20px/1.05 Georgia, "Times New Roman", serif;
+  padding: 4px 8px;
+  background: linear-gradient(90deg, #1c1e3c, #22244a);
+  color: #d4a840;
+  font: 18px/1.1 Georgia, "Times New Roman", serif;
 }
 
 .dasha-titlebar span {
@@ -1028,11 +1105,11 @@ button:hover {
   place-items: center;
   width: 34px;
   min-height: 22px;
-  border-color: #65b5d7;
+  border-color: #c8a84e;
   border-radius: 999px;
   padding: 0;
-  background: linear-gradient(#3db5e4, #1679b5);
-  color: #fff;
+  background: linear-gradient(180deg, #8a5c12, #58390a);
+  color: #ffe888;
   font-size: 13px;
 }
 
@@ -1045,11 +1122,11 @@ button:hover {
   max-width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 3px 12px;
-  background: #fffff2;
-  color: #2d4432;
+  padding: 4px 12px;
+  background: #fefbec;
+  color: #1a1e38;
   cursor: pointer;
-  font: 18px/1.25 Georgia, "Times New Roman", serif;
+  font: 17px/1.25 Georgia, "Times New Roman", serif;
   white-space: nowrap;
   -webkit-overflow-scrolling: touch;
 }
@@ -1088,7 +1165,7 @@ button:hover {
 .dasha-ad summary {
   padding-left: 22px;
   font-size: 16px;
-  background: #f7fbef;
+  background: #faf5e0;
 }
 
 .dasha-pd summary {
@@ -1110,7 +1187,7 @@ button:hover {
 }
 
 .transit-chart-grid {
-  grid-template-columns: minmax(240px, 380px) minmax(240px, 380px) minmax(0, 1fr);
+  grid-template-columns: minmax(min(240px, 100%), 380px) minmax(min(240px, 100%), 380px) minmax(0, 1fr);
   align-items: start;
 }
 
@@ -1119,7 +1196,7 @@ button:hover {
 }
 
 .transit-chart-grid .chart-panel .north-chart {
-  max-width: 380px;
+  max-width: min(380px, 100%);
 }
 
 .hora-panel {
@@ -1156,7 +1233,7 @@ button:hover {
 }
 
 .sav-panel {
-  background: #fffff2 !important;
+  background: #fefbec !important;
 }
 
 .sav-table-wrap {
@@ -1184,7 +1261,7 @@ button:hover {
 }
 
 .sav-table th {
-  background: #fffff2;
+  background: #fdf3d8;
   color: #111;
   font-size: 16px;
   font-weight: 400;
@@ -1211,7 +1288,7 @@ button:hover {
 }
 
 .output-library-section {
-  background: linear-gradient(180deg, #fbfff5, #fffaf0);
+  background: linear-gradient(180deg, #fdf8ee, #f8f0dc);
 }
 
 .output-library-grid {
@@ -1231,10 +1308,10 @@ button:hover {
 .module-column h4 {
   margin: 0;
   padding: 6px 8px;
-  border-bottom: 1px solid #9aa3a7;
-  background: #eef6e8;
-  color: #111;
-  font-size: 16px;
+  border-bottom: 1px solid #c8a84e;
+  background: linear-gradient(180deg, #1c1e3c, #141630);
+  color: #d4a840;
+  font-size: 14px;
 }
 
 .module-list {
@@ -1349,10 +1426,11 @@ td {
 }
 
 th {
-  color: #31444f;
-  background: #edf7e7;
+  color: #1a1e38;
+  background: linear-gradient(180deg, #f5ead8, #eedfc8);
   font-size: 12px;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 tr:last-child td {
@@ -1364,10 +1442,10 @@ tr:last-child td {
   grid-template-columns: repeat(4, minmax(82px, 1fr));
   grid-template-rows: repeat(4, minmax(82px, auto));
   gap: 0;
-  border: 1px solid var(--line);
+  border: 2px solid #c8a84e;
   border-radius: 8px;
   overflow: hidden;
-  background: #fffefa;
+  background: #fffdf0;
 }
 
 .chart-cell {
@@ -1412,13 +1490,13 @@ tr:last-child td {
 .north-chart {
   display: block;
   width: 100%;
-  max-width: 430px;
+  max-width: clamp(300px, 100%, 560px);
   aspect-ratio: 1;
   margin: 8px auto 0;
   background: var(--paper);
   border: 1px solid #80c36b;
   border-radius: 4px;
-  box-shadow: inset 0 0 0 3px rgba(132, 207, 101, 0.16);
+  box-shadow: inset 0 0 0 3px rgba(200, 168, 78, 0.22);
 }
 
 .north-chart rect,
@@ -1456,18 +1534,19 @@ tr:last-child td {
 }
 
 .chart-panel {
-  border-color: #94ce7b;
-  background: #fffdf4 !important;
+  border-color: #c8a84e;
+  background: #fefbef !important;
 }
 
 .chart-title-strip {
   margin: -8px -8px 8px;
-  border: 1px solid #8fcd75;
-  border-radius: 8px;
-  padding: 3px 8px;
-  background: #fffdf4;
-  color: #18261c;
-  font: 20px/1.15 Georgia, "Times New Roman", serif;
+  border: 1px solid #c8a84e;
+  border-radius: 8px 8px 0 0;
+  padding: 5px 10px;
+  background: linear-gradient(180deg, #1c1e3c, #141630);
+  color: #d4a840;
+  font: 18px/1.2 Georgia, "Times New Roman", serif;
+  letter-spacing: 0.02em;
 }
 
 .chart-meta-compact {
@@ -1800,11 +1879,11 @@ tr:last-child td {
   }
 
   .top-chart-section .chart-panel {
-    min-height: 460px;
+    min-height: auto;
   }
 
   .top-chart-section .north-chart {
-    min-height: 400px;
+    min-height: auto;
   }
 
   .grid-2,
@@ -2012,7 +2091,7 @@ tr:last-child td {
 }
 
 /* =========================================================================
-   v33 additions: lazy-render section placeholders + Bhinnashtakavarga
+   VedNetra additions: lazy-render section placeholders + Bhinnashtakavarga
    ========================================================================= */
 
 .section-pending {
@@ -2072,7 +2151,7 @@ tr:last-child td {
 
 .bav-summary-panel,
 .bav-prastara-panel {
-  background: #fffff2 !important;
+  background: #fefbec !important;
   margin-bottom: 12px;
 }
 
@@ -2152,7 +2231,7 @@ tr:last-child td {
 }
 
 /* =========================================================================
-   v37 theme: Build 32 editorial cream/navy/gold visual system
+   VedNetra theme: editorial cream/navy/gold visual system
    ========================================================================= */
 
 :root {
@@ -2544,12 +2623,12 @@ body.report-active .focus-mode-rail {
   display: grid;
   gap: 8px;
   width: 198px;
-  border: 1px solid #d7b56a;
+  border: 1px solid #c8a84e;
   border-right: 0;
   border-radius: 12px 0 0 12px;
   padding: 10px;
-  background: rgba(255, 250, 240, 0.98);
-  box-shadow: 0 16px 36px rgba(54, 39, 10, 0.2);
+  background: rgba(253, 248, 238, 0.98);
+  box-shadow: 0 16px 36px rgba(26, 15, 4, 0.22);
 }
 
 .focus-rail-panel button {
@@ -2690,6 +2769,22 @@ body.focus-mode.report-active.report-view-chartData .chart-data-nav:not(.hidden)
   z-index: 900;
   max-width: none;
   margin: 0 0 8px;
+}
+
+/* Layout bar (HIDE INPUT / TIME TOOL) sticks below the nav in fullscreen */
+body.focus-mode .chart-input-layout-bar:not(.hidden) {
+  position: sticky;
+  top: 56px;
+  z-index: 899;
+  max-width: none;
+  margin: 0 0 10px;
+}
+
+/* In fullscreen, also stick the worksheet topbar below those two */
+body.focus-mode .worksheet-topbar {
+  position: sticky;
+  top: 108px;
+  z-index: 898;
 }
 
 body.focus-mode .report,
@@ -2859,7 +2954,7 @@ body.focus-mode .focus-mode-rail:focus-within {
   }
 }
 
-/* v46 professional consistency pass */
+/* VedNetra professional consistency pass */
 .report,
 .report-view,
 #chartDataReportView {
@@ -3332,7 +3427,7 @@ body.focus-mode .output-panel {
   }
 }
 
-/* v47 movable and mouse-resizable focus panel */
+/* VedNetra movable and mouse-resizable focus panel */
 .panel-focus-popup {
   right: 52px;
   bottom: 18px;
@@ -3402,7 +3497,7 @@ body.focus-mode .output-panel {
   }
 }
 
-/* v48 compact expansion and dasha/prana table consistency */
+/* VedNetra compact expansion and dasha/prana table consistency */
 #chartDataReportView details,
 .panel-focus-popup-body details {
   max-width: 100%;
@@ -3573,7 +3668,7 @@ body.focus-mode .output-panel {
   }
 }
 
-/* v51 sticky VedNetra header and top primary charts */
+/* VedNetra sticky header and top primary charts */
 .brand-row {
   position: sticky;
   top: -22px;
@@ -3610,15 +3705,15 @@ body.focus-mode .output-panel {
   }
 
   .top-chart-section .chart-panel {
-    min-height: 460px;
+    min-height: auto;
   }
 
   .top-chart-section .north-chart {
-    min-height: 400px;
+    min-height: auto;
   }
 }
 
-/* v52 chart, table and section interaction polish */
+/* VedNetra chart, table and section interaction polish */
 #chartDataReportView .section-collapsible > .section-head {
   cursor: pointer;
 }
@@ -3720,12 +3815,21 @@ body.focus-mode .output-panel {
 }
 
 .chart-input-layout-bar {
+  position: sticky;
+  top: 56px;                    /* sit immediately below the sticky nav (~56px tall) */
+  z-index: 19;                  /* just below nav (nav is 20) */
   display: flex;
   justify-content: flex-end;
   gap: 8px;
-  max-width: 1180px;
-  margin: -6px auto 14px;
-  padding: 8px 0 0;
+  max-width: none;
+  margin: 0 0 12px;
+  padding: 8px 10px;
+  border: 1px solid rgba(200, 168, 78, 0.45);
+  border-top: 0;
+  border-radius: 0 0 8px 8px;
+  background: linear-gradient(180deg, rgba(253, 248, 238, 0.97), rgba(250, 244, 225, 0.94));
+  backdrop-filter: blur(10px);
+  box-shadow: 0 6px 16px rgba(24, 15, 4, 0.12);
 }
 
 .chart-input-layout-bar.hidden {
@@ -4168,7 +4272,7 @@ body.chart-input-collapsed .chart-input-layout-bar {
   }
 }
 
-/* v59 responsive small-screen fit: shrink dense views before horizontal scroll */
+/* VedNetra responsive small-screen fit: shrink dense views before horizontal scroll */
 @media (max-width: 1200px) {
   body {
     font-size: clamp(12.5px, 1.2vw, 14.4px);
@@ -4353,7 +4457,7 @@ body.chart-input-collapsed .chart-input-layout-bar {
   }
 }
 
-/* v60 Vimshottari popup rows: fit dates and controls without per-row scrollbars */
+/* VedNetra Vimshottari popup rows: fit dates and controls without per-row scrollbars */
 .dasha-group-list,
 .dasha-panel .dasha-group-list,
 .panel-focus-popup-body .focus-popup-dasha-panel .dasha-group-list {
@@ -4453,7 +4557,7 @@ body.chart-input-collapsed .chart-input-layout-bar {
   }
 }
 
-/* v61 full-app overflow containment for compact panels and reports */
+/* VedNetra full-app overflow containment for compact panels and reports */
 html,
 body {
   max-width: 100%;
@@ -4611,10 +4715,7 @@ button {
   }
 }
 
-/* v62 worksheet templates */
-.worksheets-section {
-  background: linear-gradient(180deg, rgba(255, 253, 244, 0.96), rgba(246, 251, 240, 0.92));
-}
+/* VedNetra worksheet templates - background handled by new viewport-fit rule below */
 
 .worksheet-controls {
   display: grid;
@@ -4638,8 +4739,10 @@ button {
 }
 
 .worksheet-page {
-  border: 1px solid #97c76d;
-  background: #ffffea;
+  border: 1px solid #c8a84e;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fdf9ec;
 }
 
 .worksheet-header {
@@ -4647,12 +4750,13 @@ button {
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 10px;
   align-items: center;
-  min-height: 24px;
-  border-bottom: 1px solid #a8d778;
-  padding: 3px 7px;
-  background: #f3f3f3;
-  color: #000;
-  font: 16px/1.1 Georgia, "Times New Roman", serif;
+  min-height: 28px;
+  border-bottom: 2px solid rgba(200, 168, 78, 0.55);
+  padding: 5px 10px;
+  background: linear-gradient(180deg, #1c1e3c, #161830);
+  color: #d4a840;
+  font: 15px/1.15 Georgia, "Times New Roman", serif;
+  letter-spacing: 0.02em;
 }
 
 .worksheet-header span {
@@ -4662,25 +4766,31 @@ button {
 }
 
 .worksheet-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  align-content: flex-start;
+  gap: 6px;
   padding: 6px;
   background:
-    linear-gradient(rgba(255, 255, 238, 0.92), rgba(255, 255, 238, 0.92)),
-    repeating-linear-gradient(45deg, rgba(160, 190, 110, 0.12) 0 18px, rgba(255, 255, 238, 0.12) 18px 36px);
+    linear-gradient(rgba(253, 248, 226, 0.94), rgba(252, 244, 218, 0.94)),
+    repeating-linear-gradient(45deg, rgba(200, 168, 78, 0.08) 0 18px, rgba(253, 248, 226, 0.08) 18px 36px);
 }
+
+/* .worksheet-grid > * rules are in the viewport-fit block at end of file */
 
 .worksheet-grid .chart-panel,
 .worksheet-grid .panel-box {
   margin: 0;
-  border-radius: 0;
+  border-radius: 4px;
   box-shadow: none;
-  background: #ffffea;
+  background: #fefbec;
 }
 
 .worksheet-span-all {
-  grid-column: 1 / -1;
+  /* Default: full row width — but no !important so JS drag-resize can override */
+  flex: 0 0 auto;
+  width: 100%;
 }
 
 .worksheet-varshfal-years-label {
@@ -4704,18 +4814,17 @@ button {
 }
 
 .worksheet-grid .chart-title-strip {
-  border-color: #83cf5a;
-  border-radius: 8px 8px 0 0;
-  background: #fffff3;
-  color: #000;
-  font: 24px/1.05 Georgia, "Times New Roman", serif;
+  border-color: #c8a84e;
+  border-radius: 4px 4px 0 0;
+  background: linear-gradient(180deg, #1a1c38, #141630);
+  color: #d4a840;
+  font: 20px/1.05 Georgia, "Times New Roman", serif;
 }
 
 .worksheet-grid .north-chart {
-  width: 100%;
-  max-width: none;
-  border-color: #000;
-  background: #ffffea;
+  /* size rules are in the viewport-fit block at end of file */
+  border-color: #1a1c38;
+  background: #fefbec;
 }
 
 .worksheet-grid .d1-details-table-panel,
@@ -4829,13 +4938,15 @@ button {
   table-layout: auto;
 }
 
-.worksheet-template-lordships .worksheet-grid,
-.worksheet-template-kp .worksheet-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+/* Lordships / KP: wider default panels (~2 per row) */
+.worksheet-template-lordships .worksheet-grid > *,
+.worksheet-template-kp .worksheet-grid > * {
+  width: calc(50% - 5px);
 }
 
-.worksheet-template-dasha .worksheet-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+/* Dasha: compact default (~3 per row) */
+.worksheet-template-dasha .worksheet-grid > * {
+  width: calc(33.33% - 5px);
 }
 
 .worksheet-metric-rows {
@@ -4844,11 +4955,12 @@ button {
 }
 
 @media (max-width: 980px) {
-  .worksheet-grid,
-  .worksheet-template-lordships .worksheet-grid,
-  .worksheet-template-kp .worksheet-grid,
-  .worksheet-template-dasha .worksheet-grid {
-    grid-template-columns: minmax(0, 1fr);
+  /* Worksheet is flex-wrap; on narrow screens make all panels full width */
+  .worksheet-grid > *,
+  .worksheet-template-lordships .worksheet-grid > *,
+  .worksheet-template-kp .worksheet-grid > *,
+  .worksheet-template-dasha .worksheet-grid > * {
+    width: 100%;
   }
 
   .worksheet-lordship-list {
@@ -4857,10 +4969,1658 @@ button {
   }
 
   .worksheet-grid .chart-title-strip {
-    font-size: 18px;
+    font-size: 17px;
   }
 
   .worksheet-dasha-panel td {
     font-size: 14px;
+  }
+}
+
+/* ─── Viewport-fit worksheet mode ─────────────────────────────────────────── */
+/* Old container-query block removed — replaced by viewport-height rules below */
+
+@container (min-width: 960px) {
+  .worksheet-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+  }
+}
+
+/* ─── Section head improvements ───────────────────────────────────────────── */
+.section-head {
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid rgba(200, 168, 78, 0.35);
+}
+
+.section-head h3,
+.section-head h2 {
+  color: var(--blue);
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+/* ─── Varga grid compact on output panel ──────────────────────────────────── */
+@media (min-width: 1200px) {
+  .varga-chart-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+/* ─── Print: worksheet prints cleanly in portrait ─────────────────────────── */
+@media print {
+  .worksheet-grid {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .worksheet-grid > * {
+    width: calc(33.33% - 6px);
+    overflow: visible;
+    resize: none;
+  }
+
+  .worksheet-page {
+    break-inside: avoid;
+  }
+}
+
+/* ─── Scrollable dasha within worksheet cells ─────────────────────────────── */
+.worksheet-grid .worksheet-dasha-panel,
+.worksheet-grid .d1-details-table-panel {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.worksheet-grid .worksheet-dasha-panel .dasha-group-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* ─── Resize handle polish ─────────────────────────────────────────────────── */
+.chart-input-resize-handle::before {
+  border-color: rgba(200, 168, 78, 0.68);
+  background:
+    radial-gradient(circle at 50% 16px, #8a5c12 0 1.8px, transparent 2.2px),
+    radial-gradient(circle at 50% 27px, #8a5c12 0 1.8px, transparent 2.2px),
+    radial-gradient(circle at 50% 38px, #8a5c12 0 1.8px, transparent 2.2px),
+    linear-gradient(180deg, #fdf6e0, #e8d4a0);
+  box-shadow: 0 6px 15px rgba(70, 40, 8, 0.2);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   WORKSHEET — TOP BAR (replaces inline controls block)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.worksheet-topbar {
+  position: sticky;
+  top: 108px;                 /* below nav (56px) + layout bar (52px) */
+  z-index: 18;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  margin-bottom: 6px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #1c1e3c, #141630);
+  border: 1px solid rgba(200, 168, 78, 0.45);
+  flex-shrink: 0;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.32);
+}
+
+.worksheet-topbar-label {
+  flex: 1;
+  color: #c8a84e;
+  font: 700 13px Georgia, serif;
+  letter-spacing: 0.04em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.worksheet-topbar-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* Utility buttons in the worksheet topbar */
+.ws-util-btn {
+  min-height: 30px;
+  padding: 4px 11px;
+  border: 1px solid rgba(200, 168, 78, 0.38);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #c8a84e;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 120ms, border-color 120ms, color 120ms;
+}
+
+.ws-util-btn:hover {
+  border-color: rgba(200, 168, 78, 0.7);
+  background: rgba(200, 168, 78, 0.18);
+  color: #ffe888;
+}
+
+.worksheet-cfg-btn {
+  min-height: 32px;
+  padding: 5px 14px;
+  border: 1px solid rgba(200, 168, 78, 0.6);
+  border-radius: 6px;
+  background: linear-gradient(180deg, #8a5c12, #58390a);
+  color: #ffe888;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.worksheet-cfg-btn:hover {
+  background: linear-gradient(180deg, #a06d18, #6a4510);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   WORKSHEET — CONFIGURATION POPUP OVERLAY
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.worksheet-controls-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 800;
+  background: rgba(10, 10, 24, 0.72);
+  backdrop-filter: blur(5px);
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 60px;
+}
+
+.worksheet-controls-overlay.is-open {
+  display: flex;
+}
+
+.worksheet-controls-overlay-box {
+  width: min(700px, calc(100vw - 32px));
+  max-height: calc(100dvh - 100px);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(200, 168, 78, 0.55);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+  animation: ws-popup-in 180ms ease;
+}
+
+@keyframes ws-popup-in {
+  from { opacity: 0; transform: translateY(-12px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.worksheet-controls-overlay-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  background: linear-gradient(180deg, #1c1e3c, #141630);
+  border-bottom: 1px solid rgba(200, 168, 78, 0.4);
+  color: #d4a840;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.worksheet-cfg-close-btn {
+  min-height: 30px;
+  padding: 4px 12px;
+  border: 1px solid rgba(200, 168, 78, 0.4);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #c8a84e;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.worksheet-cfg-close-btn:hover {
+  background: rgba(200, 168, 78, 0.18);
+  color: #ffe888;
+}
+
+.worksheet-controls-overlay-body {
+  overflow-y: auto;
+  flex: 1;
+  padding: 16px;
+  background: linear-gradient(180deg, #fdf8ee, #f8f0dc);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   WORKSHEET — FULL-VIEWPORT-HEIGHT CANVAS
+   Charts auto-fill available height so nothing needs scrolling
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* The worksheets section becomes a full-height flex column */
+.worksheets-section {
+  display: flex;
+  flex-direction: column;
+  /* No fixed height — let content scroll naturally.
+     Topbar is slim so the charts get almost all the vertical space. */
+  height: auto;
+  min-height: 0;
+  margin-top: 4px;
+  padding-top: 0;
+  border-top: 0;
+}
+
+#worksheetCanvasMount {
+  display: block;
+}
+
+.worksheet-page {
+  border: 1px solid #c8a84e;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fdf9ec;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   WORKSHEET GRID — flex-wrap layout so every panel is freely resizable
+   Width and height set by JS drag handle work on flex items directly.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── KEY: flex: 0 0 auto means the flex algorithm does NOT grow or shrink items.
+   The panel's actual rendered width = its CSS/inline width property directly.
+   JS drag sets panel.style.width = "Xpx" and it takes effect immediately.    ── */
+.worksheet-grid > * {
+  position: relative;
+  flex: 0 0 auto;                  /* NO flex-grow, NO flex-shrink — width is direct */
+  width: calc(33.33% - 5px);      /* default: ~3 panels per row */
+  min-width: 200px;
+  min-height: 200px;
+  box-sizing: border-box;
+  /* Native CSS resize as fallback */
+  resize: both;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Resize grip indicator (gold dot-grid in bottom-right corner) */
+.worksheet-grid > *::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 5px  5px,  rgba(200,168,78,.65) 0 2px, transparent 2.5px),
+    radial-gradient(circle at 12px 5px,  rgba(200,168,78,.65) 0 2px, transparent 2.5px),
+    radial-gradient(circle at 5px  12px, rgba(200,168,78,.65) 0 2px, transparent 2.5px),
+    radial-gradient(circle at 12px 12px, rgba(200,168,78,.65) 0 2px, transparent 2.5px);
+  z-index: 5;
+}
+
+/* Chart panels: fill their cell, centre the SVG */
+.worksheet-grid .chart-panel {
+  display: grid !important;
+  grid-template-rows: auto 1fr;
+  background: #fefbec !important;
+  padding: 0 !important;
+}
+
+/* Title strip spans full panel width */
+.worksheet-grid .chart-title-strip {
+  margin: 0;
+  border-radius: 4px 4px 0 0;
+  font-size: 17px;
+}
+
+/* Chart SVG — fills the column and maintains square aspect ratio.
+   Width is the primary driver; height follows via aspect-ratio.
+   No viewport-height constraints → no clipping. */
+.worksheet-grid .north-chart {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100% !important;
+  aspect-ratio: 1 !important;
+  margin: 6px auto;
+}
+
+/* Dasha / detail panels: natural scroll */
+.worksheet-grid .worksheet-dasha-panel,
+.worksheet-grid .d1-details-table-panel,
+.worksheet-grid .mudda-dasha-panel {
+  display: flex;
+  flex-direction: column;
+  padding: 0 !important;
+}
+
+.worksheet-grid .dasha-titlebar {
+  flex-shrink: 0;
+}
+
+.worksheet-grid .dasha-group-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.worksheet-grid .worksheet-dasha-panel table,
+.worksheet-grid .d1-details-table-panel table {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+}
+
+/* Generic panel-box */
+.worksheet-grid .panel-box {
+  overflow: auto;
+}
+
+.worksheet-grid .worksheet-varshfal-series {
+  overflow: auto;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   WORKSHEET — PRINT
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media print {
+  .worksheets-section { height: auto; }
+
+  .worksheet-controls-overlay,
+  .worksheet-topbar { display: none !important; }
+
+  .worksheet-grid > * { resize: none; overflow: visible; }
+  .worksheet-grid > *::after { display: none; }
+
+  .worksheet-grid .north-chart {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   WORKSHEET — CUSTOM DRAG-RESIZE HANDLE
+   Injected via JS into each .worksheet-grid child panel
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.ws-drag-handle {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: nwse-resize;
+  z-index: 10;
+  border-radius: 4px 0 4px 0;
+  background: linear-gradient(135deg, transparent 40%, rgba(200,168,78,0.18) 40%);
+  color: rgba(200,168,78,0.9);
+  font-size: 16px;
+  line-height: 1;
+  touch-action: none;
+  user-select: none;
+  transition: background 120ms, color 120ms;
+}
+
+.ws-drag-handle:hover {
+  background: linear-gradient(135deg, transparent 30%, rgba(200,168,78,0.38) 30%);
+  color: #c8a84e;
+}
+
+/* While dragging, hide default resize cursor on whole grid */
+body.ws-resizing * {
+  cursor: nwse-resize !important;
+  user-select: none !important;
+}
+
+/* Remove the CSS ::after grip dots when JS handle is present */
+.worksheet-grid > *:has(.ws-drag-handle)::after {
+  display: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TOAST NOTIFICATION — non-blocking, fullscreen-safe
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.vednetra-toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  z-index: 9999;
+  padding: 11px 22px;
+  border: 1px solid rgba(200, 168, 78, 0.6);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #1c1e3c, #141630);
+  color: #ffe888;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.45);
+  transition: opacity 280ms ease, transform 280ms ease;
+}
+
+.vednetra-toast.vednetra-toast-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PERSISTENT HEADER STACK — final overrides (highest cascade priority)
+   Uses position: fixed so sticky-failure scenarios cannot break it.
+   Affects: top nav, layout bar, worksheet topbar.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+body.report-active .output-panel {
+  padding-top: 172px;
+}
+
+/* Opaque backdrop bar — covers the gap between the three fixed headers.
+   When input panel is visible: backdrop starts AFTER the input column so the
+   VedNetra logo/brand row in the input panel remains visible.
+   When input is hidden (or fullscreen): backdrop spans full width. */
+body.report-active::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: calc(var(--chart-input-width, min(30vw, 400px)) + 50px);
+  right: 0;
+  height: 172px;
+  z-index: 8990;
+  pointer-events: none;
+  background: linear-gradient(180deg,
+    rgba(237, 229, 208, 0.99) 0%,
+    rgba(237, 229, 208, 0.98) 60%,
+    rgba(237, 229, 208, 0.96) 100%);
+  border-bottom: 1px solid rgba(200, 168, 78, 0.45);
+  box-shadow: 0 6px 18px rgba(24, 15, 4, 0.18);
+}
+
+/* When input is hidden or fullscreen: backdrop spans full width */
+body.chart-input-collapsed.report-active::before,
+body.focus-mode.report-active::before {
+  left: 0;
+}
+
+body.report-active.report-view-chartData
+  #chartDataNavRibbon:not(.hidden) {
+  position: fixed !important;
+  top: 8px !important;
+  z-index: 9000 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  border-radius: 8px !important;
+}
+
+body.report-active
+  #chartInputLayoutBar:not(.hidden) {
+  position: fixed !important;
+  top: 70px !important;
+  z-index: 8999 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 6px 12px !important;
+  border: 1px solid rgba(200, 168, 78, 0.5);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(253, 248, 238, 0.97), rgba(250, 244, 225, 0.94));
+  backdrop-filter: blur(10px);
+  box-shadow: 0 6px 16px rgba(24, 15, 4, 0.14);
+}
+
+body.report-active .worksheets-section .worksheet-topbar {
+  position: fixed !important;
+  top: 124px !important;
+  z-index: 8998 !important;
+  margin: 0 !important;
+}
+
+/* When input panel is visible (default): header starts after input column */
+body.report-active:not(.chart-input-collapsed):not(.focus-mode)
+  #chartDataNavRibbon:not(.hidden),
+body.report-active:not(.chart-input-collapsed):not(.focus-mode)
+  #chartInputLayoutBar:not(.hidden),
+body.report-active:not(.chart-input-collapsed):not(.focus-mode)
+  .worksheets-section .worksheet-topbar {
+  left: calc(var(--chart-input-width, min(30vw, 400px)) + 60px) !important;
+  right: 30px !important;
+}
+
+/* When input is hidden OR fullscreen: header stretches full width */
+body.chart-input-collapsed.report-active.report-view-chartData
+  #chartDataNavRibbon:not(.hidden),
+body.chart-input-collapsed.report-active
+  #chartInputLayoutBar:not(.hidden),
+body.chart-input-collapsed.report-active .worksheets-section .worksheet-topbar,
+body.focus-mode.report-active.report-view-chartData
+  #chartDataNavRibbon:not(.hidden),
+body.focus-mode.report-active
+  #chartInputLayoutBar:not(.hidden),
+body.focus-mode.report-active .worksheets-section .worksheet-topbar {
+  left: 12px !important;
+  right: 12px !important;
+}
+
+/* Narrow viewports: full-width minus small margins */
+@media (max-width: 1080px) {
+  body.report-active .output-panel {
+    padding-top: 156px;
+  }
+  body.report-active.report-view-chartData #chartDataNavRibbon:not(.hidden),
+  body.report-active #chartInputLayoutBar:not(.hidden),
+  body.report-active .worksheets-section .worksheet-topbar {
+    left: 6px !important;
+    right: 6px !important;
+  }
+}
+
+/* ── NUCLEAR FIX: when input is collapsed, switch workspace from Grid to Block.
+   This bypasses ALL grid column calculations entirely. The output panel becomes
+   a normal full-width block element. No grid weirdness possible.            ── */
+body.chart-input-collapsed .workspace {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  grid-template-columns: unset !important;
+}
+
+body.chart-input-collapsed .input-panel {
+  display: none !important;
+}
+
+body.chart-input-collapsed .output-panel {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+body.chart-input-collapsed .report,
+body.chart-input-collapsed .report-view {
+  width: auto !important;
+  max-width: 1500px !important;
+  margin: 0 auto !important;
+}
+
+/* ── Hide the Hide/Show-Input buttons entirely (both locations).
+   Since users can no longer un-hide the input, force the input panel
+   to always be visible regardless of the chart-input-collapsed class. ── */
+[data-chart-input-toggle],
+#wsToggleInputBtn {
+  display: none !important;
+}
+
+/* SAFETY NET: ensure input panel is ALWAYS visible — the collapse class
+   can never hide it, regardless of stale localStorage state. */
+.input-panel {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* ── Time Tool — force-hide the bottom block.
+   Existing CSS sets display:grid etc on these elements which overrides
+   the HTML `hidden` attribute; we use !important to win the cascade. ── */
+.time-tool-popup .time-tool-mode,
+.time-tool-popup .time-tool-edit-label,
+.time-tool-popup #timeToolCurrentDisplay,
+.time-tool-popup #timeToolAddPickBtn,
+.time-tool-popup #timeToolRemovePickBtn,
+.time-tool-popup #timeToolHelpBtn,
+.time-tool-popup #timeToolStatus {
+  display: none !important;
+}
+
+.time-tool-popup {
+  z-index: 9500 !important;   /* above the fixed header stack (max 9000) */
+}
+
+.time-tool-popup .time-tool-panel {
+  max-height: calc(100dvh - 200px);  /* never taller than viewport minus header */
+  overflow-y: auto;
+}
+
+/* VedNetra final multi-view overrides */
+body.report-active .focus-mode-rail:hover,
+body.report-active .focus-mode-rail:focus-within,
+body.report-active .focus-mode-rail.is-open {
+  width: min(380px, calc(100vw - 18px)) !important;
+}
+
+body.report-active .focus-rail-panel {
+  width: 250px !important;
+  max-height: min(680px, calc(100dvh - 34px)) !important;
+  overflow-y: auto !important;
+}
+
+.panel-focus-popup.is-multi-tiled {
+  min-width: 280px !important;
+  min-height: 220px !important;
+  max-width: calc(100vw - 18px) !important;
+  max-height: calc(100dvh - 18px) !important;
+}
+
+.panel-focus-popup.is-multi-tiled .panel-focus-popup-body {
+  padding: 7px !important;
+  overflow: auto !important;
+}
+
+.panel-focus-popup.is-multi-tiled .north-chart {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1 !important;
+}
+
+/* VedNetra compact multi-view dashboard */
+.focus-mode-rail:hover,
+.focus-mode-rail:focus-within,
+.focus-mode-rail.is-open {
+  width: min(380px, calc(100vw - 18px));
+}
+
+.focus-rail-tab {
+  min-height: 142px;
+}
+
+.focus-rail-panel {
+  width: 250px;
+  max-height: min(680px, calc(100dvh - 34px));
+  overflow-y: auto;
+}
+
+.focus-section-options {
+  display: grid;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(200, 168, 78, 0.48);
+}
+
+.focus-section-options label,
+.focus-reference-options label {
+  display: grid;
+  gap: 5px;
+  color: #202443;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.focus-section-options select,
+.focus-reference-options select {
+  width: 100%;
+  min-height: 34px;
+  border-radius: 8px;
+}
+
+.focus-pinned-sections {
+  display: grid;
+  gap: 7px;
+}
+
+.focus-pinned-section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 5px;
+  align-items: center;
+  padding: 6px;
+  border: 1px solid rgba(200, 168, 78, 0.42);
+  border-radius: 8px;
+  background: rgba(255, 250, 240, 0.74);
+}
+
+.focus-pinned-section span {
+  min-width: 0;
+  overflow: hidden;
+  color: #202443;
+  font-size: 12px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.focus-pinned-section button {
+  min-height: 28px;
+  padding: 5px 8px;
+  font-size: 10px;
+}
+
+.panel-focus-popup.is-multi-tiled {
+  min-width: 280px;
+  min-height: 220px;
+  resize: both;
+}
+
+.panel-focus-popup.is-multi-tiled .panel-focus-popup-shell {
+  border-radius: 8px;
+}
+
+.panel-focus-popup.is-multi-tiled .panel-focus-popup-head {
+  min-height: 34px;
+  padding: 6px 9px;
+}
+
+.panel-focus-popup.is-multi-tiled .panel-focus-popup-title {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.panel-focus-popup.is-multi-tiled .panel-focus-popup-head button {
+  min-height: 28px;
+  padding: 5px 8px;
+  font-size: 10px;
+}
+
+.panel-focus-popup.is-multi-tiled .panel-focus-popup-body {
+  padding: 7px;
+  overflow: auto;
+}
+
+.panel-focus-popup.is-multi-tiled .chart-panel {
+  padding: 6px;
+}
+
+.panel-focus-popup.is-multi-tiled .chart-title-strip {
+  min-height: 26px;
+  padding: 3px 8px;
+  font-size: 13px;
+}
+
+.panel-focus-popup.is-multi-tiled .north-chart {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1;
+}
+
+.panel-focus-popup.is-multi-tiled .north-sign {
+  font-size: clamp(10px, 1.15vw, 16px) !important;
+}
+
+.panel-focus-popup.is-multi-tiled .north-planets {
+  font-size: clamp(9px, 1vw, 14px) !important;
+  line-height: 1.05;
+}
+
+.panel-focus-popup.is-multi-tiled table {
+  font-size: 11px;
+}
+
+.panel-focus-popup.is-multi-tiled th,
+.panel-focus-popup.is-multi-tiled td {
+  padding: 5px 7px;
+}
+
+.panel-focus-popup.is-multi-tiled .dasha-titlebar,
+.panel-focus-popup.is-multi-tiled .dasha-group summary {
+  gap: 6px;
+  padding: 6px 8px;
+  font-size: 12px;
+}
+
+.panel-focus-popup.is-multi-tiled .dasha-level-actions button {
+  min-height: 26px;
+  padding: 4px 7px;
+  font-size: 10px;
+}
+
+@media (max-width: 780px) {
+  .panel-focus-popup.is-multi-tiled {
+    width: calc(100vw - 24px) !important;
+    height: min(360px, calc(100dvh - 120px)) !important;
+    left: 8px !important;
+  }
+
+  .focus-rail-panel {
+    width: min(300px, calc(100vw - 44px));
+  }
+}
+
+.part-a-fullscreen-btn {
+  margin-left: auto;
+}
+
+.part-a-fullscreen-btn.active {
+  border-color: rgba(9, 13, 39, 0.9);
+  background: linear-gradient(180deg, #30345c 0%, #0c102b 100%);
+  color: #fff2c1;
+}
+
+.part-a-identity-strip {
+  flex: 1 1 auto;
+  min-width: 260px;
+  display: none;
+  align-items: center;
+  gap: 14px;
+  min-height: 42px;
+  padding: 6px 14px;
+  border: 3px solid rgba(10, 12, 22, 0.86);
+  border-radius: 0;
+  background: linear-gradient(180deg, rgba(255, 252, 243, 0.96), rgba(247, 236, 209, 0.92));
+  color: #171c39;
+  box-shadow: inset 0 0 0 1px rgba(200, 168, 78, 0.35);
+  overflow: hidden;
+}
+
+body.focus-mode .part-a-identity-strip,
+body.chart-input-collapsed .part-a-identity-strip {
+  display: flex;
+}
+
+.part-a-brand-mini {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 12px;
+  border-right: 1px solid rgba(185, 139, 53, 0.45);
+}
+
+.part-a-brand-mini img {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(24, 15, 4, 0.14);
+}
+
+.part-a-brand-mini strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(20px, 2.1vw, 30px);
+  font-style: italic;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: #202443;
+  white-space: nowrap;
+}
+
+.part-a-native-summary {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: #202443;
+  font-size: clamp(12px, 1.05vw, 15px);
+  font-weight: 800;
+  line-height: 1.18;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.part-a-native-summary span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.part-a-native-summary strong {
+  color: #875411;
+  letter-spacing: 0.03em;
+}
+
+@media (max-width: 900px) {
+  .part-a-identity-strip {
+    flex-basis: 100%;
+    order: 2;
+  }
+
+  .part-a-fullscreen-btn {
+    margin-left: 0;
+  }
+
+  .part-a-native-summary {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    white-space: normal;
+  }
+}
+
+/* VedNetra button system polish: clearer states, touch targets, and no fullscreen controls */
+#enterFocusModeBtn,
+#exitFocusModeBtn,
+#wsFullScreenBtn {
+  display: none !important;
+}
+
+button,
+.table-top-button,
+.module-link,
+.ws-util-btn,
+.worksheet-cfg-btn,
+.worksheet-cfg-close-btn,
+.vednetra-report-options-dialog button {
+  position: relative;
+  min-height: 38px;
+  max-width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 16px;
+  border: 1px solid rgba(185, 139, 53, 0.62);
+  border-radius: 9px;
+  background: linear-gradient(180deg, #fffaf0 0%, #f4e6c2 100%);
+  color: #171c39;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  line-height: 1.12;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  box-shadow: 0 2px 0 rgba(145, 101, 33, 0.28), 0 7px 16px rgba(38, 29, 8, 0.11);
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    background 140ms ease,
+    box-shadow 140ms ease,
+    color 140ms ease;
+}
+
+button:hover,
+.table-top-button:hover,
+.module-link:hover,
+.ws-util-btn:hover,
+.worksheet-cfg-btn:hover,
+.worksheet-cfg-close-btn:hover,
+.vednetra-report-options-dialog button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(151, 99, 28, 0.82);
+  background: linear-gradient(180deg, #fffdf7 0%, #ecd39a 100%);
+  box-shadow: 0 3px 0 rgba(145, 101, 33, 0.34), 0 10px 20px rgba(38, 29, 8, 0.15);
+}
+
+button:active,
+button.button-pressed,
+button.button-clicked,
+.table-top-button:active,
+.module-link:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 rgba(145, 101, 33, 0.25), 0 4px 10px rgba(38, 29, 8, 0.12);
+}
+
+button:focus-visible,
+.table-top-button:focus-visible,
+.module-link:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(200, 168, 78, 0.58);
+  outline-offset: 2px;
+}
+
+button:disabled,
+button[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.primary-action,
+button.primary,
+#newChartModeBtn.active,
+#existingChartModeBtn.active,
+.chart-mode-actions button.active,
+.chart-data-nav button.active,
+.nav-category-actions button.active,
+.dasha-titlebar button.active,
+.dasha-level-actions button.active,
+.focus-rail-panel button.active {
+  border-color: rgba(9, 13, 39, 0.9);
+  background: linear-gradient(180deg, #30345c 0%, #0c102b 100%);
+  color: #fff2c1;
+  box-shadow: 0 3px 0 rgba(7, 9, 24, 0.44), 0 11px 22px rgba(18, 18, 45, 0.24);
+}
+
+.primary-action:hover,
+button.primary:hover,
+#newChartModeBtn.active:hover,
+#existingChartModeBtn.active:hover,
+.chart-mode-actions button.active:hover,
+.chart-data-nav button.active:hover,
+.nav-category-actions button.active:hover {
+  background: linear-gradient(180deg, #3b406d 0%, #111735 100%);
+  color: #fff7d7;
+}
+
+.chart-mode-actions,
+.actions,
+.compact-actions,
+.report-download-grid,
+.focus-reference-actions,
+.worksheet-topbar-actions,
+.dasha-level-actions,
+.transit-quick-actions {
+  align-items: center;
+  gap: 10px;
+}
+
+.chart-mode-actions button,
+.actions button,
+.compact-actions button,
+.report-download-grid button,
+.focus-reference-actions button,
+.worksheet-topbar-actions button,
+.transit-quick-actions button {
+  min-width: 0;
+  flex: 0 1 auto;
+}
+
+.focus-mode-rail {
+  width: 44px;
+  z-index: 9700 !important;
+}
+
+.focus-mode-rail:hover,
+.focus-mode-rail:focus-within,
+.focus-mode-rail.is-open {
+  width: min(330px, calc(100vw - 18px));
+}
+
+.focus-rail-panel {
+  gap: 10px;
+}
+
+.focus-rail-panel button,
+.focus-pinned-section button,
+.panel-focus-popup-head button,
+.time-tool-row button,
+.dasha-level-actions button,
+.dasha-titlebar button {
+  min-height: 34px;
+  padding: 7px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  letter-spacing: 0.025em;
+}
+
+.section-collapse-toggle,
+.dasha-level-actions button[data-dasha-level-action],
+.time-tool-row button {
+  min-width: 34px;
+  width: auto;
+}
+
+.nav-category-title {
+  justify-content: space-between;
+  width: 100%;
+}
+
+.chart-data-nav button,
+.nav-category-actions button {
+  min-height: 36px;
+  border-radius: 8px;
+}
+
+.vednetra-report-options-actions button,
+.vednetra-report-options-head button {
+  min-width: 112px;
+}
+
+@media (max-width: 760px) {
+  button,
+  .table-top-button,
+  .module-link,
+  .ws-util-btn,
+  .worksheet-cfg-btn {
+    min-height: 40px;
+    padding: 9px 12px;
+    font-size: 12px;
+    white-space: normal;
+  }
+
+  .chart-mode-actions button,
+  .actions button,
+  .compact-actions button,
+  .report-download-grid button {
+    flex: 1 1 130px;
+  }
+
+  .focus-mode-rail:hover,
+  .focus-mode-rail:focus-within,
+  .focus-mode-rail.is-open {
+    width: min(310px, calc(100vw - 12px));
+  }
+
+  .time-tool-row button,
+  .dasha-level-actions button,
+  .panel-focus-popup-head button {
+    min-height: 36px;
+    white-space: nowrap;
+  }
+}
+
+/* VedNetra absolute-final compact multi-view overrides */
+body.report-active .focus-mode-rail:hover,
+body.report-active .focus-mode-rail:focus-within,
+body.report-active .focus-mode-rail.is-open {
+  width: min(380px, calc(100vw - 18px)) !important;
+}
+
+body.report-active .focus-rail-panel {
+  width: 250px !important;
+  max-height: min(680px, calc(100dvh - 34px)) !important;
+  overflow-y: auto !important;
+}
+
+.panel-focus-popup.is-multi-tiled {
+  min-width: 280px !important;
+  min-height: 220px !important;
+  max-width: calc(100vw - 18px) !important;
+  max-height: calc(100dvh - 18px) !important;
+}
+
+.panel-focus-popup.is-multi-tiled .panel-focus-popup-body {
+  padding: 7px !important;
+  overflow: auto !important;
+}
+
+.panel-focus-popup.is-multi-tiled .panel-focus-popup-head {
+  min-height: 34px !important;
+  padding: 6px 9px !important;
+}
+
+.panel-focus-popup.is-multi-tiled .north-chart {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1 !important;
+}
+
+/* VedNetra independent desktop scrolling for setup pane and View A pane */
+@media (min-width: 1081px) {
+  html,
+  body {
+    height: 100%;
+    max-height: 100%;
+    overflow: hidden;
+  }
+
+  body:not(.focus-mode) {
+    overflow: hidden;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+  }
+
+  body:not(.focus-mode) .shell {
+    height: 100vh;
+    max-height: 100vh;
+    min-height: 0 !important;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  body:not(.focus-mode) .workspace {
+    height: calc(100vh - 44px);
+    max-height: calc(100vh - 44px);
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  body:not(.focus-mode) .input-panel {
+    position: relative !important;
+    top: auto !important;
+    align-self: stretch;
+    height: 100%;
+    max-height: none !important;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  body:not(.focus-mode) .chart-input-resize-handle {
+    position: relative !important;
+    top: auto !important;
+    align-self: stretch;
+    height: 100%;
+    min-height: 100%;
+  }
+
+  body:not(.focus-mode) .chart-input-resize-handle::before {
+    position: sticky;
+    top: calc(50vh - 46px);
+    margin-top: calc(50vh - 46px);
+  }
+
+  body:not(.focus-mode).chart-input-collapsed .chart-input-resize-handle::before,
+  body:not(.focus-mode) .chart-input-resize-handle.is-restore-tab::before {
+    top: calc(50vh - 96px);
+    margin-top: calc(50vh - 96px);
+  }
+
+  body:not(.focus-mode) .output-panel {
+    height: 100%;
+    min-height: 0 !important;
+    overflow-x: hidden;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  body:not(.focus-mode).report-active .output-panel {
+    scroll-padding-top: 190px;
+  }
+}
+
+/* VedNetra dialog stack safety: all dialogs stay above fixed headers/tables and inside viewport */
+.panel-focus-popup,
+.time-tool-popup,
+.house-result-layer,
+.house-context-layer,
+.worksheet-controls-overlay,
+.vednetra-report-options-layer {
+  z-index: 10000;
+}
+
+.time-tool-popup,
+.worksheet-controls-overlay,
+.vednetra-report-options-layer {
+  pointer-events: none;
+}
+
+.time-tool-panel,
+.worksheet-controls-overlay-box,
+.vednetra-report-options-dialog {
+  pointer-events: auto;
+}
+
+.vednetra-dialog-front {
+  filter: saturate(1.03);
+}
+
+.panel-focus-popup,
+.time-tool-panel,
+.house-result-panel,
+.house-context-menu,
+.worksheet-controls-overlay-box,
+.vednetra-report-options-dialog {
+  max-width: calc(100vw - 16px) !important;
+  max-height: calc(100dvh - 16px) !important;
+}
+
+.panel-focus-popup-shell,
+.time-tool-panel,
+.house-result-panel,
+.house-context-menu,
+.worksheet-controls-overlay-box,
+.vednetra-report-options-dialog {
+  box-sizing: border-box;
+}
+
+/* VedNetra chart setup moved from permanent left pane into top-ribbon dialog */
+.workspace {
+  display: block !important;
+  width: 100% !important;
+  max-width: 1680px !important;
+  margin: 0 auto !important;
+  grid-template-columns: unset !important;
+}
+
+.chart-input-resize-handle,
+[data-chart-input-toggle] {
+  display: none !important;
+}
+
+.chart-setup-dialog.hidden {
+  display: none !important;
+}
+
+.chart-setup-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: max(14px, env(safe-area-inset-top)) 14px 14px;
+  overflow: auto;
+  background: rgba(24, 18, 8, 0.34);
+  backdrop-filter: blur(6px);
+}
+
+.chart-setup-dialog-panel {
+  width: min(980px, calc(100vw - 28px));
+  max-height: calc(100dvh - 28px);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+  border: 1px solid rgba(200, 168, 78, 0.86);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fffaf0, #f8edd0);
+  box-shadow: 0 26px 70px rgba(24, 15, 4, 0.32);
+}
+
+.chart-setup-dialog-head {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 14px;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(200, 168, 78, 0.58);
+  background: linear-gradient(180deg, rgba(253, 248, 238, 0.98), rgba(247, 232, 193, 0.94));
+}
+
+.chart-setup-head-logo {
+  display: block !important;
+  width: 58px;
+  height: 58px;
+  flex: 0 0 auto;
+  border-radius: 14px;
+  border: 1px solid rgba(200, 168, 78, 0.72);
+  background: #fff7e2;
+  box-shadow: 0 10px 22px rgba(24, 15, 4, 0.16);
+  object-fit: contain;
+  padding: 6px;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.chart-setup-dialog .brand-row .app-logo {
+  display: block !important;
+  width: 84px !important;
+  height: 84px !important;
+  min-width: 84px !important;
+  object-fit: contain !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  background: #fff7e2;
+}
+
+.chart-setup-dialog-head .dialog-close-btn {
+  margin-left: auto;
+}
+
+.chart-setup-dialog-head h2 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(22px, 3vw, 34px);
+  color: var(--ink);
+}
+
+.dialog-close-btn {
+  min-width: 88px;
+  background: linear-gradient(180deg, #30345c 0%, #0c102b 100%);
+  color: #fff2c1;
+  border-color: rgba(12, 16, 43, 0.85);
+}
+
+.chart-setup-dialog .input-panel {
+  position: relative !important;
+  top: auto !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  align-self: stretch !important;
+  overflow: auto !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: linear-gradient(180deg, rgba(253, 248, 238, 0.96), rgba(250, 244, 228, 0.98)) !important;
+  padding: 18px !important;
+}
+
+.output-panel {
+  width: 100% !important;
+  min-height: calc(100vh - 44px);
+}
+
+.report {
+  max-width: 1500px;
+}
+
+body.report-active::before {
+  left: 0 !important;
+}
+
+body.report-active.report-view-chartData #chartDataNavRibbon:not(.hidden),
+body.report-active #chartInputLayoutBar:not(.hidden),
+body.report-active .worksheets-section .worksheet-topbar,
+body.report-active:not(.chart-input-collapsed):not(.focus-mode) #chartDataNavRibbon:not(.hidden),
+body.report-active:not(.chart-input-collapsed):not(.focus-mode) #chartInputLayoutBar:not(.hidden),
+body.report-active:not(.chart-input-collapsed):not(.focus-mode) .worksheets-section .worksheet-topbar {
+  left: 12px !important;
+  right: 12px !important;
+}
+
+body:not(.report-active) .output-panel {
+  padding-top: 0;
+}
+
+body:not(.report-active) .chart-data-nav {
+  margin-bottom: 18px;
+}
+
+@media (min-width: 1081px) {
+  body:not(.focus-mode) .workspace {
+    display: block !important;
+    height: calc(100vh - 44px);
+    max-height: calc(100vh - 44px);
+    overflow: hidden;
+  }
+
+  body:not(.focus-mode) .output-panel {
+    height: 100%;
+    min-height: 0 !important;
+    overflow-x: hidden;
+    overflow-y: auto !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .shell {
+    padding: 8px;
+  }
+
+  .chart-setup-dialog {
+    padding: max(8px, env(safe-area-inset-top)) 8px 8px;
+  }
+
+  .chart-setup-dialog-panel {
+    width: calc(100vw - 16px);
+    max-height: calc(100dvh - 16px);
+    border-radius: 10px;
+  }
+
+  .chart-setup-dialog .input-panel {
+    padding: 12px !important;
+  }
+
+  .chart-setup-dialog .brand-row {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .chart-setup-dialog .status-pill {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+
+  .chart-setup-head-logo {
+    width: 46px;
+    height: 46px;
+    border-radius: 11px;
+  }
+
+  .main-screen-logo {
+    width: 58px;
+    height: 58px;
+    opacity: 0.16;
+  }
+}
+
+@media (max-width: 1080px) {
+  .chart-data-nav {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    overflow: visible !important;
+  }
+
+  .chart-data-nav .nav-category,
+  .chart-data-nav button {
+    display: none !important;
+  }
+
+  .chart-data-nav .mobile-drilldown-label {
+    display: grid !important;
+    gap: 4px;
+    margin: 0;
+    font-size: 12px;
+    font-weight: 800;
+    color: #27443a;
+  }
+
+  .chart-data-nav .mobile-drilldown-select {
+    width: 100%;
+    min-height: 42px;
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 1081px) {
+  .chart-data-nav {
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  }
+}
+
+.nav-category:nth-of-type(5) .nav-category-actions,
+.nav-category:nth-of-type(6) .nav-category-actions {
+  right: 0 !important;
+  left: auto !important;
+}
+
+body.report-active .focus-mode-rail:not(.is-open) {
+  transform: translateX(calc(100% - 34px)) !important;
+  opacity: 0.78 !important;
+}
+
+body.report-active .focus-mode-rail.is-open {
+  transform: translateX(0) !important;
+  opacity: 1 !important;
+}
+
+.time-tool-panel,
+.house-result-panel,
+.house-context-menu,
+.vednetra-report-options-dialog {
+  overflow: auto;
+}
+
+.worksheet-controls-overlay {
+  padding: 8px !important;
+  align-items: center !important;
+}
+
+/* V.01 logo visibility and header fit */
+.main-screen-logo {
+  width: clamp(92px, 9.5vw, 150px) !important;
+  height: clamp(92px, 9.5vw, 150px) !important;
+  top: 14px !important;
+  left: 14px !important;
+  z-index: 8991 !important;
+  opacity: 0.42 !important;
+  filter: drop-shadow(0 12px 26px rgba(24, 15, 4, 0.28)) saturate(1.28) contrast(1.05) !important;
+  mix-blend-mode: multiply;
+}
+
+body.report-active .main-screen-logo {
+  width: clamp(104px, 10vw, 168px) !important;
+  height: clamp(104px, 10vw, 168px) !important;
+  top: 80px !important;
+  left: 22px !important;
+  opacity: 0.34 !important;
+}
+
+body.report-active #chartInputLayoutBar:not(.hidden) {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+body.report-active .part-a-identity-strip {
+  display: flex !important;
+  flex: 1 1 680px !important;
+  min-width: 360px !important;
+  min-height: 52px !important;
+  padding: 7px 16px !important;
+  border-width: 2px !important;
+  border-color: rgba(10, 12, 22, 0.78) !important;
+  background:
+    linear-gradient(90deg, rgba(255, 252, 243, 0.82), rgba(247, 236, 209, 0.68)),
+    radial-gradient(circle at 58px 50%, rgba(200, 168, 78, 0.18), transparent 86px) !important;
+}
+
+body.report-active .part-a-brand-mini {
+  min-width: 196px;
+}
+
+body.report-active .part-a-brand-mini img {
+  width: 44px !important;
+  height: 44px !important;
+  opacity: 0.94 !important;
+  background: rgba(255, 247, 226, 0.74);
+  border: 1px solid rgba(200, 168, 78, 0.54);
+  padding: 3px;
+}
+
+body.report-active .part-a-brand-mini strong {
+  font-size: clamp(24px, 2.3vw, 36px) !important;
+}
+
+body.report-active .part-a-native-summary {
+  font-size: clamp(13px, 1.08vw, 16px) !important;
+}
+
+body.report-active::before {
+  left: 0 !important;
+}
+
+body.report-active .report,
+body.report-active .report-view {
+  max-width: min(1600px, calc(100vw - 28px)) !important;
+}
+
+@media (max-width: 900px) {
+  body.report-active .main-screen-logo {
+    width: 86px !important;
+    height: 86px !important;
+    top: 78px !important;
+    left: 12px !important;
+    opacity: 0.28 !important;
+  }
+
+  body.report-active #chartInputLayoutBar:not(.hidden) {
+    flex-wrap: wrap !important;
+  }
+
+  body.report-active .part-a-identity-strip {
+    order: -1;
+    flex: 1 0 100% !important;
+    min-width: 0 !important;
   }
 }
