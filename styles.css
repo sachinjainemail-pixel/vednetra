@@ -6624,3 +6624,146 @@ body.report-active .report-view {
     min-width: 0 !important;
   }
 }
+
+/* V.01 hover identity ribbon and unobstructed watermark logo */
+body.report-active #chartInputLayoutBar:not(.hidden) {
+  opacity: 0 !important;
+  border-color: transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transition: opacity 180ms ease, background-color 180ms ease, box-shadow 180ms ease, border-color 180ms ease !important;
+  pointer-events: auto !important;
+}
+
+body.report-active #chartInputLayoutBar:not(.hidden) > * {
+  pointer-events: none;
+}
+
+body.report-active #chartInputLayoutBar:not(.hidden):hover,
+body.report-active #chartInputLayoutBar:not(.hidden):focus-within,
+body.report-active #chartInputLayoutBar:not(.hidden).is-open {
+  opacity: 1 !important;
+  border-color: rgba(200, 168, 78, 0.5) !important;
+  background: linear-gradient(180deg, rgba(253, 248, 238, 0.97), rgba(250, 244, 225, 0.94)) !important;
+  box-shadow: 0 6px 16px rgba(24, 15, 4, 0.14) !important;
+}
+
+body.report-active #chartInputLayoutBar:not(.hidden):hover > *,
+body.report-active #chartInputLayoutBar:not(.hidden):focus-within > *,
+body.report-active #chartInputLayoutBar:not(.hidden).is-open > * {
+  pointer-events: auto;
+}
+
+body.report-active .main-screen-logo {
+  top: 176px !important;
+  left: 24px !important;
+  z-index: 8997 !important;
+  opacity: 0.44 !important;
+  overflow: visible !important;
+}
+
+@media (max-width: 900px) {
+  body.report-active .main-screen-logo {
+    top: 166px !important;
+    left: 14px !important;
+    width: 92px !important;
+    height: 92px !important;
+    opacity: 0.38 !important;
+  }
+}
+
+/* V.01 free the hidden identity-ribbon space */
+body.report-active .output-panel {
+  padding-top: 116px !important;
+}
+
+body.report-active::before {
+  height: 116px !important;
+}
+
+body.report-active .worksheets-section .worksheet-topbar {
+  top: 70px !important;
+}
+
+body.report-active #chartInputLayoutBar:not(.hidden) {
+  top: 64px !important;
+  min-height: 9px !important;
+  height: 9px !important;
+  padding: 0 12px !important;
+  overflow: visible !important;
+  opacity: 1 !important;
+  border-color: transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+body.report-active #chartInputLayoutBar:not(.hidden)::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: rgba(200, 168, 78, 0.12);
+  opacity: 0.12;
+}
+
+body.report-active #chartInputLayoutBar:not(.hidden) > * {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-8px);
+  transition: opacity 160ms ease, transform 160ms ease, visibility 160ms ease;
+}
+
+body.report-active #chartInputLayoutBar:not(.hidden):hover,
+body.report-active #chartInputLayoutBar:not(.hidden):focus-within,
+body.report-active #chartInputLayoutBar:not(.hidden).is-open {
+  height: auto !important;
+  min-height: 54px !important;
+  padding: 6px 12px !important;
+  border-color: rgba(200, 168, 78, 0.5) !important;
+  background: linear-gradient(180deg, rgba(253, 248, 238, 0.97), rgba(250, 244, 225, 0.94)) !important;
+  box-shadow: 0 6px 16px rgba(24, 15, 4, 0.14) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+body.report-active #chartInputLayoutBar:not(.hidden):hover > *,
+body.report-active #chartInputLayoutBar:not(.hidden):focus-within > *,
+body.report-active #chartInputLayoutBar:not(.hidden).is-open > * {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+body.report-active #chartInputLayoutBar:not(.hidden):hover::before,
+body.report-active #chartInputLayoutBar:not(.hidden):focus-within::before,
+body.report-active #chartInputLayoutBar:not(.hidden).is-open::before {
+  opacity: 0;
+}
+
+body.report-active .main-screen-logo {
+  top: 122px !important;
+}
+
+@media (max-width: 1080px) {
+  body.report-active .output-panel {
+    padding-top: 104px !important;
+  }
+
+  body.report-active::before {
+    height: 104px !important;
+  }
+
+  body.report-active .worksheets-section .worksheet-topbar {
+    top: 62px !important;
+  }
+
+  body.report-active #chartInputLayoutBar:not(.hidden) {
+    top: 58px !important;
+  }
+
+  body.report-active .main-screen-logo {
+    top: 110px !important;
+  }
+}

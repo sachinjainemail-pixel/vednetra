@@ -145,4 +145,17 @@
     <path class="blink-lid" d="M77 250c54 58 113 87 179 87s125-29 179-87H77Z" fill="#fff5de"/>
     <path class="blink-line" d="M91 250c48-9 101-14 165-14s117 5 165 14" fill="none" stroke="#073b40" stroke-width="12" stroke-linecap="round" opacity="0"/>
   </g>
+
+  <g aria-hidden="true">
+    <rect x="102" y="422" width="308" height="58" rx="28" fill="#0b1534" opacity=".72"/>
+    <rect x="110" y="430" width="292" height="42" rx="21" fill="none" stroke="#d9a64a" stroke-width="2.5" opacity=".86"/>
+    <text x="256" y="461"
+      fill="#ffffff"
+      font-family="Georgia, 'Times New Roman', serif"
+      font-size="40"
+      font-style="italic"
+      font-weight="700"
+      letter-spacing=".5"
+      text-anchor="middle">VedNetra</text>
+  </g>
 </svg>
