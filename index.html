@@ -14,7 +14,6 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <img id="mainScreenLogo" class="main-screen-logo" src="icon.svg" alt="VedNetra logo" aria-hidden="true">
   <main class="shell">
     <div id="chartSetupDialog" class="chart-setup-dialog hidden" role="dialog" aria-modal="false" aria-labelledby="chartSetupDialogTitle">
       <div class="chart-setup-dialog-panel">
@@ -333,6 +332,10 @@
           <button type="button" id="partAFullScreenBtn" class="input-toggle-btn part-a-fullscreen-btn" aria-pressed="false">Full Screen</button>
         </div>
         <div id="emptyState" class="empty-state">
+          <div class="empty-state-brand" aria-label="VedNetra">
+            <img class="empty-state-logo" src="icon.svg" alt="VedNetra logo">
+            <h1 class="empty-state-title">VedNetra</h1>
+          </div>
           <h2>Ready for chart analysis</h2>
           <p>Enter birth data. The report will show chart preparation, planetary details, vargas, transit chart, and Vimshottari timing data.</p>
         </div>
