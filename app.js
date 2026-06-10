@@ -811,6 +811,11 @@
 
   function ensureDialogFullyVisible(layer) {
     if (typeof window === "undefined" || !layer || layer.classList.contains("hidden")) return;
+    // The Chart Setup dialog is a full-screen flex modal whose size and position
+    // are controlled entirely by CSS (full-screen on mobile, centred box on desktop).
+    // It must NEVER be shrunk or repositioned like a small floating popup —
+    // doing so caused it to render at ~half height with no scroll on mobile.
+    if (layer.id === "chartSetupDialog" || (layer.classList && layer.classList.contains("chart-setup-dialog"))) return;
     var target = dialogMovableElement(layer);
     if (!target || !target.getBoundingClientRect) return;
     var viewportWidth = (window.visualViewport && window.visualViewport.width) || window.innerWidth || 1280;
@@ -1896,14 +1901,19 @@
     var dialog = document.getElementById("chartSetupDialog");
     if (!dialog) return;
     prepareChartSetupDialogAction(action || chartSetupActionMode || "new");
+    // Clear any stale inline positioning/sizing so CSS fully controls the
+    // full-screen modal layout (defensive — prevents half-screen rendering).
+    dialog.classList.remove("is-floating");
+    ["left", "top", "right", "bottom", "width", "height", "maxWidth", "maxHeight", "overflow"].forEach(function (prop) {
+      dialog.style[prop] = "";
+    });
     dialog.classList.remove("hidden");
     document.body.classList.add("chart-setup-dialog-open");
-    bringDialogToFront(dialog, true);
+    bringDialogToFront(dialog, false);
     updatePartAIdentityStrip();
     setTimeout(function () {
       var first = document.getElementById("newChartModeBtn") || dialog.querySelector("input, select, textarea, button");
       if (first && first.focus) first.focus();
-      ensureDialogFullyVisible(dialog);
     }, 0);
   }
 
