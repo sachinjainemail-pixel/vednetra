@@ -7195,3 +7195,335 @@ body.report-active .empty-state {
     top: 52px !important;
   }
 }
+
+.location-search-action {
+  align-items: end;
+}
+
+#locationLookupStatus.status-error {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.quick-birth-input-panel {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid rgba(200, 168, 78, 0.55);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(255, 250, 239, 0.88), rgba(248, 236, 207, 0.66));
+}
+
+.quick-birth-input-panel textarea {
+  min-height: 70px;
+  resize: vertical;
+}
+
+.quick-birth-input-panel button {
+  justify-self: start;
+}
+
+#quickBirthInputStatus.status-error {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOBILE OPTIMISATION  ── v02 ──
+   Comprehensive mobile UX fixes for phones (≤720px) and small phones (≤480px).
+   Goals: full-screen friendly layout, larger tap targets, no horizontal scroll,
+   single-column charts, simplified header.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Prevent horizontal scrollbar from any rogue overflow on mobile */
+@media (max-width: 720px) {
+  html, body {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+  }
+
+  /* The shell loses its big padding so content uses the whole screen */
+  .shell {
+    padding: 6px 4px !important;
+  }
+
+  /* Workspace becomes a single block — no grid columns on mobile */
+  .workspace {
+    display: block !important;
+    grid-template-columns: unset !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+  }
+
+  /* Hide the resize handle entirely on mobile — useless without grid */
+  .chart-input-resize-handle {
+    display: none !important;
+  }
+
+  /* Output panel takes full width */
+  .output-panel {
+    border-radius: 8px;
+    padding: 8px !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    min-width: 0 !important;
+    min-height: auto !important;
+  }
+
+  /* Empty-state message fits without overflow */
+  .empty-state {
+    padding: 30px 14px;
+    text-align: center;
+  }
+
+  /* ── Fixed header stack: collapse to a single compact strip ── */
+  body.report-active::before {
+    height: 80px !important;
+    left: 0 !important;
+  }
+
+  body.report-active .output-panel {
+    padding-top: 92px !important;
+  }
+
+  /* Nav ribbon: stretch full width with no input-offset on mobile */
+  body.report-active.report-view-chartData #chartDataNavRibbon:not(.hidden) {
+    left: 4px !important;
+    right: 4px !important;
+    top: 4px !important;
+    padding: 6px !important;
+    border-radius: 6px !important;
+  }
+
+  /* Hide the layout bar (HIDE-INPUT / TIME-TOOL) on mobile — saves a row */
+  body.report-active #chartInputLayoutBar {
+    display: none !important;
+  }
+
+  /* Worksheet topbar: compact, full-width */
+  body.report-active .worksheets-section .worksheet-topbar {
+    top: 56px !important;
+    left: 4px !important;
+    right: 4px !important;
+    padding: 4px 8px !important;
+    gap: 4px !important;
+    flex-wrap: wrap !important;
+  }
+
+  .worksheet-topbar .worksheet-cfg-btn,
+  .worksheet-topbar .ws-util-btn {
+    min-height: 32px !important;
+    padding: 5px 8px !important;
+    font-size: 11px !important;
+  }
+
+  .worksheet-topbar-label {
+    font-size: 12px !important;
+    flex: 1 1 100% !important;
+    order: -1;
+  }
+
+  /* ── Tables and panels: prevent horizontal scroll ── */
+  .panel-box,
+  .section,
+  .report {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 10px !important;
+  }
+
+  .table-wrap {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100vw !important;
+  }
+
+  /* ── Worksheet grid: single column on mobile, no resize ── */
+  .worksheet-grid {
+    flex-direction: column !important;
+    padding: 4px !important;
+  }
+
+  .worksheet-grid > * {
+    width: 100% !important;
+    min-width: 0 !important;
+    flex: 0 0 auto !important;
+    resize: none !important;
+    margin-bottom: 8px;
+  }
+
+  .ws-drag-handle {
+    display: none !important;
+  }
+
+  /* North chart: scale to fit screen */
+  .north-chart {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 !important;
+  }
+
+  .worksheet-grid .north-chart {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    height: auto !important;
+  }
+
+  /* ── Larger tap targets ── */
+  button,
+  .primary-action,
+  .input-toggle-btn,
+  .ws-util-btn {
+    min-height: 44px !important;
+    font-size: 14px !important;
+  }
+
+  input,
+  select,
+  textarea {
+    min-height: 44px !important;
+    font-size: 16px !important;        /* prevents iOS auto-zoom */
+    padding: 10px !important;
+  }
+
+  /* ── Chart setup dialog: full-screen on mobile ── */
+  .chart-setup-dialog {
+    padding: 0 !important;
+  }
+
+  .chart-setup-dialog-panel {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+    border: 0 !important;
+  }
+
+  .chart-setup-dialog-head {
+    padding: 10px 12px !important;
+    gap: 8px !important;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .chart-setup-head-logo {
+    width: 38px !important;
+    height: 38px !important;
+  }
+
+  .chart-setup-dialog-head h2 {
+    font-size: clamp(16px, 4.5vw, 22px) !important;
+  }
+
+  .chart-setup-dialog .input-panel {
+    padding: 12px !important;
+  }
+
+  .chart-setup-dialog .brand-row .app-logo {
+    width: 54px !important;
+    height: 54px !important;
+    min-width: 54px !important;
+  }
+
+  /* Form grid → single column */
+  .grid-2,
+  .grid-3,
+  .chart-mode-actions {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  .actions {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  .actions button,
+  .actions .primary-action {
+    flex: 1 1 calc(50% - 4px) !important;
+    min-width: 0 !important;
+  }
+
+  /* Brand title smaller on mobile */
+  .brand-title {
+    font-size: clamp(20px, 6vw, 28px) !important;
+  }
+
+  /* ── Time tool popup: full-width on mobile, no drag overflow ── */
+  .time-tool-popup .time-tool-panel {
+    width: calc(100vw - 16px) !important;
+    max-width: calc(100vw - 16px) !important;
+    max-height: calc(100dvh - 20px) !important;
+  }
+
+  /* Focus rail: hide on mobile (not needed; controls are already in topbar) */
+  .focus-mode-rail {
+    display: none !important;
+  }
+
+  /* Worksheet config overlay: full-screen on mobile */
+  .worksheet-controls-overlay-box {
+    width: calc(100vw - 12px) !important;
+    max-height: calc(100dvh - 16px) !important;
+  }
+
+  /* ── Dasha panel rows: smaller text, no overflow ── */
+  .dasha-group summary {
+    font-size: 13px !important;
+    padding: 6px 8px !important;
+  }
+
+  /* Hide bulky data not useful on mobile */
+  .dasha-level-actions {
+    display: none !important;
+  }
+}
+
+/* ── Very small phones (≤480px) ── */
+@media (max-width: 480px) {
+  .brand-title {
+    font-size: 22px !important;
+  }
+
+  fieldset {
+    padding: 10px !important;
+    margin-bottom: 10px !important;
+  }
+
+  legend {
+    font-size: 13px;
+  }
+
+  .quick-birth-input-panel textarea {
+    font-size: 14px !important;
+  }
+
+  /* Action buttons full width on tiny screens */
+  .actions button,
+  .actions .primary-action {
+    flex: 1 1 100% !important;
+  }
+
+  /* Compact h-rules and dividers */
+  h2 { font-size: 18px !important; }
+  h3 { font-size: 15px !important; }
+  h4 { font-size: 13px !important; }
+}
+
+/* ── Touch device tweaks (any width) ── */
+@media (hover: none) and (pointer: coarse) {
+  /* On touch devices, show resize handles even at normal size */
+  .ws-drag-handle {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  /* Bigger hit area on chart house cells for taps */
+  .north-house-hit {
+    r: 36;
+  }
+}

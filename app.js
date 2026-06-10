@@ -537,6 +537,7 @@
       document.getElementById("copyBtn").addEventListener("click", copyReport);
       document.getElementById("downloadReportBtn").addEventListener("click", downloadSelectedReport);
       wireBirthTimeControls();
+      wireQuickBirthInputControls();
       wireBirthPlaceControls();
       wireSavedChartControls();
       wireChartStartControls();
@@ -1883,9 +1884,9 @@
     });
     var closeButton = document.getElementById("chartSetupCloseBtn");
     if (closeButton) closeButton.addEventListener("click", closeChartSetupDialog);
-    dialog.addEventListener("click", function (event) {
-      if (event.target === dialog) closeChartSetupDialog();
-    });
+    // ── Backdrop click is INTENTIONALLY NOT wired to close the dialog. ──
+    //    The dialog must only close on (1) Close button or (2) Esc key,
+    //    so an accidental click on the dimmed area can't lose the user's typing.
     document.addEventListener("keydown", function (event) {
       if (event.key === "Escape" && !dialog.classList.contains("hidden")) closeChartSetupDialog();
     });
@@ -2694,6 +2695,296 @@
     }
   }
 
+  function wireQuickBirthInputControls() {
+    var box = document.getElementById("quickBirthInput");
+    var button = document.getElementById("applyQuickBirthInputBtn");
+    if (button) button.addEventListener("click", applyQuickBirthInput);
+    if (box) {
+      box.addEventListener("keydown", function (event) {
+        if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+          event.preventDefault();
+          applyQuickBirthInput();
+        }
+      });
+    }
+  }
+
+  function updateQuickBirthInputStatus(message, isError) {
+    var status = document.getElementById("quickBirthInputStatus");
+    if (!status) return;
+    status.textContent = message || "Paste date, time and place in one line. Existing fields below can still be edited manually.";
+    status.classList.toggle("status-error", Boolean(isError));
+  }
+
+  function applyQuickBirthInput() {
+    var box = document.getElementById("quickBirthInput");
+    var text = box ? box.value.trim() : "";
+    if (!text) {
+      updateQuickBirthInputStatus("Enter a combined birth detail first, for example: Rahul Sharma, 8 March 2010, 15:58 hours, Chandigarh, Punjab.", true);
+      return;
+    }
+    var parsed = parseQuickBirthInput(text);
+    var applied = [];
+    if (parsed.name) {
+      setFieldValue("nativeName", parsed.name);
+      applied.push("name");
+    }
+    if (parsed.gender) {
+      setFieldValue("gender", parsed.gender);
+      applied.push("gender");
+    }
+    if (parsed.date) {
+      setFieldValue("birthDate", parsed.date);
+      applied.push("date");
+    }
+    if (parsed.time) {
+      setBirthTimeFields(parsed.time);
+      applied.push("time");
+    }
+    if (parsed.place) {
+      setFieldValue("birthPlace", parsed.place);
+      applied.push("place");
+      var match = findCity(parsed.place);
+      if (match) {
+        setFieldValue("birthPlace", match.name);
+        setCoordinateFields(match.latitude, match.longitude);
+        setFieldValue("timezone", match.timezone);
+        applied.push("saved coordinates");
+      }
+    }
+    updatePartAIdentityStrip();
+    if (!applied.length) {
+      updateQuickBirthInputStatus("Could not read name, date, time or place. Try: Rahul Sharma, 08-03-2010, 1525 hours, Chandigarh, Punjab.", true);
+      return;
+    }
+    var note = "Auto populated " + applied.join(", ") + ".";
+    if (parsed.place && !findCity(parsed.place)) note += " Use internet lat/long search if coordinates are not already saved.";
+    updateQuickBirthInputStatus(note);
+  }
+
+  // List of known Indian states + major Indian UTs + common countries.
+  // Used to detect the end-of-place marker so the place segment is unambiguous.
+  var QUICK_PLACE_TERMINATORS = (
+    "india|pakistan|bangladesh|nepal|sri lanka|bhutan|myanmar|china|united states|usa|us|" +
+    "uk|united kingdom|england|scotland|wales|ireland|northern ireland|canada|australia|" +
+    "new zealand|south africa|kenya|nigeria|uae|united arab emirates|saudi arabia|qatar|" +
+    "oman|kuwait|bahrain|singapore|malaysia|thailand|indonesia|philippines|japan|south korea|" +
+    "north korea|russia|germany|france|italy|spain|portugal|netherlands|belgium|switzerland|" +
+    "sweden|norway|denmark|finland|poland|austria|greece|turkey|israel|egypt|morocco|" +
+    "brazil|argentina|mexico|chile|peru|colombia|venezuela|fiji|hong kong|taiwan|vietnam|" +
+    // Indian states & UTs
+    "andhra pradesh|arunachal pradesh|assam|bihar|chhattisgarh|goa|gujarat|haryana|" +
+    "himachal pradesh|jharkhand|karnataka|kerala|madhya pradesh|maharashtra|manipur|" +
+    "meghalaya|mizoram|nagaland|odisha|orissa|punjab|rajasthan|sikkim|tamil nadu|" +
+    "telangana|tripura|uttar pradesh|uttarakhand|uttaranchal|west bengal|" +
+    "delhi|new delhi|chandigarh|puducherry|pondicherry|jammu and kashmir|jammu & kashmir|" +
+    "ladakh|andaman and nicobar|dadra and nagar haveli|daman and diu|lakshadweep"
+  );
+
+  function parseQuickBirthInput(text) {
+    var working = " " + String(text || "").replace(/\s+/g, " ").trim() + " ";
+    var result = {};
+
+    // 0. GENDER — explicit keywords or single-letter markers (M/F surrounded by space/comma)
+    var genderInfo = extractQuickBirthGender(working);
+    if (genderInfo) {
+      result.gender = genderInfo.value;
+      working = working.replace(genderInfo.raw, " ");
+    }
+
+    // 1. DATE — try every reasonable format
+    var dateInfo = extractQuickBirthDate(working);
+    if (dateInfo) {
+      result.date = dateInfo.value;
+      working = working.replace(dateInfo.raw, " ");
+    }
+
+    // 2. TIME — supports HH:MM[:SS] with optional AM/PM, or HHMM/HHMMSS with "hours/hour/hrs/hr" suffix
+    var timeInfo = extractQuickBirthTime(working);
+    if (timeInfo) {
+      result.time = timeInfo.value;
+      working = working.replace(timeInfo.raw, " ");
+    }
+
+    // 3. PLACE — the trailing segment ending with a known state/country name.
+    //    Search the remaining text for the LAST occurrence of any terminator
+    //    and take everything from the previous segment-boundary up to the terminator.
+    var placeInfo = extractQuickBirthPlace(working);
+    if (placeInfo) {
+      result.place = placeInfo.value;
+      working = working.replace(placeInfo.raw, " ");
+    }
+
+    // 4. NAME — whatever remains, after stripping keywords/punctuation.
+    var nameCandidate = working
+      .replace(/\b(born|birth|dob|date|time|place|at|on|in|name|native|of|the)\b/gi, " ")
+      .replace(/[|;:,]+/g, " ")
+      .replace(/\s+/g, " ")
+      .replace(/^[\s\-]+|[\s\-]+$/g, "")
+      .trim();
+    if (nameCandidate && /[A-Za-z]/.test(nameCandidate)) {
+      // Don't accept obviously non-name garbage like just digits or single letters
+      var alphaChars = nameCandidate.replace(/[^A-Za-z]/g, "");
+      if (alphaChars.length >= 2) result.name = nameCandidate;
+    }
+
+    // FALLBACK: if no place was found but text still has tokens that LOOK like a place
+    // (comma-separated trailing segment), use the last segment.
+    if (!result.place && nameCandidate.indexOf(",") !== -1) {
+      var parts = nameCandidate.split(",").map(function (s) { return s.trim(); }).filter(Boolean);
+      if (parts.length >= 2) {
+        // Last 1-2 parts → place; everything before → name
+        var lastTwo = parts.slice(-2).join(", ");
+        result.place = lastTwo;
+        var nameOnly = parts.slice(0, -2).join(" ").trim();
+        if (nameOnly) result.name = nameOnly;
+        else delete result.name;
+      }
+    }
+
+    return result;
+  }
+
+  function extractQuickBirthGender(text) {
+    // Explicit words first (long, unambiguous)
+    var m = text.match(/\b(male|female|man|woman|boy|girl|gentleman|lady|gent)\b/i);
+    if (m) {
+      var w = m[1].toLowerCase();
+      var v = (w === "male" || w === "man" || w === "boy" || w === "gentleman" || w === "gent") ? "male" : "female";
+      return { raw: m[0], value: v };
+    }
+    // Single-letter M/F when it's clearly a gender marker:
+    // - preceded by comma/space, followed by comma/space/end
+    // - and standalone (not part of a longer token)
+    m = text.match(/(?:^|[,\s])(M|F)(?=[,\s]|$)/);
+    if (m) {
+      return { raw: m[0], value: m[1].toUpperCase() === "M" ? "male" : "female" };
+    }
+    return null;
+  }
+
+  function extractQuickBirthTime(text) {
+    // Pattern A: HH:MM[:SS] with optional am/pm and optional "hours/hour/hrs/hr" suffix
+    var colon = text.match(/\b([01]?\d|2[0-3])[:.]([0-5]\d)(?:[:.]([0-5]\d))?\s*(a\.?m\.?|p\.?m\.?|am|pm)?\s*(hours?|hrs?)?\b/i);
+    if (colon) {
+      return { raw: colon[0], value: quickTimeToHms(colon) };
+    }
+    // Pattern B: HHMM or HHMMSS digit run followed by "hours/hour/hrs/hr" (e.g. "1525 hours", "152530 hrs")
+    var compact = text.match(/\b(\d{3,6})\s*(hours?|hrs?)\b/i);
+    if (compact) {
+      var digits = compact[1];
+      var hh, mm, ss = 0;
+      if (digits.length === 3) { hh = Number(digits.slice(0, 1)); mm = Number(digits.slice(1)); }
+      else if (digits.length === 4) { hh = Number(digits.slice(0, 2)); mm = Number(digits.slice(2)); }
+      else if (digits.length === 5) { hh = Number(digits.slice(0, 1)); mm = Number(digits.slice(1, 3)); ss = Number(digits.slice(3)); }
+      else if (digits.length === 6) { hh = Number(digits.slice(0, 2)); mm = Number(digits.slice(2, 4)); ss = Number(digits.slice(4)); }
+      if (hh >= 0 && hh <= 23 && mm >= 0 && mm <= 59 && ss >= 0 && ss <= 59) {
+        return { raw: compact[0], value: pad(hh) + ":" + pad(mm) + ":" + pad(ss) };
+      }
+    }
+    return null;
+  }
+
+  function extractQuickBirthPlace(text) {
+    // Find LAST occurrence of any terminator (state/country) in the text.
+    // The place starts after the previous comma (or beginning) up to and including the terminator.
+    var rx = new RegExp("\\b(" + QUICK_PLACE_TERMINATORS + ")\\b", "gi");
+    var lastMatch = null;
+    var m;
+    while ((m = rx.exec(text)) !== null) {
+      lastMatch = { index: m.index, match: m[0], endIndex: m.index + m[0].length };
+      if (m.index === rx.lastIndex) rx.lastIndex++;
+    }
+    if (!lastMatch) return null;
+    // Find segment boundary going backwards from terminator: previous comma / pipe / semicolon / |
+    // or beginning of string
+    var startIdx = 0;
+    for (var i = lastMatch.index - 1; i >= 0; i--) {
+      var ch = text.charAt(i);
+      if (ch === "," || ch === "|" || ch === ";") {
+        // Walk back across the comma to include the city BEFORE the terminator
+        // e.g. "Chandigarh, Punjab" — place should include "Chandigarh, Punjab"
+        // Find the comma BEFORE this one
+        var prevComma = -1;
+        for (var j = i - 1; j >= 0; j--) {
+          var c2 = text.charAt(j);
+          if (c2 === "," || c2 === "|" || c2 === ";") { prevComma = j; break; }
+        }
+        startIdx = (prevComma >= 0) ? prevComma + 1 : 0;
+        break;
+      }
+    }
+    var rawSegment = text.substring(startIdx, lastMatch.endIndex);
+    var clean = rawSegment
+      .replace(/^[,\s\-|;]+|[,\s\-|;]+$/g, "")
+      .replace(/\s+/g, " ")
+      .replace(/\s*,\s*/g, ", ")
+      .trim();
+    if (!clean) return null;
+    return { raw: rawSegment, value: clean };
+  }
+
+  function quickTimeToHms(match) {
+    var hour = Number(match[1]);
+    var minute = Number(match[2] || 0);
+    var second = Number(match[3] || 0);
+    var meridiem = String(match[4] || "").toLowerCase().replace(/\./g, "");
+    if (meridiem === "pm" && hour < 12) hour += 12;
+    if (meridiem === "am" && hour === 12) hour = 0;
+    return pad(hour) + ":" + pad(minute) + ":" + pad(second);
+  }
+
+  function extractQuickBirthDate(text) {
+    var months = {
+      jan: 1, january: 1, feb: 2, february: 2, mar: 3, march: 3, apr: 4, april: 4,
+      may: 5, jun: 6, june: 6, jul: 7, july: 7, aug: 8, august: 8, sep: 9, sept: 9, september: 9,
+      oct: 10, october: 10, nov: 11, november: 11, dec: 12, december: 12
+    };
+    var monthNames = Object.keys(months).join("|");
+    // Alpha-month dates — "8 March 2010", "8th March, 2010", "March 8, 2010", "8-Mar-2010"
+    var dmyName = new RegExp("\\b(\\d{1,2})(?:st|nd|rd|th)?[\\s,/.\\-]+(" + monthNames + ")[\\s,/.\\-]+(\\d{2,4})\\b", "i");
+    var mdName  = new RegExp("\\b(" + monthNames + ")[\\s,/.\\-]+(\\d{1,2})(?:st|nd|rd|th)?[\\s,/.\\-]+(\\d{2,4})\\b", "i");
+    var match = text.match(dmyName);
+    if (match) return quickDateResult(match[0], normalizeYear(Number(match[3])), months[match[2].toLowerCase()], Number(match[1]));
+    match = text.match(mdName);
+    if (match) return quickDateResult(match[0], normalizeYear(Number(match[3])), months[match[1].toLowerCase()], Number(match[2]));
+    // ISO YYYY-MM-DD or YYYY/MM/DD or YYYY.MM.DD (year leads with 4 digits)
+    match = text.match(/\b(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})\b/);
+    if (match) return quickDateResult(match[0], Number(match[1]), Number(match[2]), Number(match[3]));
+    // D/M/Y or DD/MM/YYYY or D-M-YY or DD.MM.YYYY etc. with any separator: / - . or space
+    // Accepts D as 1-2 digits, M as 1-2 digits, Y as 2 or 4 digits.
+    match = text.match(/\b(\d{1,2})[\s\-/.](\d{1,2})[\s\-/.](\d{2,4})\b/);
+    if (match) {
+      var d = Number(match[1]);
+      var mo = Number(match[2]);
+      var y = normalizeYear(Number(match[3]));
+      // If first number > 12, it's definitely the day (e.g. 25/03/2010)
+      // If second number > 12 too, swap interpretation (US-style mm/dd/yyyy)
+      if (d > 12 && mo <= 12) {
+        return quickDateResult(match[0], y, mo, d);
+      } else if (mo > 12 && d <= 12) {
+        return quickDateResult(match[0], y, d, mo); // mm/dd/yyyy
+      }
+      // Ambiguous (both ≤ 12) — default to D/M/Y (Indian convention)
+      return quickDateResult(match[0], y, mo, d);
+    }
+    return null;
+  }
+
+  function normalizeYear(year) {
+    if (!Number.isFinite(year)) return year;
+    if (year < 100) return year >= 40 ? 1900 + year : 2000 + year;
+    return year;
+  }
+
+  function quickDateResult(raw, year, month, day) {
+    if (!Number.isFinite(year) || !Number.isFinite(month) || !Number.isFinite(day)) return null;
+    if (year < 1800 || year > 2200 || month < 1 || month > 12 || day < 1 || day > 31) return null;
+    var date = new Date(Date.UTC(year, month - 1, day));
+    if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) return null;
+    return { raw: raw, value: year + "-" + pad(month) + "-" + pad(day) };
+  }
+
   function wireBirthPlaceControls() {
     var input = document.getElementById("birthPlace");
     customCities = readCustomLocations();
@@ -2704,6 +2995,8 @@
     }
     var defaultButton = document.getElementById("setDefaultLocationBtn");
     if (defaultButton) defaultButton.addEventListener("click", setDefaultLocationFromCurrentFields);
+    var lookupButton = document.getElementById("lookupBirthPlaceBtn");
+    if (lookupButton) lookupButton.addEventListener("click", lookupBirthPlaceFromInternet);
     updateDefaultLocationStatus();
     var partnerInput = document.getElementById("partnerBirthPlace");
     if (partnerInput) {
@@ -2787,6 +3080,141 @@
     document.getElementById("birthPlace").value = match.name;
     setCoordinateFields(match.latitude, match.longitude);
     document.getElementById("timezone").value = match.timezone;
+  }
+
+  function updateLocationLookupStatus(message, isError) {
+    var status = document.getElementById("locationLookupStatus");
+    if (!status) return;
+    status.textContent = message || "Internet lookup populates latitude and longitude in DD.MM.SS format when available.";
+    status.classList.toggle("status-error", Boolean(isError));
+  }
+
+  function internetLookupAvailable() {
+    return typeof fetch === "function" && typeof navigator !== "undefined" && navigator.onLine !== false;
+  }
+
+  async function lookupBirthPlaceFromInternet() {
+    var placeField = document.getElementById("birthPlace");
+    var button = document.getElementById("lookupBirthPlaceBtn");
+    var query = placeField ? placeField.value.trim() : "";
+    if (!query) {
+      updateLocationLookupStatus("Enter place of birth first, then click Search and populate lat/long.", true);
+      return;
+    }
+    var localMatch = findCity(query);
+    if (localMatch) {
+      placeField.value = localMatch.name;
+      setCoordinateFields(localMatch.latitude, localMatch.longitude);
+      document.getElementById("timezone").value = localMatch.timezone;
+      updateLocationLookupStatus("Matched saved/local location: " + localMatch.name + " (" + coordinateText(localMatch.latitude, localMatch.longitude) + ").");
+      return;
+    }
+    if (!internetLookupAvailable()) {
+      updateLocationLookupStatus("Internet lookup is unavailable. Please enter latitude and longitude manually.", true);
+      return;
+    }
+    if (button) {
+      button.disabled = true;
+      button.textContent = "Searching...";
+    }
+    updateLocationLookupStatus("Searching internet for " + query + "...");
+    try {
+      var result = await fetchGeocodedPlace(query);
+      if (!result) throw new Error("No matching place found online.");
+      placeField.value = result.name;
+      setCoordinateFields(result.latitude, result.longitude);
+      if (Number.isFinite(Number(result.timezone))) document.getElementById("timezone").value = result.timezone;
+      rememberCustomLocation(result.name, result.latitude, result.longitude, Number(document.getElementById("timezone").value || result.timezone || 5.5));
+      updateLocationLookupStatus("Populated " + result.name + ": " + coordinateText(result.latitude, result.longitude) + ".");
+    } catch (error) {
+      updateLocationLookupStatus((error && error.message ? error.message : "Internet lookup failed.") + " Manual coordinate entry is still available.", true);
+    } finally {
+      if (button) {
+        button.disabled = false;
+        button.textContent = "Search and populate lat/long";
+      }
+    }
+  }
+
+  async function fetchGeocodedPlace(query) {
+    try {
+      var meteo = await fetchOpenMeteoGeocodedPlace(query);
+      if (meteo) return meteo;
+    } catch (ignored) {}
+    return fetchNominatimGeocodedPlace(query);
+  }
+
+  async function fetchOpenMeteoGeocodedPlace(query) {
+    var url = "https://geocoding-api.open-meteo.com/v1/search?count=1&language=en&format=json&name=" + encodeURIComponent(query);
+    var response = await fetch(url, { method: "GET", headers: { Accept: "application/json" } });
+    if (!response.ok) throw new Error("Primary internet location service returned an error.");
+    var payload = await response.json();
+    var rows = payload && Array.isArray(payload.results) ? payload.results : [];
+    if (!rows.length) return null;
+    var row = rows[0];
+    var latitude = Number(row.latitude);
+    var longitude = Number(row.longitude);
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
+    var name = [row.name, row.admin1, row.country].filter(Boolean).filter(function (part, index, list) {
+      return list.indexOf(part) === index;
+    }).join(", ");
+    return city((name || query).slice(0, 160), latitude, longitude, timezoneOffsetFromName(row.timezone, longitude));
+  }
+
+  async function fetchNominatimGeocodedPlace(query) {
+    var url = "https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&addressdetails=1&q=" + encodeURIComponent(query);
+    var response = await fetch(url, { method: "GET", headers: { Accept: "application/json" } });
+    if (!response.ok) throw new Error("Internet location service returned an error.");
+    var rows = await response.json();
+    if (!Array.isArray(rows) || !rows.length) return null;
+    var row = rows[0];
+    var latitude = Number(row.lat);
+    var longitude = Number(row.lon);
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
+    var name = geocodedDisplayName(row, query);
+    return city(name, latitude, longitude, inferTimezoneFromGeocode(row, longitude));
+  }
+
+  function timezoneOffsetFromName(timezoneName, longitude) {
+    var known = {
+      "Asia/Kolkata": 5.5,
+      "Asia/Calcutta": 5.5,
+      "Asia/Kathmandu": 5.75,
+      "Asia/Colombo": 5.5,
+      "Asia/Dhaka": 6,
+      "Asia/Karachi": 5,
+      "Asia/Dubai": 4,
+      "Asia/Singapore": 8,
+      "Europe/London": 0,
+      "UTC": 0
+    };
+    if (known[timezoneName] !== undefined) return known[timezoneName];
+    if (Number.isFinite(Number(longitude))) return Math.round(Number(longitude) / 15);
+    return 5.5;
+  }
+
+  function geocodedDisplayName(row, fallback) {
+    var address = row && row.address ? row.address : {};
+    var cityName = address.city || address.town || address.village || address.municipality || address.county || "";
+    var country = address.country || "";
+    var display = [cityName, country].filter(Boolean).join(", ");
+    return (display || row.display_name || fallback || "Searched place").slice(0, 160);
+  }
+
+  function inferTimezoneFromGeocode(row, longitude) {
+    var address = row && row.address ? row.address : {};
+    var countryCode = String(address.country_code || "").toLowerCase();
+    if (countryCode === "in") return 5.5;
+    if (countryCode === "np") return 5.75;
+    if (countryCode === "lk") return 5.5;
+    if (countryCode === "bd") return 6;
+    if (countryCode === "pk") return 5;
+    if (countryCode === "ae") return 4;
+    if (countryCode === "sg") return 8;
+    if (countryCode === "gb") return 0;
+    if (countryCode === "us") return -5;
+    if (Number.isFinite(Number(longitude))) return Math.round(Number(longitude) / 15);
+    return 5.5;
   }
 
   function applyPartnerBirthPlaceLookup() {
