@@ -2679,7 +2679,27 @@
     var host = window.location.hostname;
     var secureEnough = window.location.protocol === "https:" || host === "localhost" || host === "127.0.0.1";
     if (!secureEnough) return;
-    navigator.serviceWorker.register("service-worker.js").catch(function () {});
+    navigator.serviceWorker.register("service-worker.js").then(function (reg) {
+      // Auto-update: when a new service worker takes control, reload once so the
+      // user always sees the latest build without any manual cache clearing.
+      if (reg && reg.update) { try { reg.update(); } catch (_e) {} }
+      reg.addEventListener("updatefound", function () {
+        var sw = reg.installing;
+        if (!sw) return;
+        sw.addEventListener("statechange", function () {
+          if (sw.state === "installed" && navigator.serviceWorker.controller) {
+            // New version available — activate it immediately
+            if (sw.postMessage) { try { sw.postMessage({ type: "SKIP_WAITING" }); } catch (_e) {} }
+          }
+        });
+      });
+    }).catch(function () {});
+    var hasReloaded = false;
+    navigator.serviceWorker.addEventListener("controllerchange", function () {
+      if (hasReloaded) return;
+      hasReloaded = true;
+      window.location.reload();
+    });
   }
 
   function city(name, latitude, longitude, timezone) {
