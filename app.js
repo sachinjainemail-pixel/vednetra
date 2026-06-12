@@ -1133,12 +1133,14 @@
   function syncTimeToolDisplay() {
     var display = document.getElementById("timeToolCurrentDisplay");
     if (!display) return;
+    var targetKey = fieldValue("timeToolTarget") || "birth";
+    var heading = targetKey === "transit" ? "Transit date & time" : "Birth date & time";
     try {
       var fields = timeToolFields();
       var date = timeToolReadDate(fields.dateField, fields.timeField);
-      display.textContent = timeToolDateLabel(date);
+      display.textContent = heading + "\n" + timeToolDateLabel(date);
     } catch (error) {
-      display.textContent = "-";
+      display.textContent = heading + "\n-";
     }
   }
 
@@ -1846,6 +1848,10 @@
     var select = document.getElementById("chartDataNavSelect");
     if (select) {
       select.addEventListener("change", function () {
+        if (select.value === "__home") {
+          returnToHome();
+          return;
+        }
         if (String(select.value || "").indexOf("__chartSetup") === 0) {
           runChartSetupMobileAction(select.value);
           return;
@@ -1854,6 +1860,33 @@
         closeChartDataNavCategories();
       });
     }
+    // Empty-state (start screen) action buttons — open the Chart Setup dialog.
+    Array.prototype.slice.call(document.querySelectorAll("#emptyState [data-chart-setup-action]")).forEach(function (button) {
+      if (button._emptyStateWired) return;
+      button._emptyStateWired = true;
+      button.addEventListener("click", function (event) {
+        event.preventDefault();
+        runChartSetupRibbonAction(button.getAttribute("data-chart-setup-action"));
+      });
+    });
+  }
+
+  // Return to the start (empty) screen from a loaded report.
+  function returnToHome() {
+    var report = document.getElementById("report");
+    var empty = document.getElementById("emptyState");
+    var nav = document.getElementById("chartDataNavRibbon");
+    var layoutBar = document.getElementById("chartInputLayoutBar");
+    if (document.body.classList.contains("focus-mode") && typeof exitFocusMode === "function") {
+      try { exitFocusMode(); } catch (_e) {}
+    }
+    if (report) report.classList.add("hidden");
+    if (empty) empty.classList.remove("hidden");
+    if (nav) nav.classList.add("hidden");
+    if (layoutBar) layoutBar.classList.add("hidden");
+    document.body.classList.remove("report-active");
+    document.body.classList.remove("report-view-chartData");
+    if (typeof window !== "undefined" && window.scrollTo) window.scrollTo(0, 0);
   }
 
   function runChartSetupMobileAction(value) {
@@ -3226,8 +3259,12 @@
   function geocodedDisplayName(row, fallback) {
     var address = row && row.address ? row.address : {};
     var cityName = address.city || address.town || address.village || address.municipality || address.county || "";
+    var state = address.state || address.region || address.state_district || "";
     var country = address.country || "";
-    var display = [cityName, country].filter(Boolean).join(", ");
+    // Format: "City, State, Country" (e.g. "Muktsar, Punjab, India")
+    var display = [cityName, state, country].filter(Boolean).filter(function (part, index, list) {
+      return list.indexOf(part) === index;
+    }).join(", ");
     return (display || row.display_name || fallback || "Searched place").slice(0, 160);
   }
 
@@ -6561,6 +6598,12 @@
     if (clone.querySelector && clone.querySelector("#varshfalUpdateBtn") && lastReportChart && lastReportInput) {
       wireVarshfalControls(lastReportChart, lastReportInput, clone);
     }
+    // cloneNode does not copy event listeners. Re-wire the transit controls within
+    // the popup clone (scoped to the clone) so its "Update chart" + step buttons work
+    // independently of the original section — fixes Update doing nothing in the popup.
+    if (clone.querySelector && clone.querySelector("#transitUpdateBtn") && lastReportChart && lastReportInput) {
+      wireTransitChartControls(transitInputFromReportInput(lastReportInput, lastReportChart.ascendant.sign), lastReportChart, clone);
+    }
   }
 
   function refreshOpenFocusPopups() {
@@ -8704,29 +8747,41 @@
     }).join("") + "</div>";
   }
 
-  function wireTransitChartControls(input, natalChart) {
+  function wireTransitChartControls(input, natalChart, scope) {
     if (typeof document === "undefined") return;
-    var update = document.getElementById("transitUpdateBtn");
-    var place = document.getElementById("transitPlace");
-    var mount = document.getElementById("transitChartMount");
+    // scope = the root element that holds this transit section's controls.
+    // When the transit chart is cloned into a focus / full-screen popup there are
+    // TWO sets of #transitDate / #transitUpdateBtn in the document. Scoping every
+    // lookup to this root makes each copy update its OWN chart independently and
+    // fixes the "Update chart does nothing in the popup" bug.
+    scope = scope || document;
+    var q = function (id) { return scope.querySelector("#" + id); };
+    var update = q("transitUpdateBtn");
+    var place = q("transitPlace");
+    var mount = q("transitChartMount");
     function updateTransitMount() {
-      var transitInput = readTransitControls(input);
+      var transitInput = readTransitControls(input, scope);
       rememberCustomLocation(transitInput.place, transitInput.latitude, transitInput.longitude, transitInput.timezone);
       var chart = buildTransitChartFromInput(transitInput);
       if (mount) {
         mount.innerHTML = transitChartPanelHtml(chart, transitInput, natalChart);
         enhanceReportTableTopControls();
       }
+      // Keep the Time Tool readout in sync when both are open and pointed at transit,
+      // so the next +/- step continues from the date just entered here.
+      if (typeof syncTimeToolDisplay === "function") {
+        try { syncTimeToolDisplay(); } catch (_e) {}
+      }
     }
     if (place) {
       place.addEventListener("change", function () {
         var found = findCity(place.value);
         if (!found) return;
-        document.getElementById("transitTimezone").value = found.timezone;
-        document.getElementById("transitLatitude").value = Math.abs(found.latitude).toFixed(4);
-        document.getElementById("transitLatitudeDirection").value = found.latitude < 0 ? "S" : "N";
-        document.getElementById("transitLongitude").value = Math.abs(found.longitude).toFixed(4);
-        document.getElementById("transitLongitudeDirection").value = found.longitude < 0 ? "W" : "E";
+        if (q("transitTimezone")) q("transitTimezone").value = found.timezone;
+        if (q("transitLatitude")) q("transitLatitude").value = Math.abs(found.latitude).toFixed(4);
+        if (q("transitLatitudeDirection")) q("transitLatitudeDirection").value = found.latitude < 0 ? "S" : "N";
+        if (q("transitLongitude")) q("transitLongitude").value = Math.abs(found.longitude).toFixed(4);
+        if (q("transitLongitudeDirection")) q("transitLongitudeDirection").value = found.longitude < 0 ? "W" : "E";
       });
     }
     if (mount) {
@@ -8734,7 +8789,7 @@
         var target = event.target && event.target.closest ? event.target.closest("[data-transit-step]") : null;
         if (!target) return;
         try {
-          adjustTransitControls(target.getAttribute("data-transit-unit"), Number(target.getAttribute("data-transit-step")));
+          adjustTransitControls(target.getAttribute("data-transit-unit"), Number(target.getAttribute("data-transit-step")), scope);
           updateTransitMount();
         } catch (error) {
           alertUser(error.message || "Could not update transit chart.");
@@ -8759,26 +8814,29 @@
     });
   }
 
-  function readTransitControls(fallbackInput) {
-    var date = document.getElementById("transitDate").value;
-    var time = document.getElementById("transitTime").value;
-    var timezone = Number(document.getElementById("transitTimezone").value);
+  function readTransitControls(fallbackInput, scope) {
+    scope = scope || document;
+    var q = function (id) { return scope.querySelector("#" + id); };
+    var date = q("transitDate").value;
+    var time = q("transitTime").value;
+    var timezone = Number(q("transitTimezone").value);
     if (!date || !time || !Number.isFinite(timezone)) throw new Error("Transit date, time and timezone are required.");
     return {
       date: date,
       time: normalizeTimeInput(time),
       timezone: timezone,
-      place: document.getElementById("transitPlace").value.trim(),
-      latitude: signedCoordinate(document.getElementById("transitLatitude").value || fallbackInput.latitude, document.getElementById("transitLatitudeDirection").value, "S"),
-      longitude: signedCoordinate(document.getElementById("transitLongitude").value || fallbackInput.longitude, document.getElementById("transitLongitudeDirection").value, "W"),
+      place: q("transitPlace").value.trim(),
+      latitude: signedCoordinate(q("transitLatitude").value || fallbackInput.latitude, q("transitLatitudeDirection").value, "S"),
+      longitude: signedCoordinate(q("transitLongitude").value || fallbackInput.longitude, q("transitLongitudeDirection").value, "W"),
       natalAscSign: fallbackInput.natalAscSign,
-      division: Number((document.getElementById("transitDivision") && document.getElementById("transitDivision").value) || fallbackInput.division || 1)
+      division: Number((q("transitDivision") && q("transitDivision").value) || fallbackInput.division || 1)
     };
   }
 
-  function adjustTransitControls(unit, amount) {
-    var dateField = document.getElementById("transitDate");
-    var timeField = document.getElementById("transitTime");
+  function adjustTransitControls(unit, amount, scope) {
+    scope = scope || document;
+    var dateField = scope.querySelector("#transitDate");
+    var timeField = scope.querySelector("#transitTime");
     if (!dateField || !timeField || !dateField.value || !timeField.value) throw new Error("Transit date and time are required.");
     var parts = normalizeTimeInput(timeField.value).split(":").map(Number);
     var date = new Date(dateField.value + "T" + pad(parts[0]) + ":" + pad(parts[1]) + ":" + pad(parts[2] || 0));
@@ -12286,11 +12344,18 @@
           '<div class="vednetra-report-options-head"><div><p class="eyebrow">Report Parameters</p><h3 id="vednetraReportOptionsTitle">VedNetra Report</h3></div><button type="button" data-vednetra-cancel>Cancel</button></div>' +
           '<p class="muted">Specify period-sensitive details before the report is built. Static natal sections are included automatically.</p>' +
           '<div class="vednetra-report-options-grid">' +
-            '<label class="vednetra-wide">Varshfal calendar years (max 7)<textarea id="vednetraVarshfalYears" rows="5" placeholder="2026&#10;2027&#10;2028&#10;2029&#10;2030&#10;2031&#10;2032">' + escapeHtml(defaults.varshfalYears) + '</textarea></label>' +
+            '<label class="vednetra-wide">Varshfal calendar years (single years or ranges, no limit)<textarea id="vednetraVarshfalYears" rows="4" placeholder="2004-2024&#10;or: 2010, 2015, 2020-2024">' + escapeHtml(defaults.varshfalYears) + '</textarea></label>' +
             '<label>Relevant life area for Varshfal<select id="vednetraLifeArea">' + vedNetraLifeAreaOptions(defaults.lifeArea) + '</select></label>' +
-            '<label class="vednetra-wide">Transit charts / snapshots<textarea id="vednetraTransitList" rows="4" placeholder="2026-05-31 12:00:00&#10;2026-06-15 18:30:00">' + escapeHtml(defaults.transitList) + '</textarea></label>' +
-            '<label class="vednetra-wide">Dasha ranges<textarea id="vednetraDashaRanges" rows="4" placeholder="2026-05-31 to 2031-05-31&#10;2031-06-01 to 2036-06-01">' + escapeHtml(defaults.dashaRanges) + '</textarea></label>' +
-            '<label>Forward dasha coverage<select id="vednetraDashaYears"><option value="5">5 years</option><option value="6">6 years</option><option value="7" selected>7 years</option></select></label>' +
+            '<label class="vednetra-wide">Transit charts / snapshots (any number, format dd-mm-yyyy)<textarea id="vednetraTransitList" rows="4" placeholder="15-02-2022, 16-04-2019&#10;or: 31-05-2026 12:00:00, 15-06-2026 18:30">' + escapeHtml(defaults.transitList) + '</textarea></label>' +
+            '<label class="vednetra-wide">Dasha ranges (default: birth to today)<textarea id="vednetraDashaRanges" rows="3" placeholder="01-04-1985 to 11-06-2026">' + escapeHtml(defaults.dashaRanges) + '</textarea></label>' +
+            '<label>Forward dasha coverage<select id="vednetraDashaYears">' +
+              '<option value="0.0833">1 month</option>' +
+              '<option value="0.25">3 months</option>' +
+              '<option value="0.5">6 months</option>' +
+              '<option value="1" selected>1 year</option>' +
+              '<option value="2">2 years</option>' +
+              '<option value="3">3 years</option>' +
+            '</select></label>' +
             '<label>Notes for analyst<textarea id="vednetraAnalystNotes" rows="3" placeholder="Optional period focus, event question, or instruction"></textarea></label>' +
           '</div>' +
           '<div class="vednetra-report-options-actions"><button type="button" data-vednetra-cancel>Cancel</button><button type="button" class="primary" data-vednetra-build>Build Report</button></div>' +
@@ -12309,13 +12374,13 @@
         if (event.target === layer) close(null);
       });
       layer.querySelector("[data-vednetra-build]").addEventListener("click", function () {
-        var dashaYears = Number(layer.querySelector("#vednetraDashaYears").value) || 7;
+        var dashaYears = Number(layer.querySelector("#vednetraDashaYears").value) || 1;
         close({
           varshfalYears: parseVedNetraYears(layer.querySelector("#vednetraVarshfalYears").value),
           lifeArea: layer.querySelector("#vednetraLifeArea").value,
           transitEntries: parseVedNetraTransitEntries(layer.querySelector("#vednetraTransitList").value, defaults.transitDate, defaults.transitTime),
           dashaRanges: parseVedNetraDashaRanges(layer.querySelector("#vednetraDashaRanges").value, defaults.dashaStart, defaults.dashaEnd),
-          dashaForwardYears: clamp(dashaYears, 5, 7),
+          dashaForwardYears: clamp(dashaYears, 0.02, 50),
           analystNotes: layer.querySelector("#vednetraAnalystNotes").value.trim()
         });
       });
@@ -12328,18 +12393,20 @@
     var input = lastReportInput || {};
     var timezone = Number(input.timezone || 5.5);
     var reference = input.asOfInstant instanceof Date ? input.asOfInstant : new Date();
-    var start = input.asOfDate || dateInputValue(reference, timezone);
-    var end = dateInputValue(addDays(localDateTimeToUtc(start, "00:00:00", timezone), 7 * 365.25), timezone);
-    var year = Number(start.slice(0, 4)) || new Date().getFullYear();
+    var transitStart = input.asOfDate || dateInputValue(reference, timezone);
+    // Dasha range default: from Date of Birth to today (current date).
+    var birthDate = input.birthInstant instanceof Date ? dateInputValue(input.birthInstant, timezone) : transitStart;
+    var today = dateInputValue(new Date(), timezone);
+    var year = Number(transitStart.slice(0, 4)) || new Date().getFullYear();
     return {
       varshfalYears: String(year),
       lifeArea: "general",
-      transitDate: start,
+      transitDate: transitStart,
       transitTime: input.asOfTime || timeInputValue(reference, timezone),
-      dashaStart: start,
-      dashaEnd: end,
-      transitList: start + " " + (input.asOfTime || timeInputValue(reference, timezone)),
-      dashaRanges: start + " to " + end
+      dashaStart: birthDate,
+      dashaEnd: today,
+      transitList: transitStart + " " + (input.asOfTime || timeInputValue(reference, timezone)),
+      dashaRanges: birthDate + " to " + today
     };
   }
 
@@ -12367,32 +12434,62 @@
   }
 
   function parseVedNetraYears(value) {
-    return String(value || "").split(/[^0-9]+/).map(function (part) { return Number(part); })
-      .filter(function (year) { return year >= 1800 && year <= 2200; }).slice(0, 7);
+    var text = String(value || "");
+    var years = [];
+    // 1. Expand ranges first: "2004-2024", "2004 to 2024", "2004–2024"
+    var rangeRx = /(\d{4})\s*(?:-|–|—|to|through|until)\s*(\d{4})/gi;
+    var remaining = text;
+    var m;
+    while ((m = rangeRx.exec(text)) !== null) {
+      var a = Number(m[1]);
+      var b = Number(m[2]);
+      if (a > b) { var tmp = a; a = b; b = tmp; }
+      for (var y = a; y <= b; y += 1) years.push(y);
+      remaining = remaining.replace(m[0], " ");
+    }
+    // 2. Any remaining standalone 4-digit years
+    remaining.split(/[^0-9]+/).forEach(function (part) {
+      var n = Number(part);
+      if (n) years.push(n);
+    });
+    // 3. Filter to valid range, dedupe, sort ascending. No 7-year cap (safety cap 300).
+    years = years.filter(function (n, i) { return n >= 1800 && n <= 2200 && years.indexOf(n) === i; });
+    years.sort(function (p, q) { return p - q; });
+    return years.slice(0, 300);
   }
 
   function parseVedNetraTransitEntries(value, fallbackDate, fallbackTime) {
+    // Accepts any date format (dd-mm-yyyy, d/m/yyyy, yyyy-mm-dd, "8 March 2010", etc.)
+    // and an optional time. Multiple snapshots may be separated by commas, semicolons
+    // or new lines. No limit on the number of transit charts.
     var entries = [];
-    var text = String(value || "");
-    var pattern = /(\d{4}-\d{2}-\d{2})(?:[ T,]+(\d{1,2}:\d{2}(?::\d{2})?))?/g;
-    var match;
-    while ((match = pattern.exec(text))) {
-      entries.push({ date: match[1], time: normalizeTimeInput(match[2] || fallbackTime || "00:00:00") });
-    }
+    String(value || "").split(/[,;\n]+/).forEach(function (token) {
+      var padded = " " + String(token || "").trim() + " ";
+      if (!padded.trim()) return;
+      var d = extractQuickBirthDate(padded);
+      if (!d) return;
+      var t = extractQuickBirthTime(padded);
+      entries.push({ date: d.value, time: normalizeTimeInput(t ? t.value : (fallbackTime || "00:00:00")) });
+    });
     if (!entries.length) entries.push({ date: fallbackDate, time: normalizeTimeInput(fallbackTime || "00:00:00") });
-    return entries.slice(0, 12);
+    return entries;
   }
 
   function parseVedNetraDashaRanges(value, fallbackStart, fallbackEnd) {
+    // Each line/entry: "<start> to <end>" in any date format. "to/through/until/-" separators.
     var ranges = [];
-    var text = String(value || "");
-    var pattern = /(\d{4}-\d{2}-\d{2})\s*(?:to|through|until|[-–—])\s*(\d{4}-\d{2}-\d{2})/gi;
-    var match;
-    while ((match = pattern.exec(text))) {
-      ranges.push({ start: match[1], end: match[2] });
-    }
+    String(value || "").split(/[;\n]+/).forEach(function (line) {
+      var parts = String(line || "").split(/\s+(?:to|through|until)\s+|\s*(?:–|—)\s*|\s+-\s+/i);
+      if (parts.length < 2) {
+        // also try a plain hyphen split if it looks like "yyyy-mm-dd - yyyy-mm-dd" was joined
+        return;
+      }
+      var s = extractQuickBirthDate(" " + parts[0].trim() + " ");
+      var e = extractQuickBirthDate(" " + parts[1].trim() + " ");
+      if (s && e) ranges.push({ start: s.value, end: e.value });
+    });
     if (!ranges.length) ranges.push({ start: fallbackStart, end: fallbackEnd });
-    return ranges.slice(0, 12);
+    return ranges.slice(0, 50);
   }
 
   function buildVedNetraReportText(chart, input, options) {
@@ -12577,7 +12674,7 @@
     }));
     var dashaRanges = options.dashaRanges && options.dashaRanges.length ? options.dashaRanges : [{
       start: options.dashaStart || dateInputValue(ref, input.timezone),
-      end: options.dashaEnd || dateInputValue(addDays(ref, clamp(Number(options.dashaForwardYears) || 7, 5, 7) * 365.25), input.timezone)
+      end: options.dashaEnd || dateInputValue(addDays(ref, clamp(Number(options.dashaForwardYears) || 1, 0.02, 50) * 365.25), input.timezone)
     }];
     dashaRanges.forEach(function (range, index) {
       var rangeStart = localDateTimeToUtc(range.start, "00:00:00", input.timezone);

@@ -660,7 +660,7 @@ button:hover {
 }
 
 .chart-data-nav.hidden {
-  display: none;
+  display: none !important;
 }
 
 .nav-category {
@@ -5577,12 +5577,25 @@ body.chart-input-collapsed .report-view {
    the HTML `hidden` attribute; we use !important to win the cascade. ── */
 .time-tool-popup .time-tool-mode,
 .time-tool-popup .time-tool-edit-label,
-.time-tool-popup #timeToolCurrentDisplay,
 .time-tool-popup #timeToolAddPickBtn,
 .time-tool-popup #timeToolRemovePickBtn,
 .time-tool-popup #timeToolHelpBtn,
 .time-tool-popup #timeToolStatus {
   display: none !important;
+}
+
+/* Current date/time readout — kept visible (shows Birth or Transit date+time) */
+.time-tool-popup #timeToolCurrentDisplay {
+  display: block !important;
+  margin-top: 8px;
+  padding: 8px 10px;
+  border: 1px solid rgba(200, 168, 78, 0.55);
+  border-radius: 8px;
+  background: linear-gradient(180deg, #1c1e3c, #141630);
+  color: #ffe8a0;
+  font: 600 13px/1.4 "Segoe UI", Arial, sans-serif;
+  text-align: center;
+  white-space: pre-line;
 }
 
 .time-tool-popup {
@@ -6475,7 +6488,7 @@ body:not(.report-active) .chart-data-nav {
 }
 
 @media (max-width: 1080px) {
-  .chart-data-nav {
+  .chart-data-nav:not(.hidden) {
     display: grid !important;
     grid-template-columns: 1fr !important;
     overflow: visible !important;
@@ -7525,5 +7538,205 @@ body.report-active .empty-state {
   /* Bigger hit area on chart house cells for taps */
   .north-house-hit {
     r: 36;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CHART SETUP DIALOG — COMPACT SINGLE-VIEW LAYOUT  (desktop / tablet ≥ 900px)
+   Two balanced columns + tight spacing so all inputs fit without scrolling.
+   Mobile (<900px) keeps the full-screen scrollable layout.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (min-width: 900px) {
+  /* Wider panel to host two columns */
+  .chart-setup-dialog-panel {
+    width: min(1180px, 97vw) !important;
+    max-width: min(1180px, 97vw) !important;
+    max-height: calc(100dvh - 16px) !important;
+  }
+
+  /* The dialog header already shows the logo + "Chart Setup", so the in-dialog
+     VedNetra brand row is redundant — hide it on desktop to reclaim vertical space. */
+  .chart-setup-dialog .brand-row { display: none !important; }
+
+  /* ── Explicit 2-column grid:
+        LEFT  = Chart Setup, Native, Actions, Report Download (stacked)
+        RIGHT = Birth Details (with its own internal 2-column field layout) ── */
+  .chart-setup-dialog #birthForm {
+    display: grid;
+    grid-template-columns: minmax(280px, 320px) minmax(0, 1fr);
+    grid-auto-rows: min-content;
+    gap: 8px 18px;
+    align-items: start;
+  }
+  .chart-setup-dialog #chartStartSection { grid-column: 1; grid-row: 1; }
+  .chart-setup-dialog #nativeSection     { grid-column: 1; grid-row: 2; }
+  .chart-setup-dialog .actions           { grid-column: 1; grid-row: 3; }
+  .chart-setup-dialog .report-download-panel { grid-column: 1; grid-row: 4; }
+  /* Birth Details occupies the whole right column */
+  .chart-setup-dialog #birthDetailsSection {
+    grid-column: 2;
+    grid-row: 1 / span 4;
+    align-self: stretch;
+  }
+
+  /* Birth Details inner fields flow into TWO columns so the block is short */
+  .chart-setup-dialog #birthDetailsSection {
+    columns: 2;
+    column-gap: 14px;
+  }
+  .chart-setup-dialog #birthDetailsSection > * {
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+  }
+  .chart-setup-dialog #birthDetailsSection > legend {
+    column-span: all;
+  }
+  /* Quick input spans both inner columns (it's wide) */
+  .chart-setup-dialog #birthDetailsSection > .quick-birth-input-panel {
+    column-span: all;
+  }
+
+  /* Tight, dense spacing everywhere in the dialog */
+  .chart-setup-dialog .input-panel { padding: 10px 16px !important; }
+  .chart-setup-dialog fieldset { padding: 8px 10px !important; margin: 0 !important; }
+  .chart-setup-dialog legend { padding: 0 5px; font-size: 12px; }
+  .chart-setup-dialog label { margin-bottom: 6px !important; gap: 3px !important; font-size: 12px; }
+  .chart-setup-dialog input,
+  .chart-setup-dialog select,
+  .chart-setup-dialog textarea {
+    min-height: 31px !important;
+    padding: 5px 8px !important;
+    font-size: 13px !important;
+  }
+  .chart-setup-dialog .grid-2,
+  .chart-setup-dialog .grid-3 { gap: 6px !important; }
+  .chart-setup-dialog button {
+    min-height: 31px !important;
+    padding: 5px 10px !important;
+    font-size: 12px !important;
+  }
+  .chart-setup-dialog .chart-mode-actions { gap: 6px !important; margin-bottom: 6px !important; }
+  .chart-setup-dialog .actions { gap: 6px !important; padding-top: 0 !important; }
+  .chart-setup-dialog .report-download-panel { padding: 8px 10px !important; }
+  .chart-setup-dialog .report-download-head { margin-bottom: 4px; font-size: 12px; }
+
+  /* Shrink the quick-input textarea */
+  .chart-setup-dialog #quickBirthInput { min-height: 40px !important; }
+  .chart-setup-dialog .quick-birth-input-panel { margin: 4px 0; }
+
+  /* Compress all helper/fine-print text (kept for JS status updates, just smaller) */
+  .chart-setup-dialog .fine-print {
+    margin: 2px 0 !important;
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+  }
+  /* Hide the long Asc-override explanation paragraph to save vertical space */
+  .chart-setup-dialog #birthDetailsSection > p.fine-print:not([id]) { display: none !important; }
+
+  /* Hide the iPhone / iPad Access fieldset (not needed for data entry) */
+  .chart-setup-dialog fieldset:has(#mobileAccessStatus) { display: none !important; }
+
+  .chart-setup-dialog .actions button { flex: 1 1 auto; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   START-SCREEN ACTION BUTTONS  +  MOBILE NAVIGATION FIXES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Two prominent call-to-action buttons under the app name on the start screen */
+.empty-state-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin: 6px auto 4px;
+  width: 100%;
+  max-width: 460px;
+}
+
+.empty-state-btn {
+  flex: 1 1 200px;
+  min-height: 52px;
+  padding: 12px 22px;
+  border: 1.5px solid var(--accent);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #fdf8ee, #f5e8c6);
+  color: var(--accent-strong);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(24, 15, 4, 0.12);
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+
+.empty-state-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(24, 15, 4, 0.18);
+}
+
+.empty-state-btn-primary {
+  border-color: var(--accent-strong);
+  background: linear-gradient(180deg, #2a2c54, #161830);
+  color: #ffe8a0;
+}
+
+.empty-state-btn-primary:hover {
+  background: linear-gradient(180deg, #34376a, #1c1e3c);
+}
+
+.empty-state-tagline {
+  max-width: 520px;
+  margin: 8px auto 0;
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* On the start screen the heavy nav/header must NOT show — only logo, name, buttons.
+   (#chartDataNavRibbon already starts hidden; this guards the backdrop bar too.) */
+body:not(.report-active)::before { display: none !important; }
+body:not(.report-active) .empty-state { padding-top: 8px; }
+
+@media (max-width: 720px) {
+  .empty-state-actions {
+    flex-direction: column;
+    gap: 10px;
+    max-width: 100%;
+  }
+  .empty-state-btn { flex: 1 1 auto; width: 100%; font-size: 17px; min-height: 54px; }
+
+  /* ── Mobile navigation when a chart is loaded ──
+     Keep the SECTION dropdown fully visible BELOW the status bar / notch,
+     not cut off at the very top. */
+  body.report-active.report-view-chartData #chartDataNavRibbon:not(.hidden) {
+    top: calc(env(safe-area-inset-top, 0px) + 6px) !important;
+    left: 6px !important;
+    right: 6px !important;
+    padding: 8px 10px !important;
+    background: linear-gradient(180deg, #1c1e3c, #141630) !important;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  /* Push report content below the (now taller) fixed nav so nothing hides under it */
+  body.report-active .output-panel {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 76px) !important;
+  }
+
+  /* Make the SECTION label + dropdown clear and tappable */
+  .chart-data-nav .mobile-drilldown-label {
+    color: #d4a840 !important;
+    font-size: 11px !important;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .chart-data-nav .mobile-drilldown-select {
+    min-height: 46px !important;
+    font-size: 16px !important;
+    font-weight: 700;
+    border-radius: 8px;
+    border: 1px solid rgba(200,168,78,0.6);
+    background: #fffbf0;
+    color: #1a1e38;
   }
 }

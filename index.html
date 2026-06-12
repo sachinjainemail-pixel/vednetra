@@ -13,7 +13,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.svg">
-  <link rel="stylesheet" href="styles.css?v=5">
+  <link rel="stylesheet" href="styles.css?v=9">
 </head>
 <body>
   <main class="shell">
@@ -84,7 +84,7 @@
             </label>
           </fieldset>
 
-          <fieldset>
+          <fieldset id="birthDetailsSection">
             <legend>Birth Details</legend>
             <label>
               Ayanamsha
@@ -229,7 +229,7 @@
 
     <section class="workspace">
       <section class="output-panel" aria-live="polite">
-        <div id="chartDataNavRibbon" class="chart-data-nav" aria-label="View A sections">
+        <div id="chartDataNavRibbon" class="chart-data-nav hidden" aria-label="View A sections">
           <div class="nav-category">
             <button type="button" class="nav-category-title" data-nav-category-toggle aria-expanded="false">Chart Setup</button>
             <div class="nav-category-actions">
@@ -290,6 +290,7 @@
           </div>
           <label class="mobile-drilldown-label">Section
             <select id="chartDataNavSelect" class="mobile-drilldown-select" aria-label="Select View A section">
+              <option value="__home">&#x2302; Home (start screen)</option>
               <optgroup label="Chart Setup">
                 <option value="__chartSetupNew">New Chart</option>
                 <option value="__chartSetupSelect">Select Existing Chart</option>
@@ -350,8 +351,11 @@
             <img class="empty-state-logo" src="icon.svg" alt="VedNetra logo">
             <h1 class="empty-state-title">VedNetra</h1>
           </div>
-          <h2>Ready for chart analysis</h2>
-          <p>Enter birth data. The report will show chart preparation, planetary details, vargas, transit chart, and Vimshottari timing data.</p>
+          <div class="empty-state-actions">
+            <button type="button" class="empty-state-btn empty-state-btn-primary" data-chart-setup-action="new">Create New Chart</button>
+            <button type="button" class="empty-state-btn" data-chart-setup-action="select">Select Existing Chart</button>
+          </div>
+          <p class="empty-state-tagline">Generate chart preparation, planetary details, vargas, transit chart and Vimshottari timing.</p>
         </div>
         <article id="report" class="report hidden"></article>
       </section>
@@ -449,7 +453,7 @@
             <option value="now">Set Current Time</option>
           </select>
         </label>
-        <div id="timeToolCurrentDisplay" class="time-tool-current" hidden>-</div>
+        <div id="timeToolCurrentDisplay" class="time-tool-current">-</div>
         <button type="button" id="timeToolAddPickBtn" hidden>Add to pick list</button>
         <button type="button" id="timeToolRemovePickBtn" hidden>Remove from Picklist</button>
         <button type="button" id="timeToolHelpBtn" hidden>Help</button>
@@ -457,6 +461,6 @@
       </div>
     </div>
   </main>
-  <script src="app.js?v=5"></script>
+  <script src="app.js?v=9"></script>
 </body>
 </html>
