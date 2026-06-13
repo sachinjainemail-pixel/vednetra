@@ -1869,6 +1869,15 @@
         runChartSetupRibbonAction(button.getAttribute("data-chart-setup-action"));
       });
     });
+    // Dedicated, always-visible Home button in the mobile nav bar.
+    var homeBtn = document.getElementById("mobileHomeBtn");
+    if (homeBtn && !homeBtn._homeWired) {
+      homeBtn._homeWired = true;
+      homeBtn.addEventListener("click", function (event) {
+        event.preventDefault();
+        returnToHome();
+      });
+    }
   }
 
   // Return to the start (empty) screen from a loaded report.
@@ -2261,24 +2270,15 @@
       if (existing && !confirmChartUpdate(existing)) return;
       var chartRecord = savedChartFromInput(input, existing);
       if (forceNew || !existing) chartRecord.id = makeSavedChartId();
-      if (forceNew) {
-        generate();
-        showReportView("chartData");
-        refreshRailFocusTargets(false);
-      }
       await persistSavedChart(chartRecord);
       await refreshSavedCharts(chartRecord.id);
       setSavedChartStatus("Saved " + chartRecord.title + ".", "good");
-      // Use non-blocking toast so it never interrupts or exits fullscreen
+      // Confirm with a non-blocking toast and STAY on the Chart Setup dialog.
+      // (No report generation, no navigation, no dialog close.)
       showToast("✓ Chart saved: " + chartRecord.title);
-      var setupDialog = document.getElementById("chartSetupDialog");
-      if (setupDialog && !setupDialog.classList.contains("hidden")) {
-        generate();
-        closeChartSetupDialog();
-        showVargaSectionAfterChartChange();
-      }
     } catch (error) {
       setSavedChartStatus(error.message || "Could not save chart.", "warning");
+      showToast("⚠ Could not save chart: " + (error && error.message ? error.message : "unknown error"));
     }
   }
 
@@ -6670,7 +6670,7 @@
     layer.id = "panelFocusPopup-" + window.__vednetraFocusPopupCounter;
     layer.className = "panel-focus-popup hidden";
     layer.innerHTML = '<div class="panel-focus-popup-shell" role="dialog" aria-modal="false" aria-label="Focused VedNetra panel">' +
-        '<div class="panel-focus-popup-head"><strong class="panel-focus-popup-title">Focus</strong><span><button type="button" data-focus-popup-close="1">Close</button></span></div>' +
+        '<div class="panel-focus-popup-head"><strong class="panel-focus-popup-title">Focus</strong><span class="panel-focus-popup-actions"><button type="button" data-focus-popup-minimize="1">Minimize</button><button type="button" data-focus-popup-close="1">Close</button></span></div>' +
         '<div class="panel-focus-popup-body"></div>' +
       '</div>';
     document.body.appendChild(layer);
@@ -6682,11 +6682,24 @@
       bringPanelFocusPopupToFront(layer);
     });
     layer.addEventListener("click", function (event) {
-      bringPanelFocusPopupToFront(layer);
+      var minimize = event.target && event.target.closest ? event.target.closest("[data-focus-popup-minimize]") : null;
+      if (minimize) {
+        event.stopPropagation();
+        toggleMinimizeFocusPopup(layer);
+        return;
+      }
       var close = event.target && event.target.closest ? event.target.closest("[data-focus-popup-close]") : null;
       if (close) {
         closePanelFocusPopup(layer);
+        restackMinimizedFocusPopups();
+        return;
       }
+      // Clicking a minimized popup's bar restores it.
+      if (layer.classList.contains("is-minimized")) {
+        toggleMinimizeFocusPopup(layer);
+        return;
+      }
+      bringPanelFocusPopupToFront(layer);
     });
     document.addEventListener("keydown", function (event) {
       if (event.key === "Escape") closePanelFocusPopup();
@@ -6695,7 +6708,48 @@
   }
 
   function bringPanelFocusPopupToFront(layer) {
+    if (layer && layer.classList && layer.classList.contains("is-minimized")) return;
     bringDialogToFront(layer, true);
+  }
+
+  // Minimize a Multi-View focus popup to a compact docked bar (and restore it).
+  function toggleMinimizeFocusPopup(layer) {
+    if (!layer) return;
+    var minimizing = !layer.classList.contains("is-minimized");
+    var btn = layer.querySelector("[data-focus-popup-minimize]");
+    if (minimizing) {
+      layer.dataset.prevStyle = layer.getAttribute("style") || "";
+      // The multi-tiled layout rules fight the minimized bar; drop the class
+      // while minimized and remember to restore it.
+      layer.dataset.wasMultiTiled = layer.classList.contains("is-multi-tiled") ? "1" : "";
+      layer.classList.remove("is-multi-tiled");
+      layer.classList.add("is-minimized");
+      if (btn) btn.textContent = "Restore";
+    } else {
+      layer.classList.remove("is-minimized");
+      if (layer.dataset.wasMultiTiled === "1") layer.classList.add("is-multi-tiled");
+      if (layer.dataset.prevStyle) layer.setAttribute("style", layer.dataset.prevStyle);
+      else layer.removeAttribute("style");
+      if (btn) btn.textContent = "Minimize";
+    }
+    restackMinimizedFocusPopups();
+    if (!minimizing) bringDialogToFront(layer, true);
+  }
+
+  // Dock all minimized focus popups in a neat row along the bottom of the screen.
+  function restackMinimizedFocusPopups() {
+    if (typeof document === "undefined" || !document.querySelectorAll) return;
+    var mins = Array.prototype.slice.call(document.querySelectorAll(".panel-focus-popup.is-minimized:not(.hidden)"));
+    mins.forEach(function (layer, i) {
+      // Use !important inline so mobile/tablet media rules can't override the dock.
+      layer.style.setProperty("left", (8 + i * 208) + "px", "important");
+      layer.style.setProperty("right", "auto", "important");
+      layer.style.setProperty("top", "auto", "important");
+      layer.style.setProperty("bottom", "8px", "important");
+      layer.style.setProperty("width", "200px", "important");
+      layer.style.setProperty("height", "auto", "important");
+      layer.style.setProperty("transform", "none", "important");
+    });
   }
 
   function setupPanelFocusPopupMotion(layer) {
@@ -11649,9 +11703,9 @@
     var end = new Date(Number(details.getAttribute("data-end")));
     if (!sd || !isFinite(start.getTime()) || !isFinite(end.getTime())) return;
     var pranas = subPeriods({ lord: sd, start: start, end: end }, "PR");
-    body.innerHTML = '<div class="dasha-prana-head"><strong>Prana</strong>' + dashaLevelButtons("PR") + '</div><div class="table-wrap dasha-prana-table-wrap"><table class="dasha-prana-table"><thead><tr><th>#</th><th>MD-AD-PD-SD-PR</th><th>Start</th><th>To</th></tr></thead><tbody>' +
+    body.innerHTML = '<div class="dasha-prana-head"><strong>Prana</strong>' + dashaLevelButtons("PR") + '</div><div class="table-wrap dasha-prana-table-wrap"><table class="dasha-prana-table"><thead><tr><th>#</th><th>MD-AD-PD-SD-PR</th><th>Start</th><th>To</th><th>Time</th></tr></thead><tbody>' +
       pranas.map(function (pr, index) {
-        return "<tr><td>" + (index + 1) + "</td><td>" + escapeHtml(dashaCode(md, ad, pd, sd, pr.lord)) + "</td><td>" + escapeHtml(dashaDate(pr.start, timezone)) + "</td><td>" + escapeHtml(dashaDate(pr.end, timezone)) + "</td></tr>";
+        return "<tr><td>" + (index + 1) + "</td><td>" + escapeHtml(dashaCode(md, ad, pd, sd, pr.lord)) + "</td><td>" + escapeHtml(dashaDate(pr.start, timezone)) + "</td><td>" + escapeHtml(dashaDate(pr.end, timezone)) + "</td><td>" + escapeHtml(dashaTime(pr.end, timezone)) + "</td></tr>";
       }).join("") + "</tbody></table></div>";
     details.dataset.pranaRendered = "1";
     setTimeout(wireDashaGroupControls, 0);
@@ -11684,6 +11738,11 @@
   function dashaDate(date, tzHours) {
     var shifted = new Date(date.getTime() + tzHours * 3600000);
     return pad(shifted.getUTCDate()) + "-" + pad(shifted.getUTCMonth() + 1) + "-" + shifted.getUTCFullYear();
+  }
+
+  function dashaTime(date, tzHours) {
+    var shifted = new Date(date.getTime() + tzHours * 3600000);
+    return pad(shifted.getUTCHours()) + ":" + pad(shifted.getUTCMinutes()) + ":" + pad(shifted.getUTCSeconds());
   }
 
   function dashaDisplayRangeEnd(chart, input) {
@@ -12257,6 +12316,10 @@
       downloadVedNetraReport(format, options);
       return;
     }
+    if (reportType === "standing") {
+      downloadStandingReport(format);
+      return;
+    }
     if (!lastPlainReport) {
       alertUser("Generate a report first, then download it.");
       return;
@@ -12293,7 +12356,7 @@
       lastPlainReports.chartData = text;
       lastReportInput = ramanInput;
       lastReportChart = chart;
-      renderVedNetraReportPreview(text, ramanInput);
+      // Download only — do NOT navigate to a preview; stay where the user is (dialog).
       var filenameBase = reportDownloadFilenameBase() + "_VedNetra_Report";
       if (format === "csv") {
         downloadBlob(filenameBase + ".csv", "text/csv;charset=utf-8", vedNetraReportTextToCsv(text));
@@ -12315,6 +12378,37 @@
     } catch (error) {
       console.error(error);
       alertUser("VedNetra Report could not be built: " + (error && error.message ? error.message : error));
+    }
+  }
+
+  function downloadStandingReport(format) {
+    try {
+      var input = lastReportInput || readInput();
+      var text = buildStandingReportText(input, {});
+      lastPlainReport = text;
+      lastPlainReports.chartData = text;
+      // Download only — do NOT navigate to a preview; stay where the user is (dialog).
+      var filenameBase = reportDownloadFilenameBase() + "_Standing_Natal_Report";
+      if (format === "csv") {
+        downloadBlob(filenameBase + ".csv", "text/csv;charset=utf-8", vedNetraReportTextToCsv(text));
+        showToast("✓ Standing Natal Report — CSV download started");
+        return;
+      }
+      if (format === "xls") {
+        downloadBlob(filenameBase + ".xls", "application/vnd.ms-excel;charset=utf-8", vedNetraReportTextToExcel(text));
+        showToast("✓ Standing Natal Report — Excel download started");
+        return;
+      }
+      if (format === "pdf") {
+        downloadBlob(filenameBase + ".pdf", "application/pdf", makeSimplePdf(text));
+        showToast("✓ Standing Natal Report — PDF download started");
+        return;
+      }
+      downloadBlob(filenameBase + ".txt", "text/plain;charset=utf-8", text);
+      showToast("✓ Standing Natal Report — TXT download started");
+    } catch (error) {
+      console.error(error);
+      alertUser("Standing Natal Report could not be built: " + (error && error.message ? error.message : error));
     }
   }
 
@@ -12925,6 +13019,549 @@
       ["Separate Sookshma-only pages", "Sookshma appears inside Module 9"],
       ["Panchang for reference date", "Not needed for natal analysis"]
     ]);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════════
+     CHAWDHRI STANDING NATAL REPORT  (Sections A-S)
+     A full, machine-readable natal data export following the Chawdhri Predictive
+     Engine requirements. Cast in Lahiri (Chitra-paksha) as the framework mandates.
+     ═══════════════════════════════════════════════════════════════════════════ */
+
+  var STANDING_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  function reportDateDMMMY(date, tzHours) {
+    if (!(date instanceof Date) || isNaN(date.getTime())) return "-";
+    var s = new Date(date.getTime() + Number(tzHours || 0) * 3600000);
+    return pad(s.getUTCDate()) + "-" + STANDING_MONTHS[s.getUTCMonth()] + "-" + s.getUTCFullYear();
+  }
+
+  function reportDateTimeDMMMY(date, tzHours) {
+    if (!(date instanceof Date) || isNaN(date.getTime())) return "-";
+    var s = new Date(date.getTime() + Number(tzHours || 0) * 3600000);
+    return reportDateDMMMY(date, tzHours) + " " + pad(s.getUTCHours()) + ":" + pad(s.getUTCMinutes()) + ":" + pad(s.getUTCSeconds());
+  }
+
+  function standingBody(chart, name, lon) {
+    // Build a uniform descriptor for a sidereal longitude as if it were a chart body.
+    var sign = signIndex(lon);
+    var nak = nakshatraInfo(lon);
+    return {
+      name: name,
+      lon: lon,
+      sign: sign,
+      signName: SIGNS[sign].name,
+      deg: lon - sign * 30,
+      nakshatra: nak.name,
+      nakLord: nak.lord,
+      pada: nak.pada,
+      house: houseFromSign(chart.ascendant.sign, sign)
+    };
+  }
+
+  // ---- Gulika / Mandi (day-night 8-part method, ascendant at start of Saturn's part) ----
+  function standingGulika(chart, input) {
+    try {
+      var tz = Number(input.timezone || 0);
+      var local = new Date(input.birthInstant.getTime() + tz * 3600000);
+      var weekday = local.getUTCDay();
+      var dateStr = local.getUTCFullYear() + "-" + pad(local.getUTCMonth() + 1) + "-" + pad(local.getUTCDate());
+      var st = sunTimesForDate(dateStr, Number(input.latitude), Number(input.longitude), tz);
+      if (!st || !Number.isFinite(st.sunrise) || !Number.isFinite(st.sunset)) return null;
+      var birthMin = local.getUTCHours() * 60 + local.getUTCMinutes() + local.getUTCSeconds() / 60;
+      var isDay = birthMin >= st.sunrise && birthMin < st.sunset;
+      var startMin, partLen, lordStartIndex;
+      if (isDay) {
+        startMin = st.sunrise;
+        partLen = (st.sunset - st.sunrise) / 8;
+        lordStartIndex = weekday;
+      } else {
+        startMin = st.sunset;
+        partLen = ((st.sunrise + 1440) - st.sunset) / 8;
+        lordStartIndex = (weekday + 5) % 7;
+      }
+      var saturnIdx = WEEKDAY_LORDS.indexOf("Saturn");
+      var partForSaturn = (((saturnIdx - lordStartIndex) % 7) + 7) % 7;
+      var gulikaMin = startMin + partForSaturn * partLen;
+      var dayOffset = Math.floor(gulikaMin / 1440);
+      var within = gulikaMin % 1440;
+      var localG = new Date(Date.UTC(local.getUTCFullYear(), local.getUTCMonth(), local.getUTCDate() + dayOffset, Math.floor(within / 60), Math.floor(within % 60), 0));
+      var utcG = new Date(localG.getTime() - tz * 3600000);
+      var jd = julianDay(utcG);
+      var sid = normalize(ascendantTropical(jd, Number(input.latitude), Number(input.longitude)) - chart.ayanamsa);
+      return standingBody(chart, "Gulika", sid);
+    } catch (error) { return null; }
+  }
+
+  // ---- Upagrahas derived from the Sun's sidereal longitude ----
+  function standingUpagrahas(chart) {
+    var sun = chart.planetsByName.Sun.lon;
+    var dhuma = normalize(sun + 133 + 20 / 60);
+    var vyatipata = normalize(360 - dhuma);
+    var parivesha = normalize(vyatipata + 180);
+    var indrachapa = normalize(360 - parivesha);
+    var upaketu = normalize(indrachapa + 16 + 40 / 60);
+    return [
+      standingBody(chart, "Dhuma", dhuma),
+      standingBody(chart, "Vyatipata", vyatipata),
+      standingBody(chart, "Parivesha", parivesha),
+      standingBody(chart, "Indrachapa", indrachapa),
+      standingBody(chart, "Upaketu", upaketu)
+    ];
+  }
+
+  // ---- Bhrigu Bindu: midpoint of Moon and Rahu ----
+  function standingBhriguBindu(chart) {
+    var moon = chart.planetsByName.Moon.lon;
+    var rahu = chart.planetsByName.Rahu.lon;
+    var arc = normalize(moon - rahu);
+    return standingBody(chart, "Bhrigu Bindu", normalize(rahu + arc / 2));
+  }
+
+  // ---- Tara Bala: the 9 taras counted from the Janma (Moon) nakshatra ----
+  function standingTaraBala(chart) {
+    var janma = nakshatraIndex(chart.planetsByName.Moon.lon);
+    var names = ["Janma (birth)", "Sampat (wealth)", "Vipat (danger)", "Kshema (well-being)",
+      "Pratyak (obstacle)", "Sadhaka (achievement)", "Vadha (death/loss)", "Mitra (friend)", "Ati-Mitra (great friend)"];
+    var quality = ["Mixed", "Good", "Bad", "Good", "Bad", "Good", "Bad", "Good", "Good"];
+    return names.map(function (label, group) {
+      var stars = [];
+      for (var cycle = 0; cycle < 3; cycle += 1) {
+        var idx = (janma + group + cycle * 9) % 27;
+        stars.push((idx + 1) + ". " + NAKSHATRAS[idx]);
+      }
+      return { tara: label, quality: quality[group], nakshatras: stars.join(", ") };
+    });
+  }
+
+  // ---- Chandra Bala reference (favourable signs/houses from natal Moon) ----
+  function standingChandraBala(chart) {
+    var moonSign = chart.planetsByName.Moon.sign;
+    var goodHouses = [1, 3, 6, 7, 10, 11];
+    var rows = [];
+    for (var h = 1; h <= 12; h += 1) {
+      var sign = normalizeSign(moonSign + h - 1);
+      rows.push({
+        fromMoon: h,
+        sign: SIGNS[sign].name,
+        verdict: goodHouses.indexOf(h) >= 0 ? "Favourable (Chandra bala)" : "Unfavourable"
+      });
+    }
+    return rows;
+  }
+
+  // ---- Sade Sati status (uses current Saturn transit vs natal Moon sign) ----
+  function standingSadeSati(chart, input) {
+    try {
+      var transit = buildChart(new Date(), Number(input.latitude), Number(input.longitude), Number(input.timezone), { ayanamshaKey: chart.ayanamshaKey });
+      var satSign = transit.planetsByName.Saturn.sign;
+      var moonSign = chart.planetsByName.Moon.sign;
+      var rel = ((satSign - moonSign + 12) % 12); // 11 = 12th, 0 = 1st, 1 = 2nd from Moon
+      var status;
+      if (rel === 11) status = "Sade Sati ACTIVE - first phase (Saturn in 12th from natal Moon)";
+      else if (rel === 0) status = "Sade Sati ACTIVE - peak phase (Saturn over natal Moon)";
+      else if (rel === 1) status = "Sade Sati ACTIVE - last phase (Saturn in 2nd from natal Moon)";
+      else if (rel === 3 || rel === 6) status = "Dhaiya / Kantaka (Saturn in " + (rel + 1) + "th from natal Moon)";
+      else status = "Not in Sade Sati (Saturn in " + (rel + 1) + "th from natal Moon)";
+      return {
+        date: reportDateDMMMY(new Date(), input.timezone),
+        natalMoonSign: SIGNS[moonSign].name,
+        transitSaturnSign: SIGNS[satSign].name,
+        status: status
+      };
+    } catch (error) { return null; }
+  }
+
+  // ---- Yogini Dasha (Moon-nakshatra based, 36-year cycle) ----
+  var YOGINIS = [
+    { name: "Mangala", years: 1 }, { name: "Pingala", years: 2 }, { name: "Dhanya", years: 3 },
+    { name: "Bhramari", years: 4 }, { name: "Bhadrika", years: 5 }, { name: "Ulka", years: 6 },
+    { name: "Siddha", years: 7 }, { name: "Sankata", years: 8 }
+  ];
+  function standingYoginiDasha(chart, input) {
+    var nakNum = nakshatraIndex(chart.planetsByName.Moon.lon) + 1; // 1..27
+    var startYogini = ((nakNum + 3) % 8); // 0..7 ; 0 maps to Sankata(index 7)
+    var firstIndex = startYogini === 0 ? 7 : startYogini - 1;
+    // fraction of the Moon already travelled through its nakshatra
+    var within = normalize(chart.planetsByName.Moon.lon) % NAK_SIZE;
+    var elapsedFrac = within / NAK_SIZE;
+    var rows = [];
+    var cursor = new Date(input.birthInstant.getTime());
+    var idx = firstIndex;
+    var first = true;
+    var endLimit = new Date(input.birthInstant.getTime() + 100 * 365.25 * DAY_MS);
+    while (cursor < endLimit && rows.length < 40) {
+      var y = YOGINIS[idx % 8];
+      var fullMs = y.years * 365.25 * DAY_MS;
+      var spanMs = first ? fullMs * (1 - elapsedFrac) : fullMs;
+      var end = new Date(cursor.getTime() + spanMs);
+      rows.push({ yogini: y.name, lord: yoginiLord(y.name), years: y.years, start: new Date(cursor.getTime()), end: end, balance: first });
+      cursor = end;
+      idx += 1;
+      first = false;
+    }
+    return rows;
+  }
+  function yoginiLord(name) {
+    return { Mangala: "Moon", Pingala: "Sun", Dhanya: "Jupiter", Bhramari: "Mars", Bhadrika: "Mercury", Ulka: "Saturn", Siddha: "Venus", Sankata: "Rahu" }[name] || "-";
+  }
+
+  // ---- Varga-dignity fraction for Vimsopaka (self-contained) ----
+  var EXALT_SIGN = { Sun: 0, Moon: 1, Mars: 9, Mercury: 5, Jupiter: 3, Venus: 11, Saturn: 6 };
+  var MOOL_SIGN = { Sun: 4, Moon: 1, Mars: 0, Mercury: 5, Jupiter: 8, Venus: 6, Saturn: 10 };
+  var NAT_FRIENDS = {
+    Sun: ["Moon", "Mars", "Jupiter"], Moon: ["Sun", "Mercury"], Mars: ["Sun", "Moon", "Jupiter"],
+    Mercury: ["Sun", "Venus"], Jupiter: ["Sun", "Moon", "Mars"], Venus: ["Mercury", "Saturn"], Saturn: ["Mercury", "Venus"]
+  };
+  var NAT_ENEMIES = {
+    Sun: ["Venus", "Saturn"], Moon: [], Mars: ["Mercury"], Mercury: ["Moon"],
+    Jupiter: ["Mercury", "Venus"], Venus: ["Sun", "Moon"], Saturn: ["Sun", "Moon", "Mars"]
+  };
+  function vargaDignity(planet, sign) {
+    if (planet === "Rahu" || planet === "Ketu") return { label: "n/a", frac: 0.5 };
+    if (EXALT_SIGN[planet] === sign) return { label: "Exalted", frac: 1 };
+    if (normalizeSign(EXALT_SIGN[planet] + 6) === sign) return { label: "Debilitated", frac: 0.125 };
+    if (MOOL_SIGN[planet] === sign && SIGNS[sign].lord === planet) return { label: "Mulatrikona", frac: 1 };
+    if (SIGNS[sign].lord === planet) return { label: "Own", frac: 1 };
+    var lord = SIGNS[sign].lord;
+    if (lord === planet) return { label: "Own", frac: 1 };
+    if ((NAT_FRIENDS[planet] || []).indexOf(lord) >= 0) return { label: "Friend", frac: 0.75 };
+    if ((NAT_ENEMIES[planet] || []).indexOf(lord) >= 0) return { label: "Enemy", frac: 0.25 };
+    return { label: "Neutral", frac: 0.5 };
+  }
+  var SHADVARGA = [{ d: 1, w: 6 }, { d: 2, w: 2 }, { d: 3, w: 4 }, { d: 9, w: 5 }, { d: 12, w: 2 }, { d: 30, w: 1 }];
+
+  function buildStandingReportText(input, options) {
+    options = options || {};
+    // Use the ayanamsha selected on the form. The Chawdhri framework recommends
+    // Lahiri (Chitra-paksha); if nothing is selected we default to Lahiri.
+    var ayanamshaKey = normalizeAyanamshaKey(input.ayanamshaKey || "lahiri");
+    var chart = buildChart(input.birthInstant, input.latitude, input.longitude, input.timezone, {
+      ascendantOverride: input.ascendantOverride,
+      ayanamshaKey: ayanamshaKey
+    });
+    var tz = Number(input.timezone || 0);
+    var isLahiri = ayanamshaKey === "lahiri";
+    var ayanamshaNote = isLahiri ? "" : " [NOTE: Chawdhri framework recommends Lahiri; this report was cast in " + chart.ayanamshaLabel + " as selected.]";
+    var out = [];
+    var L = function (s) { out.push(s === undefined ? "" : s); };
+
+    // ---- Header / format rules ----
+    L("================================================================================");
+    L(" NATAL CHART - STANDING REPORT");
+    L(" Analysis framework : The Chawdhri Predictive Engine (Vedic / Hindu Sidereal)");
+    L("================================================================================");
+    L("");
+    L("OUTPUT FORMAT CONFIRMATION");
+    L("  Ayanamsa        : " + chart.ayanamshaLabel + " - value " + decimalToDms(chart.ayanamsa) + ayanamshaNote);
+    L("  House system    : Whole-sign (Rasi) + Placidus cusps for the Bhava Chalit");
+    L("  Longitudes      : degree-minute-second");
+    L("  Dates           : DD-MMM-YYYY");
+    L("  Generated       : " + reportDateTimeDMMMY(new Date(), tz));
+
+    // ============================ SECTION A ============================
+    sectionLine(out, "SECTION A - BIRTH & CASTING DETAILS  [ESSENTIAL]");
+    var place = String(input.birthPlace || "").split(",").map(function (s) { return s.trim(); });
+    tableLines(out, "Birth & casting", ["Field", "Value"], [
+      ["Name", input.name || "Native"],
+      ["Sex / gender", standingGenderLabel(input)],
+      ["Date of birth", reportDateDMMMY(input.birthInstant, tz)],
+      ["Time of birth", timeInputValue(input.birthInstant, tz) + " (24-hour, local)"],
+      ["Birth-time source", "MANUAL - state hospital record / certificate / memory / approx."],
+      ["Place of birth", input.birthPlace || "-"],
+      ["  City", place[0] || "-"],
+      ["  State / province", place[1] || "-"],
+      ["  Country", place[2] || place[1] || "-"],
+      ["Latitude", coordinateDmsText(input.latitude) + " " + (input.latitude < 0 ? "S" : "N")],
+      ["Longitude", coordinateDmsText(input.longitude) + " " + (input.longitude < 0 ? "W" : "E")],
+      ["Timezone at birth", "UTC" + (tz >= 0 ? "+" : "") + tz + " (confirm DST / wartime adjustment manually)"],
+      ["Ayanamsa used", chart.ayanamshaLabel + " (value " + decimalToDms(chart.ayanamsa) + ")"],
+      ["House system used", "Whole-sign (Rasi) + Placidus cusps (Bhava Chalit)"],
+      ["Julian Day (UT)", chart.jd.toFixed(5)]
+    ]);
+
+    // ============================ SECTION B ============================
+    sectionLine(out, "SECTION B - PANCHANGA (the five limbs)  [ESSENTIAL]");
+    var pan = panchangInfo(chart, input);
+    var sunTimes = null;
+    try { sunTimes = sunTimesForDate(reportIsoDate(input.birthInstant, tz), Number(input.latitude), Number(input.longitude), tz); } catch (e) { sunTimes = null; }
+    tableLines(out, "Panchanga at birth", ["Limb", "Value"], [
+      ["Vara (weekday)", pan.vara],
+      ["Tithi + Paksha", pan.tithi + " (" + pan.paksha + ")"],
+      ["Janma-Nakshatra + Pada", pan.nakshatra + ", pada " + pan.pada],
+      ["Nakshatra lord", pan.nakLord],
+      ["Yoga", pan.yoga],
+      ["Karana", pan.karana],
+      ["Sunrise", sunTimes ? minuteTimeLabel(sunTimes.sunrise) : "n/a"],
+      ["Sunset", sunTimes ? minuteTimeLabel(sunTimes.sunset) : "n/a"]
+    ]);
+
+    // ============================ SECTION C ============================
+    sectionLine(out, "SECTION C - RASI CHART (D-1) + PLANETARY POSITION TABLE  [ESSENTIAL]");
+    var gulika = standingGulika(chart, input);
+    var cBodies = [{ name: "Ascendant", lon: chart.ascendant.lon, sign: chart.ascendant.sign, deg: chart.ascendant.deg, house: 1, retrograde: false, isAsc: true }]
+      .concat(chart.planets);
+    if (gulika) cBodies.push(Object.assign({}, gulika, { retrograde: false }));
+    tableLines(out, "D-1 positions (per body)", ["Body", "Rasi (sign)", "Longitude", "Nakshatra", "Nak Lord", "Pada", "House", "Retro", "Combust (dist)", "Dignity", "Avastha"], cBodies.map(function (b) {
+      var lon = b.lon;
+      var sign = b.sign;
+      var nak = nakshatraInfo(lon);
+      var combust = (!b.isAsc && b.name !== "Gulika" && chart.planetsByName[b.name]) ? combustionReport(chart, chart.planetsByName[b.name]) : null;
+      var dignity = (!b.isAsc && chart.planetsByName[b.name]) ? dignitySpec(chart.planetsByName[b.name]) : "-";
+      var nb = (!b.isAsc && chart.planetsByName[b.name]) ? neechabhangaReport(chart, chart.planetsByName[b.name]) : null;
+      return [
+        b.name,
+        SIGNS[sign].name + " (" + (sign + 1) + ")",
+        decimalToDms(lon - sign * 30),
+        nak.name,
+        nak.lord,
+        nak.pada,
+        "H" + (b.house || houseFromSign(chart.ascendant.sign, sign)),
+        b.isAsc || b.name === "Gulika" ? "-" : (b.retrograde ? "Y" : "N"),
+        combust ? (combust.status.indexOf("Not") === 0 ? "N" : "Y (" + combust.distance + ")") : "-",
+        dignity + (nb && nb.flag === "Yes" ? " / Neecha-bhanga(" + nb.type + ")" : ""),
+        b.isAsc || b.name === "Gulika" ? "-" : baaladiAvastha(b.deg !== undefined ? b.deg : (lon - sign * 30), sign)
+      ];
+    }));
+    L("");
+    L("NOTE: per-planet Nakshatra Lord is included above (CRITICAL for this framework).");
+    L("A full KP Star-Lord / Sub-Lord significator table is in SECTION N.");
+
+    // ============================ SECTION D ============================
+    sectionLine(out, "SECTION D - BHAVA CHALIT + HOUSE CUSPS  [ESSENTIAL]");
+    var tropCusps = placidusCuspLongitudes(chart) || quadrantCuspLongitudes(chart);
+    tableLines(out, "House cusps (Placidus, sidereal Lahiri)", ["House", "Cusp longitude", "Sign", "Sign lord"], (function () {
+      var r = [];
+      for (var h = 1; h <= 12; h += 1) {
+        var lon = normalize(tropCusps[h] - chart.ayanamsa);
+        var sign = signIndex(lon);
+        r.push(["H" + h, decimalToDms(lon - sign * 30) + " " + SIGNS[sign].name, SIGNS[sign].name, SIGNS[sign].lord]);
+      }
+      return r;
+    })());
+    var chalitCusps = kpCusps(chart, chart.ayanamsa);
+    tableLines(out, "Bhava Chalit - planets by house cusp", ["Planet", "Rasi house", "Bhava (cusp) house"], chart.planets.map(function (p) {
+      return [p.name, "H" + p.house, "H" + (kpHouseFromCusps(p.lon, chalitCusps) || p.house)];
+    }));
+
+    // ============================ SECTION E ============================
+    sectionLine(out, "SECTION E - DIVISIONAL CHARTS (VARGAS)  [ESSENTIAL: Saptavarga + D-10]");
+    var divisions = [2, 3, 7, 9, 12, 30, 10, 4, 16, 24, 60, 5, 6, 8, 11];
+    var points = ["Lagna"].concat(PLANETS);
+    tableLines(out, "Varga sign-placements (D-2..D-60)", ["Point", "D1"].concat(divisions.map(function (d) { return "D" + d; })), points.map(function (point) {
+      var d1 = point === "Lagna" ? chart.ascendant.sign : (chart.planetsByName[point] ? chart.planetsByName[point].sign : null);
+      return [point, d1 === null ? "-" : SIGNS[d1].name.slice(0, 3)].concat(divisions.map(function (division) {
+        var v = tableVarga(chart, division);
+        if (point === "Lagna") return SIGNS[v.ascendant.sign].name.slice(0, 3);
+        var p = v.planetsByName[point];
+        return p ? SIGNS[p.sign].name.slice(0, 3) : "-";
+      }));
+    }));
+    var vargottama = chart.planets.filter(function (p) { return isD9Vargottama(chart, p.name); }).map(prop("name"));
+    L("");
+    L("VARGOTTAMA planets (same sign in D-1 and D-9): " + (vargottama.length ? vargottama.join(", ") : "None"));
+
+    // ============================ SECTION F ============================
+    sectionLine(out, "SECTION F - VIMSHOTTARI DASHA  [ESSENTIAL]");
+    appendStandingVimshottari(out, chart, input);
+
+    // ============================ SECTION G ============================
+    sectionLine(out, "SECTION G - ASHTAKAVARGA  [RECOMMENDED]");
+    var sav = sarvashtakavargaBySign(chart);
+    tableLines(out, "Sarvashtakavarga (SAV) per rasi", ["Sign", "SAV bindus"], SIGNS.map(function (s, i) { return [s.name, sav[i].sav]; }));
+    CLASSICAL_PLANETS.forEach(function (planet) {
+      tableLines(out, planet + " Bhinnashtakavarga (BAV)", ["Sign", "Bindus"], SIGNS.map(function (s, i) { return [s.name, sav[i].bav[planet]]; }));
+    });
+
+    // ============================ SECTION H ============================
+    sectionLine(out, "SECTION H - SHADBALA & BHAVA BALA  [RECOMMENDED]");
+    var sb = shadbalaRows(chart);
+    tableLines(out, "Shadbala (rupas)", ["Planet", "Sthana", "Dig", "Kala", "Cheshta", "Naisargika", "Drik", "Total", "Required", "Ratio", "Ishta", "Kashta"], sb.map(function (row) {
+      var req = requiredShadbala(row.planet);
+      return [row.planet, row.sthana, row.dig, row.kala, row.cheshta, row.naisargika, row.drik, row.total, req, (row.total / req).toFixed(2), ishtaPhala(row), kashtaPhala(row)];
+    }));
+    tableLines(out, "Bhava Bala estimate (SAV + lord dignity + occupants)", ["House", "Sign", "SAV", "Lord", "Lord dignity", "Occupants", "Estimate /100"], chart.houses.map(function (h) {
+      var lordP = chart.planetsByName[h.lord];
+      var occ = h.tenants.map(prop("name"));
+      var benefics = occ.filter(function (n) { return ["Jupiter", "Venus", "Mercury", "Moon"].indexOf(n) >= 0; }).length;
+      var malefics = occ.filter(function (n) { return ["Sun", "Mars", "Saturn", "Rahu", "Ketu"].indexOf(n) >= 0; }).length;
+      var lordDig = lordP ? lordP.dignity : "-";
+      var lordBonus = lordDig === "Exalted" || lordDig === "Own" || lordDig === "Mulatrikona" ? 15 : (lordDig === "Debilitated" ? -12 : 0);
+      var score = clamp(Math.round(sav[h.sign].sav * 1.4 + benefics * 8 - malefics * 6 + lordBonus + 18), 0, 100);
+      return ["H" + h.house, h.signName, sav[h.sign].sav, h.lord, lordDig, occ.join(", ") || "Empty", score];
+    }));
+
+    // ============================ SECTION I ============================
+    sectionLine(out, "SECTION I - VARGA-DIGNITY / VIMSOPAKA SUMMARY  [RECOMMENDED]");
+    tableLines(out, "Shadvarga Vimsopaka (out of 20) + dignity per varga", ["Planet", "D1", "D2", "D3", "D9", "D12", "D30", "Vimsopaka"], CLASSICAL_PLANETS.map(function (planet) {
+      var cells = [];
+      var vim = 0;
+      SHADVARGA.forEach(function (item) {
+        var v = tableVarga(chart, item.d);
+        var p = v.planetsByName[planet];
+        var dg = vargaDignity(planet, p.sign);
+        cells.push(dg.label.slice(0, 3));
+        vim += item.w * dg.frac;
+      });
+      return [planet].concat(cells).concat([vim.toFixed(1)]);
+    }));
+    L("");
+    L("Vimsopaka tiers: >=18 Devaloka / 15-18 Paravata / 12-15 Simhasana / 10-12 Gopura / <10 Parijata-low.");
+
+    // ============================ SECTION J ============================
+    sectionLine(out, "SECTION J - GRAHA DRISHTI (ASPECTS)  [RECOMMENDED]");
+    tableLines(out, "Planetary aspects (houses aspected)", ["Planet", "From house", "Aspects houses", "Planets aspected"], chart.planets.map(function (p) {
+      var targets = houseAspectTargets(Number(p.house), p.name);
+      var hitPlanets = chart.planets.filter(function (o) { return o.name !== p.name && targets.indexOf(o.house) >= 0; }).map(prop("name"));
+      return [p.name, "H" + p.house, targets.map(function (h) { return "H" + h; }).join(", "), hitPlanets.join(", ") || "-"];
+    }));
+
+    // ============================ SECTION K ============================
+    sectionLine(out, "SECTION K - YOGAS LIST  [RECOMMENDED]");
+    var yogas = scanYogas(chart);
+    tableLines(out, "Auto-detected yogas (candidate list)", ["Yoga", "Category", "Planets", "Effect / evidence"], (yogas.length ? yogas : [{ name: "No major implemented yoga flagged", category: "-", planets: [], effect: "-" }]).map(function (y) {
+      return [y.name, y.category || "-", (y.planets || []).join(", ") || "-", y.effect || y.evidence || "-"];
+    }));
+
+    // ============================ SECTION L ============================
+    sectionLine(out, "SECTION L - JAIMINI  [ADVANCED]");
+    tableLines(out, "Chara karakas (8-karaka scheme)", ["Karaka", "Planet", "Karaka degree", "Sign"], jaiminiKarakas(chart, true).map(function (k) {
+      return [k.role, k.planet, decimalToDms(k.degree), k.signName];
+    }));
+    var al = arudhaPada(chart, 1);
+    var ul = arudhaPada(chart, 12);
+    var ak = jaiminiKarakas(chart, true)[0];
+    var akP = chart.planetsByName[ak.planet];
+    var karakamsa = akP ? vargaSign(akP.lon, 9) : null;
+    tableLines(out, "Jaimini special points", ["Point", "Sign", "Lord"], [
+      ["Arudha Lagna (AL)", SIGNS[al].name, SIGNS[al].lord],
+      ["Upapada Lagna (UL)", SIGNS[ul].name, SIGNS[ul].lord],
+      ["Karakamsa (AK in D-9)", karakamsa === null ? "-" : SIGNS[karakamsa].name, karakamsa === null ? "-" : SIGNS[karakamsa].lord]
+    ]);
+
+    // ============================ SECTION M ============================
+    sectionLine(out, "SECTION M - SECONDARY DASHAS  [ADVANCED]");
+    tableLines(out, "Yogini Dasha (Mahadasha sequence)", ["Yogini", "Lord", "Years", "Start", "End", "Balance at birth"], standingYoginiDasha(chart, input).map(function (r) {
+      return [r.yogini, r.lord, r.years, reportDateDMMMY(r.start, tz), reportDateDMMMY(r.end, tz), r.balance ? "Yes" : "-"];
+    }));
+    L("");
+    L("Ashtottari and Jaimini Chara/Narayana dashas are not generated by this engine build.");
+
+    // ============================ SECTION N ============================
+    sectionLine(out, "SECTION N - KP CUSP & SIGNIFICATOR TABLES  [ADVANCED]");
+    tableLines(out, "Bhava cusps - Star Lord & Sub Lord", ["Cusp", "Longitude", "Sign", "Sign Lord", "Star Lord", "Sub Lord"], chalitCusps.map(function (c) {
+      return ["H" + c.house, decimalToDms(c.deg) + " " + c.signName, c.signName, c.signLord, c.kp.starLord, c.kp.subLord];
+    }));
+    tableLines(out, "Planetary significators - Star Lord & Sub Lord", ["Planet", "House", "Sign", "Star Lord", "Sub Lord", "Sub-Sub Lord"], chart.planets.map(function (p) {
+      var kp = kpLordInfo(p.lon);
+      return [p.name, "H" + p.house, p.signName, kp.starLord, kp.subLord, kp.subSubLord];
+    }));
+
+    // ============================ SECTION O ============================
+    sectionLine(out, "SECTION O - UPAGRAHAS & BHRIGU BINDU  [ADVANCED]");
+    var upagrahas = standingUpagrahas(chart);
+    if (gulika) upagrahas = [gulika, Object.assign({}, gulika, { name: "Mandi (= Gulika in this build)" })].concat(upagrahas);
+    upagrahas.push(standingBhriguBindu(chart));
+    tableLines(out, "Upagrahas, Gulika/Mandi & Bhrigu Bindu", ["Point", "Sign", "Longitude", "Nakshatra", "Pada", "House"], upagrahas.map(function (u) {
+      return [u.name, u.signName, decimalToDms(u.deg), u.nakshatra, u.pada, "H" + u.house];
+    }));
+
+    // ============================ SECTION P ============================
+    sectionLine(out, "SECTION P - TRANSIT (GOCHARA) & SADE SATI  [ADVANCED]");
+    var transitDate = options.transitDate || dateInputValue(new Date(), tz);
+    var transitChart = buildChart(localDateTimeToUtc(transitDate, "12:00:00", tz), Number(input.latitude), Number(input.longitude), tz, { ayanamshaKey: chart.ayanamshaKey });
+    L("");
+    L("Transit chart cast for: " + reportDateDMMMY(localDateTimeToUtc(transitDate, "12:00:00", tz), tz) + " (" + chart.ayanamshaLabel + ")");
+    tableLines(out, "Current transit positions", ["Planet", "Sign", "Longitude", "Nakshatra", "Retro", "House from natal Lagna"], transitChart.planets.map(function (p) {
+      return [p.name, p.signName, decimalToDms(p.deg), p.nakshatra, p.retrograde ? "Y" : "N", "H" + houseFromSign(chart.ascendant.sign, p.sign)];
+    }));
+    var sade = standingSadeSati(chart, input);
+    if (sade) {
+      tableLines(out, "Sade Sati status", ["Field", "Value"], [
+        ["As of", sade.date],
+        ["Natal Moon sign", sade.natalMoonSign],
+        ["Transit Saturn sign", sade.transitSaturnSign],
+        ["Status", sade.status]
+      ]);
+    }
+
+    // ============================ SECTION Q ============================
+    sectionLine(out, "SECTION Q - TARA BALA / CHANDRA BALA  [ADVANCED]");
+    tableLines(out, "Tara Bala (9 taras from Janma-Nakshatra)", ["Tara", "Quality", "Nakshatras"], standingTaraBala(chart).map(function (t) {
+      return [t.tara, t.quality, t.nakshatras];
+    }));
+    tableLines(out, "Chandra Bala (signs from natal Moon)", ["From Moon", "Sign", "Verdict"], standingChandraBala(chart).map(function (c) {
+      return [c.fromMoon + "th", c.sign, c.verdict];
+    }));
+
+    // ============================ SECTION R ============================
+    sectionLine(out, "SECTION R - NATIVE'S LIFE HISTORY  [ESSENTIAL - MANUAL ENTRY]");
+    L("");
+    L("(Type the native's real, dated history below - required for back-testing.)");
+    L("  Current age / city / country         : ____________________");
+    L("  Cultural / national / socio context  : ____________________");
+    L("  Education milestones (+ year)        : ____________________");
+    L("  Career (first job, changes + year)   : ____________________");
+    L("  Marriage / relationships (+ date)    : ____________________");
+    L("  Children (+ birth dates)             : ____________________");
+    L("  Health events / surgeries (+ date)   : ____________________");
+    L("  Relocations / foreign travel (+ year): ____________________");
+    L("  Major financial events (+ year)      : ____________________");
+    L("  Significant family events (+ date)   : ____________________");
+    L("  Current life situation               : ____________________");
+
+    // ============================ SECTION S ============================
+    sectionLine(out, "SECTION S - QUESTIONS  [ESSENTIAL - MANUAL ENTRY]");
+    L("");
+    L("(List the native's questions in PRIORITY order.)");
+    L("  1. ____________________");
+    L("  2. ____________________");
+    L("  3. ____________________");
+
+    L("");
+    L("================================================================================");
+    L(" END OF STANDING REPORT");
+    L("================================================================================");
+    return out.join("\n");
+  }
+
+  function standingGenderLabel(input) {
+    var g = String(input.gender || "unspecified").toLowerCase();
+    if (g.indexOf("male") === 0 && g.indexOf("female") !== 0) return "Male";
+    if (g.indexOf("female") === 0) return "Female";
+    return "Unspecified (MANUAL - required for male/female karaka rules)";
+  }
+
+  function reportIsoDate(date, tzHours) {
+    var s = new Date(date.getTime() + Number(tzHours || 0) * 3600000);
+    return s.getUTCFullYear() + "-" + pad(s.getUTCMonth() + 1) + "-" + pad(s.getUTCDate());
+  }
+
+  function appendStandingVimshottari(out, chart, input) {
+    var tz = Number(input.timezone || 0);
+    var ref = input.asOfInstant instanceof Date ? input.asOfInstant : new Date();
+    var vim = chart.vimshottari;
+    var timeline = vim.timeline;
+    var timelineStart = timeline && timeline[0] ? timeline[0].start : chart.date;
+    out.push("");
+    out.push("Dasha balance at birth: " + vim.balanceLord + " Mahadasha, " + vim.balanceYears.toFixed(2) + " years (" + Math.round(vim.balanceDays) + " days) remaining at birth.");
+    var currentMd = activePeriod(timeline, ref);
+    tableLines(out, "Mahadasha sequence", ["MD Lord", "Start", "End", "Flag"], timeline.map(function (md) {
+      return [md.lord, reportDateDMMMY(md.start, tz), reportDateDMMMY(md.end, tz), md === currentMd ? "CURRENT" : "-"];
+    }));
+    // Full MD-AD-PD (3rd level) across lived span + next 20 years
+    var coverEnd = new Date(ref.getTime() + 20 * 365.25 * DAY_MS);
+    timeline.forEach(function (md) {
+      if (md.end < timelineStart || md.start > coverEnd) return;
+      var rows = [];
+      subPeriods(md, "AD").forEach(function (ad) {
+        subPeriods(ad, "PD").forEach(function (pd) {
+          if (pd.end < timelineStart || pd.start > coverEnd) return;
+          rows.push([md.lord + "-" + ad.lord + "-" + pd.lord, reportDateDMMMY(pd.start, tz), reportDateDMMMY(pd.end, tz),
+            (ref >= pd.start && ref < pd.end) ? "CURRENT" : "-"]);
+        });
+      });
+      if (rows.length) tableLines(out, "MD " + md.lord + " - Antardasha / Pratyantar (3rd level)", ["MD-AD-PD", "Start", "End", "Flag"], rows);
+    });
   }
 
   function sectionLine(out, title) {

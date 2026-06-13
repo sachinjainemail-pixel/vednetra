@@ -2860,6 +2860,46 @@ body.focus-mode .focus-mode-rail:focus-within {
   height: min(820px, calc(100dvh - 44px));
 }
 
+/* Minimized focus popup: collapse to just the title bar, docked at the bottom. */
+.panel-focus-popup.is-minimized {
+  height: auto !important;
+  width: 200px !important;
+  min-height: 0 !important;
+  z-index: 2600;
+}
+.panel-focus-popup.is-minimized .panel-focus-popup-shell {
+  height: auto;
+  cursor: pointer;
+}
+.panel-focus-popup.is-minimized .panel-focus-popup-body {
+  display: none !important;
+}
+.panel-focus-popup.is-minimized .panel-focus-popup-head {
+  border-bottom: 0;
+  border-radius: 12px;
+}
+.panel-focus-popup.is-minimized .panel-focus-popup-head {
+  flex-wrap: nowrap;
+  padding: 6px 8px;
+}
+.panel-focus-popup.is-minimized .panel-focus-popup-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+}
+.panel-focus-popup.is-minimized .panel-focus-popup-actions {
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+}
+.panel-focus-popup.is-minimized .panel-focus-popup-head button {
+  min-height: 26px;
+  padding: 3px 8px;
+  font-size: 11px;
+}
+
 .panel-focus-popup-head {
   display: flex;
   align-items: center;
@@ -7698,6 +7738,9 @@ body.report-active .empty-state {
 body:not(.report-active)::before { display: none !important; }
 body:not(.report-active) .empty-state { padding-top: 8px; }
 
+/* The dedicated Home button is mobile-only; hidden on desktop (full ribbon shows). */
+.mobile-home-btn { display: none; }
+
 @media (max-width: 720px) {
   .empty-state-actions {
     flex-direction: column;
@@ -7706,37 +7749,75 @@ body:not(.report-active) .empty-state { padding-top: 8px; }
   }
   .empty-state-btn { flex: 1 1 auto; width: 100%; font-size: 17px; min-height: 54px; }
 
-  /* ── Mobile navigation when a chart is loaded ──
-     Keep the SECTION dropdown fully visible BELOW the status bar / notch,
-     not cut off at the very top. */
+  /* ── Mobile navigation bar when a chart is loaded ──
+     A solid dark bar pinned to the very top: [⌂ Home] [SECTION ▾].
+     Always visible, below the status bar / notch, never faded or cut off. */
   body.report-active.report-view-chartData #chartDataNavRibbon:not(.hidden) {
-    top: calc(env(safe-area-inset-top, 0px) + 6px) !important;
-    left: 6px !important;
-    right: 6px !important;
-    padding: 8px 10px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    padding: calc(env(safe-area-inset-top, 0px) + 8px) 10px 8px !important;
+    border-radius: 0 !important;
+    border: 0 !important;
+    border-bottom: 1px solid rgba(200, 168, 78, 0.55) !important;
     background: linear-gradient(180deg, #1c1e3c, #141630) !important;
-    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.4) !important;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45) !important;
+    z-index: 9000 !important;
   }
 
-  /* Push report content below the (now taller) fixed nav so nothing hides under it */
-  body.report-active .output-panel {
-    padding-top: calc(env(safe-area-inset-top, 0px) + 76px) !important;
-  }
+  /* Remove the tall cream backdrop on mobile — the solid nav bar is its own background */
+  body.report-active::before { display: none !important; }
 
-  /* Make the SECTION label + dropdown clear and tappable */
+  /* Visible Home button — scoped under .chart-data-nav to beat the
+     `.chart-data-nav button { display:none }` rule that hides nav buttons. */
+  .chart-data-nav .mobile-home-btn,
+  #chartDataNavRibbon .mobile-home-btn {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    min-height: 44px;
+    padding: 8px 14px;
+    border: 1px solid rgba(200, 168, 78, 0.6) !important;
+    border-radius: 9px;
+    background: linear-gradient(180deg, #8a5c12, #58390a) !important;
+    color: #ffe888 !important;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .chart-data-nav .mobile-home-btn:active { filter: brightness(1.12); }
+
+  /* SECTION dropdown takes the remaining width */
   .chart-data-nav .mobile-drilldown-label {
+    display: flex !important;
+    flex-direction: column;
+    flex: 1 1 auto;
+    gap: 2px;
+    margin: 0 !important;
     color: #d4a840 !important;
-    font-size: 11px !important;
+    font-size: 10px !important;
     letter-spacing: 0.12em;
     text-transform: uppercase;
   }
   .chart-data-nav .mobile-drilldown-select {
-    min-height: 46px !important;
+    min-height: 44px !important;
     font-size: 16px !important;
     font-weight: 700;
     border-radius: 8px;
-    border: 1px solid rgba(200,168,78,0.6);
+    border: 1px solid rgba(200, 168, 78, 0.6);
     background: #fffbf0;
     color: #1a1e38;
+  }
+
+  /* Push report content below the fixed nav bar (height ≈ safe-area + ~62px) */
+  body.report-active .output-panel {
+    padding-top: calc(env(safe-area-inset-top, 0px) + 70px) !important;
   }
 }

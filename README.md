@@ -2,7 +2,7 @@
 
 A complete, self-contained Vedic astrology web application. **No build step. No dependencies. Pure static files.**
 
-Birth chart (D-1) plus all divisional charts to D-60, Vimshottari dasha, Shadbala, Ashtakavarga, KP, Jaimini, Varshfal (with year ranges), Yogas, multi-date transits, a draggable Time Tool, worksheets, and a full downloadable VedNetra report — all computed in the browser. Raman / Lahiri / KP ayanamshas. Fully mobile-responsive with a clean start screen and section navigation.
+Birth chart (D-1) + all divisional charts to D-60, Vimshottari dasha (down to Prana with end times), Shadbala, Ashtakavarga, KP, Jaimini, Varshfal (year ranges), Yogas, multi-date transits, draggable Time Tool, worksheets, a downloadable VedNetra report, and the comprehensive **Chawdhri Standing Natal Report** (Sections A–S). Lahiri / Raman / KP ayanamshas. Fully mobile-responsive with a clean start screen, sticky section navigation, and minimisable Multi-View panels.
 
 ---
 
@@ -10,7 +10,7 @@ Birth chart (D-1) plus all divisional charts to D-60, Vimshottari dasha, Shadbal
 
 | File | Purpose |
 |---|---|
-| `index.html` | Main HTML shell (loads `styles.css?v=9`, `app.js?v=9`) |
+| `index.html` | Main HTML shell (loads `styles.css?v=14`, `app.js?v=14`) |
 | `app.js` | All application logic |
 | `styles.css` | All styles (mobile + compact desktop dialog + start screen) |
 | `service-worker.js` | Offline cache (network-first, auto-updating) |
@@ -66,8 +66,8 @@ Open http://localhost:4173/
 - **HTTPS** is provided automatically by GitHub Pages (required for the service worker / offline mode).
 - **Saved charts** live in the browser's localStorage. Use the in-app **Export / Import library** to move charts between devices or browsers.
 - **Updating after edits:** bump `?v=N` in `index.html` (both `styles.css` and `app.js`) **and** `CACHE_NAME` in `service-worker.js`. Clients then fetch fresh files automatically — no manual cache clearing.
-- **Mobile:** clean start screen (logo, name, Create/Select buttons), sticky section navigation with a Home option, full-screen Chart Setup dialog, single-column charts, 44px tap targets. Users can "Add to Home Screen" to install as a PWA.
+- **Mobile:** clean start screen (logo, name, Create/Select buttons), sticky section navigation with a Home button, full-screen Chart Setup dialog, single-column charts, 44px tap targets, and minimisable Multi-View panels. "Add to Home Screen" installs it as a PWA.
 
 ---
 
-Current build: cache `vednetra-v09`, assets `?v=9`.
+Current build: cache `vednetra-v14`, assets `?v=14`.

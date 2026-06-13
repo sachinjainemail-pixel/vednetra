@@ -13,7 +13,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.svg">
-  <link rel="stylesheet" href="styles.css?v=9">
+  <link rel="stylesheet" href="styles.css?v=14">
 </head>
 <body>
   <main class="shell">
@@ -96,14 +96,6 @@
                 <option value="khullar">Khullar (KCIL)</option>
               </select>
             </label>
-            <div class="quick-birth-input-panel">
-              <label>
-                Quick birth input
-                <textarea id="quickBirthInput" rows="3" placeholder="Example: Rahul Sharma, Male, 8 March 2010, 15:58 hours, Chandigarh, Punjab&#10;or: Anita Patel F 08/03/2010 1525 hours Mumbai, India"></textarea>
-              </label>
-              <button type="button" id="applyQuickBirthInputBtn">Auto populate name, gender, date, time and place</button>
-              <p id="quickBirthInputStatus" class="fine-print">Paste in any order: name, gender (Male/Female/M/F), date, time (ending with "hours"), and place (ending with state or country).</p>
-            </div>
             <div class="grid-2">
               <label>
                 Date
@@ -155,11 +147,7 @@
                 </select>
               </label>
             </div>
-            <label>
-              D1 Asc degree override
-              <input id="ascOverrideDegree" name="ascOverrideDegree" placeholder="Optional: 03.32.00 or 3.5333">
-            </label>
-            <p class="fine-print">Use this only when you want a manual/PL9 D-1 lagna degree to override the computed ascendant degree. VedNetra keeps the computed D-1 sign and applies this degree to all lagna-based houses, vargas and reports.</p>
+            <input id="ascOverrideDegree" name="ascOverrideDegree" type="hidden" value="">
             <p id="locationLookupStatus" class="fine-print">Internet lookup populates latitude and longitude in DD.MM.SS format when available.</p>
             <p id="defaultLocationStatus" class="fine-print">Default location is used for new Prashna charts.</p>
           </fieldset>
@@ -198,6 +186,7 @@
                 Report
                 <select id="reportDownloadType">
                   <option value="vednetra" selected>VedNetra Report</option>
+                  <option value="standing">Standing Natal Report (Chawdhri)</option>
                   <option value="detailed">Detailed Report</option>
                   <option value="summary">Summary Report</option>
                 </select>
@@ -288,6 +277,7 @@
               <button type="button" data-view-a-target="viewA-predictive">Predictive</button>
             </div>
           </div>
+          <button type="button" id="mobileHomeBtn" class="mobile-home-btn" aria-label="Back to start screen">&#x2302; Home</button>
           <label class="mobile-drilldown-label">Section
             <select id="chartDataNavSelect" class="mobile-drilldown-select" aria-label="Select View A section">
               <option value="__home">&#x2302; Home (start screen)</option>
@@ -396,6 +386,7 @@
           <label>Report
             <select id="railReportDownloadType">
               <option value="vednetra" selected>VedNetra Report</option>
+              <option value="standing">Standing Natal Report (Chawdhri)</option>
               <option value="detailed">Detailed Report</option>
               <option value="summary">Summary Report</option>
             </select>
@@ -461,6 +452,6 @@
       </div>
     </div>
   </main>
-  <script src="app.js?v=9"></script>
+  <script src="app.js?v=14"></script>
 </body>
 </html>
