@@ -7,3 +7,5 @@ logs/
 data/cache/
 .venv/
 venv/
+
+backtest_results.csv
