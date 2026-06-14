@@ -108,5 +108,26 @@ watchlist:
     tick_size: 0.05
     point_value: 1
 
+  # --- Futures example (uncomment & adjust lot_size to the current lot) ------
+  # - symbol: NIFTY24JUNFUT      # tradingsymbol as it appears in Kite
+  #   exchange: NFO
+  #   lot_size: 25               # current NIFTY lot size
+  #   tick_size: 0.05
+  #   point_value: 1             # Rs 1 P&L per 1.0 point per 1 unit
+
+  # --- Options example -------------------------------------------------------
+  # Fixed Rs 5000/2500 still works on options: P&L = premium move x qty. But
+  # mind theta decay, wide spreads, and (for shorting) large margin. The bot
+  # treats the option's own 5-min premium chart like any other instrument.
+  # - symbol: NIFTY24JUN24000CE
+  #   exchange: NFO
+  #   lot_size: 25
+  #   tick_size: 0.05
+  #   point_value: 1
+
+# Trading capital (used for return % and drawdown % in the backtest report;
+# position sizing itself is risk-rupee based and independent of this).
+capital: 1000000
+
 # Logging
 log_level: INFO

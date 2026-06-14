@@ -79,6 +79,7 @@ class Config:
     patterns: PatternConfig = field(default_factory=PatternConfig)
     watchlist: List[Instrument] = field(default_factory=list)
     kite: KiteCredentials = field(default_factory=KiteCredentials)
+    capital: float = 1_000_000.0
     log_level: str = "INFO"
 
     @classmethod
@@ -124,5 +125,6 @@ class Config:
             patterns=patterns,
             watchlist=watchlist,
             kite=kite,
+            capital=float(raw.get("capital", 1_000_000.0)),
             log_level=raw.get("log_level", "INFO"),
         )

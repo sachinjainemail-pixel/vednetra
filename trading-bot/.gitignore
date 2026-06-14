@@ -9,3 +9,4 @@ data/cache/
 venv/
 
 backtest_results.csv
+data/history/

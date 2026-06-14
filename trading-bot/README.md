@@ -126,6 +126,43 @@ CLI flags override the file: `python run.py --feed kite --log-level DEBUG`.
 
 ---
 
+## Backtesting
+
+Two sources:
+
+```bash
+# 1) Offline Monte-Carlo on synthetic data - mechanics / risk profile only
+python backtest.py --source synthetic --days 250 --cost 150
+
+# 2) REAL historical data (the only source whose expectancy is meaningful)
+python backtest.py --source csv --data-dir data/history --cost 150
+```
+
+Each trading day runs a **fresh** engine, so the daily loss cap / max-trades
+limits reset per day exactly like live.
+
+### Getting real history (run on YOUR machine)
+
+The cloud/sandbox cannot reach Kite or do the daily browser login, so the
+**fetch happens locally**, then the backtest runs on the resulting CSVs:
+
+```bash
+python scripts/kite_login.py                                  # daily token
+python scripts/fetch_history.py --from 2026-01-01 --to 2026-06-13
+python backtest.py --source csv
+```
+
+CSVs land in `data/history/<SYMBOL>.csv` (`timestamp,open,high,low,close,volume`).
+You can also drop in CSVs exported from anywhere else in that same format.
+
+> **`--cost` matters.** A fixed ₹5,000/₹2,500 system is sensitive to costs.
+> ₹150/round-trip is a rough default for intraday brokerage + STT + exchange +
+> GST + stamp + a little slippage; set it to your actual costs.
+
+> **Synthetic ≠ real.** Synthetic results only prove the plumbing and risk
+> mechanics. Any profitability claim must come from `--source csv` on real data,
+> and even that does not guarantee future results.
+
 ## Going live with Zerodha (Kite Connect)
 
 1. Get a Kite Connect app (₹500/month) → API key + secret. Put them in `.env`
@@ -154,9 +191,11 @@ validate it on one share before trusting it.** See the warnings in that file.
 
 ```
 trading-bot/
-  run.py                  # entry point
-  config.yaml             # all settings
+  run.py                  # live/paper entry point
+  backtest.py             # synthetic + real-CSV backtester
+  config.yaml             # all settings (incl. capital)
   scripts/kite_login.py   # daily Kite access-token helper
+  scripts/fetch_history.py# download real 5-min history -> CSV (run locally)
   bot/
     models.py             # Candle, Signal, Position, Trade, Instrument
     config.py             # config + .env loading
@@ -165,9 +204,9 @@ trading-bot/
     risk.py               # sizing + daily caps  ← the strategy's core
     portfolio.py          # P&L + trade log
     brokers/              # base.py, paper.py, kite.py
-    feeds/                # base.py, simulated.py, kite.py
+    feeds/                # base, simulated, replay, csv_feed, kite
     engine.py             # the main loop
-  tests/                  # pytest suite
+  tests/                  # pytest suite (19 tests)
 ```
 
 ---
