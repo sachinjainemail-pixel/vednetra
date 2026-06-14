@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0b0d12">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LG Remote">
+<title>LG TV Remote</title>
+<style>
+  :root{
+    --bg:#0b0d12; --panel:#161a23; --panel2:#1e2430; --line:#2a3140;
+    --txt:#e8edf5; --muted:#8a94a6; --accent:#e11d48; --accent2:#0ea5e9;
+    --ok:#22c55e; --warn:#f59e0b; --r:16px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;overscroll-behavior:none;}
+  body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);}
+  .wrap{max-width:440px;margin:0 auto;padding:14px 14px 32px;}
+
+  /* ---- Top bar / connection ---- */
+  .bar{display:flex;align-items:center;gap:10px;background:var(--panel);
+    border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;margin-bottom:12px;}
+  .dot{width:11px;height:11px;border-radius:50%;background:#555;flex:0 0 auto;
+    box-shadow:0 0 0 0 rgba(0,0,0,0);transition:.2s;}
+  .dot.on{background:var(--ok);box-shadow:0 0 10px 1px rgba(34,197,94,.6);}
+  .dot.pair{background:var(--warn);box-shadow:0 0 10px 1px rgba(245,158,11,.6);}
+  .dot.err{background:var(--accent);}
+  .bar .title{font-weight:700;font-size:15px;letter-spacing:.3px;}
+  .bar .st{font-size:12px;color:var(--muted);}
+  .bar .grow{flex:1 1 auto;}
+  .gear{background:var(--panel2);border:1px solid var(--line);color:var(--txt);
+    width:40px;height:40px;border-radius:12px;font-size:18px;display:grid;place-items:center;cursor:pointer;}
+
+  /* ---- Settings drawer ---- */
+  .drawer{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+    padding:14px;margin-bottom:14px;display:none;}
+  .drawer.open{display:block;}
+  .drawer label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;}
+  .row{display:flex;gap:8px;margin-bottom:10px;}
+  input[type=text]{flex:1;background:var(--bg);border:1px solid var(--line);color:var(--txt);
+    border-radius:12px;padding:12px 14px;font-size:16px;outline:none;}
+  input[type=text]:focus{border-color:var(--accent2);}
+  .btn{background:var(--accent2);color:#04222e;border:none;border-radius:12px;
+    padding:0 18px;font-size:15px;font-weight:700;cursor:pointer;min-height:46px;}
+  .btn.sec{background:var(--panel2);color:var(--txt);border:1px solid var(--line);}
+  .btn.danger{background:var(--accent);color:#fff;}
+  .help{font-size:12.5px;color:var(--muted);line-height:1.55;margin-top:6px;}
+  .help b{color:var(--txt);}
+  .help a{color:var(--accent2);word-break:break-all;}
+  .help ol{margin:6px 0 0;padding-left:18px;}
+  .help li{margin-bottom:4px;}
+
+  /* ---- Remote grid ---- */
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+    padding:14px;margin-bottom:14px;}
+  .card h3{margin:0 0 10px;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:700;}
+  .grid{display:grid;gap:10px;}
+  .g3{grid-template-columns:repeat(3,1fr);}
+  .g4{grid-template-columns:repeat(4,1fr);}
+  .g5{grid-template-columns:repeat(5,1fr);}
+
+  .key{user-select:none;-webkit-user-select:none;background:var(--panel2);border:1px solid var(--line);
+    color:var(--txt);border-radius:14px;min-height:54px;display:grid;place-items:center;
+    font-size:15px;font-weight:600;cursor:pointer;transition:transform .05s, background .15s;}
+  .key:active{transform:scale(.94);background:#2b3342;}
+  .key.sm{min-height:46px;font-size:14px;}
+  .key.accent{background:var(--accent);color:#fff;border-color:transparent;}
+  .key.blue{background:var(--accent2);color:#04222e;border-color:transparent;}
+  .key svg{width:22px;height:22px;}
+  .key .lab{font-size:10px;color:var(--muted);margin-top:2px;}
+  .col-red{background:#dc2626;border:none;}
+  .col-green{background:#16a34a;border:none;}
+  .col-yellow{background:#eab308;border:none;}
+  .col-blue{background:#2563eb;border:none;}
+  .col-red,.col-green,.col-yellow,.col-blue{min-height:38px;}
+
+  /* ---- D-pad ---- */
+  .dpad{position:relative;width:230px;height:230px;margin:4px auto 0;}
+  .dpad .ring{position:absolute;inset:0;border-radius:50%;background:
+    radial-gradient(circle at 50% 50%, #232b3a 0 38%, #1a212d 38% 100%);border:1px solid var(--line);}
+  .dpad button{position:absolute;background:transparent;border:none;color:var(--txt);
+    cursor:pointer;display:grid;place-items:center;}
+  .dpad .up{top:0;left:25%;width:50%;height:33%;}
+  .dpad .down{bottom:0;left:25%;width:50%;height:33%;}
+  .dpad .left{left:0;top:25%;width:33%;height:50%;}
+  .dpad .right{right:0;top:25%;width:33%;height:50%;}
+  .dpad .ok{top:33%;left:33%;width:34%;height:34%;border-radius:50%;background:var(--accent);
+    color:#fff;font-weight:800;font-size:16px;box-shadow:0 4px 14px rgba(225,29,72,.4);}
+  .dpad button:active{opacity:.6;}
+  .dpad svg{width:24px;height:24px;}
+
+  /* ---- Trackpad ---- */
+  .pad{height:150px;background:repeating-linear-gradient(45deg,#171c26 0 12px,#1a202b 12px 24px);
+    border:1px dashed var(--line);border-radius:14px;display:grid;place-items:center;
+    color:var(--muted);font-size:13px;touch-action:none;user-select:none;}
+  .pad.act{border-color:var(--accent2);color:var(--accent2);}
+
+  /* ---- Apps ---- */
+  .apps{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;}
+  .app{flex:0 0 auto;width:74px;text-align:center;cursor:pointer;}
+  .app .ic{width:74px;height:74px;border-radius:16px;background:var(--panel2);border:1px solid var(--line);
+    overflow:hidden;display:grid;place-items:center;font-size:24px;}
+  .app .ic img{width:100%;height:100%;object-fit:cover;}
+  .app .nm{font-size:11px;color:var(--muted);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .app:active{opacity:.6;}
+  .empty{font-size:12.5px;color:var(--muted);}
+
+  /* ---- Toast ---- */
+  #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);
+    background:#000c;border:1px solid var(--line);color:var(--txt);padding:10px 16px;border-radius:30px;
+    font-size:13px;opacity:0;transition:.25s;pointer-events:none;z-index:50;max-width:90%;text-align:center;}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  .hint{font-size:11.5px;color:var(--muted);text-align:center;margin:2px 0 0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Connection bar -->
+  <div class="bar">
+    <span class="dot" id="dot"></span>
+    <div>
+      <div class="title">LG&nbsp;Remote</div>
+      <div class="st" id="status">Disconnected</div>
+    </div>
+    <span class="grow"></span>
+    <div class="gear" id="gearBtn" title="Settings">⚙︎</div>
+  </div>
+
+  <!-- Settings drawer -->
+  <div class="drawer" id="drawer">
+    <label>TV IP address (on your Wi-Fi)</label>
+    <div class="row">
+      <input type="text" id="ip" inputmode="decimal" autocomplete="off" placeholder="192.168.1.50">
+      <button class="btn" id="connectBtn">Connect</button>
+    </div>
+    <div class="row">
+      <button class="btn sec" id="certBtn" style="flex:1">① Accept TV certificate</button>
+      <button class="btn danger" id="forgetBtn" style="flex:1">Forget pairing</button>
+    </div>
+    <div class="help">
+      <b>First-time setup (one minute):</b>
+      <ol>
+        <li>On the TV: <b>Settings → General → Network</b> — note the TV's <b>IP address</b> and make sure it's on the same Wi-Fi as your phone.</li>
+        <li>Enable <b>Mobile TV On / LG Connect Apps</b> in the TV's network settings (lets phones control it).</li>
+        <li>If this page is served over <b>https</b>, tap <b>① Accept TV certificate</b>, then on the warning page choose <i>Advanced → Proceed</i>. (The TV uses a self-signed cert — this is safe on your own network.)</li>
+        <li>Type the IP above and tap <b>Connect</b>. A pairing prompt appears <b>on the TV</b> — select <b>Accept</b> with the physical remote once. After that it reconnects automatically.</li>
+      </ol>
+      <span id="schemeNote"></span>
+    </div>
+  </div>
+
+  <!-- Top row: power / mute / inputs / settings -->
+  <div class="card">
+    <div class="grid g4">
+      <div class="key accent" data-power title="Power off">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v9"/><path d="M6.4 6.4a8 8 0 1 0 11.2 0"/></svg>
+      </div>
+      <div class="key" data-btn="MUTE">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="m22 9-6 6"/><path d="m16 9 6 6"/></svg>
+      </div>
+      <div class="key" data-launch="com.webos.app.livetv" title="Live TV"><div style="text-align:center">📺<div class="lab">Live TV</div></div></div>
+      <div class="key" data-btn="MENU" title="Settings menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      </div>
+    </div>
+    <div class="grid g4" style="margin-top:10px">
+      <div class="key sm" data-input="HDMI_1">HDMI1</div>
+      <div class="key sm" data-input="HDMI_2">HDMI2</div>
+      <div class="key sm" data-input="HDMI_3">HDMI3</div>
+      <div class="key sm" data-input="HDMI_4">HDMI4</div>
+    </div>
+  </div>
+
+  <!-- D-pad -->
+  <div class="card">
+    <div class="dpad">
+      <div class="ring"></div>
+      <button class="up" data-btn="UP"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></svg></button>
+      <button class="down" data-btn="DOWN"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+      <button class="left" data-btn="LEFT"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg></button>
+      <button class="right" data-btn="RIGHT"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></button>
+      <button class="ok" data-btn="ENTER">OK</button>
+    </div>
+    <div class="grid g3" style="margin-top:14px">
+      <div class="key sm" data-btn="BACK">◀ Back</div>
+      <div class="key sm" data-btn="HOME">⌂ Home</div>
+      <div class="key sm" data-btn="EXIT">Exit</div>
+    </div>
+  </div>
+
+  <!-- Volume / Channel -->
+  <div class="card">
+    <div class="grid g3">
+      <div class="key" data-btn="VOLUMEUP">VOL +</div>
+      <div class="key" data-btn="INFO" title="Info">ℹ︎ Info</div>
+      <div class="key" data-btn="CHANNELUP">CH +</div>
+      <div class="key" data-btn="VOLUMEDOWN">VOL −</div>
+      <div class="key" data-btn="MUTE">🔇 Mute</div>
+      <div class="key" data-btn="CHANNELDOWN">CH −</div>
+    </div>
+  </div>
+
+  <!-- Playback -->
+  <div class="card">
+    <h3>Playback</h3>
+    <div class="grid g5">
+      <div class="key sm" data-btn="REWIND">⏪</div>
+      <div class="key sm" data-btn="PLAY">▶︎</div>
+      <div class="key sm" data-btn="PAUSE">⏸</div>
+      <div class="key sm" data-btn="STOP">⏹</div>
+      <div class="key sm" data-btn="FASTFORWARD">⏩</div>
+    </div>
+    <div class="grid g4" style="margin-top:10px">
+      <div class="key col-red" data-btn="RED"></div>
+      <div class="key col-green" data-btn="GREEN"></div>
+      <div class="key col-yellow" data-btn="YELLOW"></div>
+      <div class="key col-blue" data-btn="BLUE"></div>
+    </div>
+  </div>
+
+  <!-- Touchpad (Magic Remote pointer) -->
+  <div class="card">
+    <h3>Pointer · drag to move, tap to click</h3>
+    <div class="pad" id="pad">Touchpad</div>
+    <div class="grid g3" style="margin-top:10px">
+      <div class="key sm" data-keyboard>⌨︎ Type</div>
+      <div class="key sm" data-btn="ENTER">Enter</div>
+      <div class="key sm" data-btn="DELETE">⌫ Delete</div>
+    </div>
+  </div>
+
+  <!-- Number pad -->
+  <div class="card">
+    <h3>Channels</h3>
+    <div class="grid g3" id="numpad">
+      <div class="key" data-btn="1">1</div><div class="key" data-btn="2">2</div><div class="key" data-btn="3">3</div>
+      <div class="key" data-btn="4">4</div><div class="key" data-btn="5">5</div><div class="key" data-btn="6">6</div>
+      <div class="key" data-btn="7">7</div><div class="key" data-btn="8">8</div><div class="key" data-btn="9">9</div>
+      <div class="key" data-btn="DASH">—</div><div class="key" data-btn="0">0</div><div class="key" data-btn="ENTER">OK</div>
+    </div>
+  </div>
+
+  <!-- Apps -->
+  <div class="card">
+    <h3>Apps</h3>
+    <div class="apps" id="apps"><span class="empty">Connect to load the apps installed on your TV…</span></div>
+  </div>
+
+  <p class="hint">webOS SSAP · phone &amp; TV must share the same Wi-Fi · pairing key stored locally on this device</p>
+</div>
+
+<div id="toast"></div>
+
+<script>
+"use strict";
+(function(){
+  // ---------- Standard webOS pairing handshake (Connect SDK manifest) ----------
+  var HANDSHAKE = {
+    "forcePairing": false,
+    "pairingType": "PROMPT",
+    "manifest": {
+      "manifestVersion": 1,
+      "appVersion": "1.1",
+      "signed": {
+        "created": "20140509",
+        "appId": "com.lge.test",
+        "vendorId": "com.lge",
+        "localizedAppNames": { "": "LG Remote App", "ko-KR": "리모컨 앱", "zxx-XX": "ЛГ Rэмotэ AПП" },
+        "localizedVendorNames": { "": "LG Electronics" },
+        "permissions": [
+          "TEST_SECURE","CONTROL_INPUT_TEXT","CONTROL_MOUSE_AND_KEYBOARD","READ_INSTALLED_APPS",
+          "READ_LGE_SDX","READ_NOTIFICATIONS","SEARCH","WRITE_SETTINGS","WRITE_NOTIFICATION_ALERT",
+          "CONTROL_POWER","READ_CURRENT_CHANNEL","READ_RUNNING_APPS","READ_UPDATE_INFO",
+          "UPDATE_FROM_REMOTE_APP","READ_LGE_TV_INPUT_EVENTS","READ_TV_CURRENT_TIME"
+        ],
+        "serial": "2f930e2d2cfe083771f68e4fe7bb07"
+      },
+      "permissions": [
+        "LAUNCH","LAUNCH_WEBAPP","APP_TO_APP","CLOSE","TEST_OPEN","TEST_PROTECTED","CONTROL_AUDIO",
+        "CONTROL_DISPLAY","CONTROL_INPUT_JOYSTICK","CONTROL_INPUT_MEDIA_RECORDING",
+        "CONTROL_INPUT_MEDIA_PLAYBACK","CONTROL_INPUT_TV","CONTROL_POWER","READ_APP_STATUS",
+        "READ_CURRENT_CHANNEL","READ_INPUT_DEVICE_LIST","READ_NETWORK_STATE","READ_RUNNING_APPS",
+        "READ_TV_CHANNEL_LIST","WRITE_NOTIFICATION_TOAST","READ_POWER_STATE","READ_COUNTRY_INFO"
+      ],
+      "signatures": [{
+        "signatureVersion": 1,
+        "signature": "eyJhbGdvcml0aG0iOiJSU0EtU0hBMjU2Iiwia2V5SWQiOiJ0ZXN0LXNpZ25pbmctY2VydCIsInNpZ25hdHVyZVZlcnNpb24iOjF9.hrVRgjCwXVvE2OOSpDZ58hR+59aFNwYDyjQgKk3auukd7pcegmE2CzPCa0bJ0ZsRAcKkCTJrWo5iDzNhMBWRyaMOv5zWSrthlf7G128qvIlpMT0YNY+n/FaOHE73uLrS/g7swl3/qH/BGFG2Hu4RlL48eb3lLKqTt2xKHdCs6Cd4RMfJPYnzgvI4BNrFUKsjkcu+WD4OO2A27Pq1n50cMchmcaXadJhGrOqH5YmHdOCj5NSHzJYrsW0HPlpuAx/ECMeIZYDh6RMqaFM2DXzdKX9NmmyqzJ3o/0lkk/N97gfVRLW5hA29yeAwaCViZNCP8iC9aO0q9fQojoa7NQ=="
+      }]
+    }
+  };
+
+  // ---------- State ----------
+  var ws=null, pointerWs=null, cmdN=0, cbs={}, connected=false, manualClose=false;
+  var ip = localStorage.getItem('lg_tv_ip') || '';
+  var key = localStorage.getItem('lg_client_key') || '';
+
+  // ---------- DOM ----------
+  var $ = function(s){ return document.querySelector(s); };
+  var dot=$('#dot'), statusEl=$('#status'), drawer=$('#drawer'),
+      ipEl=$('#ip'), apps=$('#apps');
+  ipEl.value = ip;
+
+  var secure = location.protocol === 'https:';
+  $('#schemeNote').innerHTML = secure
+    ? 'This page is on <b>https</b>, so it connects via <b>wss://IP:3001</b>. The certificate step above is required.'
+    : 'This page is on <b>http</b>, so it connects via <b>ws://IP:3000</b> — no certificate step needed.';
+
+  function wsUrl(addr){ return secure ? 'wss://'+addr+':3001' : 'ws://'+addr+':3000'; }
+  function certUrl(addr){ return 'https://'+addr+':3001'; }
+
+  function toast(msg){
+    var t=$('#toast'); t.textContent=msg; t.classList.add('show');
+    clearTimeout(toast._t); toast._t=setTimeout(function(){ t.classList.remove('show'); },1800);
+  }
+  function vibrate(ms){ if(navigator.vibrate){ try{ navigator.vibrate(ms||12);}catch(e){} } }
+
+  function setStatus(state, text){
+    dot.className='dot'+(state?(' '+state):'');
+    statusEl.textContent=text;
+  }
+
+  // ---------- Connect ----------
+  function connect(){
+    var addr = (ipEl.value||'').trim();
+    if(!addr){ toast('Enter the TV IP address'); drawer.classList.add('open'); ipEl.focus(); return; }
+    ip = addr; localStorage.setItem('lg_tv_ip', ip);
+    cleanup();
+    manualClose=false;
+    setStatus('pair','Connecting…');
+    try{ ws = new WebSocket(wsUrl(addr)); }
+    catch(e){ setStatus('err','Bad address'); toast('Could not open connection'); return; }
+
+    ws.onopen=function(){
+      setStatus('pair','Pairing…');
+      var h=JSON.parse(JSON.stringify(HANDSHAKE));
+      if(key) h['client-key']=key;
+      ws.send(JSON.stringify({ type:'register', id:'register_0', payload:h }));
+    };
+    ws.onmessage=function(ev){
+      var m; try{ m=JSON.parse(ev.data); }catch(e){ return; }
+      if(m.type==='registered' && m.payload && m.payload['client-key']){
+        key=m.payload['client-key'];
+        localStorage.setItem('lg_client_key', key);
+        connected=true; setStatus('on','Connected'); toast('Connected to TV');
+        openPointer(); loadApps();
+      } else if(m.id==='register_0' && m.payload && m.payload.pairingType){
+        setStatus('pair','Accept the prompt on your TV');
+        toast('Press Accept on the TV screen');
+      } else if(m.id && cbs[m.id]){
+        try{ cbs[m.id](m); }catch(e){}
+        delete cbs[m.id];
+      } else if(m.type==='error'){
+        toast(m.error||'TV error');
+      }
+    };
+    ws.onerror=function(){
+      setStatus('err', secure?'Connection failed — accept cert?':'Connection failed');
+      if(secure) toast('If it keeps failing, tap “Accept TV certificate”');
+    };
+    ws.onclose=function(){
+      connected=false;
+      if(!manualClose){ setStatus('err','Disconnected'); }
+      else setStatus('','Disconnected');
+    };
+  }
+
+  function cleanup(){
+    try{ if(pointerWs) pointerWs.close(); }catch(e){}
+    try{ if(ws) ws.close(); }catch(e){}
+    pointerWs=null; ws=null;
+  }
+  function disconnect(){ manualClose=true; cleanup(); connected=false; setStatus('','Disconnected'); }
+
+  // ---------- SSAP request ----------
+  function request(uri, payload, cb){
+    if(!ws || ws.readyState!==1){ toast('Not connected'); return; }
+    var id='cmd_'+(++cmdN);
+    if(cb) cbs[id]=cb;
+    ws.send(JSON.stringify({ id:id, type:'request', uri:uri, payload:payload||{} }));
+  }
+
+  // ---------- Pointer / input socket (buttons + touchpad) ----------
+  function openPointer(){
+    request('ssap://com.webos.service.networkinput/getPointerInputSocket', {}, function(m){
+      var path = m.payload && m.payload.socketPath;
+      if(!path) return;
+      try{ pointerWs = new WebSocket(path); }catch(e){ return; }
+      pointerWs.onclose=function(){ pointerWs=null; };
+    });
+  }
+  function pointerSend(s){
+    if(pointerWs && pointerWs.readyState===1){ pointerWs.send(s); return true; }
+    return false;
+  }
+  function sendButton(name){
+    vibrate();
+    if(!pointerSend('type:button\nname:'+name+'\n\n')){
+      // fall back to ssap equivalents for the most common keys
+      var fb={ VOLUMEUP:'ssap://audio/volumeUp', VOLUMEDOWN:'ssap://audio/volumeDown',
+               CHANNELUP:'ssap://tv/channelUp', CHANNELDOWN:'ssap://tv/channelDown',
+               MUTE:'ssap://audio/setMute', HOME:'ssap://system.launcher/launch' };
+      if(name==='MUTE'){ request('ssap://audio/getVolume',{},function(m){
+          var mu = m.payload && m.payload.muted; request('ssap://audio/setMute',{mute:!mu}); }); }
+      else if(fb[name]) request(fb[name], name==='HOME'?{id:'com.webos.app.home'}:{});
+      else toast('Pointer not ready — try reconnecting');
+    }
+  }
+
+  // ---------- High level actions ----------
+  function powerOff(){
+    if(confirm('Turn the TV off?\n(Note: it cannot be turned back on from here.)'))
+      request('ssap://system/turnOff', {}, function(){ toast('Powering off'); });
+  }
+  function launch(id){ vibrate(); request('ssap://system.launcher/launch', {id:id}, function(){ toast('Launching '+id); }); }
+  function switchInput(inputId){ vibrate(); request('ssap://tv/switchInput', {inputId:inputId}, function(){ toast(inputId); }); }
+  function insertText(txt){ request('ssap://com.webos.service.ime/insertText', {text:txt, replace:0}); }
+  function deleteChars(n){ request('ssap://com.webos.service.ime/deleteCharacters', {count:n||1}); }
+
+  // ---------- Apps ----------
+  function loadApps(){
+    request('ssap://com.webos.applicationManager/listLaunchPoints', {}, function(m){
+      var lp = m.payload && m.payload.launchPoints;
+      if(!lp || !lp.length){ apps.innerHTML='<span class="empty">No apps returned by the TV.</span>'; return; }
+      apps.innerHTML='';
+      lp.forEach(function(a){
+        var el=document.createElement('div'); el.className='app';
+        var ic=document.createElement('div'); ic.className='ic';
+        if(a.icon){ var img=new Image(); img.src=a.icon; img.alt=''; img.onerror=function(){ ic.textContent='📺'; }; ic.appendChild(img); }
+        else ic.textContent='📺';
+        var nm=document.createElement('div'); nm.className='nm'; nm.textContent=a.title||a.id;
+        el.appendChild(ic); el.appendChild(nm);
+        el.addEventListener('click', function(){ launch(a.id); });
+        apps.appendChild(el);
+      });
+    });
+  }
+
+  // ---------- Touchpad ----------
+  (function(){
+    var pad=$('#pad'), lastX=0, lastY=0, moved=false, startT=0;
+    function xy(e){ var t=e.touches?e.touches[0]:e; return {x:t.clientX, y:t.clientY}; }
+    pad.addEventListener('touchstart', function(e){
+      e.preventDefault(); var p=xy(e); lastX=p.x; lastY=p.y; moved=false; startT=Date.now();
+      pad.classList.add('act'); pad.textContent='●';
+    }, {passive:false});
+    pad.addEventListener('touchmove', function(e){
+      e.preventDefault(); var p=xy(e);
+      var dx=Math.round(p.x-lastX), dy=Math.round(p.y-lastY);
+      if(Math.abs(dx)>1||Math.abs(dy)>1){ moved=true; lastX=p.x; lastY=p.y;
+        pointerSend('type:move\ndx:'+dx+'\ndy:'+dy+'\ndown:0\n\n'); }
+    }, {passive:false});
+    pad.addEventListener('touchend', function(e){
+      e.preventDefault(); pad.classList.remove('act'); pad.textContent='Touchpad';
+      if(!moved && Date.now()-startT<300){ vibrate(); pointerSend('type:click\n\n'); }
+    }, {passive:false});
+  })();
+
+  // ---------- Wire buttons ----------
+  document.addEventListener('click', function(e){
+    var el = e.target.closest('[data-btn],[data-power],[data-launch],[data-input],[data-keyboard]');
+    if(!el) return;
+    if(el.hasAttribute('data-power')){ powerOff(); return; }
+    if(el.hasAttribute('data-keyboard')){
+      var t=prompt('Type text to send to the TV:'); if(t){ insertText(t); } return;
+    }
+    if(el.dataset.btn){
+      if(el.dataset.btn==='DELETE'){ vibrate(); deleteChars(1); return; }
+      sendButton(el.dataset.btn); return;
+    }
+    if(el.dataset.launch){ launch(el.dataset.launch); return; }
+    if(el.dataset.input){ switchInput(el.dataset.input); return; }
+  });
+
+  // ---------- Controls ----------
+  $('#gearBtn').addEventListener('click', function(){ drawer.classList.toggle('open'); });
+  $('#connectBtn').addEventListener('click', function(){
+    if(connected){ disconnect(); $('#connectBtn').textContent='Connect'; }
+    else connect();
+  });
+  $('#certBtn').addEventListener('click', function(){
+    var addr=(ipEl.value||'').trim(); if(!addr){ toast('Enter the TV IP first'); ipEl.focus(); return; }
+    window.open(certUrl(addr), '_blank');
+  });
+  $('#forgetBtn').addEventListener('click', function(){
+    localStorage.removeItem('lg_client_key'); key=''; toast('Pairing key cleared');
+  });
+
+  // keep Connect/Disconnect label in sync
+  setInterval(function(){ $('#connectBtn').textContent = connected ? 'Disconnect' : 'Connect'; }, 600);
+
+  // Auto-connect if we already have an IP + key
+  if(ip && key){ setStatus('pair','Reconnecting…'); connect(); }
+  else { setStatus('','Disconnected'); drawer.classList.add('open'); }
+})();
+</script>
+</body>
+</html>
