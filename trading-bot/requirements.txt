@@ -1,0 +1,12 @@
+# Core (required to run the bot in paper mode with the simulated feed)
+pandas>=2.0
+numpy>=1.24
+PyYAML>=6.0
+python-dotenv>=1.0
+
+# Live Zerodha data + (optional) live order placement.
+# Only needed when feed/broker == "kite". Install with: pip install kiteconnect
+kiteconnect>=4.2 ; python_version >= "3.8"
+
+# Testing
+pytest>=7.0

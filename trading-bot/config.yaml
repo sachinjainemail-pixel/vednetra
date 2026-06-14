@@ -1,0 +1,112 @@
+# ==========================================================================
+# VedNetra Trading Bot - configuration
+# ==========================================================================
+# Everything here can be overridden on the command line (see `python run.py -h`).
+
+# "paper"  -> simulated order fills, no real money (DEFAULT, safe)
+# "live"   -> places REAL orders via the broker. Do NOT enable until validated.
+mode: paper
+
+# Where market data comes from:
+#   "simulated" -> synthetic 5-min candles generated in-process (no keys needed)
+#   "kite"      -> live/historical 5-min candles from Zerodha Kite Connect
+feed: simulated
+
+# Who executes orders:
+#   "paper" -> PaperBroker simulates fills against candle highs/lows
+#   "kite"  -> real Zerodha orders (only used when mode == live)
+broker: paper
+
+timeframe_minutes: 5
+
+# Indian market hours (IST). The bot only trades inside this window and
+# squares off everything at square_off_time.
+trading_window:
+  start: "09:20"        # skip the first opening minutes (noise)
+  end: "15:00"          # stop taking NEW entries after this
+  square_off: "15:15"   # force-close any open positions at/after this
+
+# --------------------------------------------------------------------------
+# Risk - this is the heart of the strategy.
+# --------------------------------------------------------------------------
+risk:
+  # Per-trade rupee targets. The bot sizes each position so that:
+  #   - hitting the stop-loss loses ~ stop_loss_rupees
+  #   - hitting the target  gains ~ profit_target_rupees
+  profit_target_rupees: 5000
+  stop_loss_rupees: 2500
+
+  # DAILY LOSS CAP: once realised P&L for the day drops to -daily_loss_cap_rupees,
+  # the bot stops taking new trades for the rest of the day. This is the real
+  # protection against a red day spiralling. Set to your max acceptable daily loss.
+  daily_loss_cap_rupees: 7500
+
+  # Optional: stop for the day once realised profit reaches this (0 = disabled).
+  daily_profit_target_rupees: 0
+
+  # Hard limits to prevent over-trading.
+  max_open_positions: 3
+  max_trades_per_day: 10
+
+  # One position per symbol at a time (no pyramiding / no hedging same symbol).
+  one_position_per_symbol: true
+
+  # The technical stop distance is derived from ATR (Average True Range) of the
+  # signal candle. Position size is then computed from this distance + the
+  # stop_loss_rupees above. Larger multiple = wider stop = smaller size.
+  stop_atr_multiple: 1.5
+
+  # Reject a trade if the smallest tradeable size (1 share / 1 lot) would risk
+  # more than this multiple of stop_loss_rupees (avoids oversized F&O lots).
+  max_risk_overshoot: 1.25
+
+# --------------------------------------------------------------------------
+# Pattern detection
+# --------------------------------------------------------------------------
+patterns:
+  # Minimum candles of history before we start detecting (need context).
+  min_history: 30
+  # Only trade signals in the direction of the short EMA trend filter.
+  use_trend_filter: true
+  ema_fast: 9
+  ema_slow: 21
+  # Require above-average volume on the signal candle.
+  use_volume_filter: true
+  volume_lookback: 20
+  # Confidence floor (0-1). Signals below this are ignored.
+  min_confidence: 0.55
+  # Which families to run.
+  enable_candlestick: true
+  enable_chart: true
+
+# --------------------------------------------------------------------------
+# Watchlist - the instruments the bot scans on the 5-min timeframe.
+# point_value = rupee P&L per 1.0 price move per 1 unit (share/lot).
+#   - Equity (CNC/MIS): point_value = 1, lot_size = 1
+#   - Futures: point_value = lot multiplier (e.g. NIFTY fut = 1 per point * 50 qty)
+#     Model a futures lot as lot_size = <lot qty>, point_value = 1.
+# --------------------------------------------------------------------------
+watchlist:
+  - symbol: RELIANCE
+    exchange: NSE
+    lot_size: 1
+    tick_size: 0.05
+    point_value: 1
+  - symbol: HDFCBANK
+    exchange: NSE
+    lot_size: 1
+    tick_size: 0.05
+    point_value: 1
+  - symbol: INFY
+    exchange: NSE
+    lot_size: 1
+    tick_size: 0.05
+    point_value: 1
+  - symbol: TCS
+    exchange: NSE
+    lot_size: 1
+    tick_size: 0.05
+    point_value: 1
+
+# Logging
+log_level: INFO
