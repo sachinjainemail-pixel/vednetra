@@ -13,7 +13,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.svg">
-  <link rel="stylesheet" href="styles.css?v=14">
+  <link rel="stylesheet" href="styles.css?v=17">
 </head>
 <body>
   <main class="shell">
@@ -33,7 +33,7 @@
           <div>
             <h1 class="brand-title">VedNetra</h1>
           </div>
-          <span class="status-pill">V.01</span>
+          <span class="status-pill">v1.17</span>
         </div>
 
         <form id="birthForm" autocomplete="off">
@@ -185,8 +185,8 @@
               <label>
                 Report
                 <select id="reportDownloadType">
-                  <option value="vednetra" selected>VedNetra Report</option>
-                  <option value="standing">Standing Natal Report (Chawdhri)</option>
+                  <option value="standing" selected>Standing Natal Report (Chawdhri)</option>
+                  <option value="vednetra">VedNetra Report</option>
                   <option value="detailed">Detailed Report</option>
                   <option value="summary">Summary Report</option>
                 </select>
@@ -327,6 +327,7 @@
         <div id="chartInputLayoutBar" class="chart-input-layout-bar hidden">
           <button type="button" class="input-toggle-btn" data-chart-input-toggle aria-pressed="false">Hide input</button>
           <button type="button" class="input-toggle-btn time-tool-layout-btn" data-time-tool-open>Time Tool</button>
+          <button type="button" id="partADownloadBtn" class="input-toggle-btn part-a-download-btn">Download Report</button>
           <div id="partAIdentityStrip" class="part-a-identity-strip" aria-live="polite">
             <div class="part-a-brand-mini">
               <img src="icon.svg" alt="" aria-hidden="true">
@@ -346,6 +347,7 @@
             <button type="button" class="empty-state-btn" data-chart-setup-action="select">Select Existing Chart</button>
           </div>
           <p class="empty-state-tagline">Generate chart preparation, planetary details, vargas, transit chart and Vimshottari timing.</p>
+          <p class="empty-state-version" id="appVersionLabel">Version 1.17</p>
         </div>
         <article id="report" class="report hidden"></article>
       </section>
@@ -385,8 +387,8 @@
         <div class="focus-download-options">
           <label>Report
             <select id="railReportDownloadType">
-              <option value="vednetra" selected>VedNetra Report</option>
-              <option value="standing">Standing Natal Report (Chawdhri)</option>
+              <option value="standing" selected>Standing Natal Report (Chawdhri)</option>
+              <option value="vednetra">VedNetra Report</option>
               <option value="detailed">Detailed Report</option>
               <option value="summary">Summary Report</option>
             </select>
@@ -452,6 +454,6 @@
       </div>
     </div>
   </main>
-  <script src="app.js?v=14"></script>
+  <script src="app.js?v=17"></script>
 </body>
 </html>

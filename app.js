@@ -1551,19 +1551,30 @@
 
   function wirePartAFullScreenControl() {
     var button = document.getElementById("partAFullScreenBtn");
-    if (!button || button.dataset.fullScreenWired === "1") return;
-    button.dataset.fullScreenWired = "1";
-    button.addEventListener("click", function (event) {
-      event.preventDefault();
-      event.stopPropagation();
-      if (document.body.classList.contains("focus-mode") || document.fullscreenElement) {
-        exitFocusMode();
-      } else {
-        openViewAInFullScreen();
-      }
+    if (button && button.dataset.fullScreenWired !== "1") {
+      button.dataset.fullScreenWired = "1";
+      button.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (document.body.classList.contains("focus-mode") || document.fullscreenElement) {
+          exitFocusMode();
+        } else {
+          openViewAInFullScreen();
+        }
+        syncPartAFullScreenButton();
+      });
       syncPartAFullScreenButton();
-    });
-    syncPartAFullScreenButton();
+    }
+    // Download Report button in the same layout bar (alongside Time Tool + Full Screen).
+    var dl = document.getElementById("partADownloadBtn");
+    if (dl && dl.dataset.downloadWired !== "1") {
+      dl.dataset.downloadWired = "1";
+      dl.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        downloadSelectedReport();
+      });
+    }
   }
 
   function syncPartAFullScreenButton() {
@@ -6670,7 +6681,7 @@
     layer.id = "panelFocusPopup-" + window.__vednetraFocusPopupCounter;
     layer.className = "panel-focus-popup hidden";
     layer.innerHTML = '<div class="panel-focus-popup-shell" role="dialog" aria-modal="false" aria-label="Focused VedNetra panel">' +
-        '<div class="panel-focus-popup-head"><strong class="panel-focus-popup-title">Focus</strong><span class="panel-focus-popup-actions"><button type="button" data-focus-popup-minimize="1">Minimize</button><button type="button" data-focus-popup-close="1">Close</button></span></div>' +
+        '<div class="panel-focus-popup-head"><strong class="panel-focus-popup-title">Focus</strong><span class="panel-focus-popup-actions"><button type="button" data-focus-popup-popout="1" title="Open in a separate window you can drag to another monitor">⧉ New Window</button><button type="button" data-focus-popup-minimize="1">Minimize</button><button type="button" data-focus-popup-close="1">Close</button></span></div>' +
         '<div class="panel-focus-popup-body"></div>' +
       '</div>';
     document.body.appendChild(layer);
@@ -6682,6 +6693,12 @@
       bringPanelFocusPopupToFront(layer);
     });
     layer.addEventListener("click", function (event) {
+      var popout = event.target && event.target.closest ? event.target.closest("[data-focus-popup-popout]") : null;
+      if (popout) {
+        event.stopPropagation();
+        popOutFocusPopup(layer);
+        return;
+      }
       var minimize = event.target && event.target.closest ? event.target.closest("[data-focus-popup-minimize]") : null;
       if (minimize) {
         event.stopPropagation();
@@ -6710,6 +6727,36 @@
   function bringPanelFocusPopupToFront(layer) {
     if (layer && layer.classList && layer.classList.contains("is-minimized")) return;
     bringDialogToFront(layer, true);
+  }
+
+  // Open the focused panel in a SEPARATE browser window. A real OS window can be
+  // dragged to any connected monitor (in-page fixed popups cannot leave the tab).
+  function popOutFocusPopup(layer) {
+    if (!layer) return;
+    var body = layer.querySelector(".panel-focus-popup-body");
+    if (!body) return;
+    var titleEl = layer.querySelector(".panel-focus-popup-title");
+    var title = (titleEl && titleEl.textContent ? titleEl.textContent : "VedNetra").trim();
+    var cssHref = "";
+    var link = document.querySelector('link[rel="stylesheet"]');
+    if (link) cssHref = link.href;
+    var win = window.open("", "_blank", "width=940,height=860,scrollbars=yes,resizable=yes");
+    if (!win) {
+      showToast("Allow pop-ups for this site to open on another screen");
+      return;
+    }
+    var html = "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">" +
+      "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">" +
+      "<title>" + escapeHtml(title) + " - VedNetra</title>" +
+      (cssHref ? "<link rel=\"stylesheet\" href=\"" + escapeHtml(cssHref) + "\">" : "") +
+      "<style>body{margin:0;padding:16px;background:#ede5d0;}.vednetra-popout{max-width:1100px;margin:0 auto;}.vednetra-popout-title{font:700 16px Georgia,serif;color:#1a1e38;margin:0 0 12px;}</style>" +
+      "</head><body class=\"report-active\"><div class=\"report vednetra-popout\"><p class=\"vednetra-popout-title\">" + escapeHtml(title) + "</p>" +
+      body.innerHTML +
+      "</div></body></html>";
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
+    showToast("Opened in a new window - drag it to any monitor");
   }
 
   // Minimize a Multi-View focus popup to a compact docked bar (and restore it).
@@ -8292,9 +8339,18 @@
     var completed = completedYears(input.birthInstant, input.asOfInstant, input.timezone);
     var runningYear = preservedState && preservedState.runningYear ? clamp(Math.round(Number(preservedState.runningYear) || 1), 1, 121) : completed + 1;
     var division = preservedState && preservedState.division ? normalizeVarshfalDivision(preservedState.division) : 9;
+    var birthYear = varshfalBirthYear(input);
+    var calendarYear = birthYear + runningYear - 1;
     return '<section id="viewA-varshfal" class="section varshfal-section"><div class="section-head"><div><p class="eyebrow">Tajik Varshfal</p><h3>Annual Solar Return With Muntha</h3></div><span class="small-pill">Before transit</span></div>' +
-      '<div class="panel-box varshfal-controls"><div class="grid-3"><label>Running year of life<input id="varshfalYear" type="number" min="1" max="121" step="1" value="' + runningYear + '"></label><label>Varshfal Shodashvarga<select id="varshfalDivision">' + varshfalDivisionOptions(division) + '</select></label><div class="button-label"><span>Update Varshfal</span><button type="button" id="varshfalUpdateBtn" class="primary-action">Update chart</button></div></div><p id="varshfalStatus" class="fine-print varshfal-status">Showing running year ' + runningYear + (preservedState && preservedState.runningYear ? " from the previous Varshfal selection" : "") + '.</p><p class="fine-print">Choose the running year of life: 1 means birth to first birthday, 2 means first birthday to second birthday, and so on. VedNetra casts the annual chart at the sidereal Sun return to the natal Sun longitude. Muntha is advanced by completed years elapsed from natal Lagna. The varga selector keeps D-9 as default and can switch the annual chart to any Shodashvarga.</p></div>' +
+      '<div class="panel-box varshfal-controls">' +
+      '<div class="grid-2"><label>Varshfal calendar year<input id="varshfalCalendarYear" type="number" min="' + birthYear + '" max="' + (birthYear + 120) + '" step="1" value="' + calendarYear + '" placeholder="e.g. 2016"></label><label>Running year of life<input id="varshfalYear" type="number" min="1" max="121" step="1" value="' + runningYear + '"></label></div>' +
+      '<div class="grid-2"><label>Varshfal Shodashvarga<select id="varshfalDivision">' + varshfalDivisionOptions(division) + '</select></label><div class="button-label"><span>Update Varshfal</span><button type="button" id="varshfalUpdateBtn" class="primary-action">Update chart</button></div></div>' +
+      '<p id="varshfalStatus" class="fine-print varshfal-status">Showing calendar year ' + calendarYear + ' (running year ' + runningYear + ').</p><p class="fine-print">Enter a calendar year (e.g. 2016) to open that year\'s Varshfal directly, or use the running year of life (1 = birth to first birthday, 2 = first to second birthday, ...). VedNetra casts the annual chart at the sidereal Sun return to the natal Sun longitude. The varga selector keeps D-9 as default and can switch the annual chart to any Shodashvarga.</p></div>' +
       '<div id="varshfalChartMount">' + varshfalPanelHtml(chart, input, runningYear, division) + "</div></section>";
+  }
+
+  function varshfalBirthYear(input) {
+    return Number(String(input.birthDate || dateInputValue(input.birthInstant, input.timezone)).slice(0, 4)) || new Date().getFullYear();
   }
 
   function varshfalPanelHtml(chart, input, completedYear, selectedDivision) {
@@ -8481,17 +8537,36 @@
       updateVarshfalFromControls(chart, input, section);
     });
     section.addEventListener("change", function (event) {
-      if (event.target && (event.target.id === "varshfalYear" || event.target.id === "varshfalDivision")) {
+      if (!event.target) return;
+      if (event.target.id === "varshfalCalendarYear") {
+        // Calendar year -> running year, then update.
+        syncVarshfalYearFromCalendar(input, section);
+        updateVarshfalFromControls(chart, input, section);
+      } else if (event.target.id === "varshfalYear" || event.target.id === "varshfalDivision") {
         updateVarshfalFromControls(chart, input, section);
       }
     });
     section.addEventListener("keydown", function (event) {
-      if (event.target && event.target.id === "varshfalYear" && event.key === "Enter") {
+      if (!event.target || event.key !== "Enter") return;
+      if (event.target.id === "varshfalCalendarYear") {
+        event.preventDefault();
+        syncVarshfalYearFromCalendar(input, section);
+        updateVarshfalFromControls(chart, input, section);
+      } else if (event.target.id === "varshfalYear") {
         event.preventDefault();
         updateVarshfalFromControls(chart, input, section);
       }
     });
     section._varshfalWired = true;
+  }
+
+  function syncVarshfalYearFromCalendar(input, root) {
+    var scope = root && root.querySelector ? root : document;
+    var calField = scope.querySelector ? scope.querySelector("#varshfalCalendarYear") : document.getElementById("varshfalCalendarYear");
+    var yearField = scope.querySelector ? scope.querySelector("#varshfalYear") : document.getElementById("varshfalYear");
+    if (!calField || !yearField) return;
+    var running = varshfalRunningYearForCalendarYear(input, Number(calField.value));
+    yearField.value = String(running);
   }
 
   function updateVarshfalFromControls(chart, input, root) {
@@ -8503,9 +8578,13 @@
     if (!field || !mount) return;
     var runningYear = clamp(Math.round(Number(field.value) || 1), 1, 121);
     field.value = String(runningYear);
+    // Keep the calendar-year field in sync with the running year.
+    var calField = scope.querySelector ? scope.querySelector("#varshfalCalendarYear") : document.getElementById("varshfalCalendarYear");
+    var calendarYear = varshfalBirthYear(input) + runningYear - 1;
+    if (calField) calField.value = String(calendarYear);
     try {
       mount.innerHTML = varshfalPanelHtml(chart, input, runningYear, divisionField ? divisionField.value : 9);
-      if (status) status.textContent = "Updated Varshfal to running year " + runningYear + ".";
+      if (status) status.textContent = "Showing calendar year " + calendarYear + " (running year " + runningYear + ").";
       enhanceReportTableTopControls();
     } catch (error) {
       alertUser(error.message || "Could not update Varshfal chart.");
