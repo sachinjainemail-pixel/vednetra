@@ -1,4 +1,4 @@
-# VedNetra
+﻿# VedNetra
 
 A complete, self-contained Vedic astrology web application. **No build step. No dependencies. Pure static files.**
 
@@ -10,7 +10,7 @@ Birth chart (D-1) + all divisional charts to D-60, Vimshottari dasha (down to Pr
 
 | File | Purpose |
 |---|---|
-| `index.html` | Main HTML shell (loads `styles.css?v=17`, `app.js?v=17`) |
+| `index.html` | Main HTML shell (loads `styles.css?v=18`, `app.js?v=18`) |
 | `app.js` | All application logic |
 | `styles.css` | All styles (mobile + compact desktop dialog + start screen) |
 | `service-worker.js` | Offline cache (network-first, auto-updating) |
@@ -76,4 +76,5 @@ Open http://localhost:4173/
 
 ---
 
-Current build: cache `vednetra-v17`, assets `?v=17`. Default report download: Standing Natal Report (Chawdhri).
+Current build: cache `vednetra-v18`, assets `?v=18`. Default report download: Standing Natal Report (Chawdhri).
+

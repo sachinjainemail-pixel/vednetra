@@ -13408,7 +13408,7 @@
     // ============================ SECTION D ============================
     sectionLine(out, "SECTION D - BHAVA CHALIT + HOUSE CUSPS  [ESSENTIAL]");
     var tropCusps = placidusCuspLongitudes(chart) || quadrantCuspLongitudes(chart);
-    tableLines(out, "House cusps (Placidus, sidereal Lahiri)", ["House", "Cusp longitude", "Sign", "Sign lord"], (function () {
+    tableLines(out, "House cusps (Placidus, sidereal " + chart.ayanamshaLabel + ")", ["House", "Cusp longitude", "Sign", "Sign lord"], (function () {
       var r = [];
       for (var h = 1; h <= 12; h += 1) {
         var lon = normalize(tropCusps[h] - chart.ayanamsa);
@@ -13527,6 +13527,9 @@
 
     // ============================ SECTION N ============================
     sectionLine(out, "SECTION N - KP CUSP & SIGNIFICATOR TABLES  [ADVANCED]");
+    L("");
+    L("Ayanamsa for these KP tables: " + chart.ayanamshaLabel + " (same as the rest of this report)." +
+      (chart.ayanamshaKey === "lahiri" ? "" : " Note: classical KP uses the KP/Lahiri ayanamsha; star and sub lords below are derived from the report's " + chart.ayanamshaLabel + " positions for internal consistency."));
     tableLines(out, "Bhava cusps - Star Lord & Sub Lord", ["Cusp", "Longitude", "Sign", "Sign Lord", "Star Lord", "Sub Lord"], chalitCusps.map(function (c) {
       return ["H" + c.house, decimalToDms(c.deg) + " " + c.signName, c.signName, c.signLord, c.kp.starLord, c.kp.subLord];
     }));
