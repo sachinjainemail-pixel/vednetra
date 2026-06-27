@@ -7833,3 +7833,24 @@ body:not(.report-active) .empty-state { padding-top: 8px; }
     padding-top: calc(env(safe-area-inset-top, 0px) + 70px) !important;
   }
 }
+
+/* ===== VedNetra Tools (Today, Muhurta, Lagna timeline, Numerology, Verdict, Rectify, Reading) ===== */
+.vn-section .vn-controls { margin-bottom: 14px; }
+.vn-control-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+.vn-geo-status { margin: 6px 0 0; min-height: 14px; }
+.vn-event-row { margin-bottom: 8px; }
+/* .report-grid (base) is already a responsive 2-col grid; .two simply reuses it */
+/* quality colour coding shared across tool tables */
+tr.vn-good td, .vn-verdict.vn-good { background: rgba(26, 100, 56, 0.12); }
+tr.vn-bad td, .vn-verdict.vn-bad { background: rgba(136, 40, 40, 0.12); }
+tr.vn-neutral td, .vn-verdict.vn-neutral { background: rgba(194, 116, 24, 0.10); }
+/* lagna timeline strip */
+.vn-timeline-bar { display: flex; width: 100%; height: 34px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; margin-bottom: 12px; }
+.vn-timeline-seg { display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #2c3337; border-right: 1px solid rgba(255,255,255,0.45); overflow: hidden; white-space: nowrap; }
+.vn-timeline-seg.vn-good { background: #bfe3cd; }
+.vn-timeline-seg.vn-bad { background: #f0c5c5; }
+.vn-timeline-seg.vn-neutral { background: #f3dcb0; }
+/* verdict box */
+.vn-verdict { text-align: center; }
+.vn-verdict-big { font-size: 30px; font-weight: 800; margin: 6px 0; color: var(--blue); }
+.vn-reading p { margin: 0; line-height: 1.55; }

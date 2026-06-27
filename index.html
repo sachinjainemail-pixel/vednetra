@@ -13,7 +13,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.svg">
-  <link rel="stylesheet" href="styles.css?v=18">
+  <link rel="stylesheet" href="styles.css?v=19">
 </head>
 <body>
   <main class="shell">
@@ -33,7 +33,7 @@
           <div>
             <h1 class="brand-title">VedNetra</h1>
           </div>
-          <span class="status-pill">v1.18</span>
+          <span class="status-pill">v1.19</span>
         </div>
 
         <form id="birthForm" autocomplete="off">
@@ -238,6 +238,18 @@
             </div>
           </div>
           <div class="nav-category">
+            <button type="button" class="nav-category-title" data-nav-category-toggle aria-expanded="false">Today &amp; Tools</button>
+            <div class="nav-category-actions">
+              <button type="button" data-view-a-target="viewA-today">Today</button>
+              <button type="button" data-view-a-target="viewA-muhurta">Muhurta &amp; Choghadiya</button>
+              <button type="button" data-view-a-target="viewA-lagna-timeline">Lagna Timeline</button>
+              <button type="button" data-view-a-target="viewA-numerology">Numerology</button>
+              <button type="button" data-view-a-target="viewA-verdict">Yes/No Verdict</button>
+              <button type="button" data-view-a-target="viewA-rectify">Rectify Birth Time</button>
+              <button type="button" data-view-a-target="viewA-reading">Reading</button>
+            </div>
+          </div>
+          <div class="nav-category">
             <button type="button" class="nav-category-title" data-nav-category-toggle aria-expanded="false">Birth Foundations</button>
             <div class="nav-category-actions">
               <button type="button" data-view-a-target="viewA-panchang">Birth Panchang</button>
@@ -293,6 +305,15 @@
                 <option value="viewA-worksheets">Worksheets</option>
                 <option value="viewA-summary">Summary</option>
               </optgroup>
+              <optgroup label="Today &amp; Tools">
+                <option value="viewA-today">Today</option>
+                <option value="viewA-muhurta">Muhurta &amp; Choghadiya</option>
+                <option value="viewA-lagna-timeline">Lagna Timeline</option>
+                <option value="viewA-numerology">Numerology</option>
+                <option value="viewA-verdict">Yes/No Verdict</option>
+                <option value="viewA-rectify">Rectify Birth Time</option>
+                <option value="viewA-reading">Reading</option>
+              </optgroup>
               <optgroup label="Birth Foundations">
                 <option value="viewA-panchang">Birth Panchang</option>
                 <option value="viewA-current-panchang">Current Panchang</option>
@@ -347,7 +368,7 @@
             <button type="button" class="empty-state-btn" data-chart-setup-action="select">Select Existing Chart</button>
           </div>
           <p class="empty-state-tagline">Generate chart preparation, planetary details, vargas, transit chart and Vimshottari timing.</p>
-          <p class="empty-state-version" id="appVersionLabel">Version 1.18</p>
+          <p class="empty-state-version" id="appVersionLabel">Version 1.19</p>
         </div>
         <article id="report" class="report hidden"></article>
       </section>
@@ -454,6 +475,6 @@
       </div>
     </div>
   </main>
-  <script src="app.js?v=18"></script>
+  <script src="app.js?v=19"></script>
 </body>
 </html>
