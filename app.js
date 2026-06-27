@@ -15649,16 +15649,36 @@
       return;
     }
     vnPendingHomeTarget = targetId;
+    // 1) a saved daily / home chart
     var raw = vnLsGet("vednetra.homeChart", "");
     if (raw) {
       try {
         applySavedInputToForm(JSON.parse(raw));
-        generate();
-        showReportView("chartData");
-        showVargaSectionAfterChartChange();
+        generate(); showReportView("chartData"); showVargaSectionAfterChartChange();
         return;
       } catch (e) {}
     }
+    // 2) most recent chart from the saved library
+    try {
+      if (typeof savedCharts !== "undefined" && savedCharts && savedCharts.length) {
+        var recent = savedCharts.slice().sort(function (a, b) { return String(b.updatedAt || "").localeCompare(String(a.updatedAt || "")); })[0];
+        if (recent && recent.input) {
+          applySavedInputToForm(recent.input);
+          generate(); showReportView("chartData"); showVargaSectionAfterChartChange();
+          return;
+        }
+      }
+    } catch (e) {}
+    // 3) no chart anywhere: open a default prashna chart for now (form is pre-filled
+    //    by setDefaultDates) so the chosen section opens directly. The user can create
+    //    or select their own chart any time from the Start cards or Chart Setup.
+    try {
+      var birthDate = document.getElementById("birthDate");
+      if (!birthDate || !birthDate.value) setDefaultDates();
+      generate(); showReportView("chartData"); showVargaSectionAfterChartChange();
+      return;
+    } catch (e) {}
+    // fallback: open chart setup
     var newBtn = document.querySelector('[data-chart-setup-action="new"]');
     if (newBtn) newBtn.click();
     var status = document.getElementById("chartStartStatus");
