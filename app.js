@@ -554,6 +554,14 @@
       wireButtonInteractionPolish();
       wireMobileAccessInfo();
       registerServiceWorker();
+      // ---- VedNetra tools: language, nav labels, onboarding, home chart ----
+      try {
+        var langSel = document.getElementById("vnLangSelect");
+        if (langSel) { langSel.value = VN_LANG; langSel.addEventListener("change", function () { vnSetLang(langSel.value); }); }
+        vnApplyNavLang();
+      } catch (e) {}
+      try { vnMaybeShowOnboarding(); } catch (e) {}
+      try { vnLoadHomeChartOnStartup(); } catch (e) {}
     });
   }
 
@@ -5513,6 +5521,8 @@
       { id: "viewA-verdict",        immediate: true, render: function () { return kpVerdictSection(chart, input); }, wire: function () { wireKpVerdictControls(chart, input); } },
       { id: "viewA-rectify",        immediate: true, render: function () { return rectifySection(chart, input); }, wire: function () { wireRectifyControls(chart, input); } },
       { id: "viewA-reading",        immediate: true, render: function () { return readingSection(chart, input); } },
+      { id: "viewA-num-compat",     immediate: true, render: function () { return numCompatSection(chart, input); }, wire: function () { wireNumCompatControls(chart, input); } },
+      { id: "viewA-cards",          immediate: true, render: function () { return cardsSection(chart, input); }, wire: function () { wireCardsControls(chart, input); } },
       { id: "viewA-d1-details",     immediate: true, render: function () { return d1DetailsSection(chart); } },
       { id: "viewA-yogas",          immediate: true, render: function () { return chartWideYogasSection(chart, input); } },
       // ---- deferred (rendered via requestIdleCallback) ----
@@ -14810,9 +14820,15 @@
   // ---- Today dashboard ---------------------------------------------------
   function todaySection(chart, input) {
     var ctx = vnDefaultCtx(input);
-    return '<section id="viewA-today" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Daily Intelligence</p><h3>Today</h3></div><span class="small-pill">Live</span></div>' +
+    return '<section id="viewA-today" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Daily Intelligence</p><h3>' + escapeHtml(vnT("tools.today")) + '</h3></div><span class="small-pill">Live</span></div>' +
       '<p class="fine-print">A daily snapshot for ' + escapeHtml(nativeReportName(input)) + ': panchang, timing windows and the running dasha for the selected day and place.</p>' +
       vnControlsHtml("vnToday", ctx, { updateLabel: "Refresh" }) +
+      '<div class="vn-control-actions vn-today-actions">' +
+      '<button type="button" id="vnTodayShareBtn" class="input-toggle-btn">Share</button>' +
+      '<button type="button" id="vnTodayCopyBtn" class="input-toggle-btn">Copy summary</button>' +
+      '<button type="button" id="vnTodayPrintBtn" class="input-toggle-btn">Print card</button>' +
+      '<button type="button" id="vnTodayHomeBtn" class="input-toggle-btn">Set as my daily chart</button>' +
+      '<span class="fine-print vn-home-status" id="vnTodayHomeStatus"></span></div>' +
       '<div id="vnTodayMount">' + todayPanelHtml(ctx, chart, input) + '</div></section>';
   }
   function todayPanelHtml(ctx, natalChart, input) {
@@ -14872,6 +14888,22 @@
       try { mount.innerHTML = todayPanelHtml(vnReadCtx(prefix, fallback), chart, input); }
       catch (e) { mount.innerHTML = '<div class="panel-box"><p class="fine-print">Could not refresh: ' + escapeHtml(e.message || "") + '</p></div>'; }
     });
+    var shareBtn = document.getElementById("vnTodayShareBtn");
+    if (shareBtn) shareBtn.addEventListener("click", function () {
+      var text = vnTodayShareText(input);
+      if (navigator.share) navigator.share({ title: "VedNetra - Today", text: text }).catch(function () {});
+      else { copyText(text); var s = document.getElementById("vnTodayHomeStatus"); if (s) s.textContent = "Summary copied (sharing not supported)."; }
+    });
+    var copyBtn = document.getElementById("vnTodayCopyBtn");
+    if (copyBtn) copyBtn.addEventListener("click", function () { copyText(vnTodayShareText(input)); var s = document.getElementById("vnTodayHomeStatus"); if (s) s.textContent = "Summary copied to clipboard."; });
+    var printBtn = document.getElementById("vnTodayPrintBtn");
+    if (printBtn) printBtn.addEventListener("click", function () { vnPrintDailyCard(input); });
+    var homeBtn = document.getElementById("vnTodayHomeBtn");
+    if (homeBtn) homeBtn.addEventListener("click", function () {
+      var ok = vnSetHomeChart(input);
+      var s = document.getElementById("vnTodayHomeStatus");
+      if (s) s.textContent = ok ? "Saved. This chart will open to Today on next launch." : "Could not save (storage unavailable).";
+    });
   }
 
   // ---- Lagna timeline ----------------------------------------------------
@@ -14881,16 +14913,20 @@
   }
   function vnLagnaSegments(ctx) {
     var base = localDateTimeToUtc(ctx.date, "00:00:00", ctx.timezone);
-    var segs = [], prevSign = -1, startMin = 0, step = 1;
-    for (var m = 0; m <= 1440; m += step) {
-      var instant = new Date(base.getTime() + m * 60000);
-      var sign = signIndex(vnLagnaAt(instant, ctx.latitude, ctx.longitude, ctx.ayanamshaKey));
+    function signAt(m) { return signIndex(vnLagnaAt(new Date(base.getTime() + m * 60000), ctx.latitude, ctx.longitude, ctx.ayanamshaKey)); }
+    // coarse scan, then binary-search each sign change to ~2-second precision
+    var segs = [], prevSign = signAt(0), startMin = 0, step = 4;
+    for (var m = step; m <= 1440; m += step) {
+      var sign = signAt(m);
       if (sign !== prevSign) {
-        if (prevSign >= 0) segs.push({ sign: prevSign, start: startMin, end: m });
-        prevSign = sign; startMin = m;
+        var lo = m - step, hi = m;
+        for (var i = 0; i < 8; i++) { var mid = (lo + hi) / 2; if (signAt(mid) === prevSign) lo = mid; else hi = mid; }
+        var boundary = hi;
+        segs.push({ sign: prevSign, start: startMin, end: boundary });
+        prevSign = sign; startMin = boundary;
       }
     }
-    if (prevSign >= 0) segs.push({ sign: prevSign, start: startMin, end: 1440 });
+    segs.push({ sign: prevSign, start: startMin, end: 1440 });
     return segs;
   }
   function vnLagnaQuality(risingSign, moonSign) {
@@ -14911,17 +14947,26 @@
     try { segs = vnLagnaSegments(ctx); }
     catch (e) { return '<div class="panel-box"><p class="fine-print">Could not compute lagna timeline: ' + escapeHtml(e.message || "") + '</p></div>'; }
     var moonSign = natalChart.planetsByName.Moon.sign;
+    // highlight the segment containing "now" if the timeline is for today
+    var nowMin = -1;
+    if (ctx.date === dateInputValue(new Date(), ctx.timezone)) {
+      var nt = timeInputValue(new Date(), ctx.timezone).split(":").map(Number);
+      nowMin = nt[0] * 60 + nt[1] + (nt[2] || 0) / 60;
+    }
     var bar = '<div class="vn-timeline-bar">' + segs.map(function (s) {
       var q = vnLagnaQuality(s.sign, moonSign);
       var pct = ((s.end - s.start) / 1440 * 100).toFixed(2);
-      return '<span class="vn-timeline-seg ' + q.cls + '" style="width:' + pct + '%" title="' + escapeHtml(SIGNS[s.sign].name + " " + vnFmtRange(s.start, s.end) + " - " + q.label) + '">' + escapeHtml(SIGNS[s.sign].name.slice(0, 3)) + '</span>';
+      var nowCls = (nowMin >= s.start && nowMin < s.end) ? " vn-now" : "";
+      return '<span class="vn-timeline-seg ' + q.cls + nowCls + '" style="width:' + pct + '%" title="' + escapeHtml(SIGNS[s.sign].name + " " + vnFmtRange(s.start, s.end) + " - " + q.label) + '">' + escapeHtml(SIGNS[s.sign].name.slice(0, 3)) + '</span>';
     }).join("") + '</div>';
     var rows = segs.map(function (s) {
       var q = vnLagnaQuality(s.sign, moonSign);
-      return '<tr class="' + q.cls + '"><td><strong>' + escapeHtml(SIGNS[s.sign].name) + '</strong></td><td>' + escapeHtml(vnFmtRange(s.start, s.end)) + '</td><td>H' + q.house + '</td><td>' + q.label + '</td></tr>';
+      var isNow = nowMin >= s.start && nowMin < s.end;
+      return '<tr class="' + q.cls + (isNow ? " vn-now-row" : "") + '"><td><strong>' + (isNow ? "&#9654; " : "") + escapeHtml(SIGNS[s.sign].name) + '</strong></td><td>' + escapeHtml(vnFmtRange(s.start, s.end)) + '</td><td>H' + q.house + '</td><td>' + q.label + '</td></tr>';
     }).join("");
+    var nowNote = nowMin >= 0 ? '<p class="fine-print">Rising now is marked &#9654;. Boundaries are refined to ~2-second precision.</p>' : '<p class="fine-print">Boundaries are refined to ~2-second precision.</p>';
     return '<div class="panel-box">' + bar +
-      '<div class="table-wrap compact-table"><table><thead><tr><th>Lagna</th><th>Window</th><th>From Moon</th><th>Quality</th></tr></thead><tbody>' + rows + '</tbody></table></div></div>';
+      '<div class="table-wrap compact-table"><table><thead><tr><th>Lagna</th><th>Window</th><th>From Moon</th><th>Quality</th></tr></thead><tbody>' + rows + '</tbody></table></div>' + nowNote + '</div>';
   }
   function wireLagnaTimelineControls(chart, input) {
     var prefix = "vnLag", fallback = vnDefaultCtx(input);
@@ -15067,26 +15112,59 @@
     var subLord = cuspKp.subLord;
     var seedScore = vnLinkScore(prashna, seedKp.subLord, matter);
     var cuspScore = vnLinkScore(prashna, subLord, matter);
+
+    // ruling planets of the prashna moment
+    var moon = prashna.planetsByName.Moon;
+    var rp = [];
+    function addRp(p) { if (p && rp.indexOf(p) < 0) rp.push(p); }
+    addRp(SIGNS[prashna.ascendant.sign].lord);
+    addRp(nakshatraInfo(prashna.ascendant.lon).lord);
+    addRp(SIGNS[moon.sign].lord);
+    addRp(moon.nakLord);
+    addRp(weekdayLord(instant, opts.timezone));
+
+    // significators of the favourable houses
+    var favSignificators = {};
+    matter.good.forEach(function (h) {
+      favSignificators[h] = PLANETS.filter(function (pl) { return vnPlanetHouses(prashna, pl).indexOf(h) >= 0; });
+    });
+    var favPlanets = [];
+    Object.keys(favSignificators).forEach(function (h) { favSignificators[h].forEach(function (pl) { if (favPlanets.indexOf(pl) < 0) favPlanets.push(pl); }); });
+
+    // transit confirmation: a natural benefic occupying the primary house
+    var benefics = ["Jupiter", "Venus", "Mercury", "Moon"];
+    var transitBenefic = PLANETS.filter(function (pl) { return benefics.indexOf(pl) >= 0 && prashna.planetsByName[pl] && prashna.planetsByName[pl].house === primaryHouse; });
+
+    // combined score: linkage + ruling-planet agreement + significator + transit
     var net = seedScore.net + cuspScore.net;
+    if (rp.indexOf(subLord) >= 0) net += 1;            // sub-lord is a ruling planet
+    if (favPlanets.indexOf(subLord) >= 0) net += 1;    // sub-lord signifies a favourable house
+    if (rp.some(function (p) { return favPlanets.indexOf(p) >= 0; })) net += 1; // ruling planet signifies favour
+    if (transitBenefic.length) net += 1;
+
     var verdict, vcls;
-    if (net >= 2) { verdict = "YES"; vcls = "vn-good"; }
+    if (net >= 3) { verdict = "YES"; vcls = "vn-good"; }
     else if (net <= -2) { verdict = "NO"; vcls = "vn-bad"; }
     else { verdict = "LIKELY " + (net > 0 ? "YES" : (net < 0 ? "NO" : "MIXED")); vcls = "vn-neutral"; }
     var dashaRows = vnDashaRows(natalChart, instant);
     var timing = dashaRows.length ? dashaRows[0][1] : "-";
     var verdictBox = '<div class="panel-box vn-verdict ' + vcls + '"><h3>Verdict</h3><p class="vn-verdict-big">' + escapeHtml(verdict) + '</p>' +
-      '<p class="fine-print">Matter: ' + escapeHtml(matter.label) + ' &middot; Horary #' + num + ' &middot; Net linkage ' + net + '</p></div>';
+      '<p class="fine-print">Matter: ' + escapeHtml(matter.label) + ' &middot; Horary #' + num + ' &middot; Combined score ' + net + '</p></div>';
     var detailBox = metricBox("Analysis", [
       ["Prashna lagna", prashna.ascendant.signName + " " + prashna.ascendant.deg.toFixed(2) + "°"],
       ["Horary sub-lord", seedKp.subLord + " (in star of " + seedKp.starLord + ")"],
       ["House " + primaryHouse + " cuspal sub-lord", subLord],
       ["Sub-lord signifies", cuspScore.houses.length ? ("houses " + cuspScore.houses.join(", ")) : "no major links"],
-      ["Favourable houses", matter.good.join(", ")],
-      ["Adverse houses", matter.bad.join(", ")],
+      ["Ruling planets", rp.join(", ")],
+      ["Transit benefic on H" + primaryHouse, transitBenefic.length ? transitBenefic.join(", ") : "none"],
       ["Indicated timing (dasha)", timing]
     ]);
-    return '<div class="report-grid two">' + verdictBox + detailBox + '</div>' +
-      '<p class="fine-print">Equal-house cusps are used for the cuspal sub-lord. For a definitive reading cross-check with the full KP section.</p>';
+    var sigRows = matter.good.map(function (h) {
+      return '<tr><td><strong>H' + h + '</strong></td><td>' + escapeHtml(VN_HOUSE_MEANING[h] || "") + '</td><td>' + (favSignificators[h].length ? escapeHtml(favSignificators[h].join(", ")) : "-") + '</td></tr>';
+    }).join("");
+    var sigBox = '<div class="panel-box"><h3>Significators (favourable houses)</h3><div class="table-wrap compact-table"><table><thead><tr><th>House</th><th>Signifies</th><th>Planets</th></tr></thead><tbody>' + sigRows + '</tbody></table></div></div>';
+    return '<div class="report-grid two">' + verdictBox + detailBox + '</div>' + sigBox +
+      '<p class="fine-print">Method: horary sub-lord + equal-house cuspal sub-lord, weighed with ruling planets, house significators and a transit check. Cross-check the full KP section for a definitive reading.</p>';
   }
   function wireKpVerdictControls(chart, input) {
     var btn = document.getElementById("vnVerUpdateBtn");
@@ -15219,6 +15297,233 @@
     if (yogaNote) boxes += '<div class="panel-box vn-reading"><p>' + escapeHtml(yogaNote) + '</p></div>';
     return '<section id="viewA-reading" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Plain Language</p><h3>Reading</h3></div><span class="small-pill">Summary</span></div>' +
       '<p class="fine-print">A plain-English summary generated from your chart. For detail, use the technical sections.</p>' + boxes + '</section>';
+  }
+
+  // ===========================================================================
+  // VedNetra Tools batch 2: numerology compatibility, Vedic cards, home chart,
+  // share/print, language toggle, onboarding. Still 100% client-side.
+  // ===========================================================================
+
+  // ---- tiny localStorage helpers ----------------------------------------
+  function vnLsGet(key, fallback) {
+    if (!localStorageAvailable()) return fallback;
+    try { var v = localStorage.getItem(key); return v === null ? fallback : v; } catch (e) { return fallback; }
+  }
+  function vnLsSet(key, value) { if (!localStorageAvailable()) return; try { localStorage.setItem(key, value); } catch (e) {} }
+
+  // ---- language (English / Hindi) framework -----------------------------
+  var VN_LANG = vnLsGet("vednetra.lang", "en");
+  var VN_STRINGS = {
+    "tools.today": { en: "Today", hi: "आज" },
+    "tools.muhurta": { en: "Muhurta & Choghadiya", hi: "मुहूर्त और चौघड़िया" },
+    "tools.lagna": { en: "Lagna Timeline", hi: "लग्न समय-रेखा" },
+    "tools.numerology": { en: "Numerology", hi: "अंक ज्योतिष" },
+    "tools.verdict": { en: "Yes / No Verdict", hi: "हाँ / नहीं निर्णय" },
+    "tools.rectify": { en: "Rectify Birth Time", hi: "जन्म समय सुधार" },
+    "tools.reading": { en: "Reading", hi: "पठन" },
+    "tools.compat": { en: "Numerology Match", hi: "अंक मिलान" },
+    "tools.cards": { en: "Vedic Cards", hi: "वैदिक कार्ड" },
+    "cat.tools": { en: "Today & Tools", hi: "आज और उपकरण" },
+    "lbl.update": { en: "Update", hi: "अद्यतन" },
+    "lbl.date": { en: "Date", hi: "दिनांक" },
+    "lbl.place": { en: "Reference place", hi: "स्थान" },
+    "lbl.geolocate": { en: "Use my location", hi: "मेरा स्थान लें" },
+    "hd.panchang": { en: "Panchang", hi: "पंचांग" },
+    "hd.windows": { en: "Today's windows", hi: "आज के समय" },
+    "hd.dasha": { en: "Running dasha", hi: "चल रही दशा" },
+    "hd.auspicious": { en: "Auspicious windows", hi: "शुभ समय" },
+    "hd.inauspicious": { en: "Inauspicious windows", hi: "अशुभ समय" }
+  };
+  function vnT(key) { var s = VN_STRINGS[key]; return s ? (s[VN_LANG] || s.en) : key; }
+  var VN_NAV_LABELS = {
+    "viewA-today": "tools.today", "viewA-muhurta": "tools.muhurta", "viewA-lagna-timeline": "tools.lagna",
+    "viewA-numerology": "tools.numerology", "viewA-verdict": "tools.verdict", "viewA-rectify": "tools.rectify",
+    "viewA-reading": "tools.reading", "viewA-num-compat": "tools.compat", "viewA-cards": "tools.cards"
+  };
+  function vnApplyNavLang() {
+    Object.keys(VN_NAV_LABELS).forEach(function (id) {
+      var label = vnT(VN_NAV_LABELS[id]);
+      document.querySelectorAll('[data-view-a-target="' + id + '"]').forEach(function (el) { el.textContent = label; });
+      document.querySelectorAll('#chartDataNavSelect option[value="' + id + '"]').forEach(function (el) { el.textContent = label; });
+    });
+    document.querySelectorAll(".nav-category-title").forEach(function (el) {
+      if (el.textContent.trim() === "Today & Tools" || el.textContent.trim() === "आज और उपकरण") el.textContent = vnT("cat.tools");
+    });
+  }
+  function vnSetLang(lang) {
+    VN_LANG = lang; vnLsSet("vednetra.lang", lang);
+    vnApplyNavLang();
+    var sel = document.getElementById("vnLangSelect"); if (sel) sel.value = lang;
+    try { if (typeof activeChartDataSectionId !== "undefined" && document.getElementById("report") && !document.getElementById("report").classList.contains("hidden")) generate({ preserveActiveSection: true }); } catch (e) {}
+  }
+
+  // ---- numerology compatibility -----------------------------------------
+  // planet natural relations (Rahu~Saturn, Ketu~Mars) -> friend/neutral/enemy
+  var VN_FRIENDS = {
+    Sun: { f: ["Moon", "Mars", "Jupiter"], e: ["Venus", "Saturn"] },
+    Moon: { f: ["Sun", "Mercury"], e: [] },
+    Mars: { f: ["Sun", "Moon", "Jupiter"], e: ["Mercury"] },
+    Mercury: { f: ["Sun", "Venus"], e: ["Moon"] },
+    Jupiter: { f: ["Sun", "Moon", "Mars"], e: ["Mercury", "Venus"] },
+    Venus: { f: ["Mercury", "Saturn"], e: ["Sun", "Moon"] },
+    Saturn: { f: ["Mercury", "Venus"], e: ["Sun", "Moon", "Mars"] },
+    Rahu: { f: ["Mercury", "Venus", "Saturn"], e: ["Sun", "Moon", "Mars"] },
+    Ketu: { f: ["Sun", "Moon", "Mars", "Jupiter"], e: ["Mercury", "Venus"] }
+  };
+  function vnPlanetRelation(a, b) {
+    if (a === b) return "Friend";
+    var rel = VN_FRIENDS[a];
+    if (rel && rel.f.indexOf(b) >= 0) return "Friend";
+    if (rel && rel.e.indexOf(b) >= 0) return "Enemy";
+    return "Neutral";
+  }
+  function vnNumPlanet(n) { return VN_NUM_PLANET[n] || "Sun"; }
+  function numCompatSection(chart, input) {
+    var d = String(input.birthDate || "").split("-").map(Number);
+    return '<section id="viewA-num-compat" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Vedic Numerology</p><h3>Numerology Match</h3></div><span class="small-pill">Editable</span></div>' +
+      '<p class="fine-print">Compatibility of two people from their Mulank (birth) and Bhagyank (destiny) numbers, judged by the natural friendship of the ruling planets.</p>' +
+      '<div class="panel-box vn-controls"><div class="grid-2"><div><h3>Person A</h3>' +
+      '<label>Name<input id="vnCmpAName" type="text" value="' + escapeHtml(input.name || "") + '"></label>' +
+      '<label>Birth date<input id="vnCmpADate" type="date" value="' + escapeHtml(input.birthDate || "") + '"></label></div>' +
+      '<div><h3>Person B</h3>' +
+      '<label>Name<input id="vnCmpBName" type="text" value=""></label>' +
+      '<label>Birth date<input id="vnCmpBDate" type="date" value=""></label></div></div>' +
+      '<div class="vn-control-actions"><button type="button" id="vnCmpUpdateBtn" class="primary-action">Compare</button></div></div>' +
+      '<div id="vnCmpMount"></div></section>';
+  }
+  function vnNumProfile(name, dateStr) {
+    var d = String(dateStr || "").split("-").map(Number);
+    if (!d[2]) return null;
+    var mulank = vnReduce(d[2]);
+    var bhagyank = vnReduce(d[2] + d[1] + d[0]);
+    var nm = vnNameNumber(name);
+    return { mulank: mulank, bhagyank: bhagyank, nameRoot: nm.root, name: name || "(unnamed)" };
+  }
+  function numCompatPanelHtml(a, b) {
+    var pa = vnNumProfile(a.name, a.date), pb = vnNumProfile(b.name, b.date);
+    if (!pa || !pb) return '<div class="panel-box"><p class="fine-print">Enter valid birth dates for both people.</p></div>';
+    function pairRow(label, na, nb) {
+      var rel = vnPlanetRelation(vnNumPlanet(na), vnNumPlanet(nb));
+      var cls = rel === "Friend" ? "vn-good" : (rel === "Enemy" ? "vn-bad" : "vn-neutral");
+      return '<tr class="' + cls + '"><td><strong>' + escapeHtml(label) + '</strong></td><td>' + na + " (" + vnNumPlanet(na) + ")</td><td>" + nb + " (" + vnNumPlanet(nb) + ')</td><td>' + rel + '</td></tr>';
+    }
+    var rels = [
+      vnPlanetRelation(vnNumPlanet(pa.mulank), vnNumPlanet(pb.mulank)),
+      vnPlanetRelation(vnNumPlanet(pa.bhagyank), vnNumPlanet(pb.bhagyank)),
+      vnPlanetRelation(vnNumPlanet(pa.mulank), vnNumPlanet(pb.bhagyank)),
+      vnPlanetRelation(vnNumPlanet(pa.bhagyank), vnNumPlanet(pb.mulank))
+    ];
+    var score = rels.reduce(function (s, r) { return s + (r === "Friend" ? 1 : (r === "Enemy" ? -1 : 0)); }, 0);
+    var verdict, vcls;
+    if (score >= 2) { verdict = "Highly compatible"; vcls = "vn-good"; }
+    else if (score <= -2) { verdict = "Challenging"; vcls = "vn-bad"; }
+    else { verdict = "Workable"; vcls = "vn-neutral"; }
+    var table = '<div class="panel-box"><h3>Number relations</h3><div class="table-wrap compact-table"><table><thead><tr><th>Pair</th><th>' + escapeHtml(pa.name) + '</th><th>' + escapeHtml(pb.name) + '</th><th>Relation</th></tr></thead><tbody>' +
+      pairRow("Mulank x Mulank", pa.mulank, pb.mulank) +
+      pairRow("Bhagyank x Bhagyank", pa.bhagyank, pb.bhagyank) +
+      pairRow("Mulank A x Bhagyank B", pa.mulank, pb.bhagyank) +
+      pairRow("Bhagyank A x Mulank B", pa.bhagyank, pb.mulank) +
+      '</tbody></table></div></div>';
+    var verdictBox = '<div class="panel-box vn-verdict ' + vcls + '"><h3>Match</h3><p class="vn-verdict-big">' + escapeHtml(verdict) + '</p><p class="fine-print">Net relation score ' + score + ' of 4</p></div>';
+    return '<div class="report-grid two">' + verdictBox + table + '</div>';
+  }
+  function wireNumCompatControls(chart, input) {
+    var btn = document.getElementById("vnCmpUpdateBtn"), mount = document.getElementById("vnCmpMount");
+    if (!btn || !mount) return;
+    btn.addEventListener("click", function () {
+      function v(id) { var el = document.getElementById(id); return el ? el.value : ""; }
+      mount.innerHTML = numCompatPanelHtml({ name: v("vnCmpAName"), date: v("vnCmpADate") }, { name: v("vnCmpBName"), date: v("vnCmpBDate") });
+    });
+  }
+
+  // ---- Vedic card reading (rule-based) ----------------------------------
+  var VN_HOUSE_MEANING = {
+    1: "self, body and fresh starts", 2: "money, family and speech", 3: "courage, effort and siblings",
+    4: "home, comfort, mother and property", 5: "creativity, romance, children and learning",
+    6: "work, service, debts and health", 7: "partnership, marriage and dealings",
+    8: "change, secrets, research and the unexpected", 9: "fortune, dharma, teachers and travel",
+    10: "career, status and public action", 11: "gains, friends and fulfilled wishes", 12: "release, expense, retreat and the foreign"
+  };
+  var VN_CARD_PLANETS = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+  function vnDrawCard() {
+    var planet = VN_CARD_PLANETS[Math.floor(Math.random() * VN_CARD_PLANETS.length)];
+    var house = 1 + Math.floor(Math.random() * 12);
+    var element = SIGNS[(house - 1) % 12].element;
+    return { planet: planet, house: house, element: element };
+  }
+  function vnCardText(frame, card) {
+    var planetTheme = VN_DASHA_THEME[card.planet] || "its themes";
+    return frame + ": " + card.planet + " in the house of " + VN_HOUSE_MEANING[card.house] +
+      " (H" + card.house + ", " + card.element + ") — a focus on " + planetTheme + ".";
+  }
+  function cardsSection(chart, input) {
+    return '<section id="viewA-cards" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Vedic Cards</p><h3>Card Reading</h3></div><span class="small-pill">Draw</span></div>' +
+      '<p class="fine-print">Pull three cards — Past, Present and Future. Each card is a planet-in-house combination interpreted from its natural significations. Optionally name your focus, then draw.</p>' +
+      '<div class="panel-box vn-controls"><label>Your focus (optional)<input id="vnCardFocus" type="text" placeholder="Example: my career"></label>' +
+      '<div class="vn-control-actions"><button type="button" id="vnCardDrawBtn" class="primary-action">Draw cards</button></div></div>' +
+      '<div id="vnCardMount"></div></section>';
+  }
+  function cardsPanelHtml(focus) {
+    var frames = ["Past", "Present", "Future"];
+    var cards = frames.map(function () { return vnDrawCard(); });
+    var boxes = frames.map(function (f, i) {
+      return '<div class="panel-box vn-card"><h3>' + f + '</h3><p class="vn-card-combo">' + escapeHtml(cards[i].planet) + ' &middot; H' + cards[i].house + ' &middot; ' + escapeHtml(cards[i].element) + '</p><p>' + escapeHtml(vnCardText(f, cards[i])) + '</p></div>';
+    }).join("");
+    var summary = (focus ? "On '" + focus + "': " : "") + "The arc moves from " + VN_DASHA_THEME[cards[0].planet].split(",")[0] +
+      ", through " + VN_DASHA_THEME[cards[1].planet].split(",")[0] + ", toward " + VN_DASHA_THEME[cards[2].planet].split(",")[0] + ".";
+    return '<div class="report-grid three">' + boxes + '</div><div class="panel-box vn-reading"><h3>Reading</h3><p>' + escapeHtml(summary) + '</p></div>';
+  }
+  function wireCardsControls(chart, input) {
+    var btn = document.getElementById("vnCardDrawBtn"), mount = document.getElementById("vnCardMount");
+    if (!btn || !mount) return;
+    btn.addEventListener("click", function () {
+      var f = document.getElementById("vnCardFocus");
+      mount.innerHTML = cardsPanelHtml(f ? f.value.trim() : "");
+    });
+  }
+
+  // ---- home / daily chart + share/print ---------------------------------
+  function vnSetHomeChart(input) {
+    try { vnLsSet("vednetra.homeChart", JSON.stringify(savedInputFromInput(input))); return true; } catch (e) { return false; }
+  }
+  function vnClearHomeChart() { vnLsSet("vednetra.homeChart", ""); }
+  function vnLoadHomeChartOnStartup() {
+    var raw = vnLsGet("vednetra.homeChart", "");
+    if (!raw) return false;
+    try {
+      var saved = JSON.parse(raw);
+      applySavedInputToForm(saved);
+      generate({ preserveActiveSection: false });
+      showReportView("chartData");
+      showSingleChartDataSection("viewA-today", { skipScroll: true });
+      return true;
+    } catch (e) { return false; }
+  }
+  function vnTodayShareText(input) {
+    var mount = document.getElementById("vnTodayMount");
+    var text = mount ? mount.innerText.replace(/\n{2,}/g, "\n") : "";
+    return "VedNetra - Today for " + nativeReportName(input) + "\n\n" + text;
+  }
+  function vnPrintDailyCard(input) {
+    var mount = document.getElementById("vnTodayMount");
+    if (!mount) return;
+    var w = window.open("", "_blank");
+    if (!w) return;
+    w.document.write('<html><head><title>VedNetra - Today</title><style>body{font-family:system-ui,Arial,sans-serif;padding:24px;color:#181c32}h1{font-size:18px}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ccc;padding:4px 8px;font-size:13px;text-align:left}.vn-reading{margin-top:12px}</style></head><body><h1>VedNetra - Today for ' + escapeHtml(nativeReportName(input)) + '</h1>' + mount.innerHTML + '</body></html>');
+    w.document.close(); w.focus(); setTimeout(function () { try { w.print(); } catch (e) {} }, 250);
+  }
+
+  // ---- first-run onboarding ---------------------------------------------
+  function vnMaybeShowOnboarding() {
+    if (vnLsGet("vednetra.onboarded", "") === "1") return;
+    var el = document.createElement("div");
+    el.className = "vn-onboard-overlay";
+    el.innerHTML = '<div class="vn-onboard-card"><h2>Welcome to VedNetra</h2>' +
+      '<p>Beyond the classical charts, the <strong>Today &amp; Tools</strong> menu now gives you a daily dashboard, auspicious timing windows (Rahu Kaal, Choghadiya, Abhijit), a lagna timeline, numerology, card readings and more.</p>' +
+      '<p class="fine-print">Generate or load a chart, then open <strong>Today</strong> to begin. You can set a default daily chart so it opens automatically.</p>' +
+      '<button type="button" class="primary-action" id="vnOnboardClose">Got it</button></div>';
+    document.body.appendChild(el);
+    el.addEventListener("click", function (e) { if (e.target === el || e.target.id === "vnOnboardClose") { el.remove(); vnLsSet("vednetra.onboarded", "1"); } });
   }
 
   var coreApi = {

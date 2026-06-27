@@ -13,7 +13,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.svg">
-  <link rel="stylesheet" href="styles.css?v=19">
+  <link rel="stylesheet" href="styles.css?v=20">
 </head>
 <body>
   <main class="shell">
@@ -33,7 +33,7 @@
           <div>
             <h1 class="brand-title">VedNetra</h1>
           </div>
-          <span class="status-pill">v1.19</span>
+          <span class="status-pill">v1.20</span>
         </div>
 
         <form id="birthForm" autocomplete="off">
@@ -247,6 +247,8 @@
               <button type="button" data-view-a-target="viewA-verdict">Yes/No Verdict</button>
               <button type="button" data-view-a-target="viewA-rectify">Rectify Birth Time</button>
               <button type="button" data-view-a-target="viewA-reading">Reading</button>
+              <button type="button" data-view-a-target="viewA-num-compat">Numerology Match</button>
+              <button type="button" data-view-a-target="viewA-cards">Vedic Cards</button>
             </div>
           </div>
           <div class="nav-category">
@@ -313,6 +315,8 @@
                 <option value="viewA-verdict">Yes/No Verdict</option>
                 <option value="viewA-rectify">Rectify Birth Time</option>
                 <option value="viewA-reading">Reading</option>
+                <option value="viewA-num-compat">Numerology Match</option>
+                <option value="viewA-cards">Vedic Cards</option>
               </optgroup>
               <optgroup label="Birth Foundations">
                 <option value="viewA-panchang">Birth Panchang</option>
@@ -349,6 +353,12 @@
           <button type="button" class="input-toggle-btn" data-chart-input-toggle aria-pressed="false">Hide input</button>
           <button type="button" class="input-toggle-btn time-tool-layout-btn" data-time-tool-open>Time Tool</button>
           <button type="button" id="partADownloadBtn" class="input-toggle-btn part-a-download-btn">Download Report</button>
+          <label class="vn-lang-toggle" aria-label="Language">
+            <select id="vnLangSelect">
+              <option value="en">English</option>
+              <option value="hi">हिंदी</option>
+            </select>
+          </label>
           <div id="partAIdentityStrip" class="part-a-identity-strip" aria-live="polite">
             <div class="part-a-brand-mini">
               <img src="icon.svg" alt="" aria-hidden="true">
@@ -368,7 +378,7 @@
             <button type="button" class="empty-state-btn" data-chart-setup-action="select">Select Existing Chart</button>
           </div>
           <p class="empty-state-tagline">Generate chart preparation, planetary details, vargas, transit chart and Vimshottari timing.</p>
-          <p class="empty-state-version" id="appVersionLabel">Version 1.19</p>
+          <p class="empty-state-version" id="appVersionLabel">Version 1.20</p>
         </div>
         <article id="report" class="report hidden"></article>
       </section>
@@ -475,6 +485,6 @@
       </div>
     </div>
   </main>
-  <script src="app.js?v=19"></script>
+  <script src="app.js?v=20"></script>
 </body>
 </html>
