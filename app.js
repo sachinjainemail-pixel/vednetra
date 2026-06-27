@@ -565,6 +565,7 @@
         if (homeBarBtn) homeBarBtn.addEventListener("click", function () { returnToHome(); });
       } catch (e) {}
       try { vnRenderHomeShowcase(); } catch (e) {}
+      try { vnWireSwipe(); } catch (e) {}
       try { vnMaybeShowOnboarding(); } catch (e) {}
       try { vnRequestGeo(); } catch (e) {} // detect current location early so cards default to it
       try { vnLoadHomeChartOnStartup(); } catch (e) {}
@@ -14775,20 +14776,60 @@
   }
   // top uses shown on each card's output page so users know what to do with it
   var VN_USAGE = {
-    today: ["Plan the day around the favourable windows (Abhijit, Brahma Muhurta) and avoid Rahu Kaal, Yamaganda and Gulika for fresh starts.", "Time errands, calls and travel using the current Choghadiya.", "Read the running Maha/Antar dasha for the period's overall theme.", "Use the Moon's nakshatra and tithi for fasting, rituals or muhurta choices."],
-    muhurta: ["Schedule auspicious activities (signing, travel, purchases) in Abhijit or a good Choghadiya slot.", "Avoid Rahu Kaal, Yamaganda and Gulika for important new beginnings.", "Use Brahma Muhurta for meditation, study and spiritual practice.", "When the activity runs into the evening, check the night Choghadiya too."],
-    lagna: ["Start important work when a favourable rising sign (from your Moon) is up.", "Avoid the caution windows for launches, interviews and signings.", "Combine with the Muhurta windows for a stronger election.", "Act on the “rising now” marker to use a good window immediately."],
-    numerology: ["Understand your core nature (Mulank) and life direction (Bhagyank).", "Use the personal day / month / year to time decisions and effort.", "Check the name number for branding, signatures or spelling choices.", "Pair with the chart's dasha for a fuller timing picture."],
-    compat: ["Gauge baseline compatibility for marriage, partnership or business.", "See which number pairing drives harmony or friction.", "Use as a quick screen before deeper Ashtakoot / chart matching.", "Where the result is “Workable”, align expectations consciously."],
-    cards: ["Get a quick Past → Present → Future narrative on your focus.", "Treat it as a reflective prompt, not a fixed prediction.", "Draw again for a fresh angle when the focus changes.", "Ground the themes against your current dasha and transits."],
-    verdict: ["Get a quick directional answer to a specific yes/no question.", "Read the indicated dasha for a sense of “when”.", "Check the significator table for which houses and planets support the matter.", "Confirm important decisions with the full KP section before acting."],
-    rectify: ["Shortlist the most likely birth times when the exact time is unknown.", "Add more dated life events and re-run to sharpen the result.", "Open the top candidate as a new natal chart for full analysis.", "Use a finer step (1–2 min) around the best time to narrow further."]
+    today: [
+      { u: "Plan the day around the favourable windows and avoid the inauspicious kaals for fresh starts.", e: "If Rahu Kaal is 10:30–12:00, launch a new project in the Abhijit window instead." },
+      { u: "Time errands, calls and travel using the current Choghadiya.", e: "Make an important sales call during an Amrit or Shubh slot, not during Kaal or Rog." },
+      { u: "Read the running Maha/Antar dasha for the period's overall theme.", e: "In a Jupiter–Mercury period, favour study, teaching and deal-making." },
+      { u: "Use the Moon's nakshatra and tithi for fasting, rituals or muhurta choices.", e: "Begin an Ekadashi fast or a Lakshmi puja on the tithi shown." }
+    ],
+    muhurta: [
+      { u: "Pick an auspicious slot for important acts (signing, travel, purchases).", e: "Sign a property deal during Abhijit (≈12:00–12:48) rather than Yamaganda." },
+      { u: "Avoid Rahu Kaal, Yamaganda and Gulika for new beginnings.", e: "Don't start a journey or a new job during Rahu Kaal." },
+      { u: "Use Brahma Muhurta for meditation, study and practice.", e: "Sit for sadhana about 96–48 minutes before sunrise for best focus." },
+      { u: "For evening plans, check the night Choghadiya too.", e: "Time a late wedding ritual to a night Amrit or Shubh slot." }
+    ],
+    lagna: [
+      { u: "Start important work when a favourable rising sign (from your Moon) is up.", e: "Open a shop when a sign 1/4/5/9/10/11 from your Moon is rising." },
+      { u: "Avoid the caution windows for launches, interviews and signings.", e: "Skip an interview slot when a 6/8/12 sign is rising." },
+      { u: "Combine with the Muhurta windows for a stronger election.", e: "Choose a moment that is both Abhijit and a favourable lagna." },
+      { u: "Act on the “rising now” marker to use a good window immediately.", e: "If the current lagna is favourable, make that call now." }
+    ],
+    numerology: [
+      { u: "Understand your core nature (Mulank) and life direction (Bhagyank).", e: "Mulank 1 (Sun) → lead; Bhagyank 5 (Mercury) → adapt and communicate." },
+      { u: "Use the personal day / month / year to time decisions and effort.", e: "Launch in a Personal Year/Month/Day of 1; consolidate in an 8." },
+      { u: "Check the name number for branding, signatures or spelling choices.", e: "Tune a business name's spelling toward a 5 or 6 for visibility." },
+      { u: "Pair with the chart's dasha for a fuller timing picture.", e: "A favourable Personal Year during a Venus dasha supports relationships." }
+    ],
+    compat: [
+      { u: "Gauge baseline compatibility for marriage, partnership or business.", e: "Mulank 2 with 6 (Moon–Venus) is harmonious for marriage." },
+      { u: "See which number pairing drives harmony or friction.", e: "A 1–8 (Sun–Saturn) link can work but needs patience." },
+      { u: "Use as a quick screen before deeper Ashtakoot / chart matching.", e: "Shortlist proposals here, then do full matching for the top ones." },
+      { u: "Where the result is “Workable”, align expectations consciously.", e: "If money numbers clash, agree on finances early." }
+    ],
+    cards: [
+      { u: "Get a quick Past → Present → Future narrative on your focus.", e: "Ask “my new job” and read the three cards as one story." },
+      { u: "Treat it as a reflective prompt, not a fixed prediction.", e: "A Saturn-in-10th card → reflect on discipline at work." },
+      { u: "Draw again for a fresh angle when the focus changes.", e: "Switch the focus to “finances” and draw a new set." },
+      { u: "Ground the themes against your current dasha and transits.", e: "A Jupiter card during a Jupiter dasha reinforces growth." }
+    ],
+    verdict: [
+      { u: "Get a quick directional answer to a specific yes/no question.", e: "Ask “Will the loan be approved?” with a number from 1–249." },
+      { u: "Read the indicated dasha for a sense of “when”.", e: "A YES with a Venus antardasha suggests it fructifies in that period." },
+      { u: "Check the significator table for which houses/planets support the matter.", e: "For marriage, houses 2/7/11 being signified is supportive." },
+      { u: "Confirm important decisions with the full KP section before acting.", e: "Cross-check the cuspal sub-lord in the KP section." }
+    ],
+    rectify: [
+      { u: "Shortlist the most likely birth times when the exact time is unknown.", e: "Unsure between 10:10 and 10:40 → sweep ±30 minutes." },
+      { u: "Add more dated life events and re-run to sharpen the result.", e: "Add marriage and first-child dates for a tighter shortlist." },
+      { u: "Open the top candidate as a new natal chart for full analysis.", e: "Generate a fresh chart at the suggested 10:21." },
+      { u: "Use a finer step (1–2 min) around the best time to narrow further.", e: "Re-run with a 1-minute step centred on the top time." }
+    ]
   };
   function vnUsagePanel(key) {
     var uses = key && VN_USAGE[key];
     if (!uses || !uses.length) return "";
     return '<div class="panel-box vn-usage"><h3>How to use this</h3><ul>' +
-      uses.map(function (u) { return "<li>" + escapeHtml(u) + "</li>"; }).join("") + "</ul></div>";
+      uses.map(function (u) { return "<li>" + escapeHtml(u.u) + '<span class="vn-usage-eg">Example: ' + escapeHtml(u.e) + "</span></li>"; }).join("") + "</ul></div>";
   }
   // full-screen output "window" for a tool card
   function vnShowToolOutput(title, bodyHtml, opts) {
@@ -15918,6 +15959,43 @@
       if (opt === "prashna") { el.remove(); vnOpenFeatureWithChart(targetId, "prashna"); return; }
       if (opt === "existing") { showExisting(); return; }
     });
+  }
+
+  // ---- mobile swipe navigation (back = left→right, forward = right→left) ----
+  function vnSwipeBack() {
+    var out = document.getElementById("vnToolOutput"); if (out) { out.remove(); return true; }
+    var ov = document.querySelector(".vn-confirm-overlay"); if (ov) { ov.remove(); return true; }
+    if (document.body.classList.contains("report-active")) { try { returnToHome(); } catch (e) {} return true; }
+    return false;
+  }
+  function vnSwipeForward() {
+    var report = document.getElementById("report");
+    var empty = document.getElementById("emptyState");
+    if (empty && !empty.classList.contains("hidden") && report && report.innerHTML.trim()) {
+      empty.classList.add("hidden"); report.classList.remove("hidden");
+      try { showReportView("chartData"); } catch (e) {}
+      return true;
+    }
+    return false;
+  }
+  function vnWireSwipe() {
+    if (typeof document === "undefined" || !document.addEventListener) return;
+    var sx = 0, sy = 0, st = 0, tracking = false, ignore = false;
+    document.addEventListener("touchstart", function (e) {
+      if (!e.touches || e.touches.length !== 1) { tracking = false; return; }
+      var t = e.touches[0]; sx = t.clientX; sy = t.clientY; st = Date.now(); tracking = true;
+      // let horizontally-scrollable regions and form fields keep their own gestures
+      ignore = !!(e.target && e.target.closest && e.target.closest(".vn-home-carousel, .table-wrap, input, select, textarea, details, .vn-pick-list"));
+    }, { passive: true });
+    document.addEventListener("touchend", function (e) {
+      if (!tracking) return; tracking = false;
+      if (ignore) return;
+      var t = e.changedTouches && e.changedTouches[0]; if (!t) return;
+      var dx = t.clientX - sx, dy = t.clientY - sy, dt = Date.now() - st;
+      if (dt > 700) return;
+      if (Math.abs(dx) < 80 || Math.abs(dx) < Math.abs(dy) * 2) return; // clear horizontal swipe only
+      if (dx > 0) vnSwipeBack(); else vnSwipeForward();
+    }, { passive: true });
   }
 
   var coreApi = {
