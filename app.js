@@ -15817,24 +15817,24 @@
       showSingleChartDataSection(targetId, { skipScroll: false });
     } catch (e) {}
   }
-  // Ask which natal chart to use; otherwise apply to a current-location Prashna chart.
+  // On a card click, offer: new natal chart, current Prashna chart, or an existing chart.
   function vnNavigateToFeature(targetId) {
     if (!targetId) return;
     var info = VN_FEATURE_INFO[targetId] || { label: "this section" };
     var saved = vnSavedChartsList();
     var prior = document.querySelector(".vn-confirm-overlay"); if (prior) prior.remove();
-    var savedHtml = saved.length
-      ? '<label class="vn-pick-label">Search your saved charts<input id="vnPickSearch" type="search" placeholder="Type a name..." autocomplete="off"></label>' +
-        '<div id="vnPickList" class="vn-pick-list"></div>'
-      : '<p class="fine-print">You have no saved natal charts yet.</p>';
     var el = document.createElement("div");
     el.className = "vn-onboard-overlay vn-confirm-overlay";
     el.innerHTML = '<div class="vn-onboard-card vn-confirm-card">' +
       '<h2>Open ' + escapeHtml(info.label) + '</h2>' +
-      '<p class="fine-print">Pick a natal chart (type to search), or apply it to a Prashna chart for your current location and time.</p>' +
-      savedHtml +
-      '<div class="vn-confirm-actions"><button type="button" class="input-toggle-btn" id="vnPickCancel">Cancel</button>' +
-      '<button type="button" class="' + (saved.length ? "input-toggle-btn" : "primary-action vn-generate-btn") + '" id="vnPickUsePrashna">Use my current location</button></div></div>';
+      '<p class="fine-print">Which chart should this use?</p>' +
+      '<div class="vn-pick-options">' +
+        '<button type="button" class="primary-action vn-generate-btn" data-pick-opt="new">Create a new natal chart</button>' +
+        '<button type="button" class="primary-action vn-generate-btn" data-pick-opt="prashna">Create a current Prashna chart</button>' +
+        '<button type="button" class="primary-action vn-generate-btn" data-pick-opt="existing">Select an existing chart</button>' +
+      '</div>' +
+      '<div id="vnPickExisting" class="vn-pick-existing hidden"></div>' +
+      '<div class="vn-confirm-actions"><button type="button" class="input-toggle-btn" id="vnPickCancel">Cancel</button></div></div>';
     document.body.appendChild(el);
     function renderPickList(filter) {
       var listEl = document.getElementById("vnPickList");
@@ -15845,16 +15845,25 @@
         ? items.map(function (c) { return '<button type="button" class="vn-pick-item" data-pick-id="' + escapeHtml(c.id) + '">' + escapeHtml(c.title || c.nativeName || "Saved chart") + '</button>'; }).join("")
         : '<p class="fine-print">No saved charts match.</p>';
     }
-    if (saved.length) {
+    function showExisting() {
+      var box = document.getElementById("vnPickExisting");
+      if (!box) return;
+      box.classList.remove("hidden");
+      if (!saved.length) { box.innerHTML = '<p class="fine-print">You have no saved charts yet. Choose “Create a new natal chart” instead.</p>'; return; }
+      box.innerHTML = '<label class="vn-pick-label">Search your saved charts<input id="vnPickSearch" type="search" placeholder="Type a name..." autocomplete="off"></label><div id="vnPickList" class="vn-pick-list"></div>';
       renderPickList("");
-      var searchEl = document.getElementById("vnPickSearch");
-      if (searchEl) { searchEl.addEventListener("input", function () { renderPickList(searchEl.value); }); searchEl.focus(); }
+      var s = document.getElementById("vnPickSearch");
+      if (s) { s.addEventListener("input", function () { renderPickList(s.value); }); s.focus(); }
     }
     el.addEventListener("click", function (e) {
-      if (e.target === el || e.target.id === "vnPickCancel") { el.remove(); return; }
-      var pick = e.target && e.target.closest && e.target.closest("[data-pick-id]");
+      var t = e.target;
+      if (t === el || t.id === "vnPickCancel") { el.remove(); return; }
+      var pick = t.closest && t.closest("[data-pick-id]");
       if (pick) { var cid = pick.getAttribute("data-pick-id"); el.remove(); vnOpenFeatureWithChart(targetId, "saved", cid); return; }
-      if (e.target.id === "vnPickUsePrashna") { el.remove(); vnOpenFeatureWithChart(targetId, "prashna"); return; }
+      var opt = t.getAttribute && t.getAttribute("data-pick-opt");
+      if (opt === "new") { vnPendingHomeTarget = targetId; el.remove(); runChartSetupRibbonAction("new"); return; }
+      if (opt === "prashna") { el.remove(); vnOpenFeatureWithChart(targetId, "prashna"); return; }
+      if (opt === "existing") { showExisting(); return; }
     });
   }
 
