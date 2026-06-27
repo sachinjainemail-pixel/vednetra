@@ -7899,3 +7899,13 @@ body:not(.report-active) .empty-state { max-width: 1140px !important; align-cont
 .vn-confirm-card { max-width: 420px; }
 .vn-confirm-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; flex-wrap: wrap; }
 .vn-home-bar-btn { font-weight: 600; }
+
+/* ===== VedNetra tool input → output "window" ===== */
+.vn-generate-row { margin-top: 10px; }
+.vn-generate-btn { width: 100%; padding: 12px; font-size: 15px; }
+.vn-tool-output-overlay { position: fixed; inset: 0; z-index: 9000; background: var(--bg); overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.vn-tool-output-shell { max-width: 1100px; margin: 0 auto; padding: 14px 16px 40px; }
+.vn-tool-output-head { position: sticky; top: 0; background: var(--bg); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 8px 0 12px; border-bottom: 2px solid rgba(200,168,78,0.35); margin-bottom: 16px; z-index: 1; }
+.vn-tool-output-head h2 { margin: 0; color: var(--blue); font-size: 18px; flex: 1 1 auto; }
+.vn-tool-output-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.vn-tool-back { font-weight: 700; }
