@@ -7955,3 +7955,9 @@ body:not(.report-active) .empty-state {
 .vn-pick-item { text-align: left; border: 1px solid var(--line); border-radius: 6px; padding: 9px 11px; background: var(--panel); cursor: pointer; font-size: 14px; }
 .vn-pick-item:hover { background: var(--gold-panel); }
 .vn-pick-label input[type="search"] { width: 100%; padding: 9px; border: 1px solid var(--line); border-radius: 8px; }
+
+/* ===== 3-option chart picker ===== */
+.vn-pick-options { display: flex; flex-direction: column; gap: 8px; margin: 12px 0 6px; }
+.vn-pick-options .vn-generate-btn { width: 100%; }
+.vn-pick-existing { margin-top: 4px; }
+.vn-pick-existing.hidden { display: none; }
