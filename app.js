@@ -8388,6 +8388,9 @@
       '<div class="panel-box varshfal-controls">' +
       '<div class="grid-2"><label>Varshfal calendar year<input id="varshfalCalendarYear" type="number" min="' + birthYear + '" max="' + (birthYear + 120) + '" step="1" value="' + calendarYear + '" placeholder="e.g. 2016"></label><label>Running year of life<input id="varshfalYear" type="number" min="1" max="121" step="1" value="' + runningYear + '"></label></div>' +
       '<div class="grid-2"><label>Varshfal Shodashvarga<select id="varshfalDivision">' + varshfalDivisionOptions(division) + '</select></label><div class="button-label"><span>Update Varshfal</span><button type="button" id="varshfalUpdateBtn" class="primary-action">Update chart</button></div></div>' +
+      '<div class="grid-2"><label>Location for the year (current city)<input id="varshfalLocPlace" list="cityOptions" placeholder="e.g. Mumbai" value="' + escapeHtml(input.birthPlace || "") + '"></label><div class="vn-control-actions"><button type="button" id="varshfalLocSearchBtn" class="input-toggle-btn">Search place</button><button type="button" id="varshfalLocGeoBtn" class="input-toggle-btn">Use my location</button></div></div>' +
+      '<details class="vn-adv"><summary>Advanced (timezone &amp; coordinates)</summary><div class="grid-3"><label>Timezone<input id="varshfalLocTimezone" type="number" step="0.25" value="' + escapeHtml(String(input.timezone)) + '"></label><label>Latitude<input id="varshfalLocLatitude" type="number" step="0.0001" value="' + escapeHtml(Number(input.latitude).toFixed(4)) + '"></label><label>Longitude<input id="varshfalLocLongitude" type="number" step="0.0001" value="' + escapeHtml(Number(input.longitude).toFixed(4)) + '"></label></div></details>' +
+      '<p class="fine-print vn-geo-status" id="varshfalLocGeoStatus">Defaults to the birth location. Set it to where you live this year (Tajika is cast for your current place).</p>' +
       '<p id="varshfalStatus" class="fine-print varshfal-status">Showing calendar year ' + calendarYear + ' (running year ' + runningYear + ').</p><p class="fine-print">Enter a calendar year (e.g. 2016) to open that year\'s Varshfal directly, or use the running year of life (1 = birth to first birthday, 2 = first to second birthday, ...). VedNetra casts the annual chart at the sidereal Sun return to the natal Sun longitude. The varga selector keeps D-9 as default and can switch the annual chart to any Shodashvarga.</p></div>' +
       '<div id="varshfalChartMount">' + varshfalPanelHtml(chart, input, runningYear, division) + "</div></section>";
   }
@@ -8570,13 +8573,52 @@
     return clamp(years, 0, 120);
   }
 
+  function vnVarshfalEffectiveInput(input, scope) {
+    function val(id) { var e = scope && scope.querySelector ? scope.querySelector("#" + id) : document.getElementById(id); return e ? e.value : ""; }
+    var place = val("varshfalLocPlace").trim();
+    var tz = Number(val("varshfalLocTimezone")), lat = Number(val("varshfalLocLatitude")), lon = Number(val("varshfalLocLongitude"));
+    var eff = {}; for (var k in input) eff[k] = input[k];
+    if (Number.isFinite(lat)) eff.latitude = lat;
+    if (Number.isFinite(lon)) eff.longitude = lon;
+    if (Number.isFinite(tz)) eff.timezone = tz;
+    if (place) eff.birthPlace = place;
+    return eff;
+  }
+  function vnVarshfalSearchPlace(chart, input, section) {
+    var placeEl = document.getElementById("varshfalLocPlace");
+    var status = document.getElementById("varshfalLocGeoStatus");
+    var q = placeEl ? placeEl.value.trim() : "";
+    if (!q) { if (status) status.textContent = "Type a place name first, then press Search place."; return; }
+    var local = findCity(q);
+    if (local) { vnFillLocation("varshfalLoc", local.name, local.latitude, local.longitude, local.timezone); updateVarshfalFromControls(chart, input, section); if (status) status.textContent = "Found " + local.name + "."; return; }
+    if (typeof fetch !== "function" || (typeof navigator !== "undefined" && navigator.onLine === false)) { if (status) status.textContent = "Offline: open Advanced to enter coordinates."; return; }
+    if (status) status.textContent = "Searching for “" + q + "”..."; var btn = document.getElementById("varshfalLocSearchBtn"); if (btn) btn.disabled = true;
+    fetchGeocodedPlace(q).then(function (res) {
+      if (!res) { if (status) status.textContent = "No match found. Open Advanced to enter coordinates."; return; }
+      vnFillLocation("varshfalLoc", res.name, res.latitude, res.longitude, Number(res.timezone));
+      try { rememberCustomLocation(res.name, res.latitude, res.longitude, Number(res.timezone) || 5.5); } catch (e) {}
+      updateVarshfalFromControls(chart, input, section);
+      if (status) status.textContent = "Found " + res.name + ".";
+    }).catch(function () { if (status) status.textContent = "Search failed. Open Advanced to enter coordinates."; }).then(function () { if (btn) btn.disabled = false; });
+  }
   function wireVarshfalControls(chart, input, root) {
     if (typeof document === "undefined") return;
     var section = root || document.getElementById("viewA-varshfal");
     if (!section || section._varshfalWired) return;
     section.addEventListener("click", function (event) {
-      var button = event.target && event.target.closest ? event.target.closest("#varshfalUpdateBtn") : null;
-      if (!button) return;
+      if (!event.target || !event.target.closest) return;
+      if (event.target.closest("#varshfalLocSearchBtn")) { vnVarshfalSearchPlace(chart, input, section); return; }
+      if (event.target.closest("#varshfalLocGeoBtn")) {
+        var status = document.getElementById("varshfalLocGeoStatus");
+        if (status) status.textContent = "Locating...";
+        VN_GEO = null;
+        vnRequestGeo(function (g, err) {
+          if (g) { vnApplyGeoToPanel("varshfalLoc", g); updateVarshfalFromControls(chart, input, section); if (status) status.textContent = "Using your current location: " + (g.place || ""); }
+          else { if (status) status.textContent = "Location unavailable (" + ((err && err.message) || "permission denied") + ")."; }
+        });
+        return;
+      }
+      if (!event.target.closest("#varshfalUpdateBtn")) return;
       updateVarshfalFromControls(chart, input, section);
     });
     section.addEventListener("change", function (event) {
@@ -8591,6 +8633,11 @@
     });
     section.addEventListener("keydown", function (event) {
       if (!event.target || event.key !== "Enter") return;
+      if (event.target.id === "varshfalLocPlace") {
+        event.preventDefault();
+        vnVarshfalSearchPlace(chart, input, section);
+        return;
+      }
       if (event.target.id === "varshfalCalendarYear") {
         event.preventDefault();
         syncVarshfalYearFromCalendar(input, section);
@@ -8626,7 +8673,7 @@
     var calendarYear = varshfalBirthYear(input) + runningYear - 1;
     if (calField) calField.value = String(calendarYear);
     try {
-      mount.innerHTML = varshfalPanelHtml(chart, input, runningYear, divisionField ? divisionField.value : 9);
+      mount.innerHTML = varshfalPanelHtml(chart, vnVarshfalEffectiveInput(input, scope), runningYear, divisionField ? divisionField.value : 9);
       if (status) status.textContent = "Showing calendar year " + calendarYear + " (running year " + runningYear + ").";
       enhanceReportTableTopControls();
     } catch (error) {
