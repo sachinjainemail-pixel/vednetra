@@ -14640,6 +14640,38 @@
   var VN_GEO = (function () { try { return JSON.parse(vnLsGet("vednetra.geo", "") || "null"); } catch (e) { return null; } })();
   var vnGeoInFlight = false, vnGeoQueue = [];
   function vnSaveGeo(g) { VN_GEO = g; vnLsSet("vednetra.geo", JSON.stringify(g)); }
+  // offline nearest city from the built-in table, so a real name always shows
+  function vnNearestCity(lat, lon) {
+    var list = allCityLookup(); var best = null, bestD = Infinity;
+    for (var i = 0; i < list.length; i++) {
+      var c = list[i]; var dLat = c.latitude - lat, dLon = (c.longitude - lon) * Math.cos(lat * Math.PI / 180);
+      var d = dLat * dLat + dLon * dLon;
+      if (d < bestD) { bestD = d; best = c; }
+    }
+    return best;
+  }
+  function vnCityShortName(name) { return String(name || "").split(",")[0].trim(); }
+  // online reverse geocode (same provider the app already uses for search)
+  function vnReverseGeocode(lat, lon, cb) {
+    try {
+      var url = "https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=10&addressdetails=1&lat=" + lat + "&lon=" + lon;
+      fetch(url, { method: "GET", headers: { Accept: "application/json" } })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (row) {
+          if (!row) { cb(null); return; }
+          var a = row.address || {};
+          var city = a.city || a.town || a.village || a.suburb || a.municipality || a.county || a.state_district || a.state;
+          cb(city ? (a.state && city !== a.state ? city + ", " + a.state : city) : null);
+        })
+        .catch(function () { cb(null); });
+    } catch (e) { cb(null); }
+  }
+  function vnApplyGeoLabelToOpenPanels() {
+    ["vnToday", "vnMuh", "vnLag"].forEach(function (prefix) {
+      var place = document.getElementById(prefix + "Place");
+      if (place && VN_GEO) place.value = VN_GEO.place || "Current location";
+    });
+  }
   function vnRequestGeo(onDone) {
     if (VN_GEO) { if (onDone) onDone(VN_GEO); return; }
     if (typeof navigator === "undefined" || !navigator.geolocation) { if (onDone) onDone(null); return; }
@@ -14647,9 +14679,15 @@
     if (vnGeoInFlight) return;
     vnGeoInFlight = true;
     navigator.geolocation.getCurrentPosition(function (pos) {
-      var g = { lat: Number(pos.coords.latitude.toFixed(4)), lon: Number(pos.coords.longitude.toFixed(4)), tz: -new Date().getTimezoneOffset() / 60 };
+      var lat = Number(pos.coords.latitude.toFixed(4)), lon = Number(pos.coords.longitude.toFixed(4));
+      var near = null; try { near = vnNearestCity(lat, lon); } catch (e) {}
+      var g = { lat: lat, lon: lon, tz: -new Date().getTimezoneOffset() / 60, place: near ? vnCityShortName(near.name) : "Current location" };
       vnSaveGeo(g); vnGeoInFlight = false;
       var q = vnGeoQueue.slice(); vnGeoQueue = []; q.forEach(function (f) { try { f(g); } catch (e) {} });
+      // refine the label with an online reverse geocode if reachable
+      vnReverseGeocode(lat, lon, function (cityName) {
+        if (cityName) { g.place = cityName; vnSaveGeo(g); vnApplyGeoLabelToOpenPanels(); }
+      });
     }, function (err) {
       vnGeoInFlight = false;
       var q = vnGeoQueue.slice(); vnGeoQueue = []; q.forEach(function (f) { try { f(null, err); } catch (e) {} });
@@ -14662,7 +14700,7 @@
     var lat = Number(input.latitude), lon = Number(input.longitude), place = input.birthPlace || "";
     // default to the user's current location when we have it cached
     if (VN_GEO && Number.isFinite(VN_GEO.lat) && Number.isFinite(VN_GEO.lon)) {
-      lat = VN_GEO.lat; lon = VN_GEO.lon; tz = VN_GEO.tz; place = "Current location";
+      lat = VN_GEO.lat; lon = VN_GEO.lon; tz = VN_GEO.tz; place = VN_GEO.place || "Current location";
     }
     return {
       date: input.asOfDate || dateInputValue(now, tz),
@@ -14727,7 +14765,7 @@
     lat.value = Number(g.lat).toFixed(4); lat.dataset.vnTouched = "1";
     lon.value = Number(g.lon).toFixed(4); lon.dataset.vnTouched = "1";
     if (tz) { tz.value = String(g.tz); tz.dataset.vnTouched = "1"; }
-    if (place) place.value = "Current location";
+    if (place) place.value = g.place || "Current location";
     if (opts.update) { var upd = document.getElementById(prefix + "UpdateBtn"); if (upd) upd.click(); }
   }
   function vnWireGeo(prefix) {
@@ -15692,7 +15730,44 @@
       dots.forEach(function (d, i) { d.classList.toggle("active", i === c); });
     });
   }
+  // feature id -> {label, desc} for the confirm dialog
+  var VN_FEATURE_INFO = (function () {
+    var map = {};
+    VN_HOME_CATALOG.forEach(function (g) { g.items.forEach(function (it) { if (it.id) map[it.id] = { label: it.label, desc: it.desc }; }); });
+    return map;
+  })();
+  function vnChartSourceLabel() {
+    var report = document.getElementById("report");
+    if (report && report.innerHTML.trim()) {
+      var summary = document.querySelector(".part-a-native-summary");
+      return "your current chart";
+    }
+    if (vnLsGet("vednetra.homeChart", "")) return "your saved daily chart";
+    try { if (typeof savedCharts !== "undefined" && savedCharts && savedCharts.length) return "your most recent saved chart"; } catch (e) {}
+    return "a sample chart for the current date, time and place";
+  }
+  // Ask the user to confirm loading a section, telling them what it will load.
   function vnNavigateToFeature(targetId) {
+    if (!targetId) return;
+    var info = VN_FEATURE_INFO[targetId] || { label: "this section", desc: "" };
+    var prior = document.querySelector(".vn-confirm-overlay"); if (prior) prior.remove();
+    var el = document.createElement("div");
+    el.className = "vn-onboard-overlay vn-confirm-overlay";
+    el.innerHTML = '<div class="vn-onboard-card vn-confirm-card">' +
+      '<h2>' + escapeHtml(info.label) + '</h2>' +
+      '<p>' + escapeHtml(info.desc) + '</p>' +
+      '<p class="fine-print">This will load <strong>' + escapeHtml(info.label) + '</strong> using ' + escapeHtml(vnChartSourceLabel()) + '.</p>' +
+      '<div class="vn-confirm-actions"><button type="button" class="input-toggle-btn" id="vnConfirmCancel">Cancel</button>' +
+      '<button type="button" class="primary-action" id="vnConfirmLoad">Load ' + escapeHtml(info.label) + '</button></div></div>';
+    document.body.appendChild(el);
+    var load = el.querySelector("#vnConfirmLoad");
+    if (load) load.focus();
+    el.addEventListener("click", function (e) {
+      if (e.target === el || e.target.id === "vnConfirmCancel") { el.remove(); return; }
+      if (e.target.id === "vnConfirmLoad") { el.remove(); vnDoNavigateToFeature(targetId); }
+    });
+  }
+  function vnDoNavigateToFeature(targetId) {
     if (!targetId) return;
     var report = document.getElementById("report");
     var empty = document.getElementById("emptyState");

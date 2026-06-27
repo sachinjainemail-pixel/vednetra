@@ -7894,3 +7894,8 @@ body:not(.report-active) .empty-state { max-width: 1140px !important; align-cont
 .vn-home-arrow { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 1px solid var(--line); background: var(--paper); color: var(--blue); border-radius: 999px; font-size: 20px; line-height: 1; cursor: pointer; }
 .vn-home-arrow:hover { box-shadow: var(--shadow); }
 .vn-home-hint { text-align: center; margin: 8px 0 0; }
+
+/* ===== VedNetra confirm-load dialog ===== */
+.vn-confirm-card { max-width: 420px; }
+.vn-confirm-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; flex-wrap: wrap; }
+.vn-home-bar-btn { font-weight: 600; }
