@@ -14744,6 +14744,7 @@
       '<label>Latitude<input id="' + prefix + 'Latitude" type="number" step="0.0001" value="' + escapeHtml(Number(ctx.latitude).toFixed(4)) + '"></label>' +
       '<label>Longitude<input id="' + prefix + 'Longitude" type="number" step="0.0001" value="' + escapeHtml(Number(ctx.longitude).toFixed(4)) + '"></label>' +
       '</div></details><div class="vn-control-actions">' +
+      '<button type="button" id="' + prefix + 'SearchBtn" class="input-toggle-btn vn-search-btn">Search place</button>' +
       '<button type="button" id="' + prefix + 'GeoBtn" class="input-toggle-btn vn-geo-btn">Use my location</button>' +
       '<button type="button" id="' + prefix + 'UpdateBtn" class="input-toggle-btn">Refresh</button>' +
       '</div>' +
@@ -14834,7 +14835,39 @@
     if (tz) { tz.value = String(g.tz); tz.dataset.vnTouched = "1"; }
     if (place) place.value = g.place || "Current location";
   }
+  function vnFillLocation(prefix, name, lat, lon, tz) {
+    var p = document.getElementById(prefix + "Place"); if (p && name) p.value = name;
+    var la = document.getElementById(prefix + "Latitude"); if (la) { la.value = Number(lat).toFixed(4); la.dataset.vnTouched = "1"; }
+    var lo = document.getElementById(prefix + "Longitude"); if (lo) { lo.value = Number(lon).toFixed(4); lo.dataset.vnTouched = "1"; }
+    var t = document.getElementById(prefix + "Timezone"); if (t && Number.isFinite(Number(tz))) { t.value = String(tz); t.dataset.vnTouched = "1"; }
+  }
+  // search the typed place name (offline list first, then online geocoders) and fill coordinates
+  function vnSearchPlace(prefix) {
+    var placeEl = document.getElementById(prefix + "Place");
+    var status = document.getElementById(prefix + "GeoStatus");
+    var query = placeEl ? placeEl.value.trim() : "";
+    if (!query) { if (status) status.textContent = "Type a place name first, then press Search place."; if (placeEl) placeEl.focus(); return; }
+    var local = findCity(query);
+    if (local) { vnFillLocation(prefix, local.name, local.latitude, local.longitude, local.timezone); if (status) status.textContent = "Found " + local.name + "."; return; }
+    if (typeof fetch !== "function" || (typeof navigator !== "undefined" && navigator.onLine === false)) {
+      if (status) status.textContent = "Offline: open Advanced to enter coordinates manually."; return;
+    }
+    if (status) status.textContent = "Searching for “" + query + "”...";
+    var btn = document.getElementById(prefix + "SearchBtn"); if (btn) btn.disabled = true;
+    fetchGeocodedPlace(query).then(function (res) {
+      if (!res) { if (status) status.textContent = "No match found. Open Advanced to enter coordinates."; return; }
+      vnFillLocation(prefix, res.name, res.latitude, res.longitude, Number(res.timezone));
+      try { rememberCustomLocation(res.name, res.latitude, res.longitude, Number(res.timezone) || 5.5); } catch (e) {}
+      if (status) status.textContent = "Found " + res.name + " (" + coordinateText(res.latitude, res.longitude) + ").";
+    }).catch(function () {
+      if (status) status.textContent = "Search failed. Open Advanced to enter coordinates manually.";
+    }).then(function () { if (btn) btn.disabled = false; });
+  }
   function vnWireGeo(prefix) {
+    var searchBtn = document.getElementById(prefix + "SearchBtn");
+    if (searchBtn) searchBtn.addEventListener("click", function () { vnSearchPlace(prefix); });
+    var placeEl = document.getElementById(prefix + "Place");
+    if (placeEl) placeEl.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); vnSearchPlace(prefix); } });
     var btn = document.getElementById(prefix + "GeoBtn");
     var status = document.getElementById(prefix + "GeoStatus");
     if (btn) {
