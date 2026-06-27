@@ -14773,9 +14773,27 @@
       catch (e) { vnShowToolOutput("Could not generate", '<div class="panel-box"><p class="fine-print">' + escapeHtml(e.message || "") + '</p></div>'); }
     });
   }
+  // top uses shown on each card's output page so users know what to do with it
+  var VN_USAGE = {
+    today: ["Plan the day around the favourable windows (Abhijit, Brahma Muhurta) and avoid Rahu Kaal, Yamaganda and Gulika for fresh starts.", "Time errands, calls and travel using the current Choghadiya.", "Read the running Maha/Antar dasha for the period's overall theme.", "Use the Moon's nakshatra and tithi for fasting, rituals or muhurta choices."],
+    muhurta: ["Schedule auspicious activities (signing, travel, purchases) in Abhijit or a good Choghadiya slot.", "Avoid Rahu Kaal, Yamaganda and Gulika for important new beginnings.", "Use Brahma Muhurta for meditation, study and spiritual practice.", "When the activity runs into the evening, check the night Choghadiya too."],
+    lagna: ["Start important work when a favourable rising sign (from your Moon) is up.", "Avoid the caution windows for launches, interviews and signings.", "Combine with the Muhurta windows for a stronger election.", "Act on the “rising now” marker to use a good window immediately."],
+    numerology: ["Understand your core nature (Mulank) and life direction (Bhagyank).", "Use the personal day / month / year to time decisions and effort.", "Check the name number for branding, signatures or spelling choices.", "Pair with the chart's dasha for a fuller timing picture."],
+    compat: ["Gauge baseline compatibility for marriage, partnership or business.", "See which number pairing drives harmony or friction.", "Use as a quick screen before deeper Ashtakoot / chart matching.", "Where the result is “Workable”, align expectations consciously."],
+    cards: ["Get a quick Past → Present → Future narrative on your focus.", "Treat it as a reflective prompt, not a fixed prediction.", "Draw again for a fresh angle when the focus changes.", "Ground the themes against your current dasha and transits."],
+    verdict: ["Get a quick directional answer to a specific yes/no question.", "Read the indicated dasha for a sense of “when”.", "Check the significator table for which houses and planets support the matter.", "Confirm important decisions with the full KP section before acting."],
+    rectify: ["Shortlist the most likely birth times when the exact time is unknown.", "Add more dated life events and re-run to sharpen the result.", "Open the top candidate as a new natal chart for full analysis.", "Use a finer step (1–2 min) around the best time to narrow further."]
+  };
+  function vnUsagePanel(key) {
+    var uses = key && VN_USAGE[key];
+    if (!uses || !uses.length) return "";
+    return '<div class="panel-box vn-usage"><h3>How to use this</h3><ul>' +
+      uses.map(function (u) { return "<li>" + escapeHtml(u) + "</li>"; }).join("") + "</ul></div>";
+  }
   // full-screen output "window" for a tool card
   function vnShowToolOutput(title, bodyHtml, opts) {
     opts = opts || {};
+    bodyHtml = bodyHtml + vnUsagePanel(opts.usage);
     var prior = document.getElementById("vnToolOutput"); if (prior) prior.remove();
     var actionsHtml = (opts.actions || []).map(function (a) {
       return '<button type="button" class="input-toggle-btn" data-vn-act="' + escapeHtml(a.id) + '">' + escapeHtml(a.label) + '</button>';
@@ -14992,7 +15010,7 @@
   }
   function wireMuhurtaControls(chart, input) {
     vnWireToolControls("vnMuh", input, function (ctx) {
-      vnShowToolOutput("Muhurta & Choghadiya", muhurtaPanelHtml(ctx));
+      vnShowToolOutput("Muhurta & Choghadiya", muhurtaPanelHtml(ctx), { usage: "muhurta" });
     });
   }
 
@@ -15059,7 +15077,7 @@
   function wireTodayControls(chart, input) {
     vnWireToolControls("vnToday", input, function (ctx) {
       var html = todayPanelHtml(ctx, chart, input);
-      vnShowToolOutput(vnT("tools.today"), html, { actions: [
+      vnShowToolOutput(vnT("tools.today"), html, { usage: "today", actions: [
         { id: "share", label: "Share", onClick: function () { var text = vnToolOutputText(input, "Today"); if (navigator.share) navigator.share({ title: "VedNetra - Today", text: text }).catch(function () {}); else copyText(text); } },
         { id: "copy", label: "Copy summary", onClick: function () { copyText(vnToolOutputText(input, "Today")); } },
         { id: "print", label: "Print card", onClick: function () { vnPrintDailyCard(input); } },
@@ -15131,7 +15149,7 @@
   }
   function wireLagnaTimelineControls(chart, input) {
     vnWireToolControls("vnLag", input, function (ctx) {
-      vnShowToolOutput("Lagna Timeline", lagnaTimelinePanelHtml(ctx, chart));
+      vnShowToolOutput("Lagna Timeline", lagnaTimelinePanelHtml(ctx, chart), { usage: "lagna" });
     });
   }
 
@@ -15194,7 +15212,7 @@
     btn.addEventListener("click", function () {
       var name = document.getElementById("vnNumName"); var date = document.getElementById("vnNumDate"); var today = document.getElementById("vnNumToday");
       var d = String(date ? date.value : "").split("-").map(Number);
-      vnShowToolOutput("Numerology", numerologyPanelHtml({ name: name ? name.value : "", date: date ? date.value : "", year: d[0], month: d[1], day: d[2], today: today ? today.value : "" }));
+      vnShowToolOutput("Numerology", numerologyPanelHtml({ name: name ? name.value : "", date: date ? date.value : "", year: d[0], month: d[1], day: d[2], today: today ? today.value : "" }), { usage: "numerology" });
     });
   }
 
@@ -15333,7 +15351,7 @@
           matterKey: v("vnVerMatter"), number: Number(v("vnVerNumber")), date: v("vnVerDate"),
           time: normalizeTimeInput(v("vnVerTime")), timezone: Number(v("vnVerTimezone")),
           latitude: Number(v("vnVerLatitude")), longitude: Number(v("vnVerLongitude"))
-        }, chart));
+        }, chart), { usage: "verdict" });
       } catch (e) { vnShowToolOutput("Yes / No Verdict", '<div class="panel-box"><p class="fine-print">Could not compute verdict: ' + escapeHtml(e.message || "") + '</p></div>'); }
     });
   }
@@ -15408,7 +15426,7 @@
         vnShowToolOutput("Rectify Birth Time", rectifyPanelHtml({
           recTime: normalizeTimeInput(v("vnRecTime")), span: Math.abs(Number(v("vnRecSpan")) || 30),
           step: Math.max(1, Number(v("vnRecStep")) || 3), events: events
-        }, chart, input));
+        }, chart, input), { usage: "rectify" });
       } catch (e) { vnShowToolOutput("Rectify Birth Time", '<div class="panel-box"><p class="fine-print">Could not run rectification: ' + escapeHtml(e.message || "") + '</p></div>'); }
     });
   }
@@ -15586,7 +15604,7 @@
     if (!btn) return;
     btn.addEventListener("click", function () {
       function v(id) { var el = document.getElementById(id); return el ? el.value : ""; }
-      vnShowToolOutput("Numerology Match", numCompatPanelHtml({ name: v("vnCmpAName"), date: v("vnCmpADate") }, { name: v("vnCmpBName"), date: v("vnCmpBDate") }));
+      vnShowToolOutput("Numerology Match", numCompatPanelHtml({ name: v("vnCmpAName"), date: v("vnCmpADate") }, { name: v("vnCmpBName"), date: v("vnCmpBDate") }), { usage: "compat" });
     });
   }
 
@@ -15631,7 +15649,7 @@
     if (!btn) return;
     btn.addEventListener("click", function () {
       var f = document.getElementById("vnCardFocus");
-      vnShowToolOutput("Vedic Cards", cardsPanelHtml(f ? f.value.trim() : ""));
+      vnShowToolOutput("Vedic Cards", cardsPanelHtml(f ? f.value.trim() : ""), { usage: "cards" });
     });
   }
 
