@@ -7934,3 +7934,18 @@ body:not(.report-active) .empty-state {
   .empty-state-logo { width: 54px; height: 54px; }
   .empty-state-title { font-size: 22px; }
 }
+
+/* ===== Homepage: bigger brand + use the empty vertical space ===== */
+.empty-state-logo { width: 104px; height: 104px; }
+.empty-state-title { font-size: 36px; }
+/* distribute the cards across the available height so there is no empty gap at the bottom */
+.vn-home-carousel { align-items: stretch; }
+.vn-home-page { display: flex; }
+.vn-home-page .vn-home-grid { width: 100%; min-height: 100%; align-content: space-between; }
+@media (max-width: 560px) {
+  .empty-state-logo { width: 88px; height: 88px; }
+  .empty-state-title { font-size: 30px; }
+  .vn-home-desc { display: block; }            /* room for descriptions again */
+  .vn-home-card { padding: 14px 14px; }
+  .vn-home-grid { gap: 10px; }
+}
