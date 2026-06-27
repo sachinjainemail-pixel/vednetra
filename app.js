@@ -5506,6 +5506,13 @@
       { id: "viewA-summary",        immediate: true, render: function () { return chartSummarySection(chart, analysis, input); } },
       { id: "viewA-panchang",       immediate: true, render: function () { return panchangSection(chart, input); } },
       { id: "viewA-current-panchang", immediate: true, render: function () { return currentPanchangSection(chart, input); }, wire: function () { wireCurrentPanchangControls(chart, input); } },
+      { id: "viewA-today",          immediate: true, render: function () { return todaySection(chart, input); }, wire: function () { wireTodayControls(chart, input); } },
+      { id: "viewA-muhurta",        immediate: true, render: function () { return muhurtaSection(chart, input); }, wire: function () { wireMuhurtaControls(chart, input); } },
+      { id: "viewA-lagna-timeline", immediate: true, render: function () { return lagnaTimelineSection(chart, input); }, wire: function () { wireLagnaTimelineControls(chart, input); } },
+      { id: "viewA-numerology",     immediate: true, render: function () { return numerologySection(chart, input); }, wire: function () { wireNumerologyControls(chart, input); } },
+      { id: "viewA-verdict",        immediate: true, render: function () { return kpVerdictSection(chart, input); }, wire: function () { wireKpVerdictControls(chart, input); } },
+      { id: "viewA-rectify",        immediate: true, render: function () { return rectifySection(chart, input); }, wire: function () { wireRectifyControls(chart, input); } },
+      { id: "viewA-reading",        immediate: true, render: function () { return readingSection(chart, input); } },
       { id: "viewA-d1-details",     immediate: true, render: function () { return d1DetailsSection(chart); } },
       { id: "viewA-yogas",          immediate: true, render: function () { return chartWideYogasSection(chart, input); } },
       // ---- deferred (rendered via requestIdleCallback) ----
@@ -14586,6 +14593,632 @@
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
+  }
+
+  // ===========================================================================
+  // VedNetra Tools (client-side only): Today dashboard, Muhurta windows,
+  // Choghadiya, Lagna timeline, Numerology, KP verdict, Birth-time rectifier,
+  // plain-language Reading. All reuse the existing offline engine.
+  // ===========================================================================
+
+  function vnPad2(n) { n = Math.round(n); return (n < 10 ? "0" : "") + n; }
+  function vnClock(minutes) {
+    var m = ((Math.round(minutes) % 1440) + 1440) % 1440;
+    return vnPad2(Math.floor(m / 60)) + ":" + vnPad2(m % 60);
+  }
+  function vnFmtRange(startMin, endMin) { return vnClock(startMin) + " - " + vnClock(endMin); }
+  function vnWeekdayIndex(dateStr) {
+    var p = String(dateStr).split("-").map(Number);
+    return new Date(Date.UTC(p[0], (p[1] || 1) - 1, p[2] || 1)).getUTCDay();
+  }
+  function vnNextDateStr(dateStr) {
+    var p = String(dateStr).split("-").map(Number);
+    var d = new Date(Date.UTC(p[0], (p[1] || 1) - 1, p[2] || 1));
+    d.setUTCDate(d.getUTCDate() + 1);
+    return d.getUTCFullYear() + "-" + vnPad2(d.getUTCMonth() + 1) + "-" + vnPad2(d.getUTCDate());
+  }
+
+  // ---- shared context + reusable control markup --------------------------
+  function vnDefaultCtx(input) {
+    var now = new Date();
+    var tz = Number(input.timezone);
+    if (!Number.isFinite(tz)) tz = 5.5;
+    return {
+      date: input.asOfDate || dateInputValue(now, tz),
+      time: normalizeTimeInput(input.asOfTime || timeInputValue(now, tz)),
+      place: input.birthPlace || "",
+      timezone: tz,
+      latitude: Number(input.latitude),
+      longitude: Number(input.longitude),
+      ayanamshaKey: input.ayanamshaKey
+    };
+  }
+  function vnControlsHtml(prefix, ctx, opts) {
+    opts = opts || {};
+    var timeRow = opts.noTime ? "" :
+      '<label>Time HH:MM:SS<input id="' + prefix + 'Time" type="text" inputmode="numeric" pattern="[0-9]{2}:[0-9]{2}:[0-9]{2}" value="' + escapeHtml(ctx.time) + '"></label>';
+    return '<div class="panel-box vn-controls"><div class="grid-3">' +
+      '<label>Date<input id="' + prefix + 'Date" type="date" value="' + escapeHtml(ctx.date) + '"></label>' +
+      timeRow +
+      '<label>Reference place<input id="' + prefix + 'Place" list="cityOptions" placeholder="Example: Delhi, India" value="' + escapeHtml(ctx.place) + '"></label>' +
+      '</div><div class="grid-3">' +
+      '<label>Timezone<input id="' + prefix + 'Timezone" type="number" step="0.25" value="' + escapeHtml(String(ctx.timezone)) + '"></label>' +
+      '<label>Latitude<input id="' + prefix + 'Latitude" type="number" step="0.0001" value="' + escapeHtml(Number(ctx.latitude).toFixed(4)) + '"></label>' +
+      '<label>Longitude<input id="' + prefix + 'Longitude" type="number" step="0.0001" value="' + escapeHtml(Number(ctx.longitude).toFixed(4)) + '"></label>' +
+      '</div><div class="vn-control-actions">' +
+      '<button type="button" id="' + prefix + 'GeoBtn" class="input-toggle-btn vn-geo-btn">Use my location</button>' +
+      '<button type="button" id="' + prefix + 'UpdateBtn" class="primary-action">' + escapeHtml(opts.updateLabel || "Update") + '</button>' +
+      '</div><p class="fine-print vn-geo-status" id="' + prefix + 'GeoStatus"></p></div>';
+  }
+  function vnReadCtx(prefix, fallback) {
+    function val(id) { var el = document.getElementById(prefix + id); return el ? el.value : ""; }
+    var timeEl = document.getElementById(prefix + "Time");
+    var place = val("Place").trim();
+    if (place) {
+      var found = findCity(place);
+      if (found) {
+        var pf = document.getElementById(prefix + "Place"); if (pf) pf.value = found.name;
+        var tzf = document.getElementById(prefix + "Timezone"); if (tzf && !tzf.dataset.vnTouched) tzf.value = found.timezone;
+        var laf = document.getElementById(prefix + "Latitude"); if (laf && !laf.dataset.vnTouched) laf.value = Number(found.latitude).toFixed(4);
+        var lof = document.getElementById(prefix + "Longitude"); if (lof && !lof.dataset.vnTouched) lof.value = Number(found.longitude).toFixed(4);
+      }
+    }
+    var tz = Number(val("Timezone")), lat = Number(val("Latitude")), lon = Number(val("Longitude"));
+    var ctx = {
+      date: val("Date") || fallback.date,
+      time: timeEl ? normalizeTimeInput(timeEl.value) : fallback.time,
+      place: place || fallback.place,
+      timezone: Number.isFinite(tz) ? tz : fallback.timezone,
+      latitude: Number.isFinite(lat) ? lat : fallback.latitude,
+      longitude: Number.isFinite(lon) ? lon : fallback.longitude,
+      ayanamshaKey: fallback.ayanamshaKey
+    };
+    if (place && Number.isFinite(lat) && Number.isFinite(lon)) rememberCustomLocation(place, lat, lon, ctx.timezone);
+    return ctx;
+  }
+  function vnWireGeo(prefix) {
+    var btn = document.getElementById(prefix + "GeoBtn");
+    var status = document.getElementById(prefix + "GeoStatus");
+    if (!btn) return;
+    btn.addEventListener("click", function () {
+      if (!navigator.geolocation) { if (status) status.textContent = "Geolocation is not available in this browser."; return; }
+      if (status) status.textContent = "Locating...";
+      navigator.geolocation.getCurrentPosition(function (pos) {
+        var lat = document.getElementById(prefix + "Latitude");
+        var lon = document.getElementById(prefix + "Longitude");
+        var tz = document.getElementById(prefix + "Timezone");
+        var place = document.getElementById(prefix + "Place");
+        if (lat) { lat.value = pos.coords.latitude.toFixed(4); lat.dataset.vnTouched = "1"; }
+        if (lon) { lon.value = pos.coords.longitude.toFixed(4); lon.dataset.vnTouched = "1"; }
+        if (tz) { tz.value = String(-new Date().getTimezoneOffset() / 60); tz.dataset.vnTouched = "1"; }
+        if (place) place.value = "";
+        if (status) status.textContent = "Location set from device. Press update.";
+        var upd = document.getElementById(prefix + "UpdateBtn"); if (upd) upd.click();
+      }, function (err) {
+        if (status) status.textContent = "Could not get location: " + (err && err.message ? err.message : "permission denied") + ".";
+      }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 });
+    });
+    ["Timezone", "Latitude", "Longitude"].forEach(function (id) {
+      var el = document.getElementById(prefix + id);
+      if (el) el.addEventListener("input", function () { el.dataset.vnTouched = "1"; });
+    });
+  }
+
+  // ---- Muhurta + Choghadiya engine --------------------------------------
+  var VN_RAHU = [8, 2, 7, 5, 6, 4, 3];
+  var VN_YAMA = [5, 4, 3, 2, 1, 7, 6];
+  var VN_GULIKA = [7, 6, 5, 4, 3, 2, 1];
+  var VN_CHOG_SEQ = ["Udveg", "Char", "Labh", "Amrit", "Kaal", "Shubh", "Rog"];
+  var VN_CHOG_LORD = { Udveg: "Sun", Char: "Venus", Labh: "Mercury", Amrit: "Moon", Kaal: "Saturn", Shubh: "Jupiter", Rog: "Mars" };
+  var VN_CHOG_NATURE = { Amrit: "Good", Shubh: "Good", Labh: "Good", Char: "Neutral", Udveg: "Bad", Kaal: "Bad", Rog: "Bad" };
+  function vnChogIndexForLord(lord) {
+    for (var i = 0; i < VN_CHOG_SEQ.length; i++) if (VN_CHOG_LORD[VN_CHOG_SEQ[i]] === lord) return i;
+    return 0;
+  }
+  function vnSunWindow(ctx) {
+    var st = sunTimesForDate(ctx.date, ctx.latitude, ctx.longitude, ctx.timezone);
+    var next = sunTimesForDate(vnNextDateStr(ctx.date), ctx.latitude, ctx.longitude, ctx.timezone);
+    return { sunrise: st.sunrise, sunset: st.sunset, nextSunrise: next.sunrise + 1440 };
+  }
+  function vnDayWindows(ctx) {
+    var s = vnSunWindow(ctx);
+    var wd = vnWeekdayIndex(ctx.date);
+    var dl = s.sunset - s.sunrise;
+    var eighth = dl / 8;
+    function eighthWin(table) { var k = table[wd]; var start = s.sunrise + (k - 1) * eighth; return { start: start, end: start + eighth }; }
+    var mu = dl / 15;
+    return {
+      sun: s,
+      weekday: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][wd],
+      rahu: eighthWin(VN_RAHU),
+      yama: eighthWin(VN_YAMA),
+      gulika: eighthWin(VN_GULIKA),
+      abhijit: { start: s.sunrise + 7 * mu, end: s.sunrise + 8 * mu },
+      brahma: { start: s.sunrise - 96, end: s.sunrise - 48 }
+    };
+  }
+  function vnChoghadiya(ctx) {
+    var s = vnSunWindow(ctx);
+    var wd = vnWeekdayIndex(ctx.date);
+    var dayStart = vnChogIndexForLord(WEEKDAY_LORDS[wd]);
+    var nightStart = vnChogIndexForLord(WEEKDAY_LORDS[(wd + 4) % 7]);
+    function slots(startIdx, from, span) {
+      var part = span / 8, out = [];
+      for (var i = 0; i < 8; i++) {
+        var name = VN_CHOG_SEQ[(startIdx + i) % 7];
+        out.push({ name: name, lord: VN_CHOG_LORD[name], nature: VN_CHOG_NATURE[name], start: from + i * part, end: from + (i + 1) * part });
+      }
+      return out;
+    }
+    return {
+      day: slots(dayStart, s.sunrise, s.sunset - s.sunrise),
+      night: slots(nightStart, s.sunset, s.nextSunrise - s.sunset)
+    };
+  }
+  function vnCurrentChoghadiya(chog, nowMin) {
+    var all = chog.day.concat(chog.night.map(function (c) { return c; }));
+    for (var i = 0; i < all.length; i++) {
+      var st = all[i].start, en = all[i].end;
+      var n = nowMin; if (st >= 1440) n += 0;
+      if (n >= st && n < en) return all[i];
+      if (st > 1440 && (n + 1440) >= st && (n + 1440) < en) return all[i];
+    }
+    return null;
+  }
+
+  function muhurtaSection(chart, input) {
+    var ctx = vnDefaultCtx(input);
+    return '<section id="viewA-muhurta" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Daily Timing</p><h3>Muhurta &amp; Choghadiya</h3></div><span class="small-pill">Editable</span></div>' +
+      '<p class="fine-print">Auspicious and inauspicious windows derived from sunrise/sunset for the selected day and place. Times are local clock time.</p>' +
+      vnControlsHtml("vnMuh", ctx, { updateLabel: "Update windows" }) +
+      '<div id="vnMuhMount">' + muhurtaPanelHtml(ctx) + '</div></section>';
+  }
+  function muhurtaPanelHtml(ctx) {
+    var w, chog;
+    try { w = vnDayWindows(ctx); chog = vnChoghadiya(ctx); }
+    catch (e) { return '<div class="panel-box"><p class="fine-print">Could not compute windows for this location (possible polar day/night). ' + escapeHtml(e.message || "") + '</p></div>'; }
+    var auspicious = metricBox("Auspicious windows", [
+      ["Brahma Muhurta", vnFmtRange(w.brahma.start, w.brahma.end)],
+      ["Abhijit Muhurta", vnFmtRange(w.abhijit.start, w.abhijit.end)],
+      ["Sunrise", vnClock(w.sun.sunrise)],
+      ["Sunset", vnClock(w.sun.sunset)]
+    ]);
+    var inauspicious = metricBox("Inauspicious windows (" + w.weekday + ")", [
+      ["Rahu Kaal", vnFmtRange(w.rahu.start, w.rahu.end)],
+      ["Yamaganda", vnFmtRange(w.yama.start, w.yama.end)],
+      ["Gulika Kaal", vnFmtRange(w.gulika.start, w.gulika.end)]
+    ]);
+    function chogTable(title, list) {
+      return '<div class="panel-box"><h3>' + escapeHtml(title) + '</h3><div class="table-wrap compact-table"><table><thead><tr><th>Choghadiya</th><th>Lord</th><th>Nature</th><th>Window</th></tr></thead><tbody>' +
+        list.map(function (c) {
+          var cls = c.nature === "Good" ? "vn-good" : (c.nature === "Bad" ? "vn-bad" : "vn-neutral");
+          return '<tr class="' + cls + '"><td><strong>' + escapeHtml(c.name) + '</strong></td><td>' + escapeHtml(c.lord) + '</td><td>' + escapeHtml(c.nature) + '</td><td>' + escapeHtml(vnFmtRange(c.start, c.end)) + '</td></tr>';
+        }).join("") + '</tbody></table></div></div>';
+    }
+    return '<div class="report-grid two">' + auspicious + inauspicious + '</div>' +
+      '<div class="report-grid two">' + chogTable("Day Choghadiya", chog.day) + chogTable("Night Choghadiya", chog.night) + '</div>' +
+      '<p class="fine-print">Varjyam and Dur Muhurtam depend on per-nakshatra segment timing and are intentionally omitted rather than approximated.</p>';
+  }
+  function wireMuhurtaControls(chart, input) {
+    var prefix = "vnMuh", fallback = vnDefaultCtx(input);
+    var mount = document.getElementById("vnMuhMount");
+    vnWireGeo(prefix);
+    var btn = document.getElementById(prefix + "UpdateBtn");
+    if (btn && mount) btn.addEventListener("click", function () { mount.innerHTML = muhurtaPanelHtml(vnReadCtx(prefix, fallback)); });
+  }
+
+  // ---- Today dashboard ---------------------------------------------------
+  function todaySection(chart, input) {
+    var ctx = vnDefaultCtx(input);
+    return '<section id="viewA-today" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Daily Intelligence</p><h3>Today</h3></div><span class="small-pill">Live</span></div>' +
+      '<p class="fine-print">A daily snapshot for ' + escapeHtml(nativeReportName(input)) + ': panchang, timing windows and the running dasha for the selected day and place.</p>' +
+      vnControlsHtml("vnToday", ctx, { updateLabel: "Refresh" }) +
+      '<div id="vnTodayMount">' + todayPanelHtml(ctx, chart, input) + '</div></section>';
+  }
+  function todayPanelHtml(ctx, natalChart, input) {
+    var instant = localDateTimeToUtc(ctx.date, ctx.time, ctx.timezone);
+    var dayChart = buildChart(instant, ctx.latitude, ctx.longitude, ctx.timezone, { ayanamshaKey: ctx.ayanamshaKey });
+    var p = panchangInfo(dayChart, { birthInstant: instant, timezone: ctx.timezone, latitude: ctx.latitude, longitude: ctx.longitude });
+    var w, chog, curChog = null;
+    try {
+      w = vnDayWindows(ctx); chog = vnChoghadiya(ctx);
+      var t = ctx.time.split(":").map(Number); var nowMin = (t[0] || 0) * 60 + (t[1] || 0) + (t[2] || 0) / 60;
+      curChog = vnCurrentChoghadiya(chog, nowMin);
+    } catch (e) { w = null; }
+    var panchangBox = metricBox("Panchang", [
+      ["Vaar", p.vara],
+      ["Tithi", p.tithi + " (" + p.paksha + ")"],
+      ["Nakshatra", p.nakshatra + " pada " + p.pada],
+      ["Yoga", p.yoga],
+      ["Karana", p.karana],
+      ["Sun / Moon", p.sunSign + " / " + p.moonSign]
+    ]);
+    var timingRows = w ? [
+      ["Rahu Kaal", vnFmtRange(w.rahu.start, w.rahu.end)],
+      ["Yamaganda", vnFmtRange(w.yama.start, w.yama.end)],
+      ["Gulika", vnFmtRange(w.gulika.start, w.gulika.end)],
+      ["Abhijit", vnFmtRange(w.abhijit.start, w.abhijit.end)],
+      ["Brahma Muhurta", vnFmtRange(w.brahma.start, w.brahma.end)],
+      ["Now (Choghadiya)", curChog ? curChog.name + " - " + curChog.nature : "-"]
+    ] : [["Timing", "Unavailable for this location"]];
+    var timingBox = metricBox("Today's windows", timingRows);
+    var dashaBox = metricBox("Running dasha", vnDashaRows(natalChart, instant));
+    var reading = '<div class="panel-box vn-reading"><h3>In plain words</h3><p>' + escapeHtml(vnDayNarrative(p, w, curChog)) + '</p></div>';
+    return '<div class="report-grid three">' + panchangBox + timingBox + dashaBox + '</div>' + reading;
+  }
+  function vnDashaRows(natalChart, instant) {
+    try {
+      var stack = findDashaStack(natalChart.vimshottari.timeline, instant);
+      var labels = ["Maha", "Antar", "Pratyantar", "Sookshma", "Prana"];
+      if (!stack.length) return [["Dasha", "Outside computed range"]];
+      return stack.map(function (period, i) {
+        return [labels[i] || ("L" + i), period.lord + " (to " + dateInputValue(period.end, natalChart.timezone) + ")"];
+      });
+    } catch (e) { return [["Dasha", "Unavailable"]]; }
+  }
+  function vnDayNarrative(p, w, curChog) {
+    var parts = [];
+    parts.push("The Moon is in " + p.nakshatra + " (" + p.moonSign + "), tithi " + p.tithi + " of " + p.paksha + ".");
+    if (w) parts.push("Avoid Rahu Kaal (" + vnFmtRange(w.rahu.start, w.rahu.end) + ") for new starts; the Abhijit window (" + vnFmtRange(w.abhijit.start, w.abhijit.end) + ") is broadly favourable.");
+    if (curChog) parts.push("The current Choghadiya is " + curChog.name + ", considered " + curChog.nature.toLowerCase() + " for activity.");
+    return parts.join(" ");
+  }
+  function wireTodayControls(chart, input) {
+    var prefix = "vnToday", fallback = vnDefaultCtx(input);
+    var mount = document.getElementById("vnTodayMount");
+    vnWireGeo(prefix);
+    var btn = document.getElementById(prefix + "UpdateBtn");
+    if (btn && mount) btn.addEventListener("click", function () {
+      try { mount.innerHTML = todayPanelHtml(vnReadCtx(prefix, fallback), chart, input); }
+      catch (e) { mount.innerHTML = '<div class="panel-box"><p class="fine-print">Could not refresh: ' + escapeHtml(e.message || "") + '</p></div>'; }
+    });
+  }
+
+  // ---- Lagna timeline ----------------------------------------------------
+  function vnLagnaAt(instant, lat, lon, ayanamshaKey) {
+    var jd = julianDay(instant);
+    return normalize(ascendantTropical(jd, lat, lon) - ayanamshaValue(jd, ayanamshaKey));
+  }
+  function vnLagnaSegments(ctx) {
+    var base = localDateTimeToUtc(ctx.date, "00:00:00", ctx.timezone);
+    var segs = [], prevSign = -1, startMin = 0, step = 1;
+    for (var m = 0; m <= 1440; m += step) {
+      var instant = new Date(base.getTime() + m * 60000);
+      var sign = signIndex(vnLagnaAt(instant, ctx.latitude, ctx.longitude, ctx.ayanamshaKey));
+      if (sign !== prevSign) {
+        if (prevSign >= 0) segs.push({ sign: prevSign, start: startMin, end: m });
+        prevSign = sign; startMin = m;
+      }
+    }
+    if (prevSign >= 0) segs.push({ sign: prevSign, start: startMin, end: 1440 });
+    return segs;
+  }
+  function vnLagnaQuality(risingSign, moonSign) {
+    var h = ((risingSign - moonSign) % 12 + 12) % 12 + 1; // house of rising sign from natal Moon
+    if ([1, 4, 5, 7, 9, 10, 11].indexOf(h) >= 0) return { label: "Favourable", cls: "vn-good", house: h };
+    if ([6, 8, 12].indexOf(h) >= 0) return { label: "Caution", cls: "vn-bad", house: h };
+    return { label: "Neutral", cls: "vn-neutral", house: h };
+  }
+  function lagnaTimelineSection(chart, input) {
+    var ctx = vnDefaultCtx(input);
+    return '<section id="viewA-lagna-timeline" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Daily Lagna</p><h3>Lagna Timeline</h3></div><span class="small-pill">Editable</span></div>' +
+      '<p class="fine-print">Rising sign (Lagna) through the day at ~1-minute resolution. Favourability is graded by the house the rising sign forms from your natal Moon (' + escapeHtml(chart.planetsByName.Moon.signName) + ').</p>' +
+      vnControlsHtml("vnLag", ctx, { noTime: true, updateLabel: "Build timeline" }) +
+      '<div id="vnLagMount">' + lagnaTimelinePanelHtml(ctx, chart) + '</div></section>';
+  }
+  function lagnaTimelinePanelHtml(ctx, natalChart) {
+    var segs;
+    try { segs = vnLagnaSegments(ctx); }
+    catch (e) { return '<div class="panel-box"><p class="fine-print">Could not compute lagna timeline: ' + escapeHtml(e.message || "") + '</p></div>'; }
+    var moonSign = natalChart.planetsByName.Moon.sign;
+    var bar = '<div class="vn-timeline-bar">' + segs.map(function (s) {
+      var q = vnLagnaQuality(s.sign, moonSign);
+      var pct = ((s.end - s.start) / 1440 * 100).toFixed(2);
+      return '<span class="vn-timeline-seg ' + q.cls + '" style="width:' + pct + '%" title="' + escapeHtml(SIGNS[s.sign].name + " " + vnFmtRange(s.start, s.end) + " - " + q.label) + '">' + escapeHtml(SIGNS[s.sign].name.slice(0, 3)) + '</span>';
+    }).join("") + '</div>';
+    var rows = segs.map(function (s) {
+      var q = vnLagnaQuality(s.sign, moonSign);
+      return '<tr class="' + q.cls + '"><td><strong>' + escapeHtml(SIGNS[s.sign].name) + '</strong></td><td>' + escapeHtml(vnFmtRange(s.start, s.end)) + '</td><td>H' + q.house + '</td><td>' + q.label + '</td></tr>';
+    }).join("");
+    return '<div class="panel-box">' + bar +
+      '<div class="table-wrap compact-table"><table><thead><tr><th>Lagna</th><th>Window</th><th>From Moon</th><th>Quality</th></tr></thead><tbody>' + rows + '</tbody></table></div></div>';
+  }
+  function wireLagnaTimelineControls(chart, input) {
+    var prefix = "vnLag", fallback = vnDefaultCtx(input);
+    var mount = document.getElementById("vnLagMount");
+    vnWireGeo(prefix);
+    var btn = document.getElementById(prefix + "UpdateBtn");
+    if (btn && mount) btn.addEventListener("click", function () { mount.innerHTML = lagnaTimelinePanelHtml(vnReadCtx(prefix, fallback), chart); });
+  }
+
+  // ---- Numerology --------------------------------------------------------
+  var VN_NUM_PLANET = { 1: "Sun", 2: "Moon", 3: "Jupiter", 4: "Rahu", 5: "Mercury", 6: "Venus", 7: "Ketu", 8: "Saturn", 9: "Mars" };
+  var VN_CHALDEAN = { A: 1, I: 1, J: 1, Q: 1, Y: 1, B: 2, K: 2, R: 2, C: 3, G: 3, L: 3, S: 3, D: 4, M: 4, T: 4, E: 5, H: 5, N: 5, X: 5, U: 6, V: 6, W: 6, O: 7, Z: 7, F: 8, P: 8 };
+  function vnDigitSum(n) { n = Math.abs(Math.round(n)); var s = 0; while (n > 0) { s += n % 10; n = Math.floor(n / 10); } return s; }
+  function vnReduce(n, keepMaster) {
+    n = Math.abs(Math.round(n));
+    while (n > 9) { if (keepMaster && (n === 11 || n === 22 || n === 33)) return n; n = vnDigitSum(n); }
+    return n;
+  }
+  function vnNameNumber(name) {
+    var total = 0, letters = String(name || "").toUpperCase().replace(/[^A-Z]/g, "");
+    for (var i = 0; i < letters.length; i++) total += VN_CHALDEAN[letters[i]] || 0;
+    return { compound: total, root: vnReduce(total) };
+  }
+  function vnNumLine(label, value) {
+    var planet = VN_NUM_PLANET[value] ? " - " + VN_NUM_PLANET[value] : "";
+    return [label, value + planet];
+  }
+  function numerologySection(chart, input) {
+    var d = String(input.birthDate || "").split("-").map(Number);
+    var ctx = { name: input.name || "", date: input.birthDate || "", year: d[0], month: d[1], day: d[2], today: dateInputValue(new Date(), input.timezone) };
+    return '<section id="viewA-numerology" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Vedic Numerology</p><h3>Numerology</h3></div><span class="small-pill">Editable</span></div>' +
+      '<p class="fine-print">Vedic (Chaldean) numerology from the birth date and name. Personal day/month/year are computed for the chosen date.</p>' +
+      '<div class="panel-box vn-controls"><div class="grid-3">' +
+      '<label>Name<input id="vnNumName" type="text" value="' + escapeHtml(ctx.name) + '"></label>' +
+      '<label>Birth date<input id="vnNumDate" type="date" value="' + escapeHtml(ctx.date) + '"></label>' +
+      '<label>For date<input id="vnNumToday" type="date" value="' + escapeHtml(ctx.today) + '"></label>' +
+      '</div><div class="vn-control-actions"><button type="button" id="vnNumUpdateBtn" class="primary-action">Update</button></div></div>' +
+      '<div id="vnNumMount">' + numerologyPanelHtml(ctx) + '</div></section>';
+  }
+  function numerologyPanelHtml(ctx) {
+    if (!ctx.day || !ctx.month || !ctx.year) return '<div class="panel-box"><p class="fine-print">Enter a valid birth date.</p></div>';
+    var mulank = vnReduce(ctx.day);
+    var bhagyank = vnReduce(ctx.day + ctx.month + ctx.year);
+    var bhagyankMaster = vnReduce(ctx.day + ctx.month + ctx.year, true);
+    var nm = vnNameNumber(ctx.name);
+    var coreBox = metricBox("Core numbers", [
+      vnNumLine("Mulank (birth)", mulank),
+      vnNumLine("Bhagyank (destiny)", bhagyank),
+      ["Bhagyank (with master)", String(bhagyankMaster)],
+      ["Name number", nm.compound + " / " + nm.root + (VN_NUM_PLANET[nm.root] ? " - " + VN_NUM_PLANET[nm.root] : "")]
+    ]);
+    var t = String(ctx.today).split("-").map(Number);
+    var personalRows = [["For date", ctx.today]];
+    if (t[0]) {
+      var py = vnReduce(ctx.day + ctx.month + t[0]);
+      var pm = vnReduce(py + t[1]);
+      var pd = vnReduce(pm + t[2]);
+      personalRows.push(vnNumLine("Personal year", py), vnNumLine("Personal month", pm), vnNumLine("Personal day", pd));
+    }
+    var personalBox = metricBox("Personal cycles", personalRows);
+    return '<div class="report-grid two">' + coreBox + personalBox + '</div>' +
+      '<p class="fine-print">Name number uses the Chaldean system (9 is not assigned to a letter). Ruling planets follow Vedic numerology.</p>';
+  }
+  function wireNumerologyControls(chart, input) {
+    var btn = document.getElementById("vnNumUpdateBtn");
+    var mount = document.getElementById("vnNumMount");
+    if (!btn || !mount) return;
+    btn.addEventListener("click", function () {
+      var name = document.getElementById("vnNumName"); var date = document.getElementById("vnNumDate"); var today = document.getElementById("vnNumToday");
+      var d = String(date ? date.value : "").split("-").map(Number);
+      mount.innerHTML = numerologyPanelHtml({ name: name ? name.value : "", date: date ? date.value : "", year: d[0], month: d[1], day: d[2], today: today ? today.value : "" });
+    });
+  }
+
+  // ---- KP sub-lord verdict + Birth-time rectifier: shared significators --
+  var VN_MATTERS = {
+    marriage: { label: "Marriage / partnership", good: [2, 7, 11], bad: [6, 10, 12] },
+    childbirth: { label: "Children", good: [2, 5, 11], bad: [1, 4, 10] },
+    career: { label: "Career / job", good: [2, 6, 10, 11], bad: [5, 8, 9, 12] },
+    finance: { label: "Wealth / finance", good: [2, 6, 10, 11], bad: [5, 8, 12] },
+    property: { label: "Property / vehicle", good: [4, 11], bad: [3, 10, 12] },
+    education: { label: "Education", good: [4, 9, 11], bad: [3, 8, 12] },
+    foreign: { label: "Foreign / relocation", good: [3, 9, 12], bad: [4, 11] },
+    health: { label: "Health recovery", good: [1, 5, 11], bad: [6, 8, 12] },
+    litigation: { label: "Dispute / litigation win", good: [6, 11], bad: [8, 12] }
+  };
+  function vnMatterOptions(selected) {
+    return Object.keys(VN_MATTERS).map(function (k) {
+      return '<option value="' + k + '"' + (k === selected ? " selected" : "") + '>' + escapeHtml(VN_MATTERS[k].label) + '</option>';
+    }).join("");
+  }
+  // significator houses for a planet: occupancy + ownership (+ star lord occupancy)
+  function vnPlanetHouses(chart, planetName) {
+    var pl = chart.planetsByName[planetName];
+    if (!pl) return [];
+    var houses = [];
+    if (pl.house) houses.push(pl.house);
+    (pl.lordships || []).forEach(function (h) { if (houses.indexOf(h) < 0) houses.push(h); });
+    var star = pl.nakLord && chart.planetsByName[pl.nakLord];
+    if (star && star.house && houses.indexOf(star.house) < 0) houses.push(star.house);
+    return houses;
+  }
+  function vnLinkScore(chart, planetName, matter) {
+    var houses = vnPlanetHouses(chart, planetName);
+    var good = 0, bad = 0;
+    houses.forEach(function (h) {
+      if (matter.good.indexOf(h) >= 0) good++;
+      if (matter.bad.indexOf(h) >= 0) bad++;
+    });
+    return { houses: houses, good: good, bad: bad, net: good - bad };
+  }
+
+  function kpVerdictSection(chart, input) {
+    var now = new Date();
+    var ctx = vnDefaultCtx(input);
+    return '<section id="viewA-verdict" class="section vn-section"><div class="section-head"><div><p class="eyebrow">KP Prashna</p><h3>Yes / No Verdict</h3></div><span class="small-pill">Beta</span></div>' +
+      '<p class="fine-print">A KP-style verdict for a question. Method: a horary number (1-249) seeds the prashna ascendant; the cuspal sub-lord of the matter\'s primary house is tested for linkage to favourable vs adverse houses (occupancy, ownership and star-lord). Timing reads from the running dasha. This is a guidance aid, not a substitute for full significator analysis.</p>' +
+      '<div class="panel-box vn-controls"><div class="grid-3">' +
+      '<label>Question matter<select id="vnVerMatter">' + vnMatterOptions("marriage") + '</select></label>' +
+      '<label>Horary number (1-249)<input id="vnVerNumber" type="number" min="1" max="249" value="1"></label>' +
+      '<label>As-of date<input id="vnVerDate" type="date" value="' + escapeHtml(ctx.date) + '"></label>' +
+      '</div><div class="grid-3">' +
+      '<label>As-of time<input id="vnVerTime" type="text" inputmode="numeric" pattern="[0-9]{2}:[0-9]{2}:[0-9]{2}" value="' + escapeHtml(ctx.time) + '"></label>' +
+      '<label>Timezone<input id="vnVerTimezone" type="number" step="0.25" value="' + escapeHtml(String(ctx.timezone)) + '"></label>' +
+      '<label>Latitude<input id="vnVerLatitude" type="number" step="0.0001" value="' + escapeHtml(Number(ctx.latitude).toFixed(4)) + '"></label>' +
+      '</div><div class="grid-3">' +
+      '<label>Longitude<input id="vnVerLongitude" type="number" step="0.0001" value="' + escapeHtml(Number(ctx.longitude).toFixed(4)) + '"></label>' +
+      '</div><div class="vn-control-actions"><button type="button" id="vnVerUpdateBtn" class="primary-action">Get verdict</button></div></div>' +
+      '<div id="vnVerMount"></div></section>';
+  }
+  function kpVerdictPanelHtml(opts, natalChart) {
+    var matter = VN_MATTERS[opts.matterKey] || VN_MATTERS.marriage;
+    var num = Math.max(1, Math.min(249, Math.round(opts.number || 1)));
+    var instant = localDateTimeToUtc(opts.date, opts.time, opts.timezone);
+    var prashna = buildChart(instant, opts.latitude, opts.longitude, opts.timezone, { ayanamshaKey: natalChart.ayanamshaKey });
+    // seed longitude from horary number, sublord of that point; primary house cusp = first favourable house from prashna asc
+    var seedLon = normalize((num - 0.5) * 360 / 249);
+    var seedKp = kpLordInfo(seedLon);
+    var primaryHouse = matter.good[0];
+    // cusp of primary house via equal house from prashna ascendant
+    var cuspLon = normalize(prashna.ascendant.lon + (primaryHouse - 1) * 30);
+    var cuspKp = kpLordInfo(cuspLon);
+    var subLord = cuspKp.subLord;
+    var seedScore = vnLinkScore(prashna, seedKp.subLord, matter);
+    var cuspScore = vnLinkScore(prashna, subLord, matter);
+    var net = seedScore.net + cuspScore.net;
+    var verdict, vcls;
+    if (net >= 2) { verdict = "YES"; vcls = "vn-good"; }
+    else if (net <= -2) { verdict = "NO"; vcls = "vn-bad"; }
+    else { verdict = "LIKELY " + (net > 0 ? "YES" : (net < 0 ? "NO" : "MIXED")); vcls = "vn-neutral"; }
+    var dashaRows = vnDashaRows(natalChart, instant);
+    var timing = dashaRows.length ? dashaRows[0][1] : "-";
+    var verdictBox = '<div class="panel-box vn-verdict ' + vcls + '"><h3>Verdict</h3><p class="vn-verdict-big">' + escapeHtml(verdict) + '</p>' +
+      '<p class="fine-print">Matter: ' + escapeHtml(matter.label) + ' &middot; Horary #' + num + ' &middot; Net linkage ' + net + '</p></div>';
+    var detailBox = metricBox("Analysis", [
+      ["Prashna lagna", prashna.ascendant.signName + " " + prashna.ascendant.deg.toFixed(2) + "°"],
+      ["Horary sub-lord", seedKp.subLord + " (in star of " + seedKp.starLord + ")"],
+      ["House " + primaryHouse + " cuspal sub-lord", subLord],
+      ["Sub-lord signifies", cuspScore.houses.length ? ("houses " + cuspScore.houses.join(", ")) : "no major links"],
+      ["Favourable houses", matter.good.join(", ")],
+      ["Adverse houses", matter.bad.join(", ")],
+      ["Indicated timing (dasha)", timing]
+    ]);
+    return '<div class="report-grid two">' + verdictBox + detailBox + '</div>' +
+      '<p class="fine-print">Equal-house cusps are used for the cuspal sub-lord. For a definitive reading cross-check with the full KP section.</p>';
+  }
+  function wireKpVerdictControls(chart, input) {
+    var btn = document.getElementById("vnVerUpdateBtn");
+    var mount = document.getElementById("vnVerMount");
+    if (!btn || !mount) return;
+    btn.addEventListener("click", function () {
+      try {
+        function v(id) { var el = document.getElementById(id); return el ? el.value : ""; }
+        mount.innerHTML = kpVerdictPanelHtml({
+          matterKey: v("vnVerMatter"), number: Number(v("vnVerNumber")), date: v("vnVerDate"),
+          time: normalizeTimeInput(v("vnVerTime")), timezone: Number(v("vnVerTimezone")),
+          latitude: Number(v("vnVerLatitude")), longitude: Number(v("vnVerLongitude"))
+        }, chart);
+      } catch (e) { mount.innerHTML = '<div class="panel-box"><p class="fine-print">Could not compute verdict: ' + escapeHtml(e.message || "") + '</p></div>'; }
+    });
+  }
+
+  // ---- Birth-time rectification wizard -----------------------------------
+  function rectifySection(chart, input) {
+    return '<section id="viewA-rectify" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Birth Time</p><h3>Rectification Wizard</h3></div><span class="small-pill">Beta</span></div>' +
+      '<p class="fine-print">Sweep candidate birth times and score each against known life events. Scoring: at each event date the running Maha/Antar dasha lords are tested as significators (occupancy, ownership, star-lord) of the event\'s houses. The candidate with the best total is suggested. Uses the current chart\'s place and ayanamsha.</p>' +
+      '<div class="panel-box vn-controls"><div class="grid-3">' +
+      '<label>Recorded birth time<input id="vnRecTime" type="text" inputmode="numeric" pattern="[0-9]{2}:[0-9]{2}:[0-9]{2}" value="' + escapeHtml(input.birthTime || "12:00:00") + '"></label>' +
+      '<label>Sweep &plusmn; minutes<input id="vnRecSpan" type="number" min="1" max="240" value="30"></label>' +
+      '<label>Step minutes<input id="vnRecStep" type="number" min="1" max="60" value="3"></label>' +
+      '</div></div>' +
+      '<div class="panel-box vn-controls"><h3>Life events</h3><div id="vnRecEvents">' + vnRectifyEventRow(0, "", "marriage") + vnRectifyEventRow(1, "", "career") + '</div>' +
+      '<div class="vn-control-actions"><button type="button" id="vnRecAddBtn" class="input-toggle-btn">Add event</button><button type="button" id="vnRecRunBtn" class="primary-action">Run rectification</button></div></div>' +
+      '<div id="vnRecMount"></div></section>';
+  }
+  function vnRectifyEventRow(i, date, matterKey) {
+    return '<div class="grid-2 vn-event-row"><label>Event date<input class="vnRecEvDate" type="date" value="' + escapeHtml(date) + '"></label>' +
+      '<label>Matter<select class="vnRecEvMatter">' + vnMatterOptions(matterKey) + '</select></label></div>';
+  }
+  function rectifyPanelHtml(opts, natalChart, input) {
+    var events = opts.events.filter(function (e) { return e.date; });
+    if (!events.length) return '<div class="panel-box"><p class="fine-print">Add at least one dated life event.</p></div>';
+    var baseTime = opts.recTime.split(":").map(Number);
+    var baseMin = (baseTime[0] || 0) * 60 + (baseTime[1] || 0) + (baseTime[2] || 0) / 60;
+    var candidates = [];
+    for (var off = -opts.span; off <= opts.span; off += opts.step) candidates.push(baseMin + off);
+    if (candidates.length > 200) return '<div class="panel-box"><p class="fine-print">Too many candidates (' + candidates.length + '). Reduce the span or increase the step.</p></div>';
+    var results = candidates.map(function (min) {
+      var hh = Math.floor(((min % 1440) + 1440) % 1440 / 60), mm = Math.round(((min % 60) + 60) % 60);
+      var timeStr = vnPad2(hh) + ":" + vnPad2(mm) + ":00";
+      var instant = localDateTimeToUtc(input.birthDate, timeStr, natalChart.timezone);
+      var cand = buildChart(instant, natalChart.latitude, natalChart.longitude, natalChart.timezone, { ayanamshaKey: natalChart.ayanamshaKey });
+      var score = 0, detail = [];
+      events.forEach(function (ev) {
+        var matter = VN_MATTERS[ev.matterKey] || VN_MATTERS.marriage;
+        var evInstant = localDateTimeToUtc(ev.date, "12:00:00", natalChart.timezone);
+        var stack = findDashaStack(cand.vimshottari.timeline, evInstant);
+        var evScore = 0;
+        stack.slice(0, 2).forEach(function (period) { if (period) evScore += vnLinkScore(cand, period.lord, matter).net; });
+        score += evScore; detail.push(evScore);
+      });
+      return { time: vnPad2(hh) + ":" + vnPad2(mm), lagna: cand.ascendant.signName, lagnaDeg: cand.ascendant.deg, score: score, detail: detail };
+    });
+    var best = results.reduce(function (a, b) { return b.score > a.score ? b : a; }, results[0]);
+    var sorted = results.slice().sort(function (a, b) { return b.score - a.score; });
+    var rows = sorted.map(function (r) {
+      var cls = r.time === best.time ? "vn-good" : "";
+      return '<tr class="' + cls + '"><td><strong>' + escapeHtml(r.time) + '</strong></td><td>' + escapeHtml(r.lagna) + " " + r.lagnaDeg.toFixed(2) + '°</td><td>' + r.score + '</td></tr>';
+    }).join("");
+    var suggestBox = '<div class="panel-box vn-verdict vn-good"><h3>Suggested time</h3><p class="vn-verdict-big">' + escapeHtml(best.time) + '</p><p class="fine-print">Lagna ' + escapeHtml(best.lagna) + ' &middot; score ' + best.score + ' across ' + events.length + ' event(s)</p></div>';
+    return '<div class="report-grid two">' + suggestBox +
+      '<div class="panel-box"><h3>Candidate ranking</h3><div class="table-wrap compact-table"><table><thead><tr><th>Time</th><th>Lagna</th><th>Score</th></tr></thead><tbody>' + rows + '</tbody></table></div></div></div>' +
+      '<p class="fine-print">Higher score = stronger dasha-to-event linkage. Treat the top few candidates as a shortlist to verify against finer charts and additional events.</p>';
+  }
+  function wireRectifyControls(chart, input) {
+    var addBtn = document.getElementById("vnRecAddBtn");
+    var runBtn = document.getElementById("vnRecRunBtn");
+    var list = document.getElementById("vnRecEvents");
+    var mount = document.getElementById("vnRecMount");
+    if (addBtn && list) addBtn.addEventListener("click", function () {
+      var i = list.querySelectorAll(".vn-event-row").length;
+      list.insertAdjacentHTML("beforeend", vnRectifyEventRow(i, "", "marriage"));
+    });
+    if (runBtn && mount) runBtn.addEventListener("click", function () {
+      try {
+        var dates = list.querySelectorAll(".vnRecEvDate");
+        var matters = list.querySelectorAll(".vnRecEvMatter");
+        var events = [];
+        for (var i = 0; i < dates.length; i++) events.push({ date: dates[i].value, matterKey: matters[i] ? matters[i].value : "marriage" });
+        function v(id) { var el = document.getElementById(id); return el ? el.value : ""; }
+        mount.innerHTML = rectifyPanelHtml({
+          recTime: normalizeTimeInput(v("vnRecTime")), span: Math.abs(Number(v("vnRecSpan")) || 30),
+          step: Math.max(1, Number(v("vnRecStep")) || 3), events: events
+        }, chart, input);
+      } catch (e) { mount.innerHTML = '<div class="panel-box"><p class="fine-print">Could not run rectification: ' + escapeHtml(e.message || "") + '</p></div>'; }
+    });
+  }
+
+  // ---- Plain-language Reading -------------------------------------------
+  var VN_DASHA_THEME = {
+    Sun: "authority, recognition, health of self and father, government dealings",
+    Moon: "mind and emotions, mother, home, public life and changefulness",
+    Mars: "energy, property, siblings, courage, conflict and initiative",
+    Mercury: "communication, commerce, learning, analysis and short travel",
+    Jupiter: "wisdom, wealth, children, teachers, expansion and good fortune",
+    Venus: "relationships, comfort, arts, vehicles and material pleasures",
+    Saturn: "discipline, delay, hard work, responsibility and slow consolidation",
+    Rahu: "ambition, foreign matters, sudden rises, obsession and the unconventional",
+    Ketu: "detachment, spirituality, losses, research and letting go"
+  };
+  function readingSection(chart, input) {
+    var asc = chart.ascendant, moon = chart.planetsByName.Moon, sun = chart.planetsByName.Sun;
+    var ascLord = SIGNS[asc.sign].lord;
+    var ascLordPl = chart.planetsByName[ascLord];
+    var stack = [];
+    try { stack = findDashaStack(chart.vimshottari.timeline, new Date()); } catch (e) {}
+    var paras = [];
+    paras.push("Your ascendant (Lagna) is " + asc.signName + ", ruled by " + ascLord +
+      (ascLordPl ? ", placed in house " + ascLordPl.house + " in " + ascLordPl.signName : "") +
+      ". This colours your temperament and physical self.");
+    paras.push("The Moon, the mind in Vedic astrology, is in " + moon.signName + " in the nakshatra " + moon.nakshatra +
+      " (pada " + moon.pada + ", lord " + moon.nakLord + "), placed in house " + moon.house + ". The Sun is in " + sun.signName + " in house " + sun.house + ".");
+    if (stack.length) {
+      var md = stack[0], ad = stack[1];
+      paras.push("You are currently running the " + md.lord + " Mahadasha" + (ad ? " with " + ad.lord + " Antardasha" : "") +
+        ". The " + md.lord + " period emphasises " + (VN_DASHA_THEME[md.lord] || "its natural significations") + "." +
+        (ad ? " Within it, " + ad.lord + " brings " + (VN_DASHA_THEME[ad.lord] || "its themes") + " to the foreground." : ""));
+    }
+    var yogaNote = "";
+    try {
+      var yogas = (typeof scanYogas === "function") ? scanYogas(chart) : null;
+      if (yogas && yogas.length) yogaNote = "Notable combinations in your chart include: " + yogas.slice(0, 4).map(function (y) { return y.name; }).join(", ") + ".";
+    } catch (e) {}
+    var boxes = paras.map(function (p, i) { return '<div class="panel-box vn-reading"><p>' + escapeHtml(p) + '</p></div>'; }).join("");
+    if (yogaNote) boxes += '<div class="panel-box vn-reading"><p>' + escapeHtml(yogaNote) + '</p></div>';
+    return '<section id="viewA-reading" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Plain Language</p><h3>Reading</h3></div><span class="small-pill">Summary</span></div>' +
+      '<p class="fine-print">A plain-English summary generated from your chart. For detail, use the technical sections.</p>' + boxes + '</section>';
   }
 
   var coreApi = {
