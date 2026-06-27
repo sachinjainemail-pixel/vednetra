@@ -15583,16 +15583,31 @@
       { id: "viewA-output-library", label: "Library", desc: "Saved charts plus import and export." }
     ] }
   ];
+  // group the catalog into swipeable pages (indices into VN_HOME_CATALOG)
+  var VN_HOME_PAGES = [[0, 1], [2, 3], [4], [5, 6]];
+  var VN_HOME_PAGE_TITLES = ["Start & Daily", "Foundations & Timing", "Strengths & Systems", "Prediction & Workspace"];
+  function vnHomeGroupHtml(group) {
+    var cards = group.items.map(function (it) {
+      var attr = it.action ? ('data-home-action="' + it.action + '"') : ('data-home-target="' + it.id + '"');
+      return '<button type="button" class="vn-home-card' + (it.primary ? " vn-home-primary" : "") + '" ' + attr + '><strong>' + escapeHtml(it.label) + '</strong><span>' + escapeHtml(it.desc) + '</span></button>';
+    }).join("");
+    return '<div class="vn-home-group"><h2>' + escapeHtml(group.title) + '</h2><div class="vn-home-grid">' + cards + '</div></div>';
+  }
   function vnRenderHomeShowcase() {
     var mount = document.getElementById("vnHomeShowcase");
     if (!mount) return;
-    mount.innerHTML = VN_HOME_CATALOG.map(function (group) {
-      var cards = group.items.map(function (it) {
-        var attr = it.action ? ('data-home-action="' + it.action + '"') : ('data-home-target="' + it.id + '"');
-        return '<button type="button" class="vn-home-card' + (it.primary ? " vn-home-primary" : "") + '" ' + attr + '><strong>' + escapeHtml(it.label) + '</strong><span>' + escapeHtml(it.desc) + '</span></button>';
-      }).join("");
-      return '<div class="vn-home-group"><h2>' + escapeHtml(group.title) + '</h2><div class="vn-home-grid">' + cards + '</div></div>';
+    var pagesHtml = VN_HOME_PAGES.map(function (grpIdxs) {
+      return '<div class="vn-home-page">' + grpIdxs.map(function (i) { return vnHomeGroupHtml(VN_HOME_CATALOG[i]); }).join("") + '</div>';
     }).join("");
+    var dots = VN_HOME_PAGES.map(function (_g, i) {
+      return '<button type="button" class="vn-home-dot' + (i === 0 ? " active" : "") + '" data-home-page="' + i + '" aria-label="' + escapeHtml(VN_HOME_PAGE_TITLES[i] || ("Page " + (i + 1))) + '"></button>';
+    }).join("");
+    mount.innerHTML =
+      '<div class="vn-home-carousel" id="vnHomeCarousel">' + pagesHtml + '</div>' +
+      '<div class="vn-home-nav"><button type="button" class="vn-home-arrow" id="vnHomePrev" aria-label="Previous page">&#8249;</button>' +
+      '<div class="vn-home-dots">' + dots + '</div>' +
+      '<button type="button" class="vn-home-arrow" id="vnHomeNext" aria-label="Next page">&#8250;</button></div>' +
+      '<p class="vn-home-hint fine-print">Swipe or use the arrows to browse all features.</p>';
     if (!mount._vnWired) {
       mount.addEventListener("click", function (e) {
         var card = e.target && e.target.closest("[data-home-target],[data-home-action]");
@@ -15603,6 +15618,23 @@
       });
       mount._vnWired = true;
     }
+    vnWireHomeCarousel();
+  }
+  function vnWireHomeCarousel() {
+    var car = document.getElementById("vnHomeCarousel");
+    if (!car) return;
+    var dots = Array.prototype.slice.call(document.querySelectorAll(".vn-home-dot"));
+    function width() { return car.clientWidth || 1; }
+    function current() { return Math.round(car.scrollLeft / width()); }
+    function go(i) { i = Math.max(0, Math.min(dots.length - 1, i)); car.scrollTo({ left: i * width(), behavior: "smooth" }); }
+    var prev = document.getElementById("vnHomePrev"), next = document.getElementById("vnHomeNext");
+    if (prev) prev.onclick = function () { go(current() - 1); };
+    if (next) next.onclick = function () { go(current() + 1); };
+    dots.forEach(function (d) { d.onclick = function () { go(Number(d.getAttribute("data-home-page"))); }; });
+    car.addEventListener("scroll", function () {
+      var c = current();
+      dots.forEach(function (d, i) { d.classList.toggle("active", i === c); });
+    });
   }
   function vnNavigateToFeature(targetId) {
     if (!targetId) return;

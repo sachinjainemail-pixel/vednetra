@@ -7882,3 +7882,15 @@ body:not(.report-active) .empty-state { max-width: 1140px !important; align-cont
 .vn-home-card span { display: block; color: var(--muted); font-size: 12px; line-height: 1.4; }
 .vn-home-card.vn-home-primary { background: linear-gradient(180deg, #fdf6e0, #f5e8be); }
 @media (max-width: 560px) { .vn-home-grid { grid-template-columns: 1fr; } }
+
+/* ===== VedNetra homepage carousel (swipeable pages) ===== */
+.vn-home-carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; scrollbar-width: none; }
+.vn-home-carousel::-webkit-scrollbar { display: none; }
+.vn-home-page { flex: 0 0 100%; width: 100%; box-sizing: border-box; scroll-snap-align: start; padding: 2px 4px 0; }
+.vn-home-nav { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 14px; }
+.vn-home-dots { display: flex; gap: 8px; }
+.vn-home-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--line); border: none; padding: 0; cursor: pointer; opacity: 0.55; }
+.vn-home-dot.active { background: var(--accent); opacity: 1; transform: scale(1.15); }
+.vn-home-arrow { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 1px solid var(--line); background: var(--paper); color: var(--blue); border-radius: 999px; font-size: 20px; line-height: 1; cursor: pointer; }
+.vn-home-arrow:hover { box-shadow: var(--shadow); }
+.vn-home-hint { text-align: center; margin: 8px 0 0; }
