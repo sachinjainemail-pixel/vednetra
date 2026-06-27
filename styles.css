@@ -7869,3 +7869,16 @@ tr.vn-now-row td { font-weight: 700; }
 .vn-onboard-card h2 { margin: 0 0 10px; color: var(--blue); }
 .vn-onboard-card p { line-height: 1.5; }
 .vn-onboard-card .primary-action { margin-top: 12px; }
+
+/* ===== VedNetra powerful homepage showcase ===== */
+body:not(.report-active) .empty-state { max-width: 1140px !important; align-content: start !important; padding-top: 20px; }
+.vn-home-showcase { width: 100%; margin: 18px 0 4px; text-align: left; }
+.vn-home-group { margin-bottom: 18px; }
+.vn-home-group h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent); border-bottom: 1px solid var(--line); padding-bottom: 6px; margin: 0 0 10px; }
+.vn-home-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+.vn-home-card { display: block; text-align: left; border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; background: var(--paper); cursor: pointer; transition: transform 0.08s ease, box-shadow 0.08s ease; }
+.vn-home-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.vn-home-card strong { display: block; color: var(--blue); margin-bottom: 3px; font-size: 14px; }
+.vn-home-card span { display: block; color: var(--muted); font-size: 12px; line-height: 1.4; }
+.vn-home-card.vn-home-primary { background: linear-gradient(180deg, #fdf6e0, #f5e8be); }
+@media (max-width: 560px) { .vn-home-grid { grid-template-columns: 1fr; } }

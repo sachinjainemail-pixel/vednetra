@@ -560,6 +560,7 @@
         if (langSel) { langSel.value = VN_LANG; langSel.addEventListener("change", function () { vnSetLang(langSel.value); }); }
         vnApplyNavLang();
       } catch (e) {}
+      try { vnRenderHomeShowcase(); } catch (e) {}
       try { vnMaybeShowOnboarding(); } catch (e) {}
       try { vnLoadHomeChartOnStartup(); } catch (e) {}
     });
@@ -2457,6 +2458,7 @@
 
   function showVargaSectionAfterChartChange() {
     window.setTimeout(function () {
+      if (vnPendingHomeTarget) { var t = vnPendingHomeTarget; vnPendingHomeTarget = null; showSingleChartDataSection(t, { skipScroll: false }); return; }
       showSingleChartDataSection("viewA-vargas", { skipScroll: false });
     }, 0);
   }
@@ -15524,6 +15526,111 @@
       '<button type="button" class="primary-action" id="vnOnboardClose">Got it</button></div>';
     document.body.appendChild(el);
     el.addEventListener("click", function (e) { if (e.target === el || e.target.id === "vnOnboardClose") { el.remove(); vnLsSet("vednetra.onboarded", "1"); } });
+  }
+
+  // ===========================================================================
+  // VedNetra powerful homepage: capability showcase with deep links into every
+  // section. Clicking a feature loads/creates a chart as needed, then opens it.
+  // ===========================================================================
+  var vnPendingHomeTarget = null;
+  var VN_HOME_CATALOG = [
+    { title: "Start here", items: [
+      { action: "new", label: "Create New Chart", desc: "Cast a fresh birth or prashna chart.", primary: true },
+      { action: "select", label: "Select Existing Chart", desc: "Open a chart from your saved library.", primary: true }
+    ] },
+    { title: "Today & Daily Tools", items: [
+      { id: "viewA-today", label: "Today Dashboard", desc: "Live panchang, timing windows and the running dasha at a glance." },
+      { id: "viewA-muhurta", label: "Muhurta & Choghadiya", desc: "Rahu Kaal, Gulika, Yamaganda, Abhijit, Brahma Muhurta and day/night Choghadiya." },
+      { id: "viewA-lagna-timeline", label: "Lagna Timeline", desc: "Rising sign across the day with favourable and caution windows." },
+      { id: "viewA-numerology", label: "Numerology", desc: "Mulank, Bhagyank, name number and your personal day cycles." },
+      { id: "viewA-num-compat", label: "Numerology Match", desc: "Compatibility of two people from their numbers." },
+      { id: "viewA-cards", label: "Vedic Cards", desc: "A Past / Present / Future card reading." },
+      { id: "viewA-verdict", label: "Yes / No Verdict", desc: "A KP prashna answer with indicated timing." },
+      { id: "viewA-rectify", label: "Rectify Birth Time", desc: "Estimate true birth time from real life events." },
+      { id: "viewA-reading", label: "Reading", desc: "A plain-language summary of your chart." }
+    ] },
+    { title: "Birth Foundations", items: [
+      { id: "viewA-panchang", label: "Birth Panchang", desc: "Tithi, nakshatra, yoga and karana at birth." },
+      { id: "viewA-current-panchang", label: "Current Panchang", desc: "Panchang for any date, time and place." },
+      { id: "viewA-d1-details", label: "D-1 Rasi Details", desc: "Planets, houses, dignities and aspects." },
+      { id: "viewA-yogas", label: "Yogas", desc: "Planetary combinations and their effects." },
+      { id: "viewA-vargas", label: "Divisional Charts", desc: "Every varga from D-1 to D-60." }
+    ] },
+    { title: "Timing & Dashas", items: [
+      { id: "viewA-dasha", label: "Vimshottari Dasha", desc: "Maha down to Prana periods with end times." },
+      { id: "viewA-transit", label: "Transits", desc: "Multi-date gochar transit chart." },
+      { id: "viewA-varshfal", label: "Varshfal", desc: "Annual Tajika chart by calendar or running year." },
+      { id: "viewA-ephemeris", label: "Ephemeris", desc: "Planetary positions over a span of time." }
+    ] },
+    { title: "Strengths & Systems", items: [
+      { id: "viewA-shadbala", label: "Shadbala", desc: "Six-fold planetary strength." },
+      { id: "viewA-sav", label: "Ashtakavarga (SAV)", desc: "Sarvashtakavarga bindu totals." },
+      { id: "viewA-bav", label: "Bhinnashtakavarga", desc: "Per-planet ashtakavarga." },
+      { id: "viewA-kp", label: "KP System", desc: "Star and sub-lords with cuspal analysis." },
+      { id: "viewA-jaimini", label: "Jaimini", desc: "Chara karakas and rasi yardsticks." },
+      { id: "viewA-chakras", label: "Chakras", desc: "Classical chart chakras." },
+      { id: "viewA-references", label: "Reference Tables", desc: "Lookup tables and constants." }
+    ] },
+    { title: "Relationship & Prediction", items: [
+      { id: "viewA-compatibility", label: "Compatibility", desc: "Ashtakoot marriage matching." },
+      { id: "viewA-horary", label: "Horary / Prashna", desc: "KP and KCIL horary answers." },
+      { id: "viewA-predictive", label: "Predictive Analysis", desc: "Topic-wise predictions for the chart." },
+      { id: "viewA-faq-pillars", label: "Query Pillars", desc: "Structured question analysis." }
+    ] },
+    { title: "Workspace", items: [
+      { id: "viewA-summary", label: "Summary", desc: "A snapshot of the whole chart." },
+      { id: "viewA-worksheets", label: "Worksheets", desc: "Editable working notes." },
+      { id: "viewA-output-library", label: "Library", desc: "Saved charts plus import and export." }
+    ] }
+  ];
+  function vnRenderHomeShowcase() {
+    var mount = document.getElementById("vnHomeShowcase");
+    if (!mount) return;
+    mount.innerHTML = VN_HOME_CATALOG.map(function (group) {
+      var cards = group.items.map(function (it) {
+        var attr = it.action ? ('data-home-action="' + it.action + '"') : ('data-home-target="' + it.id + '"');
+        return '<button type="button" class="vn-home-card' + (it.primary ? " vn-home-primary" : "") + '" ' + attr + '><strong>' + escapeHtml(it.label) + '</strong><span>' + escapeHtml(it.desc) + '</span></button>';
+      }).join("");
+      return '<div class="vn-home-group"><h2>' + escapeHtml(group.title) + '</h2><div class="vn-home-grid">' + cards + '</div></div>';
+    }).join("");
+    if (!mount._vnWired) {
+      mount.addEventListener("click", function (e) {
+        var card = e.target && e.target.closest("[data-home-target],[data-home-action]");
+        if (!card) return;
+        var action = card.getAttribute("data-home-action");
+        if (action) { runChartSetupRibbonAction(action); return; }
+        vnNavigateToFeature(card.getAttribute("data-home-target"));
+      });
+      mount._vnWired = true;
+    }
+  }
+  function vnNavigateToFeature(targetId) {
+    if (!targetId) return;
+    var report = document.getElementById("report");
+    var empty = document.getElementById("emptyState");
+    if (report && report.innerHTML.trim()) {
+      // a chart is already generated this session - just reveal and jump
+      if (empty) empty.classList.add("hidden");
+      report.classList.remove("hidden");
+      showReportView("chartData");
+      showSingleChartDataSection(targetId, { skipScroll: false });
+      return;
+    }
+    vnPendingHomeTarget = targetId;
+    var raw = vnLsGet("vednetra.homeChart", "");
+    if (raw) {
+      try {
+        applySavedInputToForm(JSON.parse(raw));
+        generate();
+        showReportView("chartData");
+        showVargaSectionAfterChartChange();
+        return;
+      } catch (e) {}
+    }
+    var newBtn = document.querySelector('[data-chart-setup-action="new"]');
+    if (newBtn) newBtn.click();
+    var status = document.getElementById("chartStartStatus");
+    if (status) status.textContent = "Create or load a chart, then it opens directly in the section you picked.";
   }
 
   var coreApi = {
