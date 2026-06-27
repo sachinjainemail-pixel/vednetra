@@ -7961,3 +7961,24 @@ body:not(.report-active) .empty-state {
 .vn-pick-options .vn-generate-btn { width: 100%; }
 .vn-pick-existing { margin-top: 4px; }
 .vn-pick-existing.hidden { display: none; }
+
+/* ===== Compact tool input screens (fit mobile without scrolling) ===== */
+.vn-controls.vn-compact { padding: 12px; }
+.vn-controls-main { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.vn-controls.vn-compact label { font-size: 12px; }
+.vn-controls.vn-compact input, .vn-controls.vn-compact select { padding: 8px; }
+.vn-adv { margin: 8px 0; }
+.vn-adv > summary { cursor: pointer; font-size: 12px; color: var(--accent); font-weight: 700; padding: 4px 0; }
+.vn-adv[open] > summary { margin-bottom: 6px; }
+@media (max-width: 560px) {
+  /* reclaim wasted space at the top on tool input screens */
+  #partAIdentityStrip { display: none; }
+  #chartInputLayoutBar { padding: 4px 6px; gap: 6px; }
+  .vn-section .section-head { margin-bottom: 8px; padding-bottom: 6px; }
+  .vn-section .section-head .eyebrow { display: none; }
+  .vn-section > p.fine-print { display: none; }   /* intro description not needed on small screens */
+  .vn-controls.vn-compact { padding: 10px; }
+  .vn-controls-main { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .vn-control-actions { gap: 6px; margin-top: 8px; }
+  .vn-generate-row { margin-top: 8px; }
+}

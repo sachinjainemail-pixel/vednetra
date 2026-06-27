@@ -14733,16 +14733,17 @@
   function vnControlsHtml(prefix, ctx, opts) {
     opts = opts || {};
     var timeRow = opts.noTime ? "" :
-      '<label>Time HH:MM:SS<input id="' + prefix + 'Time" type="text" inputmode="numeric" pattern="[0-9]{2}:[0-9]{2}:[0-9]{2}" value="' + escapeHtml(ctx.time) + '"></label>';
-    return '<div class="panel-box vn-controls"><div class="grid-3">' +
+      '<label>Time<input id="' + prefix + 'Time" type="text" inputmode="numeric" pattern="[0-9]{2}:[0-9]{2}:[0-9]{2}" value="' + escapeHtml(ctx.time) + '"></label>';
+    return '<div class="panel-box vn-controls vn-compact"><div class="vn-controls-main">' +
       '<label>Date<input id="' + prefix + 'Date" type="date" value="' + escapeHtml(ctx.date) + '"></label>' +
       timeRow +
-      '<label>Reference place<input id="' + prefix + 'Place" list="cityOptions" placeholder="Example: Delhi, India" value="' + escapeHtml(ctx.place) + '"></label>' +
-      '</div><div class="grid-3">' +
+      '<label>Place<input id="' + prefix + 'Place" list="cityOptions" placeholder="Example: Delhi" value="' + escapeHtml(ctx.place) + '"></label>' +
+      '</div>' +
+      '<details class="vn-adv"><summary>Advanced (timezone &amp; coordinates)</summary><div class="grid-3">' +
       '<label>Timezone<input id="' + prefix + 'Timezone" type="number" step="0.25" value="' + escapeHtml(String(ctx.timezone)) + '"></label>' +
       '<label>Latitude<input id="' + prefix + 'Latitude" type="number" step="0.0001" value="' + escapeHtml(Number(ctx.latitude).toFixed(4)) + '"></label>' +
       '<label>Longitude<input id="' + prefix + 'Longitude" type="number" step="0.0001" value="' + escapeHtml(Number(ctx.longitude).toFixed(4)) + '"></label>' +
-      '</div><div class="vn-control-actions">' +
+      '</div></details><div class="vn-control-actions">' +
       '<button type="button" id="' + prefix + 'GeoBtn" class="input-toggle-btn vn-geo-btn">Use my location</button>' +
       '<button type="button" id="' + prefix + 'UpdateBtn" class="input-toggle-btn">Refresh</button>' +
       '</div>' +
@@ -15206,18 +15207,19 @@
     var now = new Date();
     var ctx = vnDefaultCtx(input);
     return '<section id="viewA-verdict" class="section vn-section"><div class="section-head"><div><p class="eyebrow">KP Prashna</p><h3>Yes / No Verdict</h3></div><span class="small-pill">Beta</span></div>' +
-      '<p class="fine-print">A KP-style verdict for a question. Method: a horary number (1-249) seeds the prashna ascendant; the cuspal sub-lord of the matter\'s primary house is tested for linkage to favourable vs adverse houses (occupancy, ownership and star-lord). Timing reads from the running dasha. This is a guidance aid, not a substitute for full significator analysis.</p>' +
-      '<div class="panel-box vn-controls"><div class="grid-3">' +
+      '<p class="fine-print">A KP-style verdict: a horary number (1-249) seeds the prashna ascendant; the cuspal sub-lord is weighed against favourable houses, ruling planets and transits. Guidance aid, not a full significator analysis.</p>' +
+      '<div class="panel-box vn-controls vn-compact"><div class="vn-controls-main">' +
       '<label>Question matter<select id="vnVerMatter">' + vnMatterOptions("marriage") + '</select></label>' +
-      '<label>Horary number (1-249)<input id="vnVerNumber" type="number" min="1" max="249" value="1"></label>' +
+      '<label>Horary number<input id="vnVerNumber" type="number" min="1" max="249" value="1"></label>' +
       '<label>As-of date<input id="vnVerDate" type="date" value="' + escapeHtml(ctx.date) + '"></label>' +
-      '</div><div class="grid-3">' +
       '<label>As-of time<input id="vnVerTime" type="text" inputmode="numeric" pattern="[0-9]{2}:[0-9]{2}:[0-9]{2}" value="' + escapeHtml(ctx.time) + '"></label>' +
+      '</div>' +
+      '<details class="vn-adv"><summary>Advanced (timezone &amp; coordinates)</summary><div class="grid-3">' +
       '<label>Timezone<input id="vnVerTimezone" type="number" step="0.25" value="' + escapeHtml(String(ctx.timezone)) + '"></label>' +
       '<label>Latitude<input id="vnVerLatitude" type="number" step="0.0001" value="' + escapeHtml(Number(ctx.latitude).toFixed(4)) + '"></label>' +
-      '</div><div class="grid-3">' +
       '<label>Longitude<input id="vnVerLongitude" type="number" step="0.0001" value="' + escapeHtml(Number(ctx.longitude).toFixed(4)) + '"></label>' +
-      '</div><div class="vn-generate-row"><button type="button" id="vnVerUpdateBtn" class="primary-action vn-generate-btn">Generate</button></div></div></section>';
+      '</div></details>' +
+      '<div class="vn-generate-row"><button type="button" id="vnVerUpdateBtn" class="primary-action vn-generate-btn">Generate</button></div></div></section>';
   }
   function kpVerdictPanelHtml(opts, natalChart) {
     var matter = VN_MATTERS[opts.matterKey] || VN_MATTERS.marriage;
