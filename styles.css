@@ -7986,3 +7986,9 @@ body:not(.report-active) .empty-state {
 /* ===== tool cards: remove the generic section collapse toggle; show search button ===== */
 .vn-section .section-collapse-toggle { display: none !important; }
 .vn-search-btn { font-weight: 600; }
+
+/* ===== "How to use this" panel on tool outputs ===== */
+.vn-usage { border-left: 3px solid var(--accent); }
+.vn-usage h3 { margin: 0 0 8px; color: var(--blue); }
+.vn-usage ul { margin: 0; padding-left: 20px; }
+.vn-usage li { margin-bottom: 6px; line-height: 1.5; }
