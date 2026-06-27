@@ -5547,8 +5547,11 @@
       { id: "viewA-verdict",        immediate: true, render: function () { return kpVerdictSection(chart, input); }, wire: function () { wireKpVerdictControls(chart, input); } },
       { id: "viewA-rectify",        immediate: true, render: function () { return rectifySection(chart, input); }, wire: function () { wireRectifyControls(chart, input); } },
       { id: "viewA-reading",        immediate: true, render: function () { return readingSection(chart, input); } },
+      { id: "viewA-appearance",     immediate: true, render: function () { return appearanceSection(chart, input); } },
+      { id: "viewA-nature",         immediate: true, render: function () { return natureSection(chart, input); } },
       { id: "viewA-num-compat",     immediate: true, render: function () { return numCompatSection(chart, input); }, wire: function () { wireNumCompatControls(chart, input); } },
       { id: "viewA-cards",          immediate: true, render: function () { return cardsSection(chart, input); }, wire: function () { wireCardsControls(chart, input); } },
+      { id: "viewA-sadesati",       label: "Sade Sati", render: function () { return sadeSatiSection(chart, input); } },
       { id: "viewA-d1-details",     immediate: true, render: function () { return d1DetailsSection(chart); } },
       { id: "viewA-yogas",          immediate: true, render: function () { return chartWideYogasSection(chart, input); } },
       // ---- deferred (rendered via requestIdleCallback) ----
@@ -14870,6 +14873,22 @@
       { u: "Add more dated life events and re-run to sharpen the result.", e: "Add marriage and first-child dates for a tighter shortlist." },
       { u: "Open the top candidate as a new natal chart for full analysis.", e: "Generate a fresh chart at the suggested 10:21." },
       { u: "Use a finer step (1–2 min) around the best time to narrow further.", e: "Re-run with a 1-minute step centred on the top time." }
+    ],
+    sadesati: [
+      { u: "Know when Saturn's 7½-year cycle is active so you can pace big moves.", e: "If a “Current” period shows, prefer consolidation over risky launches." },
+      { u: "Plan ahead for an upcoming Sade Sati listed in the table.", e: "Build savings and health buffers before an Upcoming period begins." },
+      { u: "Treat the peak (Saturn over the Moon) as the most testing stretch.", e: "Schedule rest, discipline and Saturn remedies during the peak window." },
+      { u: "Use past periods to validate the timing against your life events.", e: "Check whether a past hardship lined up with a listed Sade Sati." }
+    ],
+    appearance: [
+      { u: "Recognise yourself or verify an uncertain chart against looks.", e: "A “tall, graceful” Libra-rising description fitting the person supports the lagna." },
+      { u: "Use as a tie-breaker during birth-time rectification.", e: "If two times give different risings, pick the one matching appearance." },
+      { u: "Understand constitution for health and lifestyle choices.", e: "A delicate-constitution note → prioritise routine and rest." }
+    ],
+    nature: [
+      { u: "Understand your default temperament and reactions.", e: "A Scorpio-Moon intensity note → channel it into focused, private work." },
+      { u: "Improve relationships by knowing your outer manner vs inner mind.", e: "Airy, sociable outside but watery, sensitive inside → tell close ones what you need." },
+      { u: "Pick roles and habits that fit your drive (Sun).", e: "A bold, leading Sun streak → seek initiative-taking responsibilities." }
     ]
   };
   function vnUsagePanel(key) {
@@ -15560,6 +15579,142 @@
       '<p class="fine-print">A plain-English summary generated from your chart. For detail, use the technical sections.</p>' + boxes + '</section>';
   }
 
+  // ---- usage panel for in-section (non-overlay) cards ---------------------
+  function vnInlineUsage(key) {
+    var html = vnUsagePanel(key);
+    return html || "";
+  }
+
+  // ---- Sade Sati (Saturn's 7.5-year transit over the natal Moon) ---------
+  function vnSaturnSignAtMs(ms, ayKey) {
+    var jd = julianDay(new Date(ms));
+    return signIndex(normalize(planetTropicalLongitude("Saturn", jd) - ayanamshaValue(jd, ayKey)));
+  }
+  function vnSaturnSegments(startMs, endMs, ayKey) {
+    var step = 20 * DAY_MS, segs = [], prev = vnSaturnSignAtMs(startMs, ayKey), segStart = startMs;
+    for (var t = startMs + step; t <= endMs; t += step) {
+      var s = vnSaturnSignAtMs(t, ayKey);
+      if (s !== prev) {
+        var lo = t - step, hi = t;
+        for (var i = 0; i < 22; i++) { var mid = (lo + hi) / 2; if (vnSaturnSignAtMs(mid, ayKey) === prev) lo = mid; else hi = mid; }
+        segs.push({ sign: prev, start: segStart, end: hi }); prev = s; segStart = hi;
+      }
+    }
+    segs.push({ sign: prev, start: segStart, end: endMs });
+    return segs;
+  }
+  function vnMonthYear(ms) {
+    var d = new Date(ms);
+    return ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][d.getUTCMonth()] + " " + d.getUTCFullYear();
+  }
+  function sadeSatiData(chart) {
+    var moonSign = chart.planetsByName.Moon.sign;
+    var set = [(moonSign + 11) % 12, moonSign, (moonSign + 1) % 12];
+    var ayKey = chart.ayanamshaKey;
+    var startMs = chart.date.getTime() - 2 * 365.25 * DAY_MS;
+    var endMs = chart.date.getTime() + 100 * 365.25 * DAY_MS;
+    var segs = vnSaturnSegments(startMs, endMs, ayKey);
+    var periods = [], cur = null;
+    segs.forEach(function (seg) {
+      if (set.indexOf(seg.sign) >= 0) {
+        if (!cur) cur = { start: seg.start, end: seg.end, peakStart: null, peakEnd: null };
+        cur.end = seg.end;
+        if (seg.sign === moonSign) { if (cur.peakStart === null) cur.peakStart = seg.start; cur.peakEnd = seg.end; }
+      } else if (cur) { periods.push(cur); cur = null; }
+    });
+    if (cur) periods.push(cur);
+    return { moonSign: moonSign, periods: periods };
+  }
+  function sadeSatiSection(chart, input) {
+    var data;
+    try { data = sadeSatiData(chart); }
+    catch (e) { return '<section id="viewA-sadesati" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Saturn</p><h3>Sade Sati Years</h3></div></div><div class="panel-box"><p class="fine-print">Could not compute: ' + escapeHtml(e.message || "") + '</p></div></section>'; }
+    var moonSign = data.moonSign, now = new Date().getTime();
+    var nowSign = vnSaturnSignAtMs(now, chart.ayanamshaKey);
+    var rel = ((nowSign - moonSign) % 12 + 12) % 12;
+    var phaseNow;
+    if (rel === 11) phaseNow = "In Sade Sati — rising phase (Saturn in the 12th from Moon).";
+    else if (rel === 0) phaseNow = "In Sade Sati — peak phase (Saturn over the Moon).";
+    else if (rel === 1) phaseNow = "In Sade Sati — setting phase (Saturn in the 2nd from Moon).";
+    else if (rel === 3) phaseNow = "Kantaka Shani (Saturn in the 4th from Moon) — a small panati.";
+    else if (rel === 7) phaseNow = "Ashtama Shani (Saturn in the 8th from Moon) — a small panati.";
+    else phaseNow = "Not in Sade Sati right now.";
+    var rows = data.periods.map(function (p) {
+      var status = p.end < now ? "Past" : (p.start <= now && now <= p.end ? "Current" : "Upcoming");
+      var cls = status === "Current" ? "vn-bad" : "";
+      var peak = (p.peakStart && p.peakEnd) ? (vnMonthYear(p.peakStart) + " – " + vnMonthYear(p.peakEnd)) : "-";
+      return '<tr class="' + cls + '"><td><strong>' + vnMonthYear(p.start) + " – " + vnMonthYear(p.end) + '</strong></td><td>' + peak + '</td><td>' + status + '</td></tr>';
+    }).join("");
+    var headBox = metricBox("Now", [
+      ["Natal Moon sign", SIGNS[moonSign].name],
+      ["Saturn now in", SIGNS[nowSign].name + " (" + (rel + 1) + "th from Moon)"],
+      ["Status", phaseNow]
+    ]);
+    var table = '<div class="panel-box"><h3>Sade Sati periods (≈7½ years each)</h3><div class="table-wrap compact-table"><table><thead><tr><th>Full period</th><th>Peak (over Moon)</th><th>Status</th></tr></thead><tbody>' + rows + '</tbody></table></div><p class="fine-print">Each Sade Sati runs while Saturn transits the 12th, 1st and 2nd signs from your natal Moon. The peak (Saturn over the Moon) is usually the most testing phase.</p></div>';
+    return '<section id="viewA-sadesati" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Saturn</p><h3>Sade Sati Years</h3></div><span class="small-pill">Timing</span></div>' +
+      '<div class="report-grid two">' + headBox + table + '</div>' + vnInlineUsage("sadesati") + '</section>';
+  }
+
+  // ---- physical appearance (from the rising sign + ascendant lord) -------
+  var VN_APPEARANCE = [
+    "a medium, lean and wiry build, a ruddy or reddish complexion, sharp active features and often a mark or scar on the head or face.",
+    "a medium-to-short, sturdy and well-set body, an attractive face with large eyes, a thick neck and broad shoulders.",
+    "a tall, slim frame, expressive hands, quick movements, a youthful look and a sharp nose.",
+    "a medium height with a rounded, fair face, a fleshy upper body and a tendency to put on weight later.",
+    "a tall, broad-shouldered and commanding figure, full hair and a majestic, dignified bearing.",
+    "a medium, slim and youthful body, neat and refined features and intelligent, observant eyes.",
+    "a tall, graceful and well-proportioned body, balanced features, a charming smile and pleasing looks.",
+    "a medium, strong and compact build, intense penetrating eyes, a broad face and a magnetic presence.",
+    "a tall, athletic and well-proportioned body, a high forehead and a cheerful, open face.",
+    "a lean, bony or wiry frame, prominent joints, a serious expression and a look that ages slowly.",
+    "a tall, fairly strong body, distinctive features and a calm, steady gaze.",
+    "a medium-to-short, soft and fleshy body, a fair complexion, dreamy eyes and full, rounded features."
+  ];
+  function appearanceSection(chart, input) {
+    var asc = chart.ascendant, lord = SIGNS[asc.sign].lord, lp = chart.planetsByName[lord];
+    var paras = [];
+    paras.push("With " + asc.signName + " rising, you tend to have " + VN_APPEARANCE[asc.sign]);
+    if (lp) {
+      var mod = "";
+      if (lp.dignity && ["Exalted", "Own sign", "Moolatrikona"].indexOf(lp.dignity) >= 0) mod = " Being well placed, it lends a healthy, well-formed body and good vitality.";
+      else if (lp.afflictions && lp.afflictions.length >= 2) mod = " Under some affliction, it can bring a more delicate constitution or distinguishing marks.";
+      paras.push("Your ascendant lord " + lord + " sits in " + lp.signName + " (house " + lp.house + (lp.dignity ? ", " + lp.dignity : "") + "), which shapes the finer details of your looks and constitution." + mod);
+    }
+    paras.push("The Moon in " + chart.planetsByName.Moon.signName + " and the Sun in " + chart.planetsByName.Sun.signName + " further tint complexion, expression and overall vitality.");
+    var boxes = paras.map(function (p) { return '<div class="panel-box vn-reading"><p>' + escapeHtml(p) + '</p></div>'; }).join("");
+    return '<section id="viewA-appearance" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Physical Self</p><h3>Physical Appearance</h3></div><span class="small-pill">Summary</span></div>' +
+      '<p class="fine-print">A classical reading of physical build and looks from the rising sign and its lord. Real appearance also depends on heredity and lifestyle.</p>' + boxes + vnInlineUsage("appearance") + '</section>';
+  }
+
+  // ---- nature / temperament (Moon = mind, Lagna = outer, Sun = drive) -----
+  var VN_NATURE_MOON = [
+    "bold, impulsive and pioneering, quick to act and quick to anger, but soon over it.",
+    "calm, steady and patient, sensual and loyal, with a stubborn streak once decided.",
+    "curious, communicative and witty, mentally restless and adaptable, with a dual mind.",
+    "emotional, caring and sensitive, attached to home and family, with changing moods.",
+    "confident, warm and generous, proud and dignified, with a flair for the dramatic.",
+    "analytical, practical and meticulous, helpful and discerning, sometimes self-critical.",
+    "balanced, sociable and diplomatic, charming and fair, but often indecisive.",
+    "intense, private and passionate, determined and perceptive, with deep feelings.",
+    "optimistic, philosophical and frank, freedom-loving and adventurous, ever restless.",
+    "disciplined, ambitious and reserved, practical and patient, a steady long-term builder.",
+    "independent, humane and unconventional, inventive and friendly, yet somewhat detached.",
+    "compassionate, imaginative and intuitive, gentle and idealistic, prone to day-dreaming."
+  ];
+  var VN_ELEMENT_NOTE = { Fire: "energetic and assertive", Earth: "grounded and practical", Air: "intellectual and social", Water: "emotional and intuitive" };
+  var VN_MODALITY_NOTE = { Movable: "initiating and restless", Fixed: "steadfast and determined", Common: "flexible and adaptable", Dual: "flexible and adaptable" };
+  function natureSection(chart, input) {
+    var moon = chart.planetsByName.Moon, asc = chart.ascendant, sun = chart.planetsByName.Sun;
+    var ascSign = SIGNS[asc.sign];
+    var paras = [];
+    paras.push("Your mind (Moon in " + moon.signName + ") is " + VN_NATURE_MOON[moon.sign]);
+    paras.push("Outwardly, with " + asc.signName + " rising — a " + (ascSign.element || "").toLowerCase() + ", " + (ascSign.modality || "").toLowerCase() + " sign — you come across as " + (VN_ELEMENT_NOTE[ascSign.element] || "balanced") + " and " + (VN_MODALITY_NOTE[ascSign.modality] || "adaptable") + ".");
+    paras.push("Your core drive and ego (Sun in " + sun.signName + ") add a " + (VN_NATURE_MOON[sun.sign].split(",")[0]) + " streak to how you assert yourself.");
+    var boxes = paras.map(function (p) { return '<div class="panel-box vn-reading"><p>' + escapeHtml(p) + '</p></div>'; }).join("");
+    return '<section id="viewA-nature" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Temperament</p><h3>Native\'s Nature</h3></div><span class="small-pill">Summary</span></div>' +
+      '<p class="fine-print">Temperament read from the Moon (mind), the rising sign (outer manner) and the Sun (drive).</p>' + boxes + vnInlineUsage("nature") + '</section>';
+  }
+
   // ===========================================================================
   // VedNetra Tools batch 2: numerology compatibility, Vedic cards, home chart,
   // share/print, language toggle, onboarding. Still 100% client-side.
@@ -15817,7 +15972,9 @@
       { id: "viewA-cards", label: "Vedic Cards", desc: "A Past / Present / Future card reading." },
       { id: "viewA-verdict", label: "Yes / No Verdict", desc: "A KP prashna answer with indicated timing." },
       { id: "viewA-rectify", label: "Rectify Birth Time", desc: "Estimate true birth time from real life events." },
-      { id: "viewA-reading", label: "Reading", desc: "A plain-language summary of your chart." }
+      { id: "viewA-reading", label: "Reading", desc: "A plain-language summary of your chart." },
+      { id: "viewA-appearance", label: "Physical Appearance", desc: "Build and looks from the rising sign and its lord." },
+      { id: "viewA-nature", label: "Native's Nature", desc: "Temperament from the Moon, rising sign and Sun." }
     ] },
     { title: "Birth Foundations", items: [
       { id: "viewA-panchang", label: "Birth Panchang", desc: "Tithi, nakshatra, yoga and karana at birth." },
@@ -15828,6 +15985,7 @@
     ] },
     { title: "Timing & Dashas", items: [
       { id: "viewA-dasha", label: "Vimshottari Dasha", desc: "Maha down to Prana periods with end times." },
+      { id: "viewA-sadesati", label: "Sade Sati Years", desc: "Saturn's 7½-year transits over your natal Moon." },
       { id: "viewA-transit", label: "Transits", desc: "Multi-date gochar transit chart." },
       { id: "viewA-varshfal", label: "Varshfal", desc: "Annual Tajika chart by calendar or running year." },
       { id: "viewA-ephemeris", label: "Ephemeris", desc: "Planetary positions over a span of time." }
