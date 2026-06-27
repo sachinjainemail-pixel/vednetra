@@ -7982,3 +7982,7 @@ body:not(.report-active) .empty-state {
   .vn-control-actions { gap: 6px; margin-top: 8px; }
   .vn-generate-row { margin-top: 8px; }
 }
+
+/* ===== tool cards: remove the generic section collapse toggle; show search button ===== */
+.vn-section .section-collapse-toggle { display: none !important; }
+.vn-search-btn { font-weight: 600; }
