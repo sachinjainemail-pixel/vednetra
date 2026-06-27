@@ -14726,8 +14726,56 @@
       '<label>Longitude<input id="' + prefix + 'Longitude" type="number" step="0.0001" value="' + escapeHtml(Number(ctx.longitude).toFixed(4)) + '"></label>' +
       '</div><div class="vn-control-actions">' +
       '<button type="button" id="' + prefix + 'GeoBtn" class="input-toggle-btn vn-geo-btn">Use my location</button>' +
-      '<button type="button" id="' + prefix + 'UpdateBtn" class="primary-action">' + escapeHtml(opts.updateLabel || "Update") + '</button>' +
-      '</div><p class="fine-print vn-geo-status" id="' + prefix + 'GeoStatus"></p></div>';
+      '<button type="button" id="' + prefix + 'UpdateBtn" class="input-toggle-btn">Refresh</button>' +
+      '</div>' +
+      '<p class="fine-print vn-geo-status" id="' + prefix + 'GeoStatus"></p>' +
+      '<div class="vn-generate-row"><button type="button" id="' + prefix + 'GenerateBtn" class="primary-action vn-generate-btn">' + escapeHtml(opts.generateLabel || "Generate") + '</button></div>' +
+      '</div>';
+  }
+  // unified wiring for control-based tool cards: geo, Refresh (reset inputs) and Generate
+  function vnWireToolControls(prefix, input, generateFn) {
+    var fallback = vnDefaultCtx(input);
+    vnWireGeo(prefix);
+    var refresh = document.getElementById(prefix + "UpdateBtn");
+    if (refresh) refresh.addEventListener("click", function () {
+      var d = vnDefaultCtx(input);
+      function set(id, v) { var el = document.getElementById(prefix + id); if (el) el.value = v; }
+      set("Date", d.date);
+      var t = document.getElementById(prefix + "Time"); if (t) t.value = d.time;
+      set("Place", d.place); set("Timezone", String(d.timezone));
+      var la = document.getElementById(prefix + "Latitude"); if (la) la.value = Number(d.latitude).toFixed(4);
+      var lo = document.getElementById(prefix + "Longitude"); if (lo) lo.value = Number(d.longitude).toFixed(4);
+      var st = document.getElementById(prefix + "GeoStatus"); if (st) st.textContent = "Inputs refreshed to current location and time.";
+    });
+    var gen = document.getElementById(prefix + "GenerateBtn");
+    if (gen) gen.addEventListener("click", function () {
+      try { generateFn(vnReadCtx(prefix, fallback)); }
+      catch (e) { vnShowToolOutput("Could not generate", '<div class="panel-box"><p class="fine-print">' + escapeHtml(e.message || "") + '</p></div>'); }
+    });
+  }
+  // full-screen output "window" for a tool card
+  function vnShowToolOutput(title, bodyHtml, opts) {
+    opts = opts || {};
+    var prior = document.getElementById("vnToolOutput"); if (prior) prior.remove();
+    var actionsHtml = (opts.actions || []).map(function (a) {
+      return '<button type="button" class="input-toggle-btn" data-vn-act="' + escapeHtml(a.id) + '">' + escapeHtml(a.label) + '</button>';
+    }).join("");
+    var el = document.createElement("div");
+    el.id = "vnToolOutput";
+    el.className = "vn-tool-output-overlay";
+    el.innerHTML = '<div class="vn-tool-output-shell"><div class="vn-tool-output-head">' +
+      '<button type="button" class="input-toggle-btn vn-tool-back" id="vnToolBack">&#8592; Back</button>' +
+      '<h2>' + escapeHtml(title) + '</h2>' +
+      '<div class="vn-tool-output-actions">' + actionsHtml + '</div></div>' +
+      '<div class="vn-tool-output-body" id="vnToolOutputBody">' + bodyHtml + '</div></div>';
+    document.body.appendChild(el);
+    document.getElementById("vnToolBack").addEventListener("click", function () { el.remove(); });
+    (opts.actions || []).forEach(function (a) {
+      var btn = el.querySelector('[data-vn-act="' + a.id + '"]');
+      if (btn && a.onClick) btn.addEventListener("click", function () { a.onClick(el); });
+    });
+    if (opts.onWire) try { opts.onWire(el); } catch (e) {}
+    el.scrollTop = 0;
   }
   function vnReadCtx(prefix, fallback) {
     function val(id) { var el = document.getElementById(prefix + id); return el ? el.value : ""; }
@@ -14766,7 +14814,6 @@
     lon.value = Number(g.lon).toFixed(4); lon.dataset.vnTouched = "1";
     if (tz) { tz.value = String(g.tz); tz.dataset.vnTouched = "1"; }
     if (place) place.value = g.place || "Current location";
-    if (opts.update) { var upd = document.getElementById(prefix + "UpdateBtn"); if (upd) upd.click(); }
   }
   function vnWireGeo(prefix) {
     var btn = document.getElementById(prefix + "GeoBtn");
@@ -14778,7 +14825,7 @@
         // force a fresh lookup even if cached
         VN_GEO = null;
         vnRequestGeo(function (g, err) {
-          if (g) { if (status) status.textContent = "Using your current location."; vnApplyGeoToPanel(prefix, g, { update: true }); }
+          if (g) { if (status) status.textContent = "Using your current location: " + (g.place || ""); vnApplyGeoToPanel(prefix, g); }
           else { if (status) status.textContent = "Location unavailable (" + ((err && err.message) || "permission denied") + "). Enter a place or coordinates manually."; }
         });
       });
@@ -14791,7 +14838,7 @@
     if (!VN_GEO && typeof navigator !== "undefined" && navigator.geolocation) {
       if (status) status.textContent = "Detecting your location...";
       vnRequestGeo(function (g) {
-        if (g) { if (status) status.textContent = "Using your current location."; vnApplyGeoToPanel(prefix, g, { update: true }); }
+        if (g) { if (status) status.textContent = "Using your current location: " + (g.place || ""); vnApplyGeoToPanel(prefix, g); }
         else if (status) status.textContent = "";
       });
     }
@@ -14861,10 +14908,9 @@
 
   function muhurtaSection(chart, input) {
     var ctx = vnDefaultCtx(input);
-    return '<section id="viewA-muhurta" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Daily Timing</p><h3>Muhurta &amp; Choghadiya</h3></div><span class="small-pill">Editable</span></div>' +
-      '<p class="fine-print">Auspicious and inauspicious windows derived from sunrise/sunset for the selected day and place. Times are local clock time.</p>' +
-      vnControlsHtml("vnMuh", ctx, { updateLabel: "Update windows" }) +
-      '<div id="vnMuhMount">' + muhurtaPanelHtml(ctx) + '</div></section>';
+    return '<section id="viewA-muhurta" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Daily Timing</p><h3>Muhurta &amp; Choghadiya</h3></div><span class="small-pill">Inputs</span></div>' +
+      '<p class="fine-print">Auspicious and inauspicious windows from sunrise/sunset for the selected day and place. Set the inputs below, then press Generate.</p>' +
+      vnControlsHtml("vnMuh", ctx, { generateLabel: "Generate" }) + '</section>';
   }
   function muhurtaPanelHtml(ctx) {
     var w, chog;
@@ -14893,26 +14939,17 @@
       '<p class="fine-print">Varjyam and Dur Muhurtam depend on per-nakshatra segment timing and are intentionally omitted rather than approximated.</p>';
   }
   function wireMuhurtaControls(chart, input) {
-    var prefix = "vnMuh", fallback = vnDefaultCtx(input);
-    var mount = document.getElementById("vnMuhMount");
-    vnWireGeo(prefix);
-    var btn = document.getElementById(prefix + "UpdateBtn");
-    if (btn && mount) btn.addEventListener("click", function () { mount.innerHTML = muhurtaPanelHtml(vnReadCtx(prefix, fallback)); });
+    vnWireToolControls("vnMuh", input, function (ctx) {
+      vnShowToolOutput("Muhurta & Choghadiya", muhurtaPanelHtml(ctx));
+    });
   }
 
   // ---- Today dashboard ---------------------------------------------------
   function todaySection(chart, input) {
     var ctx = vnDefaultCtx(input);
-    return '<section id="viewA-today" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Daily Intelligence</p><h3>' + escapeHtml(vnT("tools.today")) + '</h3></div><span class="small-pill">Live</span></div>' +
-      '<p class="fine-print">A daily snapshot for ' + escapeHtml(nativeReportName(input)) + ': panchang, timing windows and the running dasha for the selected day and place.</p>' +
-      vnControlsHtml("vnToday", ctx, { updateLabel: "Refresh" }) +
-      '<div class="vn-control-actions vn-today-actions">' +
-      '<button type="button" id="vnTodayShareBtn" class="input-toggle-btn">Share</button>' +
-      '<button type="button" id="vnTodayCopyBtn" class="input-toggle-btn">Copy summary</button>' +
-      '<button type="button" id="vnTodayPrintBtn" class="input-toggle-btn">Print card</button>' +
-      '<button type="button" id="vnTodayHomeBtn" class="input-toggle-btn">Set as my daily chart</button>' +
-      '<span class="fine-print vn-home-status" id="vnTodayHomeStatus"></span></div>' +
-      '<div id="vnTodayMount">' + todayPanelHtml(ctx, chart, input) + '</div></section>';
+    return '<section id="viewA-today" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Daily Intelligence</p><h3>' + escapeHtml(vnT("tools.today")) + '</h3></div><span class="small-pill">Inputs</span></div>' +
+      '<p class="fine-print">A daily snapshot for ' + escapeHtml(nativeReportName(input)) + ': panchang, timing windows and the running dasha. Set the inputs below, then press Generate.</p>' +
+      vnControlsHtml("vnToday", ctx, { generateLabel: "Generate" }) + '</section>';
   }
   function todayPanelHtml(ctx, natalChart, input) {
     var instant = localDateTimeToUtc(ctx.date, ctx.time, ctx.timezone);
@@ -14962,30 +14999,20 @@
     if (curChog) parts.push("The current Choghadiya is " + curChog.name + ", considered " + curChog.nature.toLowerCase() + " for activity.");
     return parts.join(" ");
   }
+  function vnToolOutputText(input, title) {
+    var body = document.getElementById("vnToolOutputBody");
+    var text = body ? body.innerText.replace(/\n{2,}/g, "\n") : "";
+    return "VedNetra - " + title + " for " + nativeReportName(input) + "\n\n" + text;
+  }
   function wireTodayControls(chart, input) {
-    var prefix = "vnToday", fallback = vnDefaultCtx(input);
-    var mount = document.getElementById("vnTodayMount");
-    vnWireGeo(prefix);
-    var btn = document.getElementById(prefix + "UpdateBtn");
-    if (btn && mount) btn.addEventListener("click", function () {
-      try { mount.innerHTML = todayPanelHtml(vnReadCtx(prefix, fallback), chart, input); }
-      catch (e) { mount.innerHTML = '<div class="panel-box"><p class="fine-print">Could not refresh: ' + escapeHtml(e.message || "") + '</p></div>'; }
-    });
-    var shareBtn = document.getElementById("vnTodayShareBtn");
-    if (shareBtn) shareBtn.addEventListener("click", function () {
-      var text = vnTodayShareText(input);
-      if (navigator.share) navigator.share({ title: "VedNetra - Today", text: text }).catch(function () {});
-      else { copyText(text); var s = document.getElementById("vnTodayHomeStatus"); if (s) s.textContent = "Summary copied (sharing not supported)."; }
-    });
-    var copyBtn = document.getElementById("vnTodayCopyBtn");
-    if (copyBtn) copyBtn.addEventListener("click", function () { copyText(vnTodayShareText(input)); var s = document.getElementById("vnTodayHomeStatus"); if (s) s.textContent = "Summary copied to clipboard."; });
-    var printBtn = document.getElementById("vnTodayPrintBtn");
-    if (printBtn) printBtn.addEventListener("click", function () { vnPrintDailyCard(input); });
-    var homeBtn = document.getElementById("vnTodayHomeBtn");
-    if (homeBtn) homeBtn.addEventListener("click", function () {
-      var ok = vnSetHomeChart(input);
-      var s = document.getElementById("vnTodayHomeStatus");
-      if (s) s.textContent = ok ? "Saved. This chart will open to Today on next launch." : "Could not save (storage unavailable).";
+    vnWireToolControls("vnToday", input, function (ctx) {
+      var html = todayPanelHtml(ctx, chart, input);
+      vnShowToolOutput(vnT("tools.today"), html, { actions: [
+        { id: "share", label: "Share", onClick: function () { var text = vnToolOutputText(input, "Today"); if (navigator.share) navigator.share({ title: "VedNetra - Today", text: text }).catch(function () {}); else copyText(text); } },
+        { id: "copy", label: "Copy summary", onClick: function () { copyText(vnToolOutputText(input, "Today")); } },
+        { id: "print", label: "Print card", onClick: function () { vnPrintDailyCard(input); } },
+        { id: "home", label: "Set as my daily chart", onClick: function (el) { var ok = vnSetHomeChart(input); var b = el.querySelector('[data-vn-act="home"]'); if (b) b.textContent = ok ? "Saved as daily chart" : "Could not save"; } }
+      ] });
     });
   }
 
@@ -15020,10 +15047,9 @@
   }
   function lagnaTimelineSection(chart, input) {
     var ctx = vnDefaultCtx(input);
-    return '<section id="viewA-lagna-timeline" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Daily Lagna</p><h3>Lagna Timeline</h3></div><span class="small-pill">Editable</span></div>' +
-      '<p class="fine-print">Rising sign (Lagna) through the day at ~1-minute resolution. Favourability is graded by the house the rising sign forms from your natal Moon (' + escapeHtml(chart.planetsByName.Moon.signName) + ').</p>' +
-      vnControlsHtml("vnLag", ctx, { noTime: true, updateLabel: "Build timeline" }) +
-      '<div id="vnLagMount">' + lagnaTimelinePanelHtml(ctx, chart) + '</div></section>';
+    return '<section id="viewA-lagna-timeline" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Daily Lagna</p><h3>Lagna Timeline</h3></div><span class="small-pill">Inputs</span></div>' +
+      '<p class="fine-print">Rising sign (Lagna) through the day, graded by the house it forms from your natal Moon (' + escapeHtml(chart.planetsByName.Moon.signName) + '). Set the date and place, then press Generate.</p>' +
+      vnControlsHtml("vnLag", ctx, { noTime: true, generateLabel: "Generate" }) + '</section>';
   }
   function lagnaTimelinePanelHtml(ctx, natalChart) {
     var segs;
@@ -15052,11 +15078,9 @@
       '<div class="table-wrap compact-table"><table><thead><tr><th>Lagna</th><th>Window</th><th>From Moon</th><th>Quality</th></tr></thead><tbody>' + rows + '</tbody></table></div>' + nowNote + '</div>';
   }
   function wireLagnaTimelineControls(chart, input) {
-    var prefix = "vnLag", fallback = vnDefaultCtx(input);
-    var mount = document.getElementById("vnLagMount");
-    vnWireGeo(prefix);
-    var btn = document.getElementById(prefix + "UpdateBtn");
-    if (btn && mount) btn.addEventListener("click", function () { mount.innerHTML = lagnaTimelinePanelHtml(vnReadCtx(prefix, fallback), chart); });
+    vnWireToolControls("vnLag", input, function (ctx) {
+      vnShowToolOutput("Lagna Timeline", lagnaTimelinePanelHtml(ctx, chart));
+    });
   }
 
   // ---- Numerology --------------------------------------------------------
@@ -15086,8 +15110,7 @@
       '<label>Name<input id="vnNumName" type="text" value="' + escapeHtml(ctx.name) + '"></label>' +
       '<label>Birth date<input id="vnNumDate" type="date" value="' + escapeHtml(ctx.date) + '"></label>' +
       '<label>For date<input id="vnNumToday" type="date" value="' + escapeHtml(ctx.today) + '"></label>' +
-      '</div><div class="vn-control-actions"><button type="button" id="vnNumUpdateBtn" class="primary-action">Update</button></div></div>' +
-      '<div id="vnNumMount">' + numerologyPanelHtml(ctx) + '</div></section>';
+      '</div><div class="vn-generate-row"><button type="button" id="vnNumUpdateBtn" class="primary-action vn-generate-btn">Generate</button></div></div></section>';
   }
   function numerologyPanelHtml(ctx) {
     if (!ctx.day || !ctx.month || !ctx.year) return '<div class="panel-box"><p class="fine-print">Enter a valid birth date.</p></div>';
@@ -15115,12 +15138,11 @@
   }
   function wireNumerologyControls(chart, input) {
     var btn = document.getElementById("vnNumUpdateBtn");
-    var mount = document.getElementById("vnNumMount");
-    if (!btn || !mount) return;
+    if (!btn) return;
     btn.addEventListener("click", function () {
       var name = document.getElementById("vnNumName"); var date = document.getElementById("vnNumDate"); var today = document.getElementById("vnNumToday");
       var d = String(date ? date.value : "").split("-").map(Number);
-      mount.innerHTML = numerologyPanelHtml({ name: name ? name.value : "", date: date ? date.value : "", year: d[0], month: d[1], day: d[2], today: today ? today.value : "" });
+      vnShowToolOutput("Numerology", numerologyPanelHtml({ name: name ? name.value : "", date: date ? date.value : "", year: d[0], month: d[1], day: d[2], today: today ? today.value : "" }));
     });
   }
 
@@ -15177,8 +15199,7 @@
       '<label>Latitude<input id="vnVerLatitude" type="number" step="0.0001" value="' + escapeHtml(Number(ctx.latitude).toFixed(4)) + '"></label>' +
       '</div><div class="grid-3">' +
       '<label>Longitude<input id="vnVerLongitude" type="number" step="0.0001" value="' + escapeHtml(Number(ctx.longitude).toFixed(4)) + '"></label>' +
-      '</div><div class="vn-control-actions"><button type="button" id="vnVerUpdateBtn" class="primary-action">Get verdict</button></div></div>' +
-      '<div id="vnVerMount"></div></section>';
+      '</div><div class="vn-generate-row"><button type="button" id="vnVerUpdateBtn" class="primary-action vn-generate-btn">Generate</button></div></div></section>';
   }
   function kpVerdictPanelHtml(opts, natalChart) {
     var matter = VN_MATTERS[opts.matterKey] || VN_MATTERS.marriage;
@@ -15251,17 +15272,16 @@
   }
   function wireKpVerdictControls(chart, input) {
     var btn = document.getElementById("vnVerUpdateBtn");
-    var mount = document.getElementById("vnVerMount");
-    if (!btn || !mount) return;
+    if (!btn) return;
     btn.addEventListener("click", function () {
+      function v(id) { var el = document.getElementById(id); return el ? el.value : ""; }
       try {
-        function v(id) { var el = document.getElementById(id); return el ? el.value : ""; }
-        mount.innerHTML = kpVerdictPanelHtml({
+        vnShowToolOutput("Yes / No Verdict", kpVerdictPanelHtml({
           matterKey: v("vnVerMatter"), number: Number(v("vnVerNumber")), date: v("vnVerDate"),
           time: normalizeTimeInput(v("vnVerTime")), timezone: Number(v("vnVerTimezone")),
           latitude: Number(v("vnVerLatitude")), longitude: Number(v("vnVerLongitude"))
-        }, chart);
-      } catch (e) { mount.innerHTML = '<div class="panel-box"><p class="fine-print">Could not compute verdict: ' + escapeHtml(e.message || "") + '</p></div>'; }
+        }, chart));
+      } catch (e) { vnShowToolOutput("Yes / No Verdict", '<div class="panel-box"><p class="fine-print">Could not compute verdict: ' + escapeHtml(e.message || "") + '</p></div>'); }
     });
   }
 
@@ -15275,8 +15295,8 @@
       '<label>Step minutes<input id="vnRecStep" type="number" min="1" max="60" value="3"></label>' +
       '</div></div>' +
       '<div class="panel-box vn-controls"><h3>Life events</h3><div id="vnRecEvents">' + vnRectifyEventRow(0, "", "marriage") + vnRectifyEventRow(1, "", "career") + '</div>' +
-      '<div class="vn-control-actions"><button type="button" id="vnRecAddBtn" class="input-toggle-btn">Add event</button><button type="button" id="vnRecRunBtn" class="primary-action">Run rectification</button></div></div>' +
-      '<div id="vnRecMount"></div></section>';
+      '<div class="vn-control-actions"><button type="button" id="vnRecAddBtn" class="input-toggle-btn">Add event</button></div>' +
+      '<div class="vn-generate-row"><button type="button" id="vnRecRunBtn" class="primary-action vn-generate-btn">Generate</button></div></div></section>';
   }
   function vnRectifyEventRow(i, date, matterKey) {
     return '<div class="grid-2 vn-event-row"><label>Event date<input class="vnRecEvDate" type="date" value="' + escapeHtml(date) + '"></label>' +
@@ -15321,23 +15341,22 @@
     var addBtn = document.getElementById("vnRecAddBtn");
     var runBtn = document.getElementById("vnRecRunBtn");
     var list = document.getElementById("vnRecEvents");
-    var mount = document.getElementById("vnRecMount");
     if (addBtn && list) addBtn.addEventListener("click", function () {
       var i = list.querySelectorAll(".vn-event-row").length;
       list.insertAdjacentHTML("beforeend", vnRectifyEventRow(i, "", "marriage"));
     });
-    if (runBtn && mount) runBtn.addEventListener("click", function () {
+    if (runBtn && list) runBtn.addEventListener("click", function () {
       try {
         var dates = list.querySelectorAll(".vnRecEvDate");
         var matters = list.querySelectorAll(".vnRecEvMatter");
         var events = [];
         for (var i = 0; i < dates.length; i++) events.push({ date: dates[i].value, matterKey: matters[i] ? matters[i].value : "marriage" });
         function v(id) { var el = document.getElementById(id); return el ? el.value : ""; }
-        mount.innerHTML = rectifyPanelHtml({
+        vnShowToolOutput("Rectify Birth Time", rectifyPanelHtml({
           recTime: normalizeTimeInput(v("vnRecTime")), span: Math.abs(Number(v("vnRecSpan")) || 30),
           step: Math.max(1, Number(v("vnRecStep")) || 3), events: events
-        }, chart, input);
-      } catch (e) { mount.innerHTML = '<div class="panel-box"><p class="fine-print">Could not run rectification: ' + escapeHtml(e.message || "") + '</p></div>'; }
+        }, chart, input));
+      } catch (e) { vnShowToolOutput("Rectify Birth Time", '<div class="panel-box"><p class="fine-print">Could not run rectification: ' + escapeHtml(e.message || "") + '</p></div>'); }
     });
   }
 
@@ -15471,8 +15490,7 @@
       '<div><h3>Person B</h3>' +
       '<label>Name<input id="vnCmpBName" type="text" value=""></label>' +
       '<label>Birth date<input id="vnCmpBDate" type="date" value=""></label></div></div>' +
-      '<div class="vn-control-actions"><button type="button" id="vnCmpUpdateBtn" class="primary-action">Compare</button></div></div>' +
-      '<div id="vnCmpMount"></div></section>';
+      '<div class="vn-generate-row"><button type="button" id="vnCmpUpdateBtn" class="primary-action vn-generate-btn">Generate</button></div></div></section>';
   }
   function vnNumProfile(name, dateStr) {
     var d = String(dateStr || "").split("-").map(Number);
@@ -15511,11 +15529,11 @@
     return '<div class="report-grid two">' + verdictBox + table + '</div>';
   }
   function wireNumCompatControls(chart, input) {
-    var btn = document.getElementById("vnCmpUpdateBtn"), mount = document.getElementById("vnCmpMount");
-    if (!btn || !mount) return;
+    var btn = document.getElementById("vnCmpUpdateBtn");
+    if (!btn) return;
     btn.addEventListener("click", function () {
       function v(id) { var el = document.getElementById(id); return el ? el.value : ""; }
-      mount.innerHTML = numCompatPanelHtml({ name: v("vnCmpAName"), date: v("vnCmpADate") }, { name: v("vnCmpBName"), date: v("vnCmpBDate") });
+      vnShowToolOutput("Numerology Match", numCompatPanelHtml({ name: v("vnCmpAName"), date: v("vnCmpADate") }, { name: v("vnCmpBName"), date: v("vnCmpBDate") }));
     });
   }
 
@@ -15543,8 +15561,7 @@
     return '<section id="viewA-cards" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Vedic Cards</p><h3>Card Reading</h3></div><span class="small-pill">Draw</span></div>' +
       '<p class="fine-print">Pull three cards — Past, Present and Future. Each card is a planet-in-house combination interpreted from its natural significations. Optionally name your focus, then draw.</p>' +
       '<div class="panel-box vn-controls"><label>Your focus (optional)<input id="vnCardFocus" type="text" placeholder="Example: my career"></label>' +
-      '<div class="vn-control-actions"><button type="button" id="vnCardDrawBtn" class="primary-action">Draw cards</button></div></div>' +
-      '<div id="vnCardMount"></div></section>';
+      '<div class="vn-generate-row"><button type="button" id="vnCardDrawBtn" class="primary-action vn-generate-btn">Generate</button></div></div></section>';
   }
   function cardsPanelHtml(focus) {
     var frames = ["Past", "Present", "Future"];
@@ -15557,11 +15574,11 @@
     return '<div class="report-grid three">' + boxes + '</div><div class="panel-box vn-reading"><h3>Reading</h3><p>' + escapeHtml(summary) + '</p></div>';
   }
   function wireCardsControls(chart, input) {
-    var btn = document.getElementById("vnCardDrawBtn"), mount = document.getElementById("vnCardMount");
-    if (!btn || !mount) return;
+    var btn = document.getElementById("vnCardDrawBtn");
+    if (!btn) return;
     btn.addEventListener("click", function () {
       var f = document.getElementById("vnCardFocus");
-      mount.innerHTML = cardsPanelHtml(f ? f.value.trim() : "");
+      vnShowToolOutput("Vedic Cards", cardsPanelHtml(f ? f.value.trim() : ""));
     });
   }
 
@@ -15590,7 +15607,7 @@
   function vnPrintDailyCard(input) {
     // Print via a hidden iframe so the app is never navigated away (no getting
     // stuck on a blank popup with no way back to the home screen).
-    var mount = document.getElementById("vnTodayMount");
+    var mount = document.getElementById("vnToolOutputBody") || document.getElementById("vnTodayMount");
     if (!mount) return;
     var prior = document.getElementById("vnPrintFrame");
     if (prior) prior.parentNode.removeChild(prior);
@@ -15746,9 +15763,12 @@
     try { if (typeof savedCharts !== "undefined" && savedCharts && savedCharts.length) return "your most recent saved chart"; } catch (e) {}
     return "a sample chart for the current date, time and place";
   }
+  // tool cards present their own input screen + Generate, so they skip the confirm
+  var VN_TOOL_CARDS = { "viewA-today": 1, "viewA-muhurta": 1, "viewA-lagna-timeline": 1, "viewA-numerology": 1, "viewA-num-compat": 1, "viewA-cards": 1, "viewA-verdict": 1, "viewA-rectify": 1 };
   // Ask the user to confirm loading a section, telling them what it will load.
   function vnNavigateToFeature(targetId) {
     if (!targetId) return;
+    if (VN_TOOL_CARDS[targetId]) { vnDoNavigateToFeature(targetId); return; }
     var info = VN_FEATURE_INFO[targetId] || { label: "this section", desc: "" };
     var prior = document.querySelector(".vn-confirm-overlay"); if (prior) prior.remove();
     var el = document.createElement("div");
