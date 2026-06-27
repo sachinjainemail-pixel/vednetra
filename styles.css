@@ -7854,3 +7854,18 @@ tr.vn-neutral td, .vn-verdict.vn-neutral { background: rgba(194, 116, 24, 0.10);
 .vn-verdict { text-align: center; }
 .vn-verdict-big { font-size: 30px; font-weight: 800; margin: 6px 0; color: var(--blue); }
 .vn-reading p { margin: 0; line-height: 1.55; }
+
+/* ===== VedNetra Tools batch 2 ===== */
+.vn-today-actions { margin: 10px 0 4px; }
+.vn-home-status { margin-left: 4px; }
+.vn-card .vn-card-combo { font-weight: 700; color: var(--blue); margin: 2px 0 6px; }
+.vn-lang-toggle select { border: 1px solid var(--line); border-radius: 999px; padding: 3px 8px; background: var(--paper); color: var(--ink); }
+/* current-rising highlight on lagna timeline */
+.vn-timeline-seg.vn-now { outline: 2px solid var(--blue); outline-offset: -2px; }
+tr.vn-now-row td { font-weight: 700; }
+/* onboarding overlay */
+.vn-onboard-overlay { position: fixed; inset: 0; background: rgba(24, 15, 4, 0.55); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
+.vn-onboard-card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; max-width: 460px; padding: 22px; box-shadow: var(--shadow); }
+.vn-onboard-card h2 { margin: 0 0 10px; color: var(--blue); }
+.vn-onboard-card p { line-height: 1.5; }
+.vn-onboard-card .primary-action { margin-top: 12px; }
