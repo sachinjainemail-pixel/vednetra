@@ -560,8 +560,13 @@
         if (langSel) { langSel.value = VN_LANG; langSel.addEventListener("change", function () { vnSetLang(langSel.value); }); }
         vnApplyNavLang();
       } catch (e) {}
+      try {
+        var homeBarBtn = document.getElementById("vnHomeBarBtn");
+        if (homeBarBtn) homeBarBtn.addEventListener("click", function () { returnToHome(); });
+      } catch (e) {}
       try { vnRenderHomeShowcase(); } catch (e) {}
       try { vnMaybeShowOnboarding(); } catch (e) {}
+      try { vnRequestGeo(); } catch (e) {} // detect current location early so cards default to it
       try { vnLoadHomeChartOnStartup(); } catch (e) {}
     });
   }
@@ -14631,17 +14636,41 @@
   }
 
   // ---- shared context + reusable control markup --------------------------
+  // ---- geolocation cache (default current location for daily cards) ------
+  var VN_GEO = (function () { try { return JSON.parse(vnLsGet("vednetra.geo", "") || "null"); } catch (e) { return null; } })();
+  var vnGeoInFlight = false, vnGeoQueue = [];
+  function vnSaveGeo(g) { VN_GEO = g; vnLsSet("vednetra.geo", JSON.stringify(g)); }
+  function vnRequestGeo(onDone) {
+    if (VN_GEO) { if (onDone) onDone(VN_GEO); return; }
+    if (typeof navigator === "undefined" || !navigator.geolocation) { if (onDone) onDone(null); return; }
+    if (onDone) vnGeoQueue.push(onDone);
+    if (vnGeoInFlight) return;
+    vnGeoInFlight = true;
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      var g = { lat: Number(pos.coords.latitude.toFixed(4)), lon: Number(pos.coords.longitude.toFixed(4)), tz: -new Date().getTimezoneOffset() / 60 };
+      vnSaveGeo(g); vnGeoInFlight = false;
+      var q = vnGeoQueue.slice(); vnGeoQueue = []; q.forEach(function (f) { try { f(g); } catch (e) {} });
+    }, function (err) {
+      vnGeoInFlight = false;
+      var q = vnGeoQueue.slice(); vnGeoQueue = []; q.forEach(function (f) { try { f(null, err); } catch (e) {} });
+    }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 });
+  }
   function vnDefaultCtx(input) {
     var now = new Date();
     var tz = Number(input.timezone);
     if (!Number.isFinite(tz)) tz = 5.5;
+    var lat = Number(input.latitude), lon = Number(input.longitude), place = input.birthPlace || "";
+    // default to the user's current location when we have it cached
+    if (VN_GEO && Number.isFinite(VN_GEO.lat) && Number.isFinite(VN_GEO.lon)) {
+      lat = VN_GEO.lat; lon = VN_GEO.lon; tz = VN_GEO.tz; place = "Current location";
+    }
     return {
       date: input.asOfDate || dateInputValue(now, tz),
       time: normalizeTimeInput(input.asOfTime || timeInputValue(now, tz)),
-      place: input.birthPlace || "",
+      place: place,
       timezone: tz,
-      latitude: Number(input.latitude),
-      longitude: Number(input.longitude),
+      latitude: lat,
+      longitude: lon,
       ayanamshaKey: input.ayanamshaKey
     };
   }
@@ -14688,32 +14717,46 @@
     if (place && Number.isFinite(lat) && Number.isFinite(lon)) rememberCustomLocation(place, lat, lon, ctx.timezone);
     return ctx;
   }
+  function vnApplyGeoToPanel(prefix, g, opts) {
+    opts = opts || {};
+    var lat = document.getElementById(prefix + "Latitude");
+    var lon = document.getElementById(prefix + "Longitude");
+    var tz = document.getElementById(prefix + "Timezone");
+    var place = document.getElementById(prefix + "Place");
+    if (!lat || !lon) return;
+    lat.value = Number(g.lat).toFixed(4); lat.dataset.vnTouched = "1";
+    lon.value = Number(g.lon).toFixed(4); lon.dataset.vnTouched = "1";
+    if (tz) { tz.value = String(g.tz); tz.dataset.vnTouched = "1"; }
+    if (place) place.value = "Current location";
+    if (opts.update) { var upd = document.getElementById(prefix + "UpdateBtn"); if (upd) upd.click(); }
+  }
   function vnWireGeo(prefix) {
     var btn = document.getElementById(prefix + "GeoBtn");
     var status = document.getElementById(prefix + "GeoStatus");
-    if (!btn) return;
-    btn.addEventListener("click", function () {
-      if (!navigator.geolocation) { if (status) status.textContent = "Geolocation is not available in this browser."; return; }
-      if (status) status.textContent = "Locating...";
-      navigator.geolocation.getCurrentPosition(function (pos) {
-        var lat = document.getElementById(prefix + "Latitude");
-        var lon = document.getElementById(prefix + "Longitude");
-        var tz = document.getElementById(prefix + "Timezone");
-        var place = document.getElementById(prefix + "Place");
-        if (lat) { lat.value = pos.coords.latitude.toFixed(4); lat.dataset.vnTouched = "1"; }
-        if (lon) { lon.value = pos.coords.longitude.toFixed(4); lon.dataset.vnTouched = "1"; }
-        if (tz) { tz.value = String(-new Date().getTimezoneOffset() / 60); tz.dataset.vnTouched = "1"; }
-        if (place) place.value = "";
-        if (status) status.textContent = "Location set from device. Press update.";
-        var upd = document.getElementById(prefix + "UpdateBtn"); if (upd) upd.click();
-      }, function (err) {
-        if (status) status.textContent = "Could not get location: " + (err && err.message ? err.message : "permission denied") + ".";
-      }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 });
-    });
+    if (btn) {
+      btn.addEventListener("click", function () {
+        if (typeof navigator === "undefined" || !navigator.geolocation) { if (status) status.textContent = "Geolocation is not supported by this browser."; return; }
+        if (status) status.textContent = "Locating...";
+        // force a fresh lookup even if cached
+        VN_GEO = null;
+        vnRequestGeo(function (g, err) {
+          if (g) { if (status) status.textContent = "Using your current location."; vnApplyGeoToPanel(prefix, g, { update: true }); }
+          else { if (status) status.textContent = "Location unavailable (" + ((err && err.message) || "permission denied") + "). Enter a place or coordinates manually."; }
+        });
+      });
+    }
     ["Timezone", "Latitude", "Longitude"].forEach(function (id) {
       var el = document.getElementById(prefix + id);
       if (el) el.addEventListener("input", function () { el.dataset.vnTouched = "1"; });
     });
+    // default behaviour: if we have no cached location yet, detect it once and apply
+    if (!VN_GEO && typeof navigator !== "undefined" && navigator.geolocation) {
+      if (status) status.textContent = "Detecting your location...";
+      vnRequestGeo(function (g) {
+        if (g) { if (status) status.textContent = "Using your current location."; vnApplyGeoToPanel(prefix, g, { update: true }); }
+        else if (status) status.textContent = "";
+      });
+    }
   }
 
   // ---- Muhurta + Choghadiya engine --------------------------------------
@@ -15507,12 +15550,25 @@
     return "VedNetra - Today for " + nativeReportName(input) + "\n\n" + text;
   }
   function vnPrintDailyCard(input) {
+    // Print via a hidden iframe so the app is never navigated away (no getting
+    // stuck on a blank popup with no way back to the home screen).
     var mount = document.getElementById("vnTodayMount");
     if (!mount) return;
-    var w = window.open("", "_blank");
-    if (!w) return;
-    w.document.write('<html><head><title>VedNetra - Today</title><style>body{font-family:system-ui,Arial,sans-serif;padding:24px;color:#181c32}h1{font-size:18px}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ccc;padding:4px 8px;font-size:13px;text-align:left}.vn-reading{margin-top:12px}</style></head><body><h1>VedNetra - Today for ' + escapeHtml(nativeReportName(input)) + '</h1>' + mount.innerHTML + '</body></html>');
-    w.document.close(); w.focus(); setTimeout(function () { try { w.print(); } catch (e) {} }, 250);
+    var prior = document.getElementById("vnPrintFrame");
+    if (prior) prior.parentNode.removeChild(prior);
+    var frame = document.createElement("iframe");
+    frame.id = "vnPrintFrame";
+    frame.setAttribute("aria-hidden", "true");
+    frame.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden;";
+    document.body.appendChild(frame);
+    var doc = frame.contentWindow.document;
+    doc.open();
+    doc.write('<html><head><title>VedNetra - Today</title><style>body{font-family:system-ui,Arial,sans-serif;padding:24px;color:#181c32}h1{font-size:18px}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ccc;padding:4px 8px;font-size:13px;text-align:left}.panel-box{border:1px solid #ddd;border-radius:8px;padding:10px;margin-bottom:10px}.vn-reading{margin-top:12px}</style></head><body><h1>VedNetra - Today for ' + escapeHtml(nativeReportName(input)) + '</h1>' + mount.innerHTML + '</body></html>');
+    doc.close();
+    var win = frame.contentWindow;
+    function cleanup() { setTimeout(function () { if (frame.parentNode) frame.parentNode.removeChild(frame); }, 1000); }
+    if (win.matchMedia) { var mql = win.matchMedia("print"); if (mql && mql.addListener) mql.addListener(function (m) { if (!m.matches) cleanup(); }); }
+    setTimeout(function () { try { win.focus(); win.print(); } catch (e) {} cleanup(); }, 350);
   }
 
   // ---- first-run onboarding ---------------------------------------------
