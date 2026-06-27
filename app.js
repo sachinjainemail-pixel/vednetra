@@ -2188,6 +2188,11 @@
     if (exportButton) exportButton.addEventListener("click", exportSavedChartLibrary);
     if (importButton && importFile) importButton.addEventListener("click", function () { importFile.click(); });
     if (importFile) importFile.addEventListener("change", importSavedChartLibrary);
+    var search = document.getElementById("savedChartSearch");
+    if (search) search.addEventListener("input", function () {
+      savedChartFilter = search.value;
+      renderSavedCharts(select.value || "");
+    });
     refreshSavedCharts();
   }
 
@@ -2420,22 +2425,35 @@
     return [number, name, birth].filter(Boolean).join(" - ");
   }
 
+  var savedChartFilter = "";
+  function vnChartMatchesFilter(item, filter) {
+    if (!filter) return true;
+    var hay = ((item.title || "") + " " + (item.nativeName || "") + " " + (item.birthDate || "")).toLowerCase();
+    return filter.split(/\s+/).every(function (tok) { return hay.indexOf(tok) >= 0; });
+  }
   function renderSavedCharts(selectedId) {
     var select = document.getElementById("savedChartSelect");
     if (!select) return;
     var sorted = savedCharts.slice().sort(function (a, b) {
       return String(b.updatedAt || "").localeCompare(String(a.updatedAt || ""));
     });
-    if (!sorted.length) {
+    if (!savedCharts.length) {
       select.innerHTML = '<option value="">No saved charts</option>';
       setSavedChartStatus(savedChartsMode === "server" ? "Server chart library is empty." : "Browser chart library is empty.", "");
       return;
     }
-    select.innerHTML = '<option value="">Select saved chart</option>' + sorted.map(function (item) {
+    var filter = String(savedChartFilter || "").toLowerCase().trim();
+    var filtered = filter ? sorted.filter(function (item) { return vnChartMatchesFilter(item, filter); }) : sorted;
+    if (!filtered.length) {
+      select.innerHTML = '<option value="">No charts match your search</option>';
+      setSavedChartStatus("No saved charts match “" + savedChartFilter + "”.", "warning");
+      return;
+    }
+    select.innerHTML = '<option value="">Select saved chart</option>' + filtered.map(function (item) {
       return '<option value="' + escapeHtml(item.id) + '">' + escapeHtml(item.title || item.nativeName || "Saved chart") + " - " + escapeHtml(shortSavedDate(item.updatedAt)) + "</option>";
     }).join("");
     if (selectedId) select.value = selectedId;
-    setSavedChartStatus(sorted.length + " saved chart" + (sorted.length === 1 ? "" : "s") + " available in " + (savedChartsMode === "server" ? "server storage" : "this browser") + ".", "good");
+    setSavedChartStatus((filter ? (filtered.length + " of " + savedCharts.length + " chart" + (savedCharts.length === 1 ? "" : "s") + " match") : (filtered.length + " saved chart" + (filtered.length === 1 ? "" : "s") + " available")) + " in " + (savedChartsMode === "server" ? "server storage" : "this browser") + ".", "good");
   }
 
   function loadSelectedChart() {
@@ -15806,22 +15824,36 @@
     var saved = vnSavedChartsList();
     var prior = document.querySelector(".vn-confirm-overlay"); if (prior) prior.remove();
     var savedHtml = saved.length
-      ? '<label class="vn-pick-label">Use a saved natal chart<select id="vnPickChart">' +
-        saved.map(function (c) { return '<option value="' + escapeHtml(c.id) + '">' + escapeHtml(c.title || c.nativeName || "Saved chart") + '</option>'; }).join("") +
-        '</select></label><button type="button" class="primary-action vn-generate-btn" id="vnPickUseSaved">Use selected chart</button>'
+      ? '<label class="vn-pick-label">Search your saved charts<input id="vnPickSearch" type="search" placeholder="Type a name..." autocomplete="off"></label>' +
+        '<div id="vnPickList" class="vn-pick-list"></div>'
       : '<p class="fine-print">You have no saved natal charts yet.</p>';
     var el = document.createElement("div");
     el.className = "vn-onboard-overlay vn-confirm-overlay";
     el.innerHTML = '<div class="vn-onboard-card vn-confirm-card">' +
       '<h2>Open ' + escapeHtml(info.label) + '</h2>' +
-      '<p class="fine-print">Choose a natal chart to use, or skip to apply it to a Prashna chart for your current location and time.</p>' +
+      '<p class="fine-print">Pick a natal chart (type to search), or apply it to a Prashna chart for your current location and time.</p>' +
       savedHtml +
       '<div class="vn-confirm-actions"><button type="button" class="input-toggle-btn" id="vnPickCancel">Cancel</button>' +
       '<button type="button" class="' + (saved.length ? "input-toggle-btn" : "primary-action vn-generate-btn") + '" id="vnPickUsePrashna">Use my current location</button></div></div>';
     document.body.appendChild(el);
+    function renderPickList(filter) {
+      var listEl = document.getElementById("vnPickList");
+      if (!listEl) return;
+      var f = String(filter || "").toLowerCase().trim();
+      var items = saved.filter(function (c) { return vnChartMatchesFilter(c, f); });
+      listEl.innerHTML = items.length
+        ? items.map(function (c) { return '<button type="button" class="vn-pick-item" data-pick-id="' + escapeHtml(c.id) + '">' + escapeHtml(c.title || c.nativeName || "Saved chart") + '</button>'; }).join("")
+        : '<p class="fine-print">No saved charts match.</p>';
+    }
+    if (saved.length) {
+      renderPickList("");
+      var searchEl = document.getElementById("vnPickSearch");
+      if (searchEl) { searchEl.addEventListener("input", function () { renderPickList(searchEl.value); }); searchEl.focus(); }
+    }
     el.addEventListener("click", function (e) {
       if (e.target === el || e.target.id === "vnPickCancel") { el.remove(); return; }
-      if (e.target.id === "vnPickUseSaved") { var sel = document.getElementById("vnPickChart"); var cid = sel ? sel.value : ""; el.remove(); vnOpenFeatureWithChart(targetId, "saved", cid); return; }
+      var pick = e.target && e.target.closest && e.target.closest("[data-pick-id]");
+      if (pick) { var cid = pick.getAttribute("data-pick-id"); el.remove(); vnOpenFeatureWithChart(targetId, "saved", cid); return; }
       if (e.target.id === "vnPickUsePrashna") { el.remove(); vnOpenFeatureWithChart(targetId, "prashna"); return; }
     });
   }
