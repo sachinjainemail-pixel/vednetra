@@ -7909,3 +7909,28 @@ body:not(.report-active) .empty-state { max-width: 1140px !important; align-cont
 .vn-tool-output-head h2 { margin: 0; color: var(--blue); font-size: 18px; flex: 1 1 auto; }
 .vn-tool-output-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .vn-tool-back { font-weight: 700; }
+
+/* ===== VedNetra homepage: fit to viewport (no vertical scroll), card group label ===== */
+body:not(.report-active) .empty-state {
+  height: 100dvh; max-height: 100dvh; overflow: hidden;
+  display: grid; grid-template-rows: auto auto 1fr auto; gap: 6px;
+  align-content: stretch !important; padding-top: 12px; padding-bottom: 8px;
+}
+.vn-home-showcase { display: flex; flex-direction: column; min-height: 0; margin: 6px 0 0; }
+.vn-home-carousel { flex: 1 1 auto; min-height: 0; align-items: stretch; }
+.vn-home-page { display: flex; }
+.vn-home-page .vn-home-grid { width: 100%; align-content: start; }
+.vn-home-cat { display: block; font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--accent); font-weight: 700; margin-bottom: 2px; }
+.vn-home-card { display: flex; flex-direction: column; justify-content: center; }
+/* chart picker */
+.vn-pick-label { display: block; margin: 10px 0 6px; font-size: 13px; }
+.vn-pick-label select { width: 100%; padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
+.vn-confirm-card .vn-generate-btn { width: 100%; margin-top: 8px; }
+@media (max-width: 560px) {
+  .empty-state-tagline { display: none; }
+  .vn-home-grid { grid-template-columns: 1fr; gap: 8px; }
+  .vn-home-desc { display: none; }
+  .vn-home-card { padding: 10px 12px; }
+  .empty-state-logo { width: 54px; height: 54px; }
+  .empty-state-title { font-size: 22px; }
+}

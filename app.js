@@ -15695,30 +15695,40 @@
     ] }
   ];
   // group the catalog into swipeable pages (indices into VN_HOME_CATALOG)
-  var VN_HOME_PAGES = [[0, 1], [2, 3], [4], [5, 6]];
-  var VN_HOME_PAGE_TITLES = ["Start & Daily", "Foundations & Timing", "Strengths & Systems", "Prediction & Workspace"];
-  function vnHomeGroupHtml(group) {
-    var cards = group.items.map(function (it) {
-      var attr = it.action ? ('data-home-action="' + it.action + '"') : ('data-home-target="' + it.id + '"');
-      return '<button type="button" class="vn-home-card' + (it.primary ? " vn-home-primary" : "") + '" ' + attr + '><strong>' + escapeHtml(it.label) + '</strong><span>' + escapeHtml(it.desc) + '</span></button>';
-    }).join("");
-    return '<div class="vn-home-group"><h2>' + escapeHtml(group.title) + '</h2><div class="vn-home-grid">' + cards + '</div></div>';
+  // flatten the catalog into individual cards (each carries its group name)
+  var VN_HOME_ITEMS = [];
+  VN_HOME_CATALOG.forEach(function (g) { g.items.forEach(function (it) { VN_HOME_ITEMS.push({ item: it, group: g.title }); }); });
+  function vnHomePageSize() {
+    var w = (typeof window !== "undefined" && window.innerWidth) || 360;
+    if (w <= 560) return 4;   // mobile: at most 4 cards per page (no vertical scroll)
+    if (w <= 900) return 6;
+    return 9;
   }
+  function vnHomeCardHtml(it, group) {
+    var attr = it.action ? ('data-home-action="' + it.action + '"') : ('data-home-target="' + it.id + '"');
+    return '<button type="button" class="vn-home-card' + (it.primary ? " vn-home-primary" : "") + '" ' + attr + '>' +
+      '<span class="vn-home-cat">' + escapeHtml(group) + '</span>' +
+      '<strong>' + escapeHtml(it.label) + '</strong>' +
+      '<span class="vn-home-desc">' + escapeHtml(it.desc) + '</span></button>';
+  }
+  var vnHomeResizeWired = false, vnHomeResizeTimer = null;
   function vnRenderHomeShowcase() {
     var mount = document.getElementById("vnHomeShowcase");
     if (!mount) return;
-    var pagesHtml = VN_HOME_PAGES.map(function (grpIdxs) {
-      return '<div class="vn-home-page">' + grpIdxs.map(function (i) { return vnHomeGroupHtml(VN_HOME_CATALOG[i]); }).join("") + '</div>';
+    var size = vnHomePageSize();
+    var pages = [];
+    for (var i = 0; i < VN_HOME_ITEMS.length; i += size) pages.push(VN_HOME_ITEMS.slice(i, i + size));
+    var pagesHtml = pages.map(function (pg) {
+      return '<div class="vn-home-page"><div class="vn-home-grid">' + pg.map(function (e) { return vnHomeCardHtml(e.item, e.group); }).join("") + '</div></div>';
     }).join("");
-    var dots = VN_HOME_PAGES.map(function (_g, i) {
-      return '<button type="button" class="vn-home-dot' + (i === 0 ? " active" : "") + '" data-home-page="' + i + '" aria-label="' + escapeHtml(VN_HOME_PAGE_TITLES[i] || ("Page " + (i + 1))) + '"></button>';
+    var dots = pages.map(function (_p, i) {
+      return '<button type="button" class="vn-home-dot' + (i === 0 ? " active" : "") + '" data-home-page="' + i + '" aria-label="Page ' + (i + 1) + '"></button>';
     }).join("");
     mount.innerHTML =
       '<div class="vn-home-carousel" id="vnHomeCarousel">' + pagesHtml + '</div>' +
       '<div class="vn-home-nav"><button type="button" class="vn-home-arrow" id="vnHomePrev" aria-label="Previous page">&#8249;</button>' +
       '<div class="vn-home-dots">' + dots + '</div>' +
-      '<button type="button" class="vn-home-arrow" id="vnHomeNext" aria-label="Next page">&#8250;</button></div>' +
-      '<p class="vn-home-hint fine-print">Swipe or use the arrows to browse all features.</p>';
+      '<button type="button" class="vn-home-arrow" id="vnHomeNext" aria-label="Next page">&#8250;</button></div>';
     if (!mount._vnWired) {
       mount.addEventListener("click", function (e) {
         var card = e.target && e.target.closest("[data-home-target],[data-home-action]");
@@ -15730,6 +15740,16 @@
       mount._vnWired = true;
     }
     vnWireHomeCarousel();
+    if (!vnHomeResizeWired && typeof window !== "undefined") {
+      window.addEventListener("resize", function () {
+        clearTimeout(vnHomeResizeTimer);
+        vnHomeResizeTimer = setTimeout(function () {
+          var em = document.getElementById("emptyState");
+          if (em && !em.classList.contains("hidden")) vnRenderHomeShowcase();
+        }, 250);
+      });
+      vnHomeResizeWired = true;
+    }
   }
   function vnWireHomeCarousel() {
     var car = document.getElementById("vnHomeCarousel");
@@ -15753,87 +15773,57 @@
     VN_HOME_CATALOG.forEach(function (g) { g.items.forEach(function (it) { if (it.id) map[it.id] = { label: it.label, desc: it.desc }; }); });
     return map;
   })();
-  function vnChartSourceLabel() {
-    var report = document.getElementById("report");
-    if (report && report.innerHTML.trim()) {
-      var summary = document.querySelector(".part-a-native-summary");
-      return "your current chart";
-    }
-    if (vnLsGet("vednetra.homeChart", "")) return "your saved daily chart";
-    try { if (typeof savedCharts !== "undefined" && savedCharts && savedCharts.length) return "your most recent saved chart"; } catch (e) {}
-    return "a sample chart for the current date, time and place";
+  function vnSavedChartsList() {
+    try { return (typeof savedCharts !== "undefined" && savedCharts) ? savedCharts.slice() : []; } catch (e) { return []; }
   }
-  // tool cards present their own input screen + Generate, so they skip the confirm
-  var VN_TOOL_CARDS = { "viewA-today": 1, "viewA-muhurta": 1, "viewA-lagna-timeline": 1, "viewA-numerology": 1, "viewA-num-compat": 1, "viewA-cards": 1, "viewA-verdict": 1, "viewA-rectify": 1 };
-  // Ask the user to confirm loading a section, telling them what it will load.
+  // build a Prashna chart for the current moment at the user's current location
+  function vnApplyPrashnaCurrentLocation() {
+    setDefaultDates();
+    setFieldValue("nativeName", "PRASHNA CHART");
+    if (VN_GEO && Number.isFinite(VN_GEO.lat) && Number.isFinite(VN_GEO.lon)) {
+      applyDefaultLocationToBirthDetails({ name: VN_GEO.place || "Current location", timezone: VN_GEO.tz, latitude: VN_GEO.lat, longitude: VN_GEO.lon });
+    }
+  }
+  function vnOpenFeatureWithChart(targetId, mode, id) {
+    try {
+      if (mode === "saved") {
+        var rec = vnSavedChartsList().filter(function (c) { return c.id === id; })[0];
+        if (rec && rec.input) applySavedInputToForm(rec.input);
+      } else {
+        vnApplyPrashnaCurrentLocation();
+      }
+      generate({ preserveActiveSection: false });
+      showReportView("chartData");
+      var empty = document.getElementById("emptyState"); if (empty) empty.classList.add("hidden");
+      var report = document.getElementById("report"); if (report) report.classList.remove("hidden");
+      showSingleChartDataSection(targetId, { skipScroll: false });
+    } catch (e) {}
+  }
+  // Ask which natal chart to use; otherwise apply to a current-location Prashna chart.
   function vnNavigateToFeature(targetId) {
     if (!targetId) return;
-    if (VN_TOOL_CARDS[targetId]) { vnDoNavigateToFeature(targetId); return; }
-    var info = VN_FEATURE_INFO[targetId] || { label: "this section", desc: "" };
+    var info = VN_FEATURE_INFO[targetId] || { label: "this section" };
+    var saved = vnSavedChartsList();
     var prior = document.querySelector(".vn-confirm-overlay"); if (prior) prior.remove();
+    var savedHtml = saved.length
+      ? '<label class="vn-pick-label">Use a saved natal chart<select id="vnPickChart">' +
+        saved.map(function (c) { return '<option value="' + escapeHtml(c.id) + '">' + escapeHtml(c.title || c.nativeName || "Saved chart") + '</option>'; }).join("") +
+        '</select></label><button type="button" class="primary-action vn-generate-btn" id="vnPickUseSaved">Use selected chart</button>'
+      : '<p class="fine-print">You have no saved natal charts yet.</p>';
     var el = document.createElement("div");
     el.className = "vn-onboard-overlay vn-confirm-overlay";
     el.innerHTML = '<div class="vn-onboard-card vn-confirm-card">' +
-      '<h2>' + escapeHtml(info.label) + '</h2>' +
-      '<p>' + escapeHtml(info.desc) + '</p>' +
-      '<p class="fine-print">This will load <strong>' + escapeHtml(info.label) + '</strong> using ' + escapeHtml(vnChartSourceLabel()) + '.</p>' +
-      '<div class="vn-confirm-actions"><button type="button" class="input-toggle-btn" id="vnConfirmCancel">Cancel</button>' +
-      '<button type="button" class="primary-action" id="vnConfirmLoad">Load ' + escapeHtml(info.label) + '</button></div></div>';
+      '<h2>Open ' + escapeHtml(info.label) + '</h2>' +
+      '<p class="fine-print">Choose a natal chart to use, or skip to apply it to a Prashna chart for your current location and time.</p>' +
+      savedHtml +
+      '<div class="vn-confirm-actions"><button type="button" class="input-toggle-btn" id="vnPickCancel">Cancel</button>' +
+      '<button type="button" class="' + (saved.length ? "input-toggle-btn" : "primary-action vn-generate-btn") + '" id="vnPickUsePrashna">Use my current location</button></div></div>';
     document.body.appendChild(el);
-    var load = el.querySelector("#vnConfirmLoad");
-    if (load) load.focus();
     el.addEventListener("click", function (e) {
-      if (e.target === el || e.target.id === "vnConfirmCancel") { el.remove(); return; }
-      if (e.target.id === "vnConfirmLoad") { el.remove(); vnDoNavigateToFeature(targetId); }
+      if (e.target === el || e.target.id === "vnPickCancel") { el.remove(); return; }
+      if (e.target.id === "vnPickUseSaved") { var sel = document.getElementById("vnPickChart"); var cid = sel ? sel.value : ""; el.remove(); vnOpenFeatureWithChart(targetId, "saved", cid); return; }
+      if (e.target.id === "vnPickUsePrashna") { el.remove(); vnOpenFeatureWithChart(targetId, "prashna"); return; }
     });
-  }
-  function vnDoNavigateToFeature(targetId) {
-    if (!targetId) return;
-    var report = document.getElementById("report");
-    var empty = document.getElementById("emptyState");
-    if (report && report.innerHTML.trim()) {
-      // a chart is already generated this session - just reveal and jump
-      if (empty) empty.classList.add("hidden");
-      report.classList.remove("hidden");
-      showReportView("chartData");
-      showSingleChartDataSection(targetId, { skipScroll: false });
-      return;
-    }
-    vnPendingHomeTarget = targetId;
-    // 1) a saved daily / home chart
-    var raw = vnLsGet("vednetra.homeChart", "");
-    if (raw) {
-      try {
-        applySavedInputToForm(JSON.parse(raw));
-        generate(); showReportView("chartData"); showVargaSectionAfterChartChange();
-        return;
-      } catch (e) {}
-    }
-    // 2) most recent chart from the saved library
-    try {
-      if (typeof savedCharts !== "undefined" && savedCharts && savedCharts.length) {
-        var recent = savedCharts.slice().sort(function (a, b) { return String(b.updatedAt || "").localeCompare(String(a.updatedAt || "")); })[0];
-        if (recent && recent.input) {
-          applySavedInputToForm(recent.input);
-          generate(); showReportView("chartData"); showVargaSectionAfterChartChange();
-          return;
-        }
-      }
-    } catch (e) {}
-    // 3) no chart anywhere: open a default prashna chart for now (form is pre-filled
-    //    by setDefaultDates) so the chosen section opens directly. The user can create
-    //    or select their own chart any time from the Start cards or Chart Setup.
-    try {
-      var birthDate = document.getElementById("birthDate");
-      if (!birthDate || !birthDate.value) setDefaultDates();
-      generate(); showReportView("chartData"); showVargaSectionAfterChartChange();
-      return;
-    } catch (e) {}
-    // fallback: open chart setup
-    var newBtn = document.querySelector('[data-chart-setup-action="new"]');
-    if (newBtn) newBtn.click();
-    var status = document.getElementById("chartStartStatus");
-    if (status) status.textContent = "Create or load a chart, then it opens directly in the section you picked.";
   }
 
   var coreApi = {
