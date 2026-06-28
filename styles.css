@@ -7995,3 +7995,11 @@ body:not(.report-active) .empty-state {
 
 /* example line under each "How to use this" point */
 .vn-usage-eg { display: block; margin-top: 2px; font-size: 12px; font-style: italic; color: var(--muted); }
+
+/* ===== Bigger homepage brand ===== */
+.empty-state-logo { width: 140px; height: 140px; }
+.empty-state-title { font-size: 46px; }
+@media (max-width: 560px) {
+  .empty-state-logo { width: 112px; height: 112px; }
+  .empty-state-title { font-size: 38px; }
+}
