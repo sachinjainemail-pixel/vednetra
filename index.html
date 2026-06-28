@@ -13,7 +13,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.svg">
-  <link rel="stylesheet" href="styles.css?v=43">
+  <link rel="stylesheet" href="styles.css?v=44">
 </head>
 <body>
   <div id="vnSplash" class="vn-splash" role="dialog" aria-label="Welcome to VedNetra">
@@ -53,7 +53,7 @@
           <div>
             <h1 class="brand-title">VedNetra</h1>
           </div>
-          <span class="status-pill">v1.43</span>
+          <span class="status-pill">v1.44</span>
         </div>
 
         <form id="birthForm" autocomplete="off">
@@ -293,6 +293,8 @@
             <div class="nav-category-actions">
               <button type="button" data-view-a-target="viewA-varshfal">Varshfal</button>
               <button type="button" data-view-a-target="viewA-sadesati">Sade Sati</button>
+              <button type="button" data-view-a-target="viewA-yogini">Yogini Dasha</button>
+              <button type="button" data-view-a-target="viewA-chardasha">Char Dasha</button>
               <button type="button" data-view-a-target="viewA-transit">Transit</button>
               <button type="button" data-view-a-target="viewA-ephemeris">Ephemeris</button>
               <button type="button" data-view-a-target="viewA-dasha">Dasha</button>
@@ -315,6 +317,7 @@
             <div class="nav-category-actions">
               <button type="button" data-view-a-target="viewA-compatibility">Compatibility</button>
               <button type="button" data-view-a-target="viewA-horary">Horary</button>
+              <button type="button" data-view-a-target="viewA-gochar">Gochar Predictions</button>
               <button type="button" data-view-a-target="viewA-faq-pillars">Query Pillars</button>
               <button type="button" data-view-a-target="viewA-predictive">Predictive</button>
             </div>
@@ -322,11 +325,14 @@
           <div class="nav-category">
             <button type="button" class="nav-category-title" data-nav-category-toggle aria-expanded="false">Reports &amp; Remedies</button>
             <div class="nav-category-actions">
+              <button type="button" data-view-a-target="viewA-lifereport">Life Report</button>
               <button type="button" data-view-a-target="viewA-rashifal">Rashifal</button>
               <button type="button" data-view-a-target="viewA-doshas">Doshas</button>
               <button type="button" data-view-a-target="viewA-gems">Gemstones</button>
+              <button type="button" data-view-a-target="viewA-lalkitab">Lal Kitab</button>
               <button type="button" data-view-a-target="viewA-loshu">Lo Shu Grid</button>
               <button type="button" data-view-a-target="viewA-babynames">Baby Names</button>
+              <button type="button" data-view-a-target="viewA-vrat">Vrat &amp; Parva</button>
               <button type="button" data-view-a-target="viewA-quickcalc">Quick Calculators</button>
             </div>
           </div>
@@ -370,6 +376,8 @@
               <optgroup label="Timing">
                 <option value="viewA-varshfal">Varshfal</option>
                 <option value="viewA-sadesati">Sade Sati</option>
+                <option value="viewA-yogini">Yogini Dasha</option>
+                <option value="viewA-chardasha">Char Dasha</option>
                 <option value="viewA-transit">Transit</option>
                 <option value="viewA-ephemeris">Ephemeris</option>
                 <option value="viewA-dasha">Dasha</option>
@@ -386,15 +394,19 @@
               <optgroup label="Relationship &amp; Prediction">
                 <option value="viewA-compatibility">Compatibility</option>
                 <option value="viewA-horary">Horary</option>
+                <option value="viewA-gochar">Gochar Predictions</option>
                 <option value="viewA-faq-pillars">Query Pillars</option>
                 <option value="viewA-predictive">Predictive</option>
               </optgroup>
               <optgroup label="Reports &amp; Remedies">
+                <option value="viewA-lifereport">Life Report</option>
                 <option value="viewA-rashifal">Rashifal</option>
                 <option value="viewA-doshas">Doshas</option>
                 <option value="viewA-gems">Gemstones</option>
+                <option value="viewA-lalkitab">Lal Kitab</option>
                 <option value="viewA-loshu">Lo Shu Grid</option>
                 <option value="viewA-babynames">Baby Names</option>
+                <option value="viewA-vrat">Vrat &amp; Parva</option>
                 <option value="viewA-quickcalc">Quick Calculators</option>
               </optgroup>
             </select>
@@ -534,6 +546,6 @@
       </div>
     </div>
   </main>
-  <script src="app.js?v=43"></script>
+  <script src="app.js?v=44"></script>
 </body>
 </html>

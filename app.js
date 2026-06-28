@@ -5555,6 +5555,12 @@
       { id: "viewA-loshu",          immediate: true, render: function () { return loShuSection(chart, input); } },
       { id: "viewA-babynames",      immediate: true, render: function () { return babyNamesSection(chart, input); } },
       { id: "viewA-quickcalc",      immediate: true, render: function () { return quickCalcSection(chart, input); } },
+      { id: "viewA-lalkitab",       immediate: true, render: function () { return lalKitabSection(chart, input); } },
+      { id: "viewA-lifereport",     immediate: true, render: function () { return lifeReportSection(chart, input); }, wire: function () { wireLifeReportControls(chart, input); } },
+      { id: "viewA-yogini",         immediate: true, render: function () { return yoginiDashaSection(chart, input); } },
+      { id: "viewA-chardasha",      immediate: true, render: function () { return charDashaSection(chart, input); } },
+      { id: "viewA-gochar",         immediate: true, render: function () { return gocharSection(chart, input); } },
+      { id: "viewA-vrat",           label: "Vrat calendar", render: function () { return vratCalendarSection(chart, input); } },
       { id: "viewA-num-compat",     immediate: true, render: function () { return numCompatSection(chart, input); }, wire: function () { wireNumCompatControls(chart, input); } },
       { id: "viewA-cards",          immediate: true, render: function () { return cardsSection(chart, input); }, wire: function () { wireCardsControls(chart, input); } },
       { id: "viewA-sadesati",       label: "Sade Sati", render: function () { return sadeSatiSection(chart, input); } },
@@ -14932,6 +14938,42 @@
       { u: "Understand your default temperament and reactions.", e: "A Scorpio-Moon intensity note → channel it into focused, private work." },
       { u: "Improve relationships by knowing your outer manner vs inner mind.", e: "Airy, sociable outside but watery, sensitive inside → tell close ones what you need." },
       { u: "Pick roles and habits that fit your drive (Sun).", e: "A bold, leading Sun streak → seek initiative-taking responsibilities." }
+    ],
+    lalkitab: [
+      { u: "Pick one or two doable remedies (upay) and keep them up consistently.", e: "Weak Saturn → feed crows and donate mustard oil every Saturday." },
+      { u: "Act first on any karmic debt (rin) shown — it clears recurring blocks.", e: "Pitri Rin → perform Tarpan and honour your father/forefathers." },
+      { u: "Start a remedy on the planet's own weekday for best effect.", e: "Jupiter remedy → begin on a Thursday with a saffron tilak." },
+      { u: "Use as low-cost support alongside the Gemstones card.", e: "If a gem isn't feasible, do the Lal Kitab upay for that planet instead." }
+    ],
+    lifereport: [
+      { u: "Get the whole chart's headline story in one place.", e: "Read it before a consultation so you know your dasha, doshas and remedies." },
+      { u: "Save it as a PDF to keep or share.", e: "Export the report and send it to a family astrologer." },
+      { u: "Use the running-dasha line to time the year's focus.", e: "A Jupiter–Venus period → favour learning, partnerships and comforts." },
+      { u: "Treat the dosha and remedy lines as an action checklist.", e: "Manglik present → do the matching/remedy before marriage talks." }
+    ],
+    yogini: [
+      { u: "Cross-check Vimshottari timing with a second dasha system.", e: "If both Vimshottari and Yogini turn favourable, act with confidence." },
+      { u: "Pace effort by the running Yogini's theme.", e: "Ulka (Saturn) period → expect delays; work steadily, avoid shortcuts." },
+      { u: "Prepare ahead for a Sankata (Rahu) phase.", e: "Build buffers before Sankata; avoid risky launches during it." },
+      { u: "Use favourable Yoginis for important starts.", e: "Begin a venture in a Dhanya (Jupiter) or Siddha (Venus) period." }
+    ],
+    chardasha: [
+      { u: "Read life chapters by sign rather than by planet.", e: "A running Libra dasha → partnerships, trade and balance come to the fore." },
+      { u: "Judge the period by planets in and aspecting the dasha rasi.", e: "Benefics in the rasi or its lord well-placed → a supportive chapter." },
+      { u: "Use it as a Jaimini cross-check on Vimshottari timing.", e: "When both systems point to gains, weight the prediction higher." },
+      { u: "Follow the rasi lord's house for where results land.", e: "Lord in the 10th → the chapter plays out through career and status." }
+    ],
+    gochar: [
+      { u: "Plan by the slow planets' house from your Moon.", e: "Jupiter in the 11th from the Moon → push for gains and new networks." },
+      { u: "Respect Saturn's Sade Sati / Dhaiya note.", e: "Saturn in the 12th–2nd from Moon → keep finances and health tight." },
+      { u: "Use the fast planets to fine-tune the current days.", e: "Mars in a tough house → avoid needless conflict this fortnight." },
+      { u: "Combine with the dasha and Rashifal for a full picture.", e: "Good transit + supportive dasha → a green light to act." }
+    ],
+    vrat: [
+      { u: "Plan fasts and pujas around the upcoming tithi days.", e: "Mark the next Ekadashi for a fast or a Vishnu puja." },
+      { u: "Use Purnima/Amavasya for rituals and ancestor offerings.", e: "Do Tarpan on the listed Amavasya." },
+      { u: "Time Pradosh and Chaturthi vrats for Shiva and Ganesha.", e: "Observe Sankashti Chaturthi for a Ganesha vrat." },
+      { u: "Note Sankranti dates for charity and sankalpa.", e: "Donate on Makar Sankranti as shown." }
     ]
   };
   function vnUsagePanel(key) {
@@ -16202,6 +16244,8 @@
       { id: "viewA-sadesati", label: "Sade Sati Years", desc: "Saturn's 7½-year transits over your natal Moon." },
       { id: "viewA-transit", label: "Transits", desc: "Multi-date gochar transit chart." },
       { id: "viewA-varshfal", label: "Varshfal", desc: "Annual Tajika chart by calendar or running year." },
+      { id: "viewA-yogini", label: "Yogini Dasha", desc: "The 36-year Yogini dasha cycle from your birth-star." },
+      { id: "viewA-chardasha", label: "Char Dasha", desc: "Jaimini rasi (sign) dasha sequence and timing." },
       { id: "viewA-ephemeris", label: "Ephemeris", desc: "Planetary positions over a span of time." }
     ] },
     { title: "Strengths & Systems", items: [
@@ -16217,14 +16261,18 @@
       { id: "viewA-compatibility", label: "Compatibility", desc: "Ashtakoot marriage matching." },
       { id: "viewA-horary", label: "Horary / Prashna", desc: "KP and KCIL horary answers." },
       { id: "viewA-predictive", label: "Predictive Analysis", desc: "Topic-wise predictions for the chart." },
+      { id: "viewA-gochar", label: "Gochar Predictions", desc: "Plain-language transit guidance from your Moon." },
       { id: "viewA-faq-pillars", label: "Query Pillars", desc: "Structured question analysis." }
     ] },
     { title: "Reports & Remedies", items: [
+      { id: "viewA-lifereport", label: "Life Report", desc: "One consolidated report — save it as a PDF." },
       { id: "viewA-rashifal", label: "Rashifal", desc: "Daily/weekly/monthly/yearly Moon-sign horoscope." },
       { id: "viewA-doshas", label: "Dosha Analysis", desc: "Manglik, Kaal Sarp and Pitra dosha with remedies." },
       { id: "viewA-gems", label: "Gemstones & Remedies", desc: "Gemstones, mantras and days for your planets." },
+      { id: "viewA-lalkitab", label: "Lal Kitab Remedies", desc: "Lal Kitab upay and karmic debts by house." },
       { id: "viewA-loshu", label: "Lo Shu Grid", desc: "Numerology grid from your date of birth." },
       { id: "viewA-babynames", label: "Baby Names", desc: "Auspicious name syllables from the birth-star." },
+      { id: "viewA-vrat", label: "Vrat & Parva", desc: "Upcoming fasting and festival days." },
       { id: "viewA-quickcalc", label: "Quick Calculators", desc: "Moon/Sun sign, ascendant, nakshatra at a glance." }
     ] },
     { title: "Workspace", items: [
@@ -16621,6 +16669,336 @@
     return '<section id="viewA-quickcalc" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Quick Facts</p><h3>Quick Calculators</h3></div><span class="small-pill">At a glance</span></div>' +
       '<p class="fine-print">The key points of your chart in one place — ascendant, Moon and Sun signs, birth-star, sign lords and the ayanamsha used.</p>' +
       '<div class="report-grid two">' + metricBox("Signs & Lagna", rows.slice(0, 4)) + metricBox("Lords & Ayanamsha", rows.slice(4)) + '</div>' + vnInlineUsage("quickcalc") + '</section>';
+  }
+
+  // ===========================================================================
+  // Tier-2 cards: Lal Kitab, Life Report (PDF), Yogini & Char dasha, Gochar
+  // predictions, Vrat & Parva calendar. All client-side, natal-derived.
+  // ===========================================================================
+
+  // ---- shared helpers ----------------------------------------------------
+  var VN_WD = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  var VN_MO = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  function vnFmtFullDate(ms) {
+    var d = new Date(ms);
+    return VN_WD[d.getUTCDay()] + ", " + d.getUTCDate() + " " + VN_MO[d.getUTCMonth()] + " " + d.getUTCFullYear();
+  }
+  function vnFmtLocalDate(ms, tz) { return vnFmtFullDate(ms + (Number(tz) || 0) * 3600000); }
+  function vnChartTz(chart, input) {
+    var tz = input && input.timezone;
+    if (tz === undefined || tz === null || tz === "") tz = (VN_GEO && Number.isFinite(VN_GEO.tz)) ? VN_GEO.tz : 5.5;
+    return Number(tz);
+  }
+  // open a clean print window for "Save as PDF"
+  function vnPrintHtml(title, innerHtml) {
+    var w = window.open("", "_blank");
+    if (!w) { try { window.print(); } catch (e) {} return; }
+    var css = "body{font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#1f2937;margin:28px;line-height:1.5}" +
+      "h1{font-size:22px;margin:0 0 4px;color:#0f766e}h2{font-size:16px;margin:18px 0 6px;color:#0f766e;border-bottom:1px solid #ddd;padding-bottom:3px}" +
+      "h3{font-size:13px;margin:12px 0 4px}p{margin:6px 0}ul{margin:6px 0 6px 18px}table{border-collapse:collapse;width:100%;margin:6px 0;font-size:12px}" +
+      "th,td{border:1px solid #ddd;padding:4px 6px;text-align:left}.muted,.fine-print{color:#6b7280;font-size:11px}.brand{color:#6b7280;font-size:11px;margin-top:24px}";
+    w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>' + escapeHtml(title) +
+      '</title><style>' + css + '</style></head><body>' + innerHtml +
+      '<p class="brand">Generated by VedNetra &middot; ' + vnFmtFullDate(Date.now()) + '</p></body></html>');
+    w.document.close();
+    setTimeout(function () { try { w.focus(); w.print(); } catch (e) {} }, 350);
+  }
+
+  // ---- Lal Kitab remedies -------------------------------------------------
+  var VN_LALKITAB = {
+    Sun: { sig: "father, soul, status, government and the eyes", remedy: "Offer water (arghya) to the Sun at sunrise; keep relations with father cordial; donate wheat/jaggery on Sunday." },
+    Moon: { sig: "mother, mind, fluids, peace of mind and milk", remedy: "Serve and respect your mother; keep a silver glass; offer milk/rice; avoid taking milk free of cost." },
+    Mars: { sig: "brothers, courage, blood, land and energy", remedy: "Keep good ties with brothers; offer sweet items / revadi at a temple; keep teeth clean; donate to soldiers/sportsmen." },
+    Mercury: { sig: "speech, business, sisters/daughters, skin and intellect", remedy: "Feed green fodder to cows; respect sisters, daughters and aunts; pierce the nose (for women); donate green moong." },
+    Jupiter: { sig: "wisdom, wealth, guru, religion and children", remedy: "Respect teachers and elders; apply saffron tilak; donate gram-dal/turmeric; serve in temples on Thursday." },
+    Venus: { sig: "spouse, comforts, vehicles, art and beauty", remedy: "Keep marital relations harmonious; donate curd/white cloth; serve cows; avoid moral lapses." },
+    Saturn: { sig: "labour, discipline, longevity, servants and iron", remedy: "Serve the poor, labourers and the disabled; feed crows; donate mustard oil on Saturday; keep conduct honest." },
+    Rahu: { sig: "ambition, confusion, foreign matters and sudden change", remedy: "Keep a solid silver square; donate barley / coconut in flowing water; avoid blue and electrical clutter; respect in-laws." },
+    Ketu: { sig: "detachment, sons/grandsons, dogs and spirituality", remedy: "Keep a pet dog or feed dogs; donate a blanket; keep a black-and-white blanket; serve at temples; care for sons." }
+  };
+  function vnLalKitabHouseNote(house) {
+    var good = [1, 2, 3, 5, 9, 10, 11], harsh = [6, 8, 12];
+    if (good.indexOf(house) >= 0) return "an active, fruit-giving house — the planet works openly here.";
+    if (harsh.indexOf(house) >= 0) return "a testing house — guard the planet's significations and do the remedy diligently.";
+    return "a mixed house — results come with effort.";
+  }
+  function vnLalKitabDebts(chart) {
+    var debts = [];
+    function H(n) { return chart.planetsByName[n] ? chart.planetsByName[n].house : 0; }
+    if (H("Sun") === H("Rahu") || H("Sun") === H("Ketu") || H("Sun") === H("Saturn")) debts.push(["Pitri Rin (debt of ancestors/father)", "Honour your father and forefathers; perform Tarpan/Shraddh; donate on Sundays and Amavasya."]);
+    if (H("Moon") === H("Rahu") || H("Moon") === H("Ketu")) debts.push(["Maatri Rin (debt of mother)", "Serve your mother and elderly women; donate milk/rice; keep a silver item."]);
+    if (H("Jupiter") === H("Rahu") || H("Jupiter") === H("Ketu")) debts.push(["Guru Rin (debt of teachers/dharma)", "Respect teachers and elders; donate gram-dal and turmeric; serve in temples on Thursday."]);
+    if (H("Venus") === H("Saturn") || H("Venus") === H("Ketu")) debts.push(["Stri Rin (debt to women/spouse)", "Keep marital and family relations clean; donate curd and white cloth; serve cows."]);
+    if (H("Mercury") === H("Ketu") || H("Mercury") === H("Rahu")) debts.push(["Kanya Rin (debt to girls/relatives)", "Respect sisters, daughters and aunts; feed green fodder to cows."]);
+    return debts;
+  }
+  function lalKitabSection(chart, input) {
+    var order = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+    var rows = order.map(function (n) {
+      var pl = chart.planetsByName[n]; if (!pl) return "";
+      var lk = VN_LALKITAB[n] || { sig: "-", remedy: "-" };
+      return '<tr><td><strong>' + escapeHtml(n) + '</strong></td><td>' + pl.house + '</td>' +
+        '<td>' + escapeHtml(lk.sig) + '</td>' +
+        '<td>' + escapeHtml("House " + pl.house + " is " + vnLalKitabHouseNote(pl.house)) + '</td>' +
+        '<td>' + escapeHtml(lk.remedy) + '</td></tr>';
+    }).join("");
+    var debts = vnLalKitabDebts(chart);
+    var debtBox = debts.length
+      ? '<div class="panel-box vn-verdict vn-bad" style="text-align:left"><h3>Karmic debts (Rin) indicated</h3><ul class="vn-usage-list">' +
+        debts.map(function (d) { return "<li><strong>" + escapeHtml(d[0]) + ":</strong> " + escapeHtml(d[1]) + "</li>"; }).join("") + '</ul></div>'
+      : '<div class="panel-box vn-verdict vn-good" style="text-align:left"><h3>Karmic debts (Rin)</h3><p class="fine-print">No major Lal Kitab debt pattern detected from the luminaries, Jupiter, Venus or Mercury with the nodes/Saturn.</p></div>';
+    return '<section id="viewA-lalkitab" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Lal Kitab</p><h3>Lal Kitab Remedies</h3></div><span class="small-pill">Upay</span></div>' +
+      '<p class="fine-print">Lal Kitab reads planets by the house (bhava) they occupy and prescribes simple, low-cost remedies (upay). Below are each planet\'s significations, its house tone and a classic remedy, plus any karmic debts (rin).</p>' +
+      debtBox +
+      '<div class="panel-box"><h3>Planet-wise remedies</h3><div class="table-wrap compact-table"><table><thead><tr><th>Planet</th><th>House</th><th>Signifies</th><th>House tone</th><th>Remedy (Upay)</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+      '<p class="fine-print">Do remedies with faith and consistency; start on the planet\'s weekday. These are traditional Lal Kitab upay, not a substitute for medical, legal or financial advice.</p></div>' +
+      vnInlineUsage("lalkitab") + '</section>';
+  }
+
+  // ---- consolidated Life Report (with Save-as-PDF) -----------------------
+  function vnLifeReportBody(chart, input) {
+    var asc = chart.ascendant, moon = chart.planetsByName.Moon, sun = chart.planetsByName.Sun;
+    var ascLord = SIGNS[asc.sign].lord, alp = chart.planetsByName[ascLord];
+    var moonNk = nakshatraInfo(moon.lon);
+    var parts = [];
+    parts.push("<h2>Identity &amp; core</h2>");
+    parts.push("<p>Ascendant (Lagna): <strong>" + escapeHtml(asc.signName) + "</strong> at " + asc.deg.toFixed(2) + "&deg;, lord " + escapeHtml(ascLord) +
+      (alp ? " in house " + alp.house + " (" + escapeHtml(alp.signName) + ")" : "") + ". Moon sign (Rashi): <strong>" + escapeHtml(moon.signName) +
+      "</strong>; birth-star <strong>" + escapeHtml(NAKSHATRAS[moonNk.index]) + "</strong> pada " + moonNk.pada + " (lord " + escapeHtml(NAK_LORDS[moonNk.index]) + "). Sun sign: <strong>" + escapeHtml(sun.signName) + "</strong> in house " + sun.house + ".</p>");
+    parts.push("<p>" + escapeHtml("Temperament is coloured by the " + asc.signName + " ascendant, the " + moon.signName + " Moon (the mind) and the " + sun.signName + " Sun (the will).") + "</p>");
+
+    var stack = [];
+    try { stack = findDashaStack(chart.vimshottari.timeline, new Date()); } catch (e) {}
+    if (stack.length) {
+      parts.push("<h2>Current direction (Vimshottari dasha)</h2>");
+      var line = stack.map(function (p, i) { return ["Maha", "Antar", "Praty", "Sookshma", "Prana"][i] + " " + p.lord; }).join(" &rarr; ");
+      parts.push("<p>Running period: <strong>" + line + "</strong>.</p>");
+      parts.push("<p>" + escapeHtml(stack[0].lord + " Mahadasha emphasises " + (VN_DASHA_THEME[stack[0].lord] || "its significations") + (stack[1] ? "; within it " + stack[1].lord + " brings " + (VN_DASHA_THEME[stack[1].lord] || "its themes") : "") + ".") + "</p>");
+    }
+
+    try {
+      var yogas = (typeof scanYogas === "function") ? scanYogas(chart) : [];
+      if (yogas && yogas.length) {
+        parts.push("<h2>Key yogas</h2><ul>" + yogas.slice(0, 6).map(function (y) { return "<li><strong>" + escapeHtml(y.name) + "</strong>" + (y.summary ? " — " + escapeHtml(y.summary) : "") + "</li>"; }).join("") + "</ul>");
+      }
+    } catch (e) {}
+
+    var m = vnManglik(chart), k = vnKaalSarp(chart), p2 = vnPitra(chart);
+    parts.push("<h2>Doshas</h2><ul>" +
+      "<li>Manglik / Mangal: <strong>" + escapeHtml(m.present ? m.severity : "Not present") + "</strong>" + (m.present ? " (affects " + escapeHtml(m.from.join(", ")) + ")" : "") + "</li>" +
+      "<li>Kaal Sarp: <strong>" + escapeHtml(k.present ? (k.type + " (Rahu in house " + k.rahuHouse + ")") : "Not present") + "</strong></li>" +
+      "<li>Pitra: <strong>" + escapeHtml(p2.present ? "Indicated" : "Not present") + "</strong></li></ul>");
+
+    var gemLord = SIGNS[asc.sign].lord, gem = (VN_GEM[gemLord] || ["-", "-", "-", "-"]);
+    parts.push("<h2>Remedial gemstone</h2><p>Life stone (Lagna lord " + escapeHtml(gemLord) + "): <strong>" + escapeHtml(gem[0]) + "</strong>, worn on " + escapeHtml(gem[1]) + " (" + escapeHtml(gem[2]) + "). Consult an astrologer before wearing a new gem.</p>");
+
+    try {
+      var ss = sadeSatiData(chart), now = Date.now(), cur = ss.periods.filter(function (r) { return r.start <= now && now <= r.end; })[0];
+      var up = ss.periods.filter(function (r) { return r.start > now; })[0];
+      parts.push("<h2>Sade Sati</h2><p>" + escapeHtml(cur ? "Currently in a Sade Sati period (" + vnMonthYear(cur.start) + " – " + vnMonthYear(cur.end) + ") — pace big moves and keep routines steady."
+        : (up ? "Not in Sade Sati now; the next runs " + vnMonthYear(up.start) + " – " + vnMonthYear(up.end) + "." : "Not in Sade Sati now.")) + "</p>");
+    } catch (e) {}
+    return parts.join("");
+  }
+  function lifeReportSection(chart, input) {
+    var nm = (input && (input.nativeName || input.name)) || "this chart";
+    var body = vnLifeReportBody(chart, input);
+    return '<section id="viewA-lifereport" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Consolidated</p><h3>Life Report</h3></div><span class="small-pill">Overview</span></div>' +
+      '<p class="fine-print">A single plain-language report pulling together identity, the running dasha, key yogas, doshas, a remedial gem and Sade Sati for ' + escapeHtml(nm) + '. Use the button to save it as a PDF.</p>' +
+      '<div class="vn-tool-actions" style="margin-bottom:10px"><button type="button" id="vnLifeReportPdf" class="primary-action vn-generate-btn">Save as PDF / Print</button></div>' +
+      '<div class="panel-box vn-reading" id="vnLifeReportBody">' + body + '</div>' +
+      vnInlineUsage("lifereport") + '</section>';
+  }
+  function wireLifeReportControls(chart, input) {
+    var btn = document.getElementById("vnLifeReportPdf");
+    if (!btn) return;
+    btn.addEventListener("click", function () {
+      var nm = (input && (input.nativeName || input.name)) || "Chart";
+      vnPrintHtml("VedNetra Life Report — " + nm, "<h1>VedNetra Life Report</h1><p class=\"muted\">" + escapeHtml(nm) + "</p>" + vnLifeReportBody(chart, input));
+    });
+  }
+
+  // ---- Yogini Dasha (36-year cycle) --------------------------------------
+  var VN_YOGINI = [
+    { name: "Mangala", years: 1, lord: "Moon", theme: "auspicious beginnings, comfort and emotional ease" },
+    { name: "Pingala", years: 2, lord: "Sun", theme: "effort, recognition, ego tests and dealings with authority" },
+    { name: "Dhanya", years: 3, lord: "Jupiter", theme: "wealth, wisdom, gains and good fortune" },
+    { name: "Bhramari", years: 4, lord: "Mars", theme: "movement, energy, travel and conflict" },
+    { name: "Bhadrika", years: 5, lord: "Mercury", theme: "intellect, communication, business and learning" },
+    { name: "Ulka", years: 6, lord: "Saturn", theme: "hard work, obstacles, delays and endurance" },
+    { name: "Siddha", years: 7, lord: "Venus", theme: "success, comforts, relationships and accomplishment" },
+    { name: "Sankata", years: 8, lord: "Rahu", theme: "crisis, upheaval, sudden change and caution" }
+  ];
+  function vnYoginiTimeline(chart) {
+    var moon = chart.planetsByName.Moon, nk = nakshatraInfo(moon.lon);
+    var nakNum = nk.index + 1;
+    var startOrder = (nakNum + 3) % 8; if (startOrder === 0) startOrder = 8; // 1..8
+    var startIdx = startOrder - 1;
+    var elapsedFraction = nk.within / NAK_SIZE;
+    var firstDur = VN_YOGINI[startIdx].years;
+    var start = addDays(chart.date, -elapsedFraction * firstDur * 365.25);
+    var periods = [], cur = start, guard = 0;
+    var endLimit = addDays(chart.date, 108 * 365.25);
+    while (cur < endLimit && guard < 60) {
+      var y = VN_YOGINI[(startIdx + guard) % 8];
+      var end = addDays(cur, y.years * 365.25);
+      periods.push({ name: y.name, lord: y.lord, theme: y.theme, start: cur, end: end });
+      cur = end; guard += 1;
+    }
+    return { periods: periods, birthYogini: VN_YOGINI[startIdx] };
+  }
+  function yoginiDashaSection(chart, input) {
+    var data;
+    try { data = vnYoginiTimeline(chart); }
+    catch (e) { return '<section id="viewA-yogini" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Dasha</p><h3>Yogini Dasha</h3></div></div><div class="panel-box"><p class="fine-print">Could not compute: ' + escapeHtml(e.message || "") + '</p></div></section>'; }
+    var now = Date.now();
+    var rows = data.periods.filter(function (p) { return p.end.getTime() > now - 20 * 365.25 * DAY_MS; }).slice(0, 24).map(function (p) {
+      var status = p.end.getTime() < now ? "Past" : (p.start.getTime() <= now && now < p.end.getTime() ? "Current" : "Upcoming");
+      return '<tr class="' + (status === "Current" ? "vn-bad" : "") + '"><td><strong>' + escapeHtml(p.name) + '</strong> (' + escapeHtml(p.lord) + ')</td><td>' +
+        vnFmtFullDate(p.start.getTime()) + ' – ' + vnFmtFullDate(p.end.getTime()) + '</td><td>' + status + '</td><td>' + escapeHtml(p.theme) + '</td></tr>';
+    }).join("");
+    var cur = data.periods.filter(function (p) { return p.start.getTime() <= now && now < p.end.getTime(); })[0];
+    var head = metricBox("Now", [
+      ["Birth Yogini", data.birthYogini.name + " (" + data.birthYogini.lord + ")"],
+      ["Running Yogini", cur ? (cur.name + " — " + cur.lord) : "-"],
+      ["Theme", cur ? cur.theme : "-"]
+    ]);
+    return '<section id="viewA-yogini" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Dasha</p><h3>Yogini Dasha</h3></div><span class="small-pill">36-year cycle</span></div>' +
+      '<p class="fine-print">An 8-fold dasha (Mangala…Sankata) totalling 36 years, seeded from your birth nakshatra. A useful second opinion alongside Vimshottari.</p>' +
+      head +
+      '<div class="panel-box"><h3>Yogini periods</h3><div class="table-wrap compact-table"><table><thead><tr><th>Yogini (lord)</th><th>Period</th><th>Status</th><th>Theme</th></tr></thead><tbody>' + rows + '</tbody></table></div></div>' +
+      vnInlineUsage("yogini") + '</section>';
+  }
+
+  // ---- Char Dasha (Jaimini, K.N. Rao convention) -------------------------
+  function vnCharDuration(rasi, lordSign) {
+    var odd = (rasi % 2 === 0); // index 0=Aries = 1st (odd) sign
+    var count = odd ? (((lordSign - rasi + 12) % 12) + 1) : (((rasi - lordSign + 12) % 12) + 1);
+    var dur = count - 1;
+    if (dur <= 0) dur = 12;
+    return dur;
+  }
+  function vnCharTimeline(chart) {
+    var lagna = chart.ascendant.sign;
+    var lagnaOdd = (lagna % 2 === 0);
+    // build the 12-rasi sequence from the lagna in its direction
+    var seq = [];
+    for (var i = 0; i < 12; i++) seq.push(lagnaOdd ? (lagna + i) % 12 : (lagna - i + 12) % 12);
+    var durs = seq.map(function (r) {
+      var lord = SIGNS[r].lord; var lp = chart.planetsByName[lord];
+      return vnCharDuration(r, lp ? lp.sign : r);
+    });
+    var periods = [], cur = chart.date, guard = 0, endLimit = addDays(chart.date, 108 * 365.25);
+    while (cur < endLimit && guard < 36) {
+      var idx = guard % 12, r2 = seq[idx], d = durs[idx];
+      var end = addDays(cur, d * 365.25);
+      periods.push({ sign: r2, years: d, start: cur, end: end, lord: SIGNS[r2].lord });
+      cur = end; guard += 1;
+    }
+    return { periods: periods, lagnaOdd: lagnaOdd };
+  }
+  function charDashaSection(chart, input) {
+    var data;
+    try { data = vnCharTimeline(chart); }
+    catch (e) { return '<section id="viewA-chardasha" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Jaimini</p><h3>Char Dasha</h3></div></div><div class="panel-box"><p class="fine-print">Could not compute: ' + escapeHtml(e.message || "") + '</p></div></section>'; }
+    var now = Date.now();
+    var rows = data.periods.filter(function (p) { return p.end.getTime() > now - 20 * 365.25 * DAY_MS; }).slice(0, 20).map(function (p) {
+      var status = p.end.getTime() < now ? "Past" : (p.start.getTime() <= now && now < p.end.getTime() ? "Current" : "Upcoming");
+      var lp = chart.planetsByName[p.lord];
+      var note = "Sign lord " + p.lord + (lp ? " in house " + lp.house + " (" + lp.signName + ")" : "");
+      return '<tr class="' + (status === "Current" ? "vn-bad" : "") + '"><td><strong>' + escapeHtml(SIGNS[p.sign].name) + '</strong></td><td>' + p.years + 'y</td><td>' +
+        vnFmtFullDate(p.start.getTime()) + ' – ' + vnFmtFullDate(p.end.getTime()) + '</td><td>' + status + '</td><td>' + escapeHtml(note) + '</td></tr>';
+    }).join("");
+    var cur = data.periods.filter(function (p) { return p.start.getTime() <= now && now < p.end.getTime(); })[0];
+    var head = metricBox("Now", [
+      ["Lagna", chart.ascendant.signName + " (" + (data.lagnaOdd ? "direct" : "reverse") + " progression)"],
+      ["Running rasi", cur ? SIGNS[cur.sign].name : "-"],
+      ["Rasi lord", cur ? cur.lord : "-"]
+    ]);
+    return '<section id="viewA-chardasha" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Jaimini</p><h3>Char Dasha</h3></div><span class="small-pill">Rasi dasha</span></div>' +
+      '<p class="fine-print">Jaimini Char dasha (K.N. Rao convention): the dasha rasi sequence runs from the Lagna, each rasi\'s length set by the distance to its lord. Scorpio uses Mars and Aquarius uses Saturn as lord.</p>' +
+      head +
+      '<div class="panel-box"><h3>Rasi dasha periods</h3><div class="table-wrap compact-table"><table><thead><tr><th>Rasi</th><th>Years</th><th>Period</th><th>Status</th><th>Note</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+      '<p class="fine-print">Read each rasi dasha through the planets placed in it and aspecting it, and through the placement of its lord (shown). Mahadasha level only.</p></div>' +
+      vnInlineUsage("chardasha") + '</section>';
+  }
+
+  // ---- Gochar (transit) predictions vs natal Moon ------------------------
+  var VN_GOCHAR_HOUSE = {
+    Jupiter: { 2: "growth in family, savings and speech", 5: "good for children, learning, romance and creativity", 7: "favourable for marriage, partnerships and travel", 9: "luck, dharma, higher learning and long journeys", 11: "strong gains, fulfilment of desires and new networks", other: "a quieter Jupiter phase — keep faith and effort steady" },
+    Saturn: { 3: "courage and effort pay off; gains through persistence", 6: "victory over enemies, debts and disease through discipline", 11: "steady, hard-won gains and recognition", 1: "Sade Sati — patience, health care and routine matter", 12: "Sade Sati begins — manage expenses, sleep and faraway matters", 2: "Sade Sati ends — rebuild finances and family stability", 4: "Kantaka/Ardha-ashtama — care for home, mother and peace of mind", 8: "Ashtama Shani — slow down, protect health and avoid risk", other: "a maturing Saturn phase — work steadily and avoid shortcuts" },
+    Rahu: { other: "Rahu stirs ambition and the unexpected — verify facts and avoid shortcuts" },
+    Ketu: { other: "Ketu brings detachment and review — good for research, less for new launches" }
+  };
+  function gocharSection(chart, input) {
+    var moonSign = chart.planetsByName.Moon.sign, ayKey = chart.ayanamshaKey;
+    var tr;
+    try { tr = vnTransitNowLon(ayKey); }
+    catch (e) { return '<section id="viewA-gochar" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Transits</p><h3>Gochar Predictions</h3></div></div><div class="panel-box"><p class="fine-print">Could not compute transits: ' + escapeHtml(e.message || "") + '</p></div></section>'; }
+    var bodies = ["Jupiter", "Saturn", "Rahu", "Ketu", "Sun", "Mars", "Venus", "Mercury"];
+    var rows = bodies.map(function (n) {
+      if (!Number.isFinite(tr[n])) return "";
+      var sign = signIndex(tr[n]), h = houseFromSign(moonSign, sign);
+      var tbl = VN_GOCHAR_HOUSE[n];
+      var pred = tbl ? (tbl[h] || tbl.other) : (h + "th from the Moon — colours that area of life");
+      return '<tr><td><strong>' + escapeHtml(n) + '</strong></td><td>' + escapeHtml(SIGNS[sign].name) + '</td><td>' + h + 'th</td><td>' + escapeHtml(pred) + '</td></tr>';
+    }).join("");
+    var satH = houseFromSign(moonSign, signIndex(tr.Saturn));
+    var sadeNote = ([12, 1, 2].indexOf(satH) >= 0) ? "Saturn is in your " + satH + "th from the Moon — you are in a Sade Sati phase; pace big commitments and protect health." :
+      (satH === 4 || satH === 8 ? "Saturn is in your " + satH + "th from the Moon — a Dhaiya (small panoti) phase; keep routines steady." : "Saturn is not in a Sade Sati position from the Moon right now.");
+    var head = metricBox("Now", [
+      ["Natal Moon sign", SIGNS[moonSign].name],
+      ["Jupiter", SIGNS[signIndex(tr.Jupiter)].name + " (" + houseFromSign(moonSign, signIndex(tr.Jupiter)) + "th)"],
+      ["Saturn", SIGNS[signIndex(tr.Saturn)].name + " (" + satH + "th)"]
+    ]);
+    return '<section id="viewA-gochar" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Transits</p><h3>Gochar Predictions</h3></div><span class="small-pill">From the Moon</span></div>' +
+      '<p class="fine-print">Plain-language transit guidance: where each planet is transiting counted from your natal Moon sign (' + escapeHtml(SIGNS[moonSign].name) + '), and what that tends to bring.</p>' +
+      head +
+      '<div class="panel-box vn-reading"><p>' + escapeHtml(sadeNote) + '</p></div>' +
+      '<div class="panel-box"><h3>Transits from the Moon</h3><div class="table-wrap compact-table"><table><thead><tr><th>Planet</th><th>Transit sign</th><th>From Moon</th><th>Effect</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+      '<p class="fine-print">Slow planets (Jupiter, Saturn, Rahu, Ketu) matter most for trend; the fast planets shade the current days. Combine with your dasha and the Rashifal card.</p></div>' +
+      vnInlineUsage("gochar") + '</section>';
+  }
+
+  // ---- Vrat & Parva calendar (next ~120 days) ----------------------------
+  var VN_SANKRANTI_NAME = ["Mesha", "Vrishabha", "Mithuna", "Karka", "Simha", "Kanya", "Tula", "Vrischika", "Dhanu", "Makara (Makar Sankranti)", "Kumbha", "Meena"];
+  function vnVratCalendar(chart, input) {
+    var ayKey = chart.ayanamshaKey, tz = vnChartTz(chart, input);
+    var targets = { 3: "Vinayaka Chaturthi", 10: "Ekadashi", 12: "Pradosh Vrat", 14: "Purnima (Full Moon)", 18: "Sankashti Chaturthi", 25: "Ekadashi", 27: "Pradosh Vrat", 29: "Amavasya (New Moon)" };
+    var events = [], seen = {};
+    var startMs = Date.now(), stepMs = 6 * 3600000, prevTithi = null, prevSun = null;
+    for (var t = startMs; t <= startMs + 120 * DAY_MS; t += stepMs) {
+      var jd = julianDay(new Date(t)), pls = computePlanets(jd), bn = {};
+      pls.forEach(function (p) { bn[p.name] = p.tropical; });
+      var elong = normalize(bn.Moon - bn.Sun), tithi = Math.floor(elong / 12);
+      var ay = ayanamshaValue(jd, ayKey), sunSign = signIndex(normalize(bn.Sun - ay));
+      if (prevTithi !== null && tithi !== prevTithi && targets[tithi]) {
+        var dKey = "t" + targets[tithi] + vnFmtLocalDate(t, tz);
+        if (!seen[dKey]) { seen[dKey] = 1; events.push({ ms: t, name: targets[tithi], kind: "tithi" }); }
+      }
+      if (prevSun !== null && sunSign !== prevSun) {
+        var sKey = "s" + sunSign + vnFmtLocalDate(t, tz);
+        if (!seen[sKey]) { seen[sKey] = 1; events.push({ ms: t, name: "Sankranti — Sun enters " + VN_SANKRANTI_NAME[sunSign], kind: "sankranti" }); }
+      }
+      prevTithi = tithi; prevSun = sunSign;
+    }
+    events.sort(function (a, b) { return a.ms - b.ms; });
+    return events;
+  }
+  function vratCalendarSection(chart, input) {
+    var events;
+    try { events = vnVratCalendar(chart, input); }
+    catch (e) { return '<section id="viewA-vrat" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Panchang</p><h3>Vrat &amp; Parva</h3></div></div><div class="panel-box"><p class="fine-print">Could not compute: ' + escapeHtml(e.message || "") + '</p></div></section>'; }
+    var tz = vnChartTz(chart, input);
+    var rows = events.map(function (ev) {
+      return '<tr><td>' + vnFmtLocalDate(ev.ms, tz) + '</td><td><strong>' + escapeHtml(ev.name) + '</strong></td></tr>';
+    }).join("");
+    if (!rows) rows = '<tr><td colspan="2" class="fine-print">No events found in the scan window.</td></tr>';
+    return '<section id="viewA-vrat" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Panchang</p><h3>Vrat &amp; Parva Calendar</h3></div><span class="small-pill">Next 120 days</span></div>' +
+      '<p class="fine-print">Upcoming fasting and festival days computed from the tithi and Sun ingress — Ekadashi, Pradosh, Purnima, Amavasya, Chaturthi and Sankranti — for the chart\'s timezone (UTC' + (tz >= 0 ? "+" : "") + tz + ').</p>' +
+      '<div class="panel-box"><h3>Upcoming vrat &amp; parva</h3><div class="table-wrap compact-table"><table><thead><tr><th>Date</th><th>Observance</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+      '<p class="fine-print">Dates use the prevailing tithi and are approximate (tithi can shift by region and sunrise rule). For ritual timing confirm with a local panchang.</p></div>' +
+      vnInlineUsage("vrat") + '</section>';
   }
 
   var coreApi = {
