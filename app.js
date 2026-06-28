@@ -15489,11 +15489,30 @@
       '<label>Matter<select class="vnRecEvMatter">' + vnMatterOptions(matterKey) + '</select></label></div>';
   }
   var VN_RECT_DASHA_W = { MD: 3, AD: 2, PD: 1 };
+  // significator houses of a planet in a divisional chart (occupancy + ownership)
+  function vnVargaPlanetHouses(chart, planetName, division) {
+    var pl = chart.planetsByName[planetName];
+    if (!pl) return [];
+    var ascSign = vargaSign(chart.ascendant.lon, division);
+    var pSign = vargaSign(pl.lon, division);
+    var houses = [houseFromSign(ascSign, pSign)];
+    for (var s = 0; s < 12; s++) { if (SIGNS[s].lord === planetName) { var h = houseFromSign(ascSign, s); if (houses.indexOf(h) < 0) houses.push(h); } }
+    return houses;
+  }
+  // which natural benefics support a matter's houses in the navamsa (D-9)
+  function vnNavamsaSupport(cand, matter) {
+    var benefics = ["Jupiter", "Venus", "Mercury", "Moon"], hit = [];
+    benefics.forEach(function (n) {
+      var hs = vnVargaPlanetHouses(cand, n, 9);
+      if (hs.some(function (h) { return matter.good.indexOf(h) >= 0; })) hit.push(n);
+    });
+    return hit;
+  }
   function vnRectScoreEvent(cand, ev, tz) {
     var matter = VN_MATTERS[ev.matterKey] || VN_MATTERS.marriage;
     var evInstant = localDateTimeToUtc(ev.date, "12:00:00", tz);
     var stack = findDashaStack(cand.vimshottari.timeline, evInstant);
-    var labels = ["MD", "AD", "PD"], dasha = [], dScore = 0;
+    var labels = ["MD", "AD", "PD"], dasha = [], dScore = 0, agreement = [], aScore = 0;
     stack.slice(0, 3).forEach(function (p, i) {
       if (!p) return;
       var ls = vnLinkScore(cand, p.lord, matter);
@@ -15501,29 +15520,36 @@
       dScore += w * ls.net;
       var good = ls.houses.filter(function (h) { return matter.good.indexOf(h) >= 0; });
       if (good.length) dasha.push(labels[i] + " " + p.lord + " (" + good.join(",") + ")");
+      // dasha lord must be activated by transit (KP principle): is it transiting a good house?
+      if (i < 2 && ev._trAll && ev._trAll[p.lord] != null) {
+        var th = houseFromSign(cand.ascendant.sign, ev._trAll[p.lord]);
+        if (matter.good.indexOf(th) >= 0) { aScore += (i === 0 ? 2 : 1); agreement.push(labels[i] + " " + p.lord + "→" + th); }
+      }
     });
     var transit = [], tScore = 0;
     ["Jupiter", "Saturn", "Rahu"].forEach(function (n) {
-      if (ev._tr == null || ev._tr[n] == null) return;
-      var h = houseFromSign(cand.ascendant.sign, ev._tr[n]);
+      if (ev._trAll == null || ev._trAll[n] == null) return;
+      var h = houseFromSign(cand.ascendant.sign, ev._trAll[n]);
       if (matter.good.indexOf(h) >= 0) { tScore += (n === "Jupiter" ? 2 : 1.5); transit.push(n + "→" + h); }
     });
-    return { matter: matter, score: dScore + tScore, dasha: dasha, transit: transit };
+    return { matter: matter, score: dScore + tScore + aScore, dasha: dasha, transit: transit, agreement: agreement };
   }
   function rectifyPanelHtml(opts, natalChart, input) {
     var events = opts.events.filter(function (e) { return e.date; });
     if (!events.length) return '<div class="panel-box"><p class="fine-print">Add at least one dated life event (date + matter) to run rectification.</p></div>';
     var tz = natalChart.timezone, ayKey = natalChart.ayanamshaKey;
-    // Pre-compute transit signs of the slow planets on each event date (independent of birth time).
+    // Pre-compute every planet's transit sign on each event date (independent of birth time).
     events.forEach(function (ev) {
-      ev._tr = {};
+      ev._trAll = {};
       try {
         var jd = julianDay(localDateTimeToUtc(ev.date, "12:00:00", tz));
         var ay = ayanamshaValue(jd, ayKey);
-        var pl = computePlanets(jd);
-        ["Jupiter", "Saturn", "Rahu"].forEach(function (n) { var p = pl.filter(function (x) { return x.name === n; })[0]; if (p) ev._tr[n] = signIndex(normalize(p.tropical - ay)); });
+        computePlanets(jd).forEach(function (p) { ev._trAll[p.name] = signIndex(normalize(p.tropical - ay)); });
       } catch (e) {}
     });
+    var matters = {};
+    events.forEach(function (e) { matters[e.matterKey] = VN_MATTERS[e.matterKey] || VN_MATTERS.marriage; });
+    var matterKeys = Object.keys(matters);
     var baseTime = opts.recTime.split(":").map(Number);
     var baseMin = (baseTime[0] || 0) * 60 + (baseTime[1] || 0) + (baseTime[2] || 0) / 60;
     var candidates = [];
@@ -15535,15 +15561,21 @@
       var instant = localDateTimeToUtc(input.birthDate, timeStr, tz);
       var cand = buildChart(instant, natalChart.latitude, natalChart.longitude, tz, { ayanamshaKey: ayKey });
       var detail = events.map(function (ev) { return vnRectScoreEvent(cand, ev, tz); });
-      var total = detail.reduce(function (s, d) { return s + d.score; }, 0);
-      return { time: vnPad2(hh) + ":" + vnPad2(mm), lagna: cand.ascendant.signName, lagnaDeg: cand.ascendant.deg, moonNak: cand.planetsByName.Moon.nakshatra, total: total, detail: detail };
+      var eventTotal = detail.reduce(function (s, d) { return s + d.score; }, 0);
+      // structural: navamsa (D-9) promise per unique matter
+      var nav = matterKeys.map(function (k) { var sup = vnNavamsaSupport(cand, matters[k]); return { label: matters[k].label, support: sup }; });
+      var navTotal = nav.reduce(function (s, n) { return s + (n.support.length ? 1.5 : 0); }, 0);
+      // Lagna fitness: penalise sign-junction (sandhi) births
+      var deg = cand.ascendant.deg, sandhi = deg < 1 || deg > 29;
+      var total = eventTotal + navTotal - (sandhi ? 1 : 0);
+      return { time: vnPad2(hh) + ":" + vnPad2(mm), lagna: cand.ascendant.signName, lagnaDeg: deg, moonNak: cand.planetsByName.Moon.nakshatra, total: total, detail: detail, nav: nav, sandhi: sandhi };
     });
     var sorted = results.slice().sort(function (a, b) { return b.total - a.total; });
     var best = sorted[0], second = sorted[1] || best;
     var margin = best.total - second.total;
     var confidence = margin >= 6 ? "High" : (margin >= 3 ? "Medium" : "Low");
     var suggestBox = '<div class="panel-box vn-verdict vn-good"><h3>Suggested birth time</h3><p class="vn-verdict-big">' + escapeHtml(best.time) + '</p>' +
-      '<p class="fine-print">Lagna ' + escapeHtml(best.lagna) + " " + best.lagnaDeg.toFixed(2) + '° &middot; Moon nakshatra ' + escapeHtml(best.moonNak) + '<br>Score ' + best.total + ' across ' + events.length + ' event(s) &middot; confidence <strong>' + confidence + '</strong> (margin ' + margin.toFixed(1) + ' over runner-up ' + escapeHtml(second.time) + ')</p></div>';
+      '<p class="fine-print">Lagna ' + escapeHtml(best.lagna) + " " + best.lagnaDeg.toFixed(2) + '° &middot; Moon nakshatra ' + escapeHtml(best.moonNak) + '<br>Score ' + best.total.toFixed(1) + ' across ' + events.length + ' event(s) &middot; confidence <strong>' + confidence + '</strong> (margin ' + margin.toFixed(1) + ' over ' + escapeHtml(second.time) + ')' + (best.sandhi ? '<br><strong>Note:</strong> ascendant near a sign junction — verify carefully.' : '') + '</p></div>';
     var topN = sorted.slice(0, 15);
     var rankRows = topN.map(function (r) {
       var cls = r.time === best.time ? "vn-good" : "";
@@ -15551,24 +15583,40 @@
     }).join("");
     var rankBox = '<div class="panel-box"><h3>Candidate ranking</h3><div class="table-wrap compact-table"><table><thead><tr><th>Time</th><th>Lagna</th><th>Score</th></tr></thead><tbody>' + rankRows + '</tbody></table></div>' +
       (sorted.length > topN.length ? '<p class="fine-print">Showing top ' + topN.length + ' of ' + sorted.length + ' candidates.</p>' : '') + '</div>';
-    // per-event breakdown for the winning time
     var evRows = events.map(function (ev, i) {
       var d = best.detail[i];
       return '<tr><td><strong>' + escapeHtml(ev.date) + '</strong><br><span class="fine-print">' + escapeHtml(d.matter.label) + '</span></td>' +
         '<td>' + (d.dasha.length ? escapeHtml(d.dasha.join("; ")) : "<span class=\"fine-print\">no strong link</span>") + '</td>' +
         '<td>' + (d.transit.length ? escapeHtml(d.transit.join(", ")) : "—") + '</td>' +
+        '<td>' + (d.agreement.length ? escapeHtml(d.agreement.join(", ")) : "—") + '</td>' +
         '<td>' + d.score.toFixed(1) + '</td></tr>';
     }).join("");
-    var evBox = '<div class="panel-box"><h3>Why this time — event by event</h3><div class="table-wrap compact-table"><table><thead><tr><th>Event</th><th>Dasha lords signifying the houses</th><th>Transit hits</th><th>Score</th></tr></thead><tbody>' + evRows + '</tbody></table></div>' +
-      '<p class="fine-print">Dasha lords are shown with the favourable houses they signify at the candidate Lagna; transit hits show slow planets activating those houses on the event date.</p></div>';
-    var methodBox = '<div class="panel-box vn-usage"><h3>Methodology</h3><ol>' +
-      '<li>Every candidate time in your window (recorded time ± ' + opts.span + ' min, step ' + opts.step + ' min) is cast as a full chart.</li>' +
-      '<li><strong>Dasha test:</strong> on each event date the running Vimshottari lords are weighed — Mahadasha ×3, Antardasha ×2, Pratyantardasha ×1 — as significators of that event’s houses (by occupancy, ownership and star-lord). Favourable houses add, adverse houses subtract.</li>' +
-      '<li><strong>Transit test:</strong> slow planets transiting the event’s houses from the candidate Lagna on the event date add activation points (Jupiter ×2, Saturn and Rahu ×1.5).</li>' +
-      '<li>Scores are summed over all events. The Lagna that best “lights up” your real events ranks first.</li>' +
-      '<li><strong>Confidence</strong> reflects the winning margin over the runner-up. Add more events and use a finer step (1–2 min) to sharpen it.</li>' +
-      '</ol><p class="fine-print">Houses use whole-sign significators; results are only as good as the accuracy of your event dates. Always sanity-check the suggested Lagna against physical appearance and known traits before finalising.</p></div>';
-    return '<div class="report-grid two">' + suggestBox + rankBox + '</div>' + evBox + methodBox;
+    var evBox = '<div class="panel-box"><h3>Why this time — event by event</h3><div class="table-wrap compact-table"><table><thead><tr><th>Event</th><th>Dasha significators</th><th>Transit triggers</th><th>Dasha–transit agreement</th><th>Score</th></tr></thead><tbody>' + evRows + '</tbody></table></div>' +
+      '<p class="fine-print">Dasha significators = running lords that signify the event’s houses at this Lagna. Transit triggers = slow planets over those houses on the date. Agreement = the dasha lord is itself transiting one of those houses (the strongest timing signal).</p></div>';
+    var navRows = best.nav.map(function (n) {
+      return '<tr><td><strong>' + escapeHtml(n.label) + '</strong></td><td>' + (n.support.length ? escapeHtml(n.support.join(", ")) : "<span class=\"fine-print\">no benefic support</span>") + '</td></tr>';
+    }).join("");
+    var structBox = '<div class="panel-box"><h3>Structural support (Navamsa &amp; Lagna fitness)</h3>' +
+      '<div class="table-wrap compact-table"><table><thead><tr><th>Matter</th><th>D-9 benefics supporting it</th></tr></thead><tbody>' + navRows + '</tbody></table></div>' +
+      '<p class="fine-print">Navamsa (D-9) shows whether each life area is actually <em>promised</em> in the chart. Lagna fitness: ascendant at ' + best.lagnaDeg.toFixed(2) + '° — ' + (best.sandhi ? 'near a sign junction (sandhi), so a small shift may change the rising sign; verify closely.' : 'comfortably inside the sign.') + '</p></div>';
+    var methodBox = '<div class="panel-box vn-usage"><h3>Methodology — how this rectifies</h3>' +
+      '<p class="fine-print">Birth-time rectification finds the Lagna (and its degree) that makes your <em>actual</em> life events line up with the chart\'s timing and promise. VedNetra tests every candidate time in your window against several independent techniques and scores the agreement:</p><ol>' +
+      '<li><strong>Candidate sweep.</strong> Each time from recorded ± ' + opts.span + ' min (step ' + opts.step + ' min) is cast as a full chart, fixing the Lagna and house framework.</li>' +
+      '<li><strong>Dasha correlation (Vimshottari).</strong> On each event date the running Mahadasha (×3), Antardasha (×2) and Pratyantardasha (×1) lords are tested as significators of that event’s houses — by occupancy, ownership and star-lord. Favourable houses add, adverse subtract.</li>' +
+      '<li><strong>Transit triggers (gochar).</strong> Slow planets transiting the event’s houses from the candidate Lagna on the event date add activation points (Jupiter ×2; Saturn, Rahu ×1.5).</li>' +
+      '<li><strong>Dasha–transit agreement.</strong> When the running dasha lord is <em>itself</em> transiting one of the event’s houses, the timing is doubly confirmed (Mahadasha lord ×2, Antardasha lord ×1) — the single strongest signal.</li>' +
+      '<li><strong>Divisional confirmation (Navamsa D-9).</strong> Each life area must be <em>promised</em> in the chart: benefic support of the matter’s houses in the D-9 adds structural points, so a Lagna that only "fits" by transit but lacks the promise is down-weighted.</li>' +
+      '<li><strong>Lagna fitness.</strong> Births with the ascendant at a sign junction (sandhi, within 1°) are flagged and lightly penalised, since a tiny error there flips the whole chart.</li>' +
+      '<li><strong>Scoring &amp; confidence.</strong> All techniques are summed per candidate; the best Lagna ranks first, and confidence reflects its margin over the runner-up.</li>' +
+      '</ol></div>';
+    var verifyBox = '<div class="panel-box vn-usage"><h3>Finish the rectification manually</h3><ul>' +
+      '<li>Match the suggested Lagna against the <strong>Physical Appearance</strong> and <strong>Nature</strong> cards — the body and temperament should fit.</li>' +
+      '<li>Add more dated events (childhood illness, accidents, a parent’s death, property, promotions) — convergence across many events is the real proof.</li>' +
+      '<li>Cross-check with <strong>KP cuspal sub-lords and ruling planets</strong> at a precisely-timed event for the final 1–2 minutes.</li>' +
+      '<li>Re-run with a <strong>1-minute step</strong> around the top candidate, then confirm the Moon’s nakshatra/pada and the D-9 Lagna look right.</li>' +
+      '<li>Whole-sign significators and noon-dated events are used here, so treat the result as a strong shortlist, not a final verdict.</li>' +
+      '</ul></div>';
+    return '<div class="report-grid two">' + suggestBox + rankBox + '</div>' + evBox + structBox + methodBox + verifyBox;
   }
   function wireRectifyControls(chart, input) {
     var addBtn = document.getElementById("vnRecAddBtn");
