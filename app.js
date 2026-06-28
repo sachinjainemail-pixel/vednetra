@@ -14773,8 +14773,9 @@
       lat = VN_GEO.lat; lon = VN_GEO.lon; tz = VN_GEO.tz; place = VN_GEO.place || "Current location";
     }
     return {
-      date: input.asOfDate || dateInputValue(now, tz),
-      time: normalizeTimeInput(input.asOfTime || timeInputValue(now, tz)),
+      // always default the tool inputs to the current date and time
+      date: dateInputValue(now, tz),
+      time: normalizeTimeInput(timeInputValue(now, tz)),
       place: place,
       timezone: tz,
       latitude: lat,
