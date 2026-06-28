@@ -13,7 +13,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.svg">
-  <link rel="stylesheet" href="styles.css?v=40">
+  <link rel="stylesheet" href="styles.css?v=41">
 </head>
 <body>
   <main class="shell">
@@ -33,7 +33,7 @@
           <div>
             <h1 class="brand-title">VedNetra</h1>
           </div>
-          <span class="status-pill">v1.40</span>
+          <span class="status-pill">v1.41</span>
         </div>
 
         <form id="birthForm" autocomplete="off">
@@ -299,6 +299,17 @@
               <button type="button" data-view-a-target="viewA-predictive">Predictive</button>
             </div>
           </div>
+          <div class="nav-category">
+            <button type="button" class="nav-category-title" data-nav-category-toggle aria-expanded="false">Reports &amp; Remedies</button>
+            <div class="nav-category-actions">
+              <button type="button" data-view-a-target="viewA-rashifal">Rashifal</button>
+              <button type="button" data-view-a-target="viewA-doshas">Doshas</button>
+              <button type="button" data-view-a-target="viewA-gems">Gemstones</button>
+              <button type="button" data-view-a-target="viewA-loshu">Lo Shu Grid</button>
+              <button type="button" data-view-a-target="viewA-babynames">Baby Names</button>
+              <button type="button" data-view-a-target="viewA-quickcalc">Quick Calculators</button>
+            </div>
+          </div>
           <button type="button" id="mobileHomeBtn" class="mobile-home-btn" aria-label="Back to start screen">&#x2302; Home</button>
           <label class="mobile-drilldown-label">Section
             <select id="chartDataNavSelect" class="mobile-drilldown-select" aria-label="Select View A section">
@@ -358,6 +369,14 @@
                 <option value="viewA-faq-pillars">Query Pillars</option>
                 <option value="viewA-predictive">Predictive</option>
               </optgroup>
+              <optgroup label="Reports &amp; Remedies">
+                <option value="viewA-rashifal">Rashifal</option>
+                <option value="viewA-doshas">Doshas</option>
+                <option value="viewA-gems">Gemstones</option>
+                <option value="viewA-loshu">Lo Shu Grid</option>
+                <option value="viewA-babynames">Baby Names</option>
+                <option value="viewA-quickcalc">Quick Calculators</option>
+              </optgroup>
             </select>
           </label>
         </div>
@@ -388,7 +407,7 @@
           </div>
           <p class="empty-state-tagline">A complete Vedic workbench: divisional charts (D-1 to D-60), Vimshottari dasha, Shadbala, Ashtakavarga, KP, Jaimini and Varshfal — plus a daily dashboard, muhurta windows, numerology, card readings and more. Pick anything below to jump straight in.</p>
           <div id="vnHomeShowcase" class="vn-home-showcase"></div>
-          <p class="empty-state-version" id="appVersionLabel">Version 1.40</p>
+          <p class="empty-state-version" id="appVersionLabel">Version 1.41</p>
         </div>
         <article id="report" class="report hidden"></article>
       </section>
@@ -495,6 +514,6 @@
       </div>
     </div>
   </main>
-  <script src="app.js?v=40"></script>
+  <script src="app.js?v=41"></script>
 </body>
 </html>

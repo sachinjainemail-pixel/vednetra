@@ -5550,6 +5550,12 @@
       { id: "viewA-appearance",     immediate: true, render: function () { return appearanceSection(chart, input); } },
       { id: "viewA-nature",         immediate: true, render: function () { return natureSection(chart, input); } },
       { id: "viewA-nakshatra",      immediate: true, render: function () { return nakshatraPadaSection(chart, input); } },
+      { id: "viewA-doshas",         immediate: true, render: function () { return doshasSection(chart, input); } },
+      { id: "viewA-gems",           immediate: true, render: function () { return gemstonesSection(chart, input); } },
+      { id: "viewA-rashifal",       immediate: true, render: function () { return rashifalSection(chart, input); } },
+      { id: "viewA-loshu",          immediate: true, render: function () { return loShuSection(chart, input); } },
+      { id: "viewA-babynames",      immediate: true, render: function () { return babyNamesSection(chart, input); } },
+      { id: "viewA-quickcalc",      immediate: true, render: function () { return quickCalcSection(chart, input); } },
       { id: "viewA-num-compat",     immediate: true, render: function () { return numCompatSection(chart, input); }, wire: function () { wireNumCompatControls(chart, input); } },
       { id: "viewA-cards",          immediate: true, render: function () { return cardsSection(chart, input); }, wire: function () { wireCardsControls(chart, input); } },
       { id: "viewA-sadesati",       label: "Sade Sati", render: function () { return sadeSatiSection(chart, input); } },
@@ -14887,6 +14893,36 @@
       { u: "Use as a tie-breaker during birth-time rectification.", e: "If two times give different risings, pick the one matching appearance." },
       { u: "Understand constitution for health and lifestyle choices.", e: "A delicate-constitution note → prioritise routine and rest." }
     ],
+    doshas: [
+      { u: "Check before marriage whether Manglik matching is needed.", e: "Strong Manglik → match with another Manglik or apply remedies first." },
+      { u: "Understand recurring obstacles via Kaal Sarp / Pitra dosha.", e: "Kaal Sarp present → do the named Rahu/Ketu remedies before big launches." },
+      { u: "Act on the remedies listed for any present dosha.", e: "Pitra dosha → perform Tarpan on Amavasya and serve elders." }
+    ],
+    gems: [
+      { u: "Strengthen weak but important planets with the life stone.", e: "Libra Lagna → Venus → Diamond/White Sapphire as the life stone." },
+      { u: "Use the mantra and wearing day for the chosen gem.", e: "Yellow Sapphire → wear Thursday, index finger, chant the Jupiter beej." },
+      { u: "Support the running Mahadasha planet for current results.", e: "In a Saturn dasha, a tested Blue Sapphire (after trial) can steady things." }
+    ],
+    rashifal: [
+      { u: "Read the day/week/month/year guidance for your Moon sign.", e: "A favourable Jupiter month → push for gains, family and learning." },
+      { u: "Time effort by the transit tone.", e: "Sade-Sati note → keep routines tight and avoid risky new ventures." },
+      { u: "Combine with the Today and Muhurta cards for daily action.", e: "Good yearly tone + a good Choghadiya now → act today." }
+    ],
+    loshu: [
+      { u: "See your strengths (repeated numbers) and gaps (missing).", e: "Many 1s (Sun) → strong will; missing 6 (Venus) → cultivate relationships/arts." },
+      { u: "Work on missing-number areas through their planet.", e: "Missing 5 (Mercury) → practise communication and learning." },
+      { u: "Pair with the Numerology card for the full picture.", e: "Mulank + Lo Shu together describe temperament and balance." }
+    ],
+    babynames: [
+      { u: "Pick a name starting with the birth-star's auspicious syllable.", e: "Rohini pada 2 → start the name with “Va”." },
+      { u: "Any of the nakshatra's four syllables is acceptable if needed.", e: "Choose another pada syllable when the exact one is hard to use." },
+      { u: "Use alongside numerology for an auspicious name number.", e: "Tune spelling so the name number is a friendly 5 or 6." }
+    ],
+    quickcalc: [
+      { u: "Get the chart's headline facts instantly.", e: "Confirm Moon sign and birth-star before reading a daily horoscope." },
+      { u: "Verify the ayanamsha and Lagna used.", e: "Cross-check the ascendant degree when comparing software." },
+      { u: "Hand these basics to anyone reading your chart.", e: "Share Lagna, Rashi and Nakshatra quickly." }
+    ],
     nakshatra: [
       { u: "See the flavour each planet takes from its nakshatra.", e: "Mars in Krittika → courage expressed as sharp, cutting drive." },
       { u: "Know when a planet's results ripen — its nakshatra-lord dasha.", e: "Venus in Bharani (lord Venus) → marriage/comfort themes peak in Venus periods." },
@@ -16170,6 +16206,14 @@
       { id: "viewA-predictive", label: "Predictive Analysis", desc: "Topic-wise predictions for the chart." },
       { id: "viewA-faq-pillars", label: "Query Pillars", desc: "Structured question analysis." }
     ] },
+    { title: "Reports & Remedies", items: [
+      { id: "viewA-rashifal", label: "Rashifal", desc: "Daily/weekly/monthly/yearly Moon-sign horoscope." },
+      { id: "viewA-doshas", label: "Dosha Analysis", desc: "Manglik, Kaal Sarp and Pitra dosha with remedies." },
+      { id: "viewA-gems", label: "Gemstones & Remedies", desc: "Gemstones, mantras and days for your planets." },
+      { id: "viewA-loshu", label: "Lo Shu Grid", desc: "Numerology grid from your date of birth." },
+      { id: "viewA-babynames", label: "Baby Names", desc: "Auspicious name syllables from the birth-star." },
+      { id: "viewA-quickcalc", label: "Quick Calculators", desc: "Moon/Sun sign, ascendant, nakshatra at a glance." }
+    ] },
     { title: "Workspace", items: [
       { id: "viewA-summary", label: "Summary", desc: "A snapshot of the whole chart." },
       { id: "viewA-worksheets", label: "Worksheets", desc: "Editable working notes." },
@@ -16366,6 +16410,204 @@
       if (Math.abs(dx) < 80 || Math.abs(dx) < Math.abs(dy) * 2) return; // clear horizontal swipe only
       if (dx > 0) vnSwipeBack(); else vnSwipeForward();
     }, { passive: true });
+  }
+
+  // ===========================================================================
+  // Tier-1 consumer cards: Doshas, Gemstones & Remedies, Rashifal, Lo Shu Grid,
+  // Baby Names, Quick Calculators. All natal-derived, client-side.
+  // ===========================================================================
+  function vnHouseFromTo(fromHouse, toHouse) { return ((toHouse - fromHouse) % 12 + 12) % 12 + 1; }
+  function vnTransitNowLon(ayKey) {
+    var jd = julianDay(new Date()), ay = ayanamshaValue(jd, ayKey), out = {};
+    computePlanets(jd).forEach(function (p) { out[p.name] = normalize(p.tropical - ay); });
+    return out;
+  }
+
+  // ---- Doshas: Manglik, Kaal Sarp, Pitra ---------------------------------
+  function vnManglik(chart) {
+    var mars = chart.planetsByName.Mars, doshaHouses = [1, 2, 4, 7, 8, 12], from = [];
+    [["Lagna", chart.ascendant.sign], ["Moon", chart.planetsByName.Moon.sign], ["Venus", chart.planetsByName.Venus.sign]].forEach(function (r) {
+      var h = houseFromSign(r[1], mars.sign);
+      if (doshaHouses.indexOf(h) >= 0) from.push(r[0] + " (house " + h + ")");
+    });
+    var cancels = [];
+    if (["Aries", "Scorpio", "Capricorn"].indexOf(mars.signName) >= 0) cancels.push("Mars is in its own/exalted sign (" + mars.signName + "), which greatly reduces the dosha.");
+    var jup = chart.planetsByName.Jupiter;
+    if (jup.house === mars.house) cancels.push("Jupiter is conjunct Mars, mitigating the dosha.");
+    else if ([5, 7, 9].indexOf(vnHouseFromTo(jup.house, mars.house)) >= 0) cancels.push("Jupiter aspects Mars, mitigating the dosha.");
+    var sev = from.length >= 3 ? "Strong" : (from.length === 2 ? "Moderate" : (from.length === 1 ? "Mild" : "None"));
+    if (from.length && cancels.length) sev = "Reduced (" + sev.toLowerCase() + ")";
+    return { present: from.length > 0, from: from, cancels: cancels, severity: sev, marsHouse: mars.house };
+  }
+  var VN_KSARP_TYPES = { 1: "Anant", 2: "Kulik", 3: "Vasuki", 4: "Shankhapal", 5: "Padma", 6: "Mahapadma", 7: "Takshak", 8: "Karkotak", 9: "Shankhachud", 10: "Ghatak", 11: "Vishdhar", 12: "Sheshnag" };
+  function vnKaalSarp(chart) {
+    var rahu = chart.planetsByName.Rahu.lon, planets = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
+    var allFwd = true, allRev = true, nearAxis = false;
+    planets.forEach(function (n) {
+      var d = ((chart.planetsByName[n].lon - rahu) % 360 + 360) % 360;
+      if (!(d > 0 && d < 180)) allFwd = false;
+      if (!(d > 180 && d < 360)) allRev = false;
+      if (d < 6 || d > 354 || Math.abs(d - 180) < 6) nearAxis = true;
+    });
+    var present = allFwd || allRev;
+    var rh = chart.planetsByName.Rahu.house;
+    return { present: present, partial: present && nearAxis, type: VN_KSARP_TYPES[rh] || "", rahuHouse: rh, reversed: allRev && !allFwd };
+  }
+  function vnPitra(chart) {
+    var reasons = [], malefics = ["Rahu", "Ketu", "Saturn"];
+    function houseOf(n) { return chart.planetsByName[n].house; }
+    malefics.forEach(function (m) { if (houseOf("Sun") === houseOf(m)) reasons.push("Sun conjunct " + m + " (afflicted father-significator)."); });
+    malefics.forEach(function (m) { if (houseOf("Moon") === houseOf(m)) reasons.push("Moon conjunct " + m + " (afflicted mind/mother)."); });
+    ["Rahu", "Ketu", "Saturn"].forEach(function (m) { if (houseOf(m) === 9) reasons.push(m + " in the 9th house (house of father/ancestors)."); });
+    var ninthLord = SIGNS[(chart.ascendant.sign + 8) % 12].lord, nl = chart.planetsByName[ninthLord];
+    ["Rahu", "Ketu", "Saturn"].forEach(function (m) { if (nl.house === houseOf(m)) reasons.push("9th lord " + ninthLord + " conjunct " + m + "."); });
+    return { present: reasons.length > 0, reasons: reasons, ninthLord: ninthLord };
+  }
+  function doshasSection(chart, input) {
+    var m = vnManglik(chart), k = vnKaalSarp(chart), p = vnPitra(chart);
+    function box(title, present, presentTxt, rows, remedy) {
+      var cls = present ? "vn-bad" : "vn-good";
+      return '<div class="panel-box vn-verdict ' + cls + '" style="text-align:left"><h3>' + escapeHtml(title) + '</h3>' +
+        '<p class="vn-verdict-big" style="font-size:20px">' + (present ? "Present" : "Not present") + '</p>' +
+        '<p class="fine-print">' + escapeHtml(presentTxt) + '</p>' +
+        (rows && rows.length ? '<ul class="vn-usage-list">' + rows.map(function (r) { return "<li>" + escapeHtml(r) + "</li>"; }).join("") + '</ul>' : '') +
+        (present && remedy ? '<p class="fine-print"><strong>Remedy:</strong> ' + escapeHtml(remedy) + '</p>' : '') + '</div>';
+    }
+    var mBox = box("Manglik / Mangal Dosha", m.present, m.present ? ("Severity: " + m.severity + ". Mars affects: " + m.from.join(", ") + ".") : "Mars does not fall in 1/2/4/7/8/12 from Lagna, Moon or Venus.", m.cancels, "Worship Hanuman, recite Hanuman Chalisa on Tuesdays; marrying another Manglik neutralises it.");
+    var kBox = box("Kaal Sarp Dosha", k.present, k.present ? (k.type + " Kaal Sarp" + (k.partial ? " (partial — a planet sits near the Rahu/Ketu axis)" : "") + ", with Rahu in house " + k.rahuHouse + ".") : "Planets are not all hemmed between Rahu and Ketu.", [], "Rahu/Ketu and Maha Mrityunjaya remedies; pilgrimage to Trimbakeshwar/Kalahasti.");
+    var pBox = box("Pitra Dosha", p.present, p.present ? "Afflictions involving the luminaries / 9th house indicate ancestral karma." : "No major affliction of the luminaries or 9th house.", p.reasons, "Offer Shraddha/Tarpan to ancestors; serve elders and feed crows/Brahmins on Amavasya.");
+    return '<section id="viewA-doshas" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Doshas</p><h3>Dosha Analysis</h3></div><span class="small-pill">Summary</span></div>' +
+      '<p class="fine-print">Manglik (Mangal), Kaal Sarp and Pitra dosha checks with severity, cancellations and remedies.</p>' +
+      '<div class="report-grid three">' + mBox + kBox + pBox + '</div>' + vnInlineUsage("doshas") + '</section>';
+  }
+
+  // ---- Gemstones & remedies ----------------------------------------------
+  var VN_GEM = {
+    Sun: ["Ruby", "Sunday", "ring finger", "Om Hraam Hreem Hraum Sah Suryaya Namah"],
+    Moon: ["Pearl", "Monday", "little finger", "Om Shraam Shreem Shraum Sah Chandraya Namah"],
+    Mars: ["Red Coral", "Tuesday", "ring finger", "Om Kraam Kreem Kraum Sah Bhaumaya Namah"],
+    Mercury: ["Emerald", "Wednesday", "little finger", "Om Braam Breem Braum Sah Budhaya Namah"],
+    Jupiter: ["Yellow Sapphire", "Thursday", "index finger", "Om Graam Greem Graum Sah Gurave Namah"],
+    Venus: ["Diamond / White Sapphire", "Friday", "ring finger", "Om Draam Dreem Draum Sah Shukraya Namah"],
+    Saturn: ["Blue Sapphire", "Saturday", "middle finger", "Om Praam Preem Praum Sah Shanaye Namah"],
+    Rahu: ["Hessonite (Gomed)", "Saturday", "middle finger", "Om Bhraam Bhreem Bhraum Sah Rahave Namah"],
+    Ketu: ["Cat's Eye", "Tuesday", "ring finger", "Om Sraam Sreem Sraum Sah Ketave Namah"]
+  };
+  function gemstonesSection(chart, input) {
+    var asc = chart.ascendant.sign;
+    var recs = [
+      { role: "Life stone (Lagna lord)", planet: SIGNS[asc].lord },
+      { role: "Fortune (5th lord)", planet: SIGNS[(asc + 4) % 12].lord },
+      { role: "Luck (9th lord)", planet: SIGNS[(asc + 8) % 12].lord }
+    ];
+    try { var st = findDashaStack(chart.vimshottari.timeline, new Date()); if (st[0]) recs.push({ role: "Current Mahadasha (" + st[0].lord + ")", planet: st[0].lord }); } catch (e) {}
+    var seen = {};
+    var rows = recs.filter(function (r) { if (seen[r.role + r.planet]) return false; seen[r.role + r.planet] = 1; return true; }).map(function (r) {
+      var g = VN_GEM[r.planet] || ["-", "-", "-", "-"];
+      return '<tr><td><strong>' + escapeHtml(r.role) + '</strong></td><td>' + escapeHtml(r.planet) + '</td><td>' + escapeHtml(g[0]) + '</td><td>' + escapeHtml(g[1]) + '</td><td>' + escapeHtml(g[2]) + '</td></tr>';
+    }).join("");
+    var mantraRows = recs.filter(function (r, i, a) { return a.findIndex(function (x) { return x.planet === r.planet; }) === i; }).map(function (r) {
+      var g = VN_GEM[r.planet] || ["", "", "", ""];
+      return '<tr><td><strong>' + escapeHtml(r.planet) + '</strong></td><td>' + escapeHtml(g[3]) + '</td></tr>';
+    }).join("");
+    return '<section id="viewA-gems" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Remedies</p><h3>Gemstones &amp; Remedies</h3></div><span class="small-pill">Summary</span></div>' +
+      '<p class="fine-print">Suggested strengthening gemstones from your Lagna and trikona (5th, 9th) lords and the running Mahadasha, with mantras and wearing days. Consult an astrologer before wearing a new gem.</p>' +
+      '<div class="panel-box"><h3>Recommended gemstones</h3><div class="table-wrap compact-table"><table><thead><tr><th>Role</th><th>Planet</th><th>Gemstone</th><th>Day</th><th>Finger</th></tr></thead><tbody>' + rows + '</tbody></table></div></div>' +
+      '<div class="panel-box"><h3>Beej mantras</h3><div class="table-wrap compact-table"><table><thead><tr><th>Planet</th><th>Mantra (108×)</th></tr></thead><tbody>' + mantraRows + '</tbody></table></div></div>' +
+      vnInlineUsage("gems") + '</section>';
+  }
+
+  // ---- Rashifal (Moon-sign horoscope driven by transits + dasha) ----------
+  function rashifalSection(chart, input) {
+    var moonSign = chart.planetsByName.Moon.sign, ayKey = chart.ayanamshaKey;
+    var tr, jupH, satH, rahuH;
+    try {
+      tr = vnTransitNowLon(ayKey);
+      jupH = houseFromSign(moonSign, signIndex(tr.Jupiter));
+      satH = houseFromSign(moonSign, signIndex(tr.Saturn));
+      rahuH = houseFromSign(moonSign, signIndex(tr.Rahu));
+    } catch (e) {}
+    var jupGood = [2, 5, 7, 9, 11].indexOf(jupH) >= 0;
+    var satTough = [1, 12, 2].indexOf(satH) >= 0; // Sade Sati
+    var satGood = [3, 6, 11].indexOf(satH) >= 0;
+    var st = [];
+    try { st = findDashaStack(chart.vimshottari.timeline, new Date()); } catch (e) {}
+    var md = st[0] ? st[0].lord : null, ad = st[1] ? st[1].lord : null;
+    var dayLine = "Today, the Moon's daily mood for " + SIGNS[moonSign].name + " is shaped by the running " + (md ? md + " dasha" : "period") + ". " +
+      (jupGood ? "Jupiter's transit is supportive — act on opportunities. " : "Keep effort steady; avoid over-reach. ") +
+      (satTough ? "Saturn (Sade Sati) advises patience and routine." : (satGood ? "Saturn supports disciplined gains." : "Saturn is neutral now."));
+    var weekLine = "This week favours " + (jupGood ? "growth, learning and relationships" : "consolidation and finishing pending work") + ". " +
+      (md && ad ? "The " + md + "–" + ad + " sub-period colours the theme." : "");
+    var monthLine = "This month: Jupiter is in your " + (jupH || "?") + "th from the Moon (" + (jupGood ? "favourable for gains, family and fortune" : "a phase for prudence") + "); Saturn is in your " + (satH || "?") + "th (" + (satTough ? "Sade Sati — health and patience matter" : (satGood ? "good for steady, structured progress" : "manage responsibilities calmly")) + ").";
+    var yearLine = "This year is broadly " + (jupGood && !satTough ? "expansive and lucky" : (satTough ? "demanding but maturing" : "mixed — measured progress")) + ", under the " + (md ? md + " Mahadasha" : "current dasha") + ", which emphasises " + (VN_DASHA_THEME[md] || "its natural significations") + ".";
+    function box(t, txt) { return '<div class="panel-box vn-reading"><h3>' + t + '</h3><p>' + escapeHtml(txt) + '</p></div>'; }
+    return '<section id="viewA-rashifal" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Horoscope</p><h3>Rashifal</h3></div><span class="small-pill">Moon sign</span></div>' +
+      '<p class="fine-print">Moon-sign (' + escapeHtml(SIGNS[moonSign].name) + ') horoscope driven by the current Jupiter/Saturn transits and your running dasha — personalised, not generic.</p>' +
+      box("Today", dayLine) + box("This week", weekLine) + box("This month", monthLine) + box("This year", yearLine) + vnInlineUsage("rashifal") + '</section>';
+  }
+
+  // ---- Lo Shu grid (numerology) ------------------------------------------
+  function loShuSection(chart, input) {
+    var dateStr = String(input.birthDate || "");
+    var digits = dateStr.replace(/[^0-9]/g, "").split("").map(Number).filter(function (d) { return d >= 1 && d <= 9; });
+    var counts = {}; for (var i = 1; i <= 9; i++) counts[i] = 0; digits.forEach(function (d) { counts[d]++; });
+    var grid = [[4, 9, 2], [3, 5, 7], [8, 1, 6]];
+    var cells = grid.map(function (row) {
+      return '<tr>' + row.map(function (n) {
+        var c = counts[n], txt = c ? new Array(c + 1).join(String(n) + " ").trim() : "·";
+        return '<td class="vn-loshu-cell' + (c ? " vn-loshu-on" : "") + '"><span class="vn-loshu-num">' + escapeHtml(txt) + '</span></td>';
+      }).join("") + '</tr>';
+    }).join("");
+    var present = [], missing = [];
+    for (var k = 1; k <= 9; k++) (counts[k] ? present : missing).push(k);
+    var planetByNum = { 1: "Sun", 2: "Moon", 3: "Jupiter", 4: "Rahu", 5: "Mercury", 6: "Venus", 7: "Ketu", 8: "Saturn", 9: "Mars" };
+    var missTxt = missing.length ? missing.map(function (n) { return n + " (" + planetByNum[n] + ")"; }).join(", ") : "none — a balanced grid";
+    return '<section id="viewA-loshu" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Numerology</p><h3>Lo Shu Grid</h3></div><span class="small-pill">From DOB</span></div>' +
+      '<p class="fine-print">The Lo Shu grid places each digit of your date of birth into a 3×3 magic square. Repeated numbers show strengths; missing numbers show areas to develop.</p>' +
+      '<div class="report-grid two"><div class="panel-box"><h3>Your grid</h3><table class="vn-loshu"><tbody>' + cells + '</tbody></table></div>' +
+      '<div class="panel-box">' + metricBox("Reading", [["Present numbers", present.join(", ") || "-"], ["Missing numbers", missTxt], ["Most repeated", (function () { var best = 0, bn = "-"; for (var z = 1; z <= 9; z++) if (counts[z] > best) { best = counts[z]; bn = z + " (" + planetByNum[z] + ") ×" + best; } return best ? bn : "-"; })()]]) + '</div></div>' +
+      vnInlineUsage("loshu") + '</section>';
+  }
+
+  // ---- Baby names (syllables by janma nakshatra-pada) ---------------------
+  var VN_NAK_SYLLABLES = [
+    ["Chu", "Che", "Cho", "La"], ["Lee", "Lu", "Le", "Lo"], ["A", "Ee", "U", "Ea"], ["O", "Va", "Vi", "Vu"],
+    ["Ve", "Vo", "Ka", "Ki"], ["Ku", "Gha", "Ang", "Chha"], ["Ke", "Ko", "Ha", "Hi"], ["Hu", "He", "Ho", "Da"],
+    ["Dee", "Doo", "De", "Do"], ["Ma", "Mi", "Mu", "Me"], ["Mo", "Ta", "Ti", "Tu"], ["Te", "To", "Pa", "Pi"],
+    ["Pu", "Sha", "Na", "Tha"], ["Pe", "Po", "Ra", "Ri"], ["Ru", "Re", "Ro", "Taa"], ["Tee", "Tu", "Te", "To"],
+    ["Na", "Ni", "Nu", "Ne"], ["No", "Ya", "Yi", "Yu"], ["Ye", "Yo", "Bha", "Bhi"], ["Bhu", "Dha", "Pha", "Dhaa"],
+    ["Bhe", "Bho", "Ja", "Ji"], ["Ju", "Je", "Jo", "Gha"], ["Ga", "Gi", "Gu", "Ge"], ["Go", "Sa", "Si", "Su"],
+    ["Se", "So", "Da", "Di"], ["Du", "Tha", "Jha", "Tra"], ["De", "Do", "Cha", "Chi"]
+  ];
+  function babyNamesSection(chart, input) {
+    var moonNk = nakshatraInfo(chart.planetsByName.Moon.lon);
+    var syl = VN_NAK_SYLLABLES[moonNk.index] || ["-", "-", "-", "-"];
+    var rows = syl.map(function (s, i) {
+      var cls = (i + 1) === moonNk.pada ? "vn-good" : "";
+      return '<tr class="' + cls + '"><td><strong>Pada ' + (i + 1) + '</strong>' + ((i + 1) === moonNk.pada ? " (your pada)" : "") + '</td><td><strong>' + escapeHtml(s) + '</strong></td></tr>';
+    }).join("");
+    return '<section id="viewA-babynames" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Naamkaran</p><h3>Baby Name Syllables</h3></div><span class="small-pill">Janma nakshatra</span></div>' +
+      '<p class="fine-print">Traditional auspicious starting sounds for a name, taken from the birth nakshatra (' + escapeHtml(NAKSHATRAS[moonNk.index]) + ', pada ' + moonNk.pada + '). The pada\'s own syllable is highlighted.</p>' +
+      '<div class="panel-box"><h3>Auspicious starting syllables</h3><div class="table-wrap compact-table"><table><thead><tr><th>Pada</th><th>Start the name with</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+      '<p class="fine-print">Choose a name beginning with the highlighted syllable for the exact birth pada; any syllable of the nakshatra is considered auspicious.</p></div>' + vnInlineUsage("babynames") + '</section>';
+  }
+
+  // ---- Quick calculators (key chart facts at a glance) -------------------
+  function quickCalcSection(chart, input) {
+    var moon = chart.planetsByName.Moon, sun = chart.planetsByName.Sun, asc = chart.ascendant;
+    var moonNk = nakshatraInfo(moon.lon);
+    var rows = [
+      ["Ascendant (Lagna)", asc.signName + " " + asc.deg.toFixed(2) + "°"],
+      ["Moon sign (Rashi)", moon.signName],
+      ["Sun sign", sun.signName],
+      ["Janma Nakshatra", NAKSHATRAS[moonNk.index] + " pada " + moonNk.pada + " (lord " + NAK_LORDS[moonNk.index] + ")"],
+      ["Lagna lord", SIGNS[asc.sign].lord],
+      ["Rashi lord", SIGNS[moon.sign].lord],
+      ["Ayanamsha", (chart.ayanamshaLabel || chart.ayanamshaKey) + " (" + chart.ayanamsa.toFixed(3) + "°)"]
+    ];
+    return '<section id="viewA-quickcalc" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Quick Facts</p><h3>Quick Calculators</h3></div><span class="small-pill">At a glance</span></div>' +
+      '<p class="fine-print">The key points of your chart in one place — ascendant, Moon and Sun signs, birth-star, sign lords and the ayanamsha used.</p>' +
+      '<div class="report-grid two">' + metricBox("Signs & Lagna", rows.slice(0, 4)) + metricBox("Lords & Ayanamsha", rows.slice(4)) + '</div>' + vnInlineUsage("quickcalc") + '</section>';
   }
 
   var coreApi = {
