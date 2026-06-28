@@ -8011,3 +8011,27 @@ body:not(.report-active) .empty-state {
 .vn-loshu .vn-loshu-num { font-size: 15px; letter-spacing: 1px; }
 .vn-usage-list { margin: 6px 0 0; padding-left: 18px; }
 .vn-usage-list li { margin-bottom: 4px; line-height: 1.4; }
+
+/* ===== Blessings splash screen ===== */
+.vn-splash { position: fixed; inset: 0; z-index: 10000; overflow: auto; display: flex; align-items: center; justify-content: center; color: #f7ecd0; background: radial-gradient(circle at 50% 28%, #2a1a4a 0%, #170e2c 55%, #0c0820 100%); transition: opacity 0.6s ease; }
+.vn-splash-hide { opacity: 0; pointer-events: none; }
+.vn-splash-inner { text-align: center; padding: 26px 16px; max-width: 760px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.vn-splash-bless { letter-spacing: 0.16em; text-transform: uppercase; font-size: 12px; color: #e6c97a; margin: 0; }
+.vn-deities { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.vn-deity { width: 100px; padding: 12px 8px; border: 1px solid rgba(230,201,122,0.35); border-radius: 14px; background: rgba(255,255,255,0.04); display: flex; flex-direction: column; align-items: center; gap: 3px; box-shadow: 0 0 18px rgba(230,201,122,0.12); animation: vnFloat 3.6s ease-in-out infinite; animation-delay: calc(var(--i) * 0.3s); }
+.vn-deity-glyph { font-size: 30px; line-height: 1.1; color: #ffd97a; text-shadow: 0 0 14px rgba(255,200,90,0.7); }
+.vn-deity-name { font-size: 12px; font-weight: 700; }
+.vn-deity-sub { font-size: 12px; color: #cbb88c; }
+.vn-splash-center { position: relative; margin-top: 8px; display: flex; flex-direction: column; align-items: center; }
+.vn-aura { position: absolute; top: -22px; width: 230px; height: 230px; border-radius: 50%; background: conic-gradient(from 0deg, rgba(255,210,120,0), rgba(255,210,120,0.55), rgba(255,210,120,0), rgba(255,210,120,0.55), rgba(255,210,120,0)); filter: blur(10px); z-index: 0; animation: vnSpin 11s linear infinite; }
+.vn-splash-logo { width: 124px; height: 124px; position: relative; z-index: 1; filter: drop-shadow(0 0 18px rgba(255,210,120,0.65)); animation: vnPulse 3s ease-in-out infinite; }
+.vn-splash-title { font-size: 46px; margin: 10px 0 0; background: linear-gradient(90deg, #ffd97a, #fff3d0, #ffd97a); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; color: transparent; animation: vnShimmer 4s linear infinite; }
+.vn-splash-tag { color: #d9c79a; font-size: 14px; margin: 4px 0 0; }
+.vn-enter-btn { margin-top: 18px; padding: 13px 46px; font-size: 17px; font-weight: 800; letter-spacing: 0.02em; border: none; border-radius: 999px; cursor: pointer; color: #2a1a08; background: linear-gradient(180deg, #ffd97a, #e6b24a); box-shadow: 0 6px 22px rgba(230,178,74,0.45); animation: vnPulse 2.6s ease-in-out infinite; }
+.vn-enter-btn:hover { filter: brightness(1.06); }
+@keyframes vnFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes vnSpin { to { transform: rotate(360deg); } }
+@keyframes vnPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+@keyframes vnShimmer { to { background-position: 200% center; } }
+@media (max-width: 560px) { .vn-deity { width: 84px; } .vn-deity-glyph { font-size: 26px; } .vn-splash-logo { width: 96px; height: 96px; } .vn-splash-title { font-size: 34px; } .vn-aura { width: 175px; height: 175px; } }
+@media (prefers-reduced-motion: reduce) { .vn-deity, .vn-aura, .vn-splash-logo, .vn-splash-title, .vn-enter-btn { animation: none; } }
