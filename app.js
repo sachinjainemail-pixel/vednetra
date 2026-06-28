@@ -566,9 +566,8 @@
       } catch (e) {}
       try { vnRenderHomeShowcase(); } catch (e) {}
       try { vnWireSwipe(); } catch (e) {}
-      try { vnMaybeShowOnboarding(); } catch (e) {}
       try { vnRequestGeo(); } catch (e) {} // detect current location early so cards default to it
-      try { vnLoadHomeChartOnStartup(); } catch (e) {}
+      try { vnWireSplash(); } catch (e) { try { vnMaybeShowOnboarding(); } catch (e2) {} try { vnLoadHomeChartOnStartup(); } catch (e3) {} }
     });
   }
 
@@ -16140,6 +16139,20 @@
     setTimeout(function () { try { win.focus(); win.print(); } catch (e) {} cleanup(); }, 350);
   }
 
+  // ---- blessings splash screen ------------------------------------------
+  function vnWireSplash() {
+    var splash = document.getElementById("vnSplash");
+    var enter = document.getElementById("vnEnterBtn");
+    var proceeded = false;
+    function proceed() {
+      if (proceeded) return; proceeded = true;
+      if (splash) { splash.classList.add("vn-splash-hide"); setTimeout(function () { if (splash.parentNode) splash.parentNode.removeChild(splash); }, 650); }
+      try { vnMaybeShowOnboarding(); } catch (e) {}
+      try { vnLoadHomeChartOnStartup(); } catch (e) {}
+    }
+    if (enter) enter.addEventListener("click", proceed);
+    if (!splash) proceed();
+  }
   // ---- first-run onboarding ---------------------------------------------
   function vnMaybeShowOnboarding() {
     if (vnLsGet("vednetra.onboarded", "") === "1") return;
