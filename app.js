@@ -5549,6 +5549,7 @@
       { id: "viewA-reading",        immediate: true, render: function () { return readingSection(chart, input); } },
       { id: "viewA-appearance",     immediate: true, render: function () { return appearanceSection(chart, input); } },
       { id: "viewA-nature",         immediate: true, render: function () { return natureSection(chart, input); } },
+      { id: "viewA-nakshatra",      immediate: true, render: function () { return nakshatraPadaSection(chart, input); } },
       { id: "viewA-num-compat",     immediate: true, render: function () { return numCompatSection(chart, input); }, wire: function () { wireNumCompatControls(chart, input); } },
       { id: "viewA-cards",          immediate: true, render: function () { return cardsSection(chart, input); }, wire: function () { wireCardsControls(chart, input); } },
       { id: "viewA-sadesati",       label: "Sade Sati", render: function () { return sadeSatiSection(chart, input); } },
@@ -14885,6 +14886,12 @@
       { u: "Use as a tie-breaker during birth-time rectification.", e: "If two times give different risings, pick the one matching appearance." },
       { u: "Understand constitution for health and lifestyle choices.", e: "A delicate-constitution note → prioritise routine and rest." }
     ],
+    nakshatra: [
+      { u: "See the flavour each planet takes from its nakshatra.", e: "Mars in Krittika → courage expressed as sharp, cutting drive." },
+      { u: "Know when a planet's results ripen — its nakshatra-lord dasha.", e: "Venus in Bharani (lord Venus) → marriage/comfort themes peak in Venus periods." },
+      { u: "Use the pada (navamsa) to fine-tune the expression.", e: "A pada in a watery navamsa softens and emotionalises the planet." },
+      { u: "Treat the Moon's birth-star as your core instinct and dasha seed.", e: "Janma nakshatra Rohini → a comfort- and beauty-seeking nature." }
+    ],
     nature: [
       { u: "Understand your default temperament and reactions.", e: "A Scorpio-Moon intensity note → channel it into focused, private work." },
       { u: "Improve relationships by knowing your outer manner vs inner mind.", e: "Airy, sociable outside but watery, sensitive inside → tell close ones what you need." },
@@ -15637,55 +15644,62 @@
     var jd = julianDay(new Date(ms));
     return signIndex(normalize(planetTropicalLongitude("Saturn", jd) - ayanamshaValue(jd, ayKey)));
   }
-  function vnSaturnSegments(startMs, endMs, ayKey) {
-    var step = 20 * DAY_MS, segs = [], prev = vnSaturnSignAtMs(startMs, ayKey), segStart = startMs;
-    for (var t = startMs + step; t <= endMs; t += step) {
-      var s = vnSaturnSignAtMs(t, ayKey);
-      if (s !== prev) {
-        var lo = t - step, hi = t;
-        for (var i = 0; i < 22; i++) { var mid = (lo + hi) / 2; if (vnSaturnSignAtMs(mid, ayKey) === prev) lo = mid; else hi = mid; }
-        segs.push({ sign: prev, start: segStart, end: hi }); prev = s; segStart = hi;
-      }
-    }
-    segs.push({ sign: prev, start: segStart, end: endMs });
-    return segs;
+  function vnSaturnLonAtMs(ms, ayKey) {
+    var jd = julianDay(new Date(ms));
+    return normalize(planetTropicalLongitude("Saturn", jd) - ayanamshaValue(jd, ayKey));
   }
+  function vnAngDiff(a, b) { return ((a - b + 540) % 360) - 180; } // signed degrees in (-180, 180]
   function vnMonthYear(ms) {
     var d = new Date(ms);
     return ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][d.getUTCMonth()] + " " + d.getUTCFullYear();
   }
+  // Sade Sati = transiting Saturn within 45° before to 45° after the natal Moon's
+  // exact longitude (a 90° arc centred on the Moon's degree).
   function sadeSatiData(chart) {
-    var moonSign = chart.planetsByName.Moon.sign;
-    var set = [(moonSign + 11) % 12, moonSign, (moonSign + 1) % 12];
+    var moonLon = chart.planetsByName.Moon.lon;
     var ayKey = chart.ayanamshaKey;
-    var startMs = chart.date.getTime() - 2 * 365.25 * DAY_MS;
+    function diff(ms) { return vnAngDiff(vnSaturnLonAtMs(ms, ayKey), moonLon); }
+    function active(ms) { return Math.abs(diff(ms)) <= 45; }
+    var startMs = chart.date.getTime() - 3 * 365.25 * DAY_MS;
     var endMs = chart.date.getTime() + 100 * 365.25 * DAY_MS;
-    var segs = vnSaturnSegments(startMs, endMs, ayKey);
-    var periods = [], cur = null;
-    segs.forEach(function (seg) {
-      if (set.indexOf(seg.sign) >= 0) {
-        if (!cur) cur = { start: seg.start, end: seg.end, peakStart: null, peakEnd: null };
-        cur.end = seg.end;
-        if (seg.sign === moonSign) { if (cur.peakStart === null) cur.peakStart = seg.start; cur.peakEnd = seg.end; }
-      } else if (cur) { periods.push(cur); cur = null; }
+    var step = 15 * DAY_MS, runs = [], inRun = active(startMs), runStart = startMs;
+    for (var t = startMs + step; t <= endMs; t += step) {
+      var a = active(t);
+      if (a && !inRun) { var lo = t - step, hi = t; for (var i = 0; i < 22; i++) { var m = (lo + hi) / 2; if (active(m)) hi = m; else lo = m; } runStart = hi; inRun = true; }
+      else if (!a && inRun) { var lo2 = t - step, hi2 = t; for (var j = 0; j < 22; j++) { var m2 = (lo2 + hi2) / 2; if (active(m2)) lo2 = m2; else hi2 = m2; } runs.push({ start: runStart, end: lo2 }); inRun = false; }
+    }
+    if (inRun) runs.push({ start: runStart, end: endMs });
+    // merge splits caused by Saturn's retrograde wobble across the ±45° edge
+    var merged = [];
+    runs.forEach(function (r) {
+      if (merged.length && r.start - merged[merged.length - 1].end < 400 * DAY_MS) merged[merged.length - 1].end = r.end;
+      else merged.push({ start: r.start, end: r.end });
     });
-    if (cur) periods.push(cur);
-    return { moonSign: moonSign, periods: periods };
+    // peak = Saturn within 15° of the natal Moon (middle 30° of the 90° arc)
+    merged.forEach(function (r) {
+      var ps = null, pe = null;
+      for (var t2 = r.start; t2 <= r.end; t2 += 10 * DAY_MS) { if (Math.abs(diff(t2)) <= 15) { if (ps === null) ps = t2; pe = t2; } }
+      r.peakStart = ps; r.peakEnd = pe;
+    });
+    return { moonLon: moonLon, moonSign: chart.planetsByName.Moon.sign, periods: merged };
   }
   function sadeSatiSection(chart, input) {
     var data;
     try { data = sadeSatiData(chart); }
     catch (e) { return '<section id="viewA-sadesati" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Saturn</p><h3>Sade Sati Years</h3></div></div><div class="panel-box"><p class="fine-print">Could not compute: ' + escapeHtml(e.message || "") + '</p></div></section>'; }
-    var moonSign = data.moonSign, now = new Date().getTime();
-    var nowSign = vnSaturnSignAtMs(now, chart.ayanamshaKey);
-    var rel = ((nowSign - moonSign) % 12 + 12) % 12;
+    var now = new Date().getTime(), ayKey = chart.ayanamshaKey, moonLon = data.moonLon;
+    var d = vnAngDiff(vnSaturnLonAtMs(now, ayKey), moonLon);
+    var dTxt = (d >= 0 ? "+" : "") + Math.round(d) + "°";
     var phaseNow;
-    if (rel === 11) phaseNow = "In Sade Sati — rising phase (Saturn in the 12th from Moon).";
-    else if (rel === 0) phaseNow = "In Sade Sati — peak phase (Saturn over the Moon).";
-    else if (rel === 1) phaseNow = "In Sade Sati — setting phase (Saturn in the 2nd from Moon).";
-    else if (rel === 3) phaseNow = "Kantaka Shani (Saturn in the 4th from Moon) — a small panati.";
-    else if (rel === 7) phaseNow = "Ashtama Shani (Saturn in the 8th from Moon) — a small panati.";
-    else phaseNow = "Not in Sade Sati right now.";
+    if (d >= -45 && d < -15) phaseNow = "In Sade Sati — rising phase (Saturn " + dTxt + " from the Moon).";
+    else if (d >= -15 && d <= 15) phaseNow = "In Sade Sati — peak phase (Saturn over the Moon, " + dTxt + ").";
+    else if (d > 15 && d <= 45) phaseNow = "In Sade Sati — setting phase (Saturn " + dTxt + " from the Moon).";
+    else {
+      var nowSign = vnSaturnSignAtMs(now, ayKey), rel = ((nowSign - data.moonSign) % 12 + 12) % 12;
+      if (rel === 3) phaseNow = "Kantaka Shani (Saturn in the 4th from Moon) — a small panati.";
+      else if (rel === 7) phaseNow = "Ashtama Shani (Saturn in the 8th from Moon) — a small panati.";
+      else phaseNow = "Not in Sade Sati right now (Saturn " + dTxt + " from the Moon).";
+    }
     var rows = data.periods.map(function (p) {
       var status = p.end < now ? "Past" : (p.start <= now && now <= p.end ? "Current" : "Upcoming");
       var cls = status === "Current" ? "vn-bad" : "";
@@ -15693,13 +15707,67 @@
       return '<tr class="' + cls + '"><td><strong>' + vnMonthYear(p.start) + " – " + vnMonthYear(p.end) + '</strong></td><td>' + peak + '</td><td>' + status + '</td></tr>';
     }).join("");
     var headBox = metricBox("Now", [
-      ["Natal Moon sign", SIGNS[moonSign].name],
-      ["Saturn now in", SIGNS[nowSign].name + " (" + (rel + 1) + "th from Moon)"],
+      ["Natal Moon", SIGNS[data.moonSign].name + " " + (moonLon - data.moonSign * 30).toFixed(2) + "°"],
+      ["Saturn now", SIGNS[vnSaturnSignAtMs(now, ayKey)].name + " (" + dTxt + " from Moon)"],
       ["Status", phaseNow]
     ]);
-    var table = '<div class="panel-box"><h3>Sade Sati periods (≈7½ years each)</h3><div class="table-wrap compact-table"><table><thead><tr><th>Full period</th><th>Peak (over Moon)</th><th>Status</th></tr></thead><tbody>' + rows + '</tbody></table></div><p class="fine-print">Each Sade Sati runs while Saturn transits the 12th, 1st and 2nd signs from your natal Moon. The peak (Saturn over the Moon) is usually the most testing phase.</p></div>';
+    var table = '<div class="panel-box"><h3>Sade Sati periods (≈7½ years each)</h3><div class="table-wrap compact-table"><table><thead><tr><th>Full period</th><th>Peak (over Moon)</th><th>Status</th></tr></thead><tbody>' + rows + '</tbody></table></div><p class="fine-print">Computed by exact degree: Sade Sati runs while transiting Saturn is within 45° before to 45° after your natal Moon\'s degree (a 90° arc). The peak is when Saturn is within 15° of the Moon.</p></div>';
     return '<section id="viewA-sadesati" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Saturn</p><h3>Sade Sati Years</h3></div><span class="small-pill">Timing</span></div>' +
       '<div class="report-grid two">' + headBox + table + '</div>' + vnInlineUsage("sadesati") + '</section>';
+  }
+
+  // ---- Nakshatra & Pada (effects of each planet by nakshatra and pada) ----
+  var VN_PLANET_SIG = {
+    Sun: "authority, soul, vitality and father", Moon: "mind, emotions and nurturing", Mars: "drive, courage and conflict",
+    Mercury: "intellect, speech and commerce", Jupiter: "wisdom, fortune and expansion", Venus: "love, art and comfort",
+    Saturn: "discipline, delay and endurance", Rahu: "ambition, obsession and the unconventional", Ketu: "detachment, spirituality and past karma",
+    Ascendant: "the body, self and life direction"
+  };
+  var VN_NAK_THEME = [
+    "speed, healing and pioneering fresh starts", "restraint, endurance and transformation through pressure", "sharp, fiery cutting-through and purification",
+    "growth, beauty, fertility and material comfort", "gentle searching, curiosity and seeking", "storms, upheaval and breakthrough through crisis",
+    "renewal, optimism and nourishing return", "nourishment, care and steady spiritual support", "clinging, hypnotic depth and cunning",
+    "ancestry, authority and royal pride", "pleasure, creativity, romance and relaxation", "service, friendship, reliability and contracts",
+    "skill of the hands, craft and cleverness", "brilliance, design, charisma and artistry", "independence, balance and trade like the wind",
+    "focused ambition and goal-driven determination", "friendship, devotion and success among others", "seniority, power, protection and the occult",
+    "roots, deep investigation and destruction-to-rebuild", "invincibility, persuasion and proud expansion", "lasting victory, integrity and leadership",
+    "listening, learning and fame through knowledge", "rhythm, wealth, music and group success", "healing, secrecy, mysticism and wide vision",
+    "intense idealism and transformation by fire", "depth, patience, wisdom and compassion", "nourishment, completion, journeys and kindness"
+  ];
+  function vnSignElementByName(name) {
+    for (var i = 0; i < SIGNS.length; i++) if (SIGNS[i].name === name) return (SIGNS[i].element || "").toLowerCase();
+    return "balanced";
+  }
+  function vnNakEffect(planetName, nakIdx, pada, navName) {
+    var sig = VN_PLANET_SIG[planetName] || "its significations";
+    var theme = VN_NAK_THEME[nakIdx] || "its themes";
+    var lord = NAK_LORDS[nakIdx];
+    return planetName + "'s " + sig + " is expressed through " + NAKSHATRAS[nakIdx] + "'s " + theme +
+      ". Ruled by " + lord + ", so these results ripen in " + lord + " dasha and antardasha. Pada " + pada +
+      " (navamsa " + navName + ") gives a " + vnSignElementByName(navName) + " emphasis.";
+  }
+  function nakshatraPadaSection(chart, input) {
+    var order = ["Ascendant", "Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+    var moon = chart.planetsByName.Moon;
+    var rows = order.map(function (name) {
+      var lon, navName, retro = "";
+      if (name === "Ascendant") { lon = chart.ascendant.lon; navName = SIGNS[vargaSign(lon, 9)].name; }
+      else { var pl = chart.planetsByName[name]; if (!pl) return ""; lon = pl.lon; navName = pl.navamsaSignName || SIGNS[vargaSign(lon, 9)].name; if (pl.retrograde) retro = " (R)"; }
+      var nk = nakshatraInfo(lon);
+      return '<tr><td><strong>' + escapeHtml(name === "Ascendant" ? "Lagna" : name) + retro + '</strong></td>' +
+        '<td>' + escapeHtml(NAKSHATRAS[nk.index] + " · pada " + nk.pada) + '</td>' +
+        '<td>' + escapeHtml(NAK_LORDS[nk.index]) + '</td>' +
+        '<td>' + escapeHtml(navName) + '</td>' +
+        '<td>' + escapeHtml(vnNakEffect(name === "Ascendant" ? "Ascendant" : name, nk.index, nk.pada, navName)) + '</td></tr>';
+    }).join("");
+    var moonNk = nakshatraInfo(moon.lon);
+    var headBox = '<div class="panel-box vn-reading"><h3>Janma Nakshatra</h3><p>' +
+      escapeHtml("Your birth-star is " + NAKSHATRAS[moonNk.index] + " pada " + moonNk.pada + " (lord " + NAK_LORDS[moonNk.index] + ") — the Moon expresses " + VN_NAK_THEME[moonNk.index] + ". This is the seed of your Vimshottari dasha sequence and your core instincts.") + '</p></div>';
+    var table = '<div class="panel-box"><h3>Each planet by nakshatra &amp; pada</h3><div class="table-wrap compact-table"><table><thead><tr><th>Body</th><th>Nakshatra · Pada</th><th>Lord</th><th>Navamsa</th><th>Effect</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+      '<p class="fine-print">Each planet acts in the flavour of the nakshatra it sits in; its results tend to fruit during the dasha of the nakshatra lord. The pada (1–4) maps to a navamsa sign that fine-tunes the expression.</p></div>';
+    return '<section id="viewA-nakshatra" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Stars</p><h3>Nakshatra &amp; Pada</h3></div><span class="small-pill">Summary</span></div>' +
+      '<p class="fine-print">How each planet behaves by the nakshatra and pada it occupies, with the nakshatra lord that times its results.</p>' +
+      headBox + table + vnInlineUsage("nakshatra") + '</section>';
   }
 
   // ---- physical appearance (from the rising sign + ascendant lord) -------
@@ -16027,6 +16095,7 @@
       { id: "viewA-panchang", label: "Birth Panchang", desc: "Tithi, nakshatra, yoga and karana at birth." },
       { id: "viewA-current-panchang", label: "Current Panchang", desc: "Panchang for any date, time and place." },
       { id: "viewA-d1-details", label: "D-1 Rasi Details", desc: "Planets, houses, dignities and aspects." },
+      { id: "viewA-nakshatra", label: "Nakshatra & Pada", desc: "Each planet's nakshatra, pada and its effects." },
       { id: "viewA-yogas", label: "Yogas", desc: "Planetary combinations and their effects." },
       { id: "viewA-vargas", label: "Divisional Charts", desc: "Every varga from D-1 to D-60." }
     ] },
