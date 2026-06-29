@@ -1586,7 +1586,16 @@
       dl.addEventListener("click", function (event) {
         event.preventDefault();
         event.stopPropagation();
-        downloadSelectedReport();
+        showReportDownloadChooser();
+      });
+    }
+    var fab = document.getElementById("vnFloatingDownloadBtn");
+    if (fab && fab.dataset.downloadWired !== "1") {
+      fab.dataset.downloadWired = "1";
+      fab.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        showReportDownloadChooser();
       });
     }
   }
@@ -1938,7 +1947,7 @@
   function runChartSetupRibbonAction(action) {
     if (action === "download") {
       closeChartSetupDialog();
-      downloadSelectedReport();
+      showReportDownloadChooser();
       return;
     }
     openChartSetupDialog(action || "new");
@@ -12490,6 +12499,63 @@
     var reportType = document.getElementById("reportDownloadType").value;
     var format = document.getElementById("reportDownloadFormat").value;
     await downloadCurrentReport(format, reportType);
+  }
+
+  // In-chart "Download Report" chooser: lets the user pick the report type and
+  // format before anything downloads (instead of auto-downloading the preset).
+  function showReportDownloadChooser() {
+    if (!lastReportChart && !lastReportInput) {
+      alertUser("Generate or load a chart first, then download a report.");
+      return;
+    }
+    var existing = document.querySelector(".vn-dl-chooser-layer");
+    if (existing) existing.remove();
+    var typeEl = document.getElementById("reportDownloadType");
+    var fmtEl = document.getElementById("reportDownloadFormat");
+    var curType = typeEl ? typeEl.value : "cc";
+    var curFmt = fmtEl ? fmtEl.value : "pdf";
+    var types = [
+      ["cc", "Natal Report (Chamatkar Chintamani)"],
+      ["standing", "Standing Natal Report (Chawdhri)"],
+      ["vednetra", "VedNetra Report"],
+      ["detailed", "Detailed Report"],
+      ["summary", "Summary Report"]
+    ];
+    var formats = [["pdf", "PDF"], ["txt", "TXT"], ["csv", "CSV"], ["xls", "Excel"]];
+    function opts(list, cur) {
+      return list.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === cur ? " selected" : "") + ">" + escapeHtml(o[1]) + "</option>"; }).join("");
+    }
+    var layer = document.createElement("div");
+    layer.className = "vednetra-report-options-layer vn-dl-chooser-layer";
+    layer.innerHTML =
+      '<div class="vednetra-report-options-dialog" role="dialog" aria-modal="true" aria-label="Download report">' +
+        '<div class="vednetra-report-options-head"><div><p class="eyebrow">Download</p><h3>Download Report</h3></div><button type="button" data-dl-cancel>Cancel</button></div>' +
+        '<p class="muted">Choose which report and file format to download for this chart.</p>' +
+        '<div class="vednetra-report-options-grid">' +
+          '<label>Report<select id="vnDlType">' + opts(types, curType) + '</select></label>' +
+          '<label>Format<select id="vnDlFormat">' + opts(formats, curFmt) + '</select></label>' +
+        '</div>' +
+        '<div class="vednetra-report-options-actions"><button type="button" data-dl-cancel>Cancel</button><button type="button" class="primary" data-dl-go>Download</button></div>' +
+      '</div>';
+    document.body.appendChild(layer);
+    try { bringDialogToFront(layer, true); } catch (e) {}
+    function close() { layer.remove(); }
+    layer.querySelectorAll("[data-dl-cancel]").forEach(function (b) { b.addEventListener("click", close); });
+    layer.addEventListener("click", function (event) {
+      try { bringDialogToFront(layer, false); } catch (e) {}
+      if (event.target === layer) close();
+    });
+    layer.querySelector("[data-dl-go]").addEventListener("click", function () {
+      var type = layer.querySelector("#vnDlType").value;
+      var format = layer.querySelector("#vnDlFormat").value;
+      // keep the persistent selects in sync so the choice sticks
+      if (typeEl) typeEl.value = type;
+      if (fmtEl) fmtEl.value = format;
+      close();
+      downloadCurrentReport(format, type);
+    });
+    var first = layer.querySelector("select");
+    if (first && first.focus) first.focus();
   }
 
   async function downloadCurrentReport(format, reportType) {

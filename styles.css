@@ -8035,3 +8035,30 @@ body:not(.report-active) .empty-state {
 @keyframes vnShimmer { to { background-position: 200% center; } }
 @media (max-width: 560px) { .vn-deity { width: 84px; } .vn-deity-glyph { font-size: 26px; } .vn-splash-logo { width: 96px; height: 96px; } .vn-splash-title { font-size: 34px; } .vn-aura { width: 175px; height: 175px; } }
 @media (prefers-reduced-motion: reduce) { .vn-deity, .vn-aura, .vn-splash-logo, .vn-splash-title, .vn-enter-btn { animation: none; } }
+
+/* Always-visible floating "Download Report" button while reviewing a chart */
+.vn-floating-download {
+  position: fixed;
+  right: 16px;
+  bottom: 18px;
+  z-index: 9000;
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a1205;
+  background: linear-gradient(180deg, #f4d98b 0%, #d8a83a 100%);
+  box-shadow: 0 8px 22px rgba(24, 15, 4, 0.32);
+  cursor: pointer;
+}
+.vn-floating-download:hover { filter: brightness(1.05); }
+.vn-floating-download:active { transform: translateY(1px); }
+body.report-active .vn-floating-download { display: inline-flex; }
+/* keep clear of the multi-view rail on wide screens */
+@media (min-width: 1081px) { .vn-floating-download { right: 84px; } }
+@media (max-width: 560px) { .vn-floating-download { right: 12px; bottom: 14px; padding: 11px 16px; font-size: 14px; } }
+@media print { .vn-floating-download { display: none !important; } }
