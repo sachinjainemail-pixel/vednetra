@@ -12505,6 +12505,10 @@
       downloadStandingReport(format);
       return;
     }
+    if (reportType === "cc") {
+      downloadCcReport(format);
+      return;
+    }
     if (!lastPlainReport) {
       alertUser("Generate a report first, then download it.");
       return;
@@ -12594,6 +12598,40 @@
     } catch (error) {
       console.error(error);
       alertUser("Standing Natal Report could not be built: " + (error && error.message ? error.message : error));
+    }
+  }
+
+  function downloadCcReport(format) {
+    try {
+      var input = lastReportInput || readInput();
+      var chart = lastReportChart || buildChart(input.birthInstant, input.latitude, input.longitude, input.timezone, {
+        ascendantOverride: input.ascendantOverride,
+        ayanamshaKey: input.ayanamshaKey || "raman"
+      });
+      var text = vnCcMarkdown(chart, input);
+      lastPlainReport = text;
+      lastPlainReports.chartData = text;
+      var filenameBase = reportDownloadFilenameBase() + "_Natal_Report_CC";
+      if (format === "pdf") {
+        downloadBlob(filenameBase + ".pdf", "application/pdf", makeSimplePdf(text));
+        showToast("✓ Natal Report (Chamatkar Chintamani) — PDF download started");
+        return;
+      }
+      if (format === "csv") {
+        downloadBlob(filenameBase + ".csv", "text/csv;charset=utf-8", text);
+        showToast("✓ Natal Report (Chamatkar Chintamani) — CSV download started");
+        return;
+      }
+      if (format === "xls") {
+        downloadBlob(filenameBase + ".xls", "application/vnd.ms-excel;charset=utf-8", text);
+        showToast("✓ Natal Report (Chamatkar Chintamani) — Excel download started");
+        return;
+      }
+      downloadBlob(filenameBase + ".txt", "text/plain;charset=utf-8", text);
+      showToast("✓ Natal Report (Chamatkar Chintamani) — TXT download started");
+    } catch (error) {
+      console.error(error);
+      alertUser("Natal Report (Chamatkar Chintamani) could not be built: " + (error && error.message ? error.message : error));
     }
   }
 
@@ -17293,6 +17331,60 @@
     L.push("");
     L.push("| Mahadasha | Start | End |"); L.push("|---|---|---|");
     d.timeline.slice(0, 12).forEach(function (p) { L.push("| " + p.lord + " | " + vnFmtFullDate(p.start.getTime()) + " | " + vnFmtFullDate(p.end.getTime()) + " |"); });
+    if (d.stack[0]) {
+      L.push(""); L.push("**Running Mahādaśā bhuktis (" + d.stack[0].lord + "):**");
+      L.push("| AD | Start | End |"); L.push("|---|---|---|");
+      try { subPeriods(d.stack[0], "AD").forEach(function (a) { L.push("| " + a.lord + " | " + vnFmtFullDate(a.start.getTime()) + " | " + vnFmtFullDate(a.end.getTime()) + " |"); }); } catch (e) {}
+    }
+    // Tier 2 — Shadbala
+    try {
+      L.push(""); L.push("## 6. Shadbala (engine estimate, max 360)");
+      L.push("| Graha | Sthana | Dig | Kala | Cheshta | Naisargika | Drik | Total | Judgement |");
+      L.push("|---|---|---|---|---|---|---|---|---|");
+      shadbalaRows(chart).forEach(function (r) { L.push("| " + r.planet + " | " + r.sthana + " | " + r.dig + " | " + r.kala + " | " + r.cheshta + " | " + r.naisargika + " | " + r.drik + " | " + r.total + " | " + r.judgement + " |"); });
+    } catch (e) {}
+    // Tier 2 — Ashtakavarga
+    try {
+      var avd = samudayaAshtakavargaData(chart);
+      L.push(""); L.push("## 7. Ashtakavarga");
+      L.push("| Row | " + avd.houseNumbers.join(" | ") + " | Total |");
+      L.push("|" + new Array(avd.houseNumbers.length + 3).join("---|"));
+      L.push("| SAV | " + avd.columnTotals.join(" | ") + " | " + avd.grandTotal + " |");
+      CLASSICAL_PLANETS.forEach(function (n) { L.push("| " + n + " | " + avd.rows[n].join(" | ") + " | " + avd.rowTotals[n] + " |"); });
+    } catch (e) {}
+    // Tier 2 — speed/avastha
+    L.push(""); L.push("## 8. Planetary speed / avastha");
+    L.push("| Graha | Daily motion | Fast/Avg/Slow/Retro | Combust |"); L.push("|---|---|---|---|");
+    d.planets.forEach(function (p) { L.push("| " + p.name + " | " + p.motion.toFixed(4) + "°/day | " + p.speed + " | " + (p.combust ? "Yes" : "No") + " |"); });
+    // Tier 2 — Navamsa
+    try {
+      var d9 = makeVargaChart(chart, 9);
+      L.push(""); L.push("## 9. Navamsa (D-9) — Lagna " + d9.ascendant.signName);
+      L.push("| Graha | D-9 sign | Vargottama |"); L.push("|---|---|---|");
+      d.planets.forEach(function (p) { var np = d9.planetsByName[p.name]; L.push("| " + p.name + " | " + (np ? np.signName : "—") + " | " + (np && np.vargottama ? "Yes" : "—") + " |"); });
+      // Tier 3 — divisional charts
+      var vlist = [["D10", 10, "career"], ["D7", 7, "children"], ["D12", 12, "parents"], ["D3", 3, "siblings"], ["D24", 24, "education"], ["D30", 30, "health/character"]];
+      var vcols = vlist.map(function (v) { return makeVargaChart(chart, v[1]); });
+      L.push(""); L.push("## 10. Divisional charts");
+      L.push("| Body | " + vlist.map(function (v) { return v[0]; }).join(" | ") + " |");
+      L.push("|" + new Array(vlist.length + 2).join("---|"));
+      L.push("| Lagna | " + vcols.map(function (vc) { return vc.ascendant.signName; }).join(" | ") + " |");
+      ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].forEach(function (n) {
+        L.push("| " + n + " | " + vcols.map(function (vc) { var vp = vc.planetsByName[n]; return vp ? vp.signName : "—"; }).join(" | ") + " |");
+      });
+      // Tier 3 — Jaimini
+      var karakas = jaiminiKarakas(chart, false);
+      var akName = (karakas.filter(function (k) { return k.role === "AK"; })[0] || {}).planet;
+      var karakamsa = akName ? d9.planetsByName[akName] : null;
+      L.push(""); L.push("## 11. Jaimini layer");
+      L.push("| Chara Karaka | Planet | Degree | Sign |"); L.push("|---|---|---|---|");
+      karakas.forEach(function (k) { L.push("| " + k.role + " | " + k.planet + " | " + vnCcDms(k.degree) + " | " + k.signName + " |"); });
+      L.push("");
+      L.push("- Arudha Lagna (AL): " + SIGNS[vnCcArudha(chart, 1)].name);
+      L.push("- Upapada (UL): " + SIGNS[vnCcArudha(chart, 12)].name);
+      L.push("- Karakamsa (AK in D-9): " + (karakamsa ? karakamsa.signName : "—"));
+    } catch (e) {}
+    L.push(""); L.push("_Generated by VedNetra · " + vnFmtFullDate(Date.now()) + "_");
     return L.join("\n");
   }
   function ccReportSection(chart, input) {
