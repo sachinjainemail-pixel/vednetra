@@ -16354,34 +16354,44 @@
   // streams that deity's mantra (with a synthesized-Om fallback if the stream
   // is unavailable). Images are animated symbolic art (offline); audio streams.
   // ===========================================================================
+  // Real deity images are freely-licensed Wikimedia Commons works, loaded via
+  // Special:FilePath (a stable redirect that works in <img> without a hash).
+  // If an image fails to load, the animated symbolic art shows instead.
+  function vnCommonsImg(file, w) { return "https://commons.wikimedia.org/wiki/Special:FilePath/" + file + "?width=" + (w || 640); }
   var VN_DEITIES = [
     { key: "ganesha", name: "Shri Ganesha", sub: "श्री गणेश", color: "#e8a33d", hue: 38,
       hero: "🐘", orbit: ["🕉️", "🪔", "🌺"],
+      img: vnCommonsImg("Ganesha%20Basohli%20miniature%20circa%201730%20Dubost%20p73.jpg"),
       mantra: "ॐ गं गणपतये नमः", roman: "Om Gaṃ Gaṇapataye Namaḥ",
       meaning: "Salutations to Ganesha, remover of obstacles and lord of beginnings.",
-      audio: ["https://archive.org/download/OmGamGanapatayeNamaha/OmGamGanapatayeNamaha.mp3", "https://archive.org/download/OmGamGanapatayeNamaha/Om%20Gam%20Ganapataye%20Namaha.mp3"] },
+      audio: ["https://archive.org/download/GaneshMantra_201709/GaneshMantra.mp3", "https://archive.org/download/OmGamGanapatayeNamaha/OmGamGanapatayeNamaha.mp3", "https://archive.org/download/ganesha-maha-mantra-vakratunda-mahakaya/Ganesha%20Maha%20Mantra.mp3"] },
     { key: "shiva", name: "Mahadeva Shiva", sub: "महादेव", color: "#7fb4e6", hue: 205,
       hero: "🔱", orbit: ["🌙", "🐍", "🕊️"],
+      img: vnCommonsImg("Ravi%20Varma-Descent%20of%20Ganga.jpg"),
       mantra: "ॐ नमः शिवाय", roman: "Om Namaḥ Śivāya",
       meaning: "I bow to Shiva, the auspicious inner Self and lord of transformation.",
       audio: ["https://archive.org/download/shivamantrasandsongs/Aum%20Namah%20Shivaya.mp3", "https://archive.org/download/shivamantrasandsongs/Om%20namah%20shivaya%202.mp3"] },
     { key: "saraswati", name: "Maa Saraswati", sub: "माँ सरस्वती", color: "#f2f0ea", hue: 48,
       hero: "🪷", orbit: ["🦢", "🎶", "📿"],
+      img: vnCommonsImg("Raja%20Ravi%20Varma%2C%20Goddess%20Saraswati.jpg"),
       mantra: "ॐ ऐं सरस्वत्यै नमः", roman: "Om Aiṃ Sarasvatyai Namaḥ",
       meaning: "Salutations to Saraswati, goddess of knowledge, speech, music and the arts.",
-      audio: ["https://archive.org/download/SaraswatiMantra_201709/SaraswatiMantra.mp3", "https://archive.org/download/SaraswatiMantra_201709/Saraswati%20Mantra.mp3"] },
+      audio: ["https://archive.org/download/SaraswatiMantra_201709/SaraswatiMantra.mp3", "https://archive.org/download/god-mantra/Saraswati%20Mantra-1.mp3", "https://archive.org/download/god-mantra/Saraswati%20Mantra-2.mp3"] },
     { key: "brihaspati", name: "Guru Brihaspati", sub: "गुरु बृहस्पति", color: "#f0c44a", hue: 45,
       hero: "♃", orbit: ["🪔", "📿", "🌼"],
+      img: vnCommonsImg("Brihaspati%20graha.JPG"),
       mantra: "ॐ ग्रां ग्रीं ग्रौं सः गुरवे नमः", roman: "Om Grāṃ Grīṃ Grauṃ Saḥ Gurave Namaḥ",
       meaning: "Beej mantra of Jupiter (Guru) — for wisdom, fortune, dharma and expansion.",
       audio: ["https://archive.org/download/navagraha-songs_202004/BHUHASPATIYE%20GURUVE.mp3"] },
     { key: "budh", name: "Budh Dev", sub: "बुध देव", color: "#8fd18a", hue: 130,
       hero: "☿", orbit: ["📗", "🪶", "🌿"],
+      img: vnCommonsImg("Budha%20graha.JPG"),
       mantra: "ॐ ब्रां ब्रीं ब्रौं सः बुधाय नमः", roman: "Om Brāṃ Brīṃ Brauṃ Saḥ Budhāya Namaḥ",
       meaning: "Beej mantra of Mercury (Budh) — for intellect, speech, learning and trade.",
       audio: ["https://archive.org/download/navagraha-songs_202004/BUDHANENISO%20ENNA.mp3"] },
     { key: "ketu", name: "Ketu Maharaj", sub: "केतु", color: "#c69be0", hue: 275,
       hero: "☉", orbit: ["🚩", "✨", "🔯"],
+      img: vnCommonsImg("Ketu%20graha.JPG"),
       mantra: "ॐ स्रां स्रीं स्रौं सः केतवे नमः", roman: "Om Srāṃ Srīṃ Srauṃ Saḥ Ketave Namaḥ",
       meaning: "Beej mantra of Ketu — for detachment, insight, research and moksha.",
       audio: ["https://archive.org/download/navagraha-songs_202004/GNANAKARAKA%20KETU%20DEVANE.mp3"] }
@@ -16468,10 +16478,16 @@
     }).join("");
     var petals = "";
     for (var i = 0; i < 6; i++) petals += '<span class="vn-darshan-petal" style="--p:' + i + '">🌸</span>';
+    // Real deity photo (framed inside the halo); the emoji hero is the fallback
+    // shown only if the image fails to load (wired in vnOpenDarshan).
+    var hero = deity.img
+      ? '<img class="vn-darshan-photo" src="' + escapeHtml(deity.img) + '" alt="' + escapeHtml(deity.name) + '" referrerpolicy="no-referrer" loading="eager">' +
+        '<span class="vn-darshan-hero" style="display:none">' + deity.hero + '</span>'
+      : '<span class="vn-darshan-hero">' + deity.hero + '</span>';
     return '<div class="vn-darshan-scene" style="--deity:' + deity.color + ';--deity-hue:' + deity.hue + '">' +
       '<span class="vn-darshan-rays" aria-hidden="true"></span>' +
       '<span class="vn-darshan-halo" aria-hidden="true"></span>' +
-      '<span class="vn-darshan-hero">' + deity.hero + '</span>' +
+      hero +
       orbit +
       '<span class="vn-darshan-petals" aria-hidden="true">' + petals + '</span>' +
       '</div>';
@@ -16499,6 +16515,13 @@
         '<span class="vn-darshan-status" id="vnDarshanStatus">Loading mantra…</span></div>' +
       '</div>';
     document.body.appendChild(el);
+    // If the real deity photo fails to load, reveal the animated symbolic art.
+    var photo = el.querySelector(".vn-darshan-photo");
+    if (photo) photo.addEventListener("error", function () {
+      photo.style.display = "none";
+      var fb = photo.parentNode && photo.parentNode.querySelector(".vn-darshan-hero");
+      if (fb) fb.style.display = "inline-flex";
+    });
     var statusEl = el.querySelector("#vnDarshanStatus");
     var playBtn = el.querySelector("#vnDarshanPlay");
     vnStartMantra(deity, statusEl, playBtn);

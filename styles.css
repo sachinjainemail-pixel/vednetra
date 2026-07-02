@@ -8218,3 +8218,21 @@ body.report-active .vn-floating-download { display: inline-flex; }
   .vn-darshan-rays, .vn-darshan-halo, .vn-darshan-hero, .vn-darshan-orbit, .vn-darshan-petal { animation: none; }
   .vn-darshan-petals { display: none; }
 }
+
+/* Real deity photo inside the darshan halo */
+.vn-darshan-photo {
+  position: relative;
+  z-index: 1;
+  width: 168px;
+  height: 168px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;
+  border: 3px solid hsla(var(--deity-hue), 80%, 70%, 0.85);
+  box-shadow: 0 0 34px hsla(var(--deity-hue), 90%, 60%, 0.55), 0 8px 22px rgba(0, 0, 0, 0.5);
+  animation: vnDeityBob 4s ease-in-out infinite;
+  background: rgba(0, 0, 0, 0.25);
+}
+@media (max-width: 560px) {
+  .vn-darshan-photo { width: 148px; height: 148px; }
+}
