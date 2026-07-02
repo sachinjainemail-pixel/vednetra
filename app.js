@@ -16399,6 +16399,9 @@
   var VN_DEITY_BY_KEY = (function () { var m = {}; VN_DEITIES.forEach(function (d) { m[d.key] = d; }); return m; })();
   var vnDarshanAudio = null;      // current HTMLAudioElement
   var vnDarshanOm = null;         // { ctx, stop } synthesized-Om fallback
+  var vnDarshanTTS = false;       // spoken-mantra (speechSynthesis) fallback active
+  var vnDarshanToken = 0;         // generation counter — invalidates stale start chains
+  function vnAsciiFold(s) { return (s && s.normalize) ? s.normalize("NFD").replace(/[̀-ͯ]/g, "") : (s || ""); }
 
   function vnWireDeities() {
     var wrap = document.querySelector("#vnSplash .vn-deities");
@@ -16411,8 +16414,38 @@
   }
 
   function vnStopDarshanAudio() {
-    if (vnDarshanAudio) { try { vnDarshanAudio.pause(); vnDarshanAudio.src = ""; } catch (e) {} vnDarshanAudio = null; }
+    vnDarshanToken++; // invalidate any in-flight start chain so it can't restart audio
+    if (vnDarshanAudio) { try { vnDarshanAudio.pause(); vnDarshanAudio.removeAttribute("src"); vnDarshanAudio.load(); } catch (e) {} vnDarshanAudio = null; }
     if (vnDarshanOm) { try { vnDarshanOm.stop(); } catch (e) {} vnDarshanOm = null; }
+    if (vnDarshanTTS) { try { window.speechSynthesis.cancel(); } catch (e) {} vnDarshanTTS = false; }
+  }
+  function vnDarshanPlaying() {
+    return (vnDarshanAudio && !vnDarshanAudio.paused) || !!vnDarshanOm || vnDarshanTTS;
+  }
+  // Recite the mantra with the device voice — a meaningful fallback when the
+  // recording can't stream (so e.g. Ganesha still chants, not just an Om drone).
+  function vnSpeakMantra(deity, myToken, setState) {
+    if (typeof window === "undefined" || !window.speechSynthesis || !window.SpeechSynthesisUtterance) return false;
+    var text = vnAsciiFold(deity.roman || deity.mantra || "").trim();
+    if (!text) return false;
+    vnDarshanTTS = true;
+    function pickVoice() {
+      try {
+        var vs = window.speechSynthesis.getVoices() || [];
+        return vs.filter(function (v) { return /hi[-_]?IN|hindi|sanskrit/i.test(v.lang + " " + v.name); })[0] || null;
+      } catch (e) { return null; }
+    }
+    function chant() {
+      if (myToken !== vnDarshanToken || !vnDarshanTTS) return;
+      var u = new window.SpeechSynthesisUtterance(text);
+      u.rate = 0.78; u.pitch = 0.9; u.lang = "hi-IN";
+      var v = pickVoice(); if (v) u.voice = v;
+      u.onend = function () { if (myToken === vnDarshanToken && vnDarshanTTS) setTimeout(chant, 700); };
+      try { window.speechSynthesis.speak(u); } catch (e) {}
+    }
+    chant();
+    if (setState) setState("Reciting the mantra aloud", true);
+    return true;
   }
 
   // Synthesized "Om" drone (Web Audio) — plays when a mantra stream can't load.
@@ -16438,36 +16471,42 @@
     } catch (e) { return null; }
   }
 
-  // Try each candidate URL; on failure fall back to the synthesized Om.
+  // Try each candidate URL; if none stream, recite the mantra aloud; if speech
+  // is unavailable, fall back to the synthesized Om. A per-call token makes any
+  // stale chain (from a previous deity/tap) abort so only ONE mantra ever plays.
   function vnStartMantra(deity, statusEl, btn) {
-    vnStopDarshanAudio();
+    vnStopDarshanAudio();               // stops everything AND bumps the token
+    var myToken = vnDarshanToken;       // this call's generation
     var urls = (deity.audio || []).slice();
+    function alive() { return myToken === vnDarshanToken; }
     function setState(txt, playing) {
+      if (!alive()) return;
       if (statusEl) statusEl.textContent = txt;
       if (btn) { btn.textContent = playing ? "❚❚ Pause" : "▶ Play mantra"; btn.setAttribute("aria-pressed", playing ? "true" : "false"); }
     }
-    function omFallback() {
-      vnDarshanOm = vnPlayOmDrone();
+    function fallback() {
+      if (!alive()) return;
+      if (vnSpeakMantra(deity, myToken, setState)) return;       // recite the mantra
+      vnDarshanOm = vnPlayOmDrone();                             // else the sacred Om
       setState(vnDarshanOm ? "Mantra stream unavailable — chanting sacred Om" : "Audio unavailable on this device", !!vnDarshanOm);
     }
     function tryAt(i) {
-      if (i >= urls.length) { omFallback(); return; }
+      if (!alive()) return;
+      if (i >= urls.length) { fallback(); return; }
       var audio = new Audio();
-      // No crossOrigin: we only play the media (never read its samples), so
-      // opaque cross-origin playback works even when the host sends no CORS
-      // headers. Setting crossOrigin would force CORS and break playback.
       audio.preload = "auto"; audio.loop = true;
-      audio.src = urls[i];
-      vnDarshanAudio = audio;
       var advanced = false;
-      audio.addEventListener("error", function () { if (advanced) return; advanced = true; tryAt(i + 1); });
-      audio.addEventListener("playing", function () { setState("Now playing the mantra — loop on", true); });
+      audio.addEventListener("error", function () { if (advanced || !alive()) return; advanced = true; tryAt(i + 1); });
+      audio.addEventListener("playing", function () {
+        if (!alive()) { try { audio.pause(); } catch (e) {} return; }  // navigated away → don't overlap
+        setState("Now playing the mantra — loop on", true);
+      });
+      audio.src = urls[i];
+      if (!alive()) return;
+      vnDarshanAudio = audio;
       setState("Loading mantra…", true);
       var p = audio.play();
-      if (p && p.catch) p.catch(function () {
-        // autoplay blocked or load error — try next, else Om
-        if (advanced) return; advanced = true; tryAt(i + 1);
-      });
+      if (p && p.catch) p.catch(function () { if (advanced || !alive()) return; advanced = true; tryAt(i + 1); });
     }
     tryAt(0);
   }
@@ -16542,11 +16581,16 @@
     Array.prototype.forEach.call(el.querySelectorAll("[data-darshan-nav]"), function (b) {
       b.addEventListener("click", function () { go(Number(b.getAttribute("data-darshan-nav"))); });
     });
+    // Single, reliable toggle: if anything is sounding (stream, Om or speech),
+    // stop it all; otherwise (re)start the mantra for THIS deity.
     playBtn.addEventListener("click", function () {
-      if (vnDarshanAudio && !vnDarshanAudio.paused) { vnDarshanAudio.pause(); playBtn.textContent = "▶ Play mantra"; playBtn.setAttribute("aria-pressed", "false"); statusEl.textContent = "Paused"; }
-      else if (vnDarshanAudio) { vnDarshanAudio.play(); playBtn.textContent = "❚❚ Pause"; playBtn.setAttribute("aria-pressed", "true"); statusEl.textContent = "Now playing the mantra — loop on"; }
-      else if (vnDarshanOm) { vnStopDarshanAudio(); playBtn.textContent = "▶ Play mantra"; playBtn.setAttribute("aria-pressed", "false"); statusEl.textContent = "Stopped"; }
-      else { vnStartMantra(deity, statusEl, playBtn); }
+      if (vnDarshanPlaying()) {
+        vnStopDarshanAudio();
+        playBtn.textContent = "▶ Play mantra"; playBtn.setAttribute("aria-pressed", "false");
+        statusEl.textContent = "Paused";
+      } else {
+        vnStartMantra(deity, statusEl, playBtn);
+      }
     });
     document.addEventListener("keydown", onKey);
   }
