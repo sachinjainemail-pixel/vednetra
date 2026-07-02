@@ -8062,3 +8062,159 @@ body.report-active .vn-floating-download { display: inline-flex; }
 @media (min-width: 1081px) { .vn-floating-download { right: 84px; } }
 @media (max-width: 560px) { .vn-floating-download { right: 12px; bottom: 14px; padding: 11px 16px; font-size: 14px; } }
 @media print { .vn-floating-download { display: none !important; } }
+
+/* ---- Deity tiles are now interactive buttons ---- */
+.vn-splash .vn-deity {
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(230, 200, 120, 0.22);
+  border-radius: 16px;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+.vn-splash .vn-deity:hover,
+.vn-splash .vn-deity:focus-visible {
+  transform: translateY(-4px) scale(1.04);
+  border-color: rgba(240, 210, 120, 0.7);
+  background: rgba(255, 255, 255, 0.09);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
+  outline: none;
+}
+.vn-splash .vn-deity::after {
+  content: "◉ Darshan";
+  display: block;
+  margin-top: 4px;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: rgba(240, 210, 130, 0.85);
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+.vn-splash .vn-deity:hover::after,
+.vn-splash .vn-deity:focus-visible::after { opacity: 1; }
+
+/* ---- Darshan overlay ---- */
+.vn-darshan-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: radial-gradient(circle at 50% 30%, rgba(30, 18, 54, 0.86), rgba(6, 4, 16, 0.96));
+  backdrop-filter: blur(6px);
+  animation: vnFadeIn 240ms ease;
+}
+@keyframes vnFadeIn { from { opacity: 0; } to { opacity: 1; } }
+.vn-darshan-card {
+  position: relative;
+  width: min(440px, 94vw);
+  max-height: 92vh;
+  overflow-y: auto;
+  text-align: center;
+  padding: 22px 20px 26px;
+  border-radius: 26px;
+  color: #fbf4e2;
+  background:
+    radial-gradient(circle at 50% 22%, hsla(var(--deity-hue), 60%, 30%, 0.55), rgba(12, 8, 26, 0.9)),
+    linear-gradient(180deg, rgba(28, 20, 48, 0.96), rgba(10, 7, 22, 0.98));
+  border: 1px solid hsla(var(--deity-hue), 70%, 62%, 0.5);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6), 0 0 60px hsla(var(--deity-hue), 70%, 50%, 0.28) inset;
+}
+.vn-darshan-close {
+  position: absolute; top: 10px; right: 12px;
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.3); color: #fff; font-size: 16px; cursor: pointer; z-index: 2;
+}
+.vn-darshan-close:hover { background: rgba(0, 0, 0, 0.5); }
+.vn-darshan-nav {
+  position: absolute; top: 46%; transform: translateY(-50%);
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(0, 0, 0, 0.28); color: #fff; font-size: 24px; line-height: 1; cursor: pointer; z-index: 2;
+}
+.vn-darshan-prev { left: 8px; } .vn-darshan-next { right: 8px; }
+.vn-darshan-nav:hover { background: rgba(0, 0, 0, 0.5); }
+
+/* darshan animated scene */
+.vn-darshan-scene {
+  position: relative;
+  width: 220px; height: 220px;
+  margin: 6px auto 10px;
+  display: flex; align-items: center; justify-content: center;
+}
+.vn-darshan-rays {
+  position: absolute; inset: -6%;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, hsla(var(--deity-hue), 85%, 62%, 0.0), hsla(var(--deity-hue), 90%, 66%, 0.42), hsla(var(--deity-hue), 85%, 62%, 0.0) 40%, hsla(var(--deity-hue), 90%, 70%, 0.42) 60%, hsla(var(--deity-hue), 85%, 62%, 0.0));
+  filter: blur(2px);
+  animation: vnSpin 14s linear infinite;
+}
+.vn-darshan-halo {
+  position: absolute; width: 150px; height: 150px; border-radius: 50%;
+  background: radial-gradient(circle, hsla(var(--deity-hue), 90%, 72%, 0.55), hsla(var(--deity-hue), 80%, 50%, 0.12) 60%, transparent 72%);
+  animation: vnPulse 3.4s ease-in-out infinite;
+}
+.vn-darshan-hero {
+  position: relative;
+  font-size: 90px;
+  line-height: 1;
+  filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.5));
+  animation: vnDeityBob 4s ease-in-out infinite;
+  z-index: 1;
+}
+@keyframes vnDeityBob { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-8px) scale(1.05); } }
+.vn-darshan-orbit {
+  position: absolute; left: 50%; top: 50%;
+  font-size: 28px;
+  transform-origin: 0 0;
+  animation: vnOrbit 12s linear infinite;
+  animation-delay: calc(var(--o) * -4s);
+}
+@keyframes vnOrbit {
+  from { transform: rotate(0deg) translateX(104px) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(104px) rotate(-360deg); }
+}
+.vn-darshan-petals { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.vn-darshan-petal {
+  position: absolute; bottom: -18px; font-size: 16px; opacity: 0;
+  left: calc(10% + var(--p) * 15%);
+  animation: vnPetal 6s linear infinite;
+  animation-delay: calc(var(--p) * -1s);
+}
+@keyframes vnPetal {
+  0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+  15% { opacity: 0.9; }
+  100% { transform: translateY(-240px) rotate(220deg); opacity: 0; }
+}
+.vn-darshan-name { margin: 6px 0 0; font-size: 24px; }
+.vn-darshan-sub { margin: 2px 0 10px; font-size: 15px; color: hsla(var(--deity-hue), 60%, 80%, 0.95); }
+.vn-darshan-mantra {
+  margin: 8px auto; font-size: 22px; font-weight: 700; line-height: 1.5;
+  color: #ffe9ad; text-shadow: 0 0 18px hsla(var(--deity-hue), 90%, 60%, 0.5);
+}
+.vn-darshan-roman { margin: 2px 0; font-size: 14px; font-style: italic; color: #efe6cf; }
+.vn-darshan-meaning { margin: 8px auto 14px; font-size: 13px; max-width: 340px; color: #d9cfe6; line-height: 1.5; }
+.vn-darshan-audio { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.vn-darshan-play {
+  padding: 9px 18px; border-radius: 999px; cursor: pointer;
+  border: none; font-weight: 700; font-size: 14px; color: #22160a;
+  background: linear-gradient(180deg, #f4d98b, #d8a83a);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+.vn-darshan-status { font-size: 11px; color: #c7bcd8; }
+@media (max-width: 560px) {
+  .vn-darshan-scene { width: 190px; height: 190px; }
+  .vn-darshan-hero { font-size: 74px; }
+  @keyframes vnOrbit { from { transform: rotate(0deg) translateX(88px) rotate(0deg); } to { transform: rotate(360deg) translateX(88px) rotate(-360deg); } }
+  .vn-darshan-mantra { font-size: 19px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vn-darshan-rays, .vn-darshan-halo, .vn-darshan-hero, .vn-darshan-orbit, .vn-darshan-petal { animation: none; }
+  .vn-darshan-petals { display: none; }
+}
