@@ -16304,8 +16304,186 @@
       try { vnLoadHomeChartOnStartup(); } catch (e) {}
     }
     if (enter) enter.addEventListener("click", proceed);
+    try { vnWireDeities(); } catch (e) {}
     if (!splash) proceed();
   }
+
+  // ===========================================================================
+  // Deity darshan: tapping a splash tile opens an animated darshan scene and
+  // streams that deity's mantra (with a synthesized-Om fallback if the stream
+  // is unavailable). Images are animated symbolic art (offline); audio streams.
+  // ===========================================================================
+  var VN_DEITIES = [
+    { key: "ganesha", name: "Shri Ganesha", sub: "श्री गणेश", color: "#e8a33d", hue: 38,
+      hero: "🐘", orbit: ["🕉️", "🪔", "🌺"],
+      mantra: "ॐ गं गणपतये नमः", roman: "Om Gaṃ Gaṇapataye Namaḥ",
+      meaning: "Salutations to Ganesha, remover of obstacles and lord of beginnings.",
+      audio: ["https://archive.org/download/OmGamGanapatayeNamaha/OmGamGanapatayeNamaha.mp3", "https://archive.org/download/OmGamGanapatayeNamaha/Om%20Gam%20Ganapataye%20Namaha.mp3"] },
+    { key: "shiva", name: "Mahadeva Shiva", sub: "महादेव", color: "#7fb4e6", hue: 205,
+      hero: "🔱", orbit: ["🌙", "🐍", "🕊️"],
+      mantra: "ॐ नमः शिवाय", roman: "Om Namaḥ Śivāya",
+      meaning: "I bow to Shiva, the auspicious inner Self and lord of transformation.",
+      audio: ["https://archive.org/download/shivamantrasandsongs/Aum%20Namah%20Shivaya.mp3", "https://archive.org/download/shivamantrasandsongs/Om%20namah%20shivaya%202.mp3"] },
+    { key: "saraswati", name: "Maa Saraswati", sub: "माँ सरस्वती", color: "#f2f0ea", hue: 48,
+      hero: "🪷", orbit: ["🦢", "🎶", "📿"],
+      mantra: "ॐ ऐं सरस्वत्यै नमः", roman: "Om Aiṃ Sarasvatyai Namaḥ",
+      meaning: "Salutations to Saraswati, goddess of knowledge, speech, music and the arts.",
+      audio: ["https://archive.org/download/SaraswatiMantra_201709/SaraswatiMantra.mp3", "https://archive.org/download/SaraswatiMantra_201709/Saraswati%20Mantra.mp3"] },
+    { key: "brihaspati", name: "Guru Brihaspati", sub: "गुरु बृहस्पति", color: "#f0c44a", hue: 45,
+      hero: "♃", orbit: ["🪔", "📿", "🌼"],
+      mantra: "ॐ ग्रां ग्रीं ग्रौं सः गुरवे नमः", roman: "Om Grāṃ Grīṃ Grauṃ Saḥ Gurave Namaḥ",
+      meaning: "Beej mantra of Jupiter (Guru) — for wisdom, fortune, dharma and expansion.",
+      audio: ["https://archive.org/download/navagraha-songs_202004/BHUHASPATIYE%20GURUVE.mp3"] },
+    { key: "budh", name: "Budh Dev", sub: "बुध देव", color: "#8fd18a", hue: 130,
+      hero: "☿", orbit: ["📗", "🪶", "🌿"],
+      mantra: "ॐ ब्रां ब्रीं ब्रौं सः बुधाय नमः", roman: "Om Brāṃ Brīṃ Brauṃ Saḥ Budhāya Namaḥ",
+      meaning: "Beej mantra of Mercury (Budh) — for intellect, speech, learning and trade.",
+      audio: ["https://archive.org/download/navagraha-songs_202004/BUDHANENISO%20ENNA.mp3"] },
+    { key: "ketu", name: "Ketu Maharaj", sub: "केतु", color: "#c69be0", hue: 275,
+      hero: "☉", orbit: ["🚩", "✨", "🔯"],
+      mantra: "ॐ स्रां स्रीं स्रौं सः केतवे नमः", roman: "Om Srāṃ Srīṃ Srauṃ Saḥ Ketave Namaḥ",
+      meaning: "Beej mantra of Ketu — for detachment, insight, research and moksha.",
+      audio: ["https://archive.org/download/navagraha-songs_202004/GNANAKARAKA%20KETU%20DEVANE.mp3"] }
+  ];
+  var VN_DEITY_BY_KEY = (function () { var m = {}; VN_DEITIES.forEach(function (d) { m[d.key] = d; }); return m; })();
+  var vnDarshanAudio = null;      // current HTMLAudioElement
+  var vnDarshanOm = null;         // { ctx, stop } synthesized-Om fallback
+
+  function vnWireDeities() {
+    var wrap = document.querySelector("#vnSplash .vn-deities");
+    if (!wrap || wrap._vnWired) return;
+    wrap._vnWired = true;
+    wrap.addEventListener("click", function (e) {
+      var tile = e.target && e.target.closest ? e.target.closest("[data-deity]") : null;
+      if (tile) { e.stopPropagation(); vnOpenDarshan(tile.getAttribute("data-deity")); }
+    });
+  }
+
+  function vnStopDarshanAudio() {
+    if (vnDarshanAudio) { try { vnDarshanAudio.pause(); vnDarshanAudio.src = ""; } catch (e) {} vnDarshanAudio = null; }
+    if (vnDarshanOm) { try { vnDarshanOm.stop(); } catch (e) {} vnDarshanOm = null; }
+  }
+
+  // Synthesized "Om" drone (Web Audio) — plays when a mantra stream can't load.
+  function vnPlayOmDrone() {
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      var ctx = new AC();
+      var master = ctx.createGain(); master.gain.value = 0; master.connect(ctx.destination);
+      master.gain.linearRampToValueAtTime(0.16, ctx.currentTime + 1.2);
+      var freqs = [136.1, 272.2, 204.15]; // Om (Sa) drone + octave + fifth
+      var oscs = freqs.map(function (f, i) {
+        var o = ctx.createOscillator(); o.type = i === 0 ? "sine" : "triangle"; o.frequency.value = f;
+        var g = ctx.createGain(); g.gain.value = i === 0 ? 0.6 : 0.22; o.connect(g); g.connect(master); o.start();
+        var lfo = ctx.createOscillator(); lfo.frequency.value = 0.18 + i * 0.05;
+        var lg = ctx.createGain(); lg.gain.value = 2.2; lfo.connect(lg); lg.connect(o.frequency); lfo.start();
+        return [o, lfo];
+      });
+      return { ctx: ctx, stop: function () {
+        try { master.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.4); } catch (e) {}
+        setTimeout(function () { oscs.forEach(function (pair) { pair.forEach(function (n) { try { n.stop(); } catch (e) {} }); }); try { ctx.close(); } catch (e) {} }, 500);
+      } };
+    } catch (e) { return null; }
+  }
+
+  // Try each candidate URL; on failure fall back to the synthesized Om.
+  function vnStartMantra(deity, statusEl, btn) {
+    vnStopDarshanAudio();
+    var urls = (deity.audio || []).slice();
+    function setState(txt, playing) {
+      if (statusEl) statusEl.textContent = txt;
+      if (btn) { btn.textContent = playing ? "❚❚ Pause" : "▶ Play mantra"; btn.setAttribute("aria-pressed", playing ? "true" : "false"); }
+    }
+    function omFallback() {
+      vnDarshanOm = vnPlayOmDrone();
+      setState(vnDarshanOm ? "Mantra stream unavailable — chanting sacred Om" : "Audio unavailable on this device", !!vnDarshanOm);
+    }
+    function tryAt(i) {
+      if (i >= urls.length) { omFallback(); return; }
+      var audio = new Audio();
+      audio.preload = "auto"; audio.loop = true; audio.crossOrigin = "anonymous";
+      audio.src = urls[i];
+      vnDarshanAudio = audio;
+      var advanced = false;
+      audio.addEventListener("error", function () { if (advanced) return; advanced = true; tryAt(i + 1); });
+      audio.addEventListener("playing", function () { setState("Now playing the mantra — loop on", true); });
+      setState("Loading mantra…", true);
+      var p = audio.play();
+      if (p && p.catch) p.catch(function () {
+        // autoplay blocked or load error — try next, else Om
+        if (advanced) return; advanced = true; tryAt(i + 1);
+      });
+    }
+    tryAt(0);
+  }
+
+  function vnDarshanArtHtml(deity) {
+    var orbit = (deity.orbit || []).map(function (g, i) {
+      return '<span class="vn-darshan-orbit" style="--o:' + i + '">' + g + '</span>';
+    }).join("");
+    var petals = "";
+    for (var i = 0; i < 6; i++) petals += '<span class="vn-darshan-petal" style="--p:' + i + '">🌸</span>';
+    return '<div class="vn-darshan-scene" style="--deity:' + deity.color + ';--deity-hue:' + deity.hue + '">' +
+      '<span class="vn-darshan-rays" aria-hidden="true"></span>' +
+      '<span class="vn-darshan-halo" aria-hidden="true"></span>' +
+      '<span class="vn-darshan-hero">' + deity.hero + '</span>' +
+      orbit +
+      '<span class="vn-darshan-petals" aria-hidden="true">' + petals + '</span>' +
+      '</div>';
+  }
+
+  function vnOpenDarshan(key) {
+    var deity = VN_DEITY_BY_KEY[key]; if (!deity) return;
+    var prior = document.getElementById("vnDarshan"); if (prior) prior.remove();
+    vnStopDarshanAudio();
+    var el = document.createElement("div");
+    el.id = "vnDarshan";
+    el.className = "vn-darshan-overlay";
+    el.innerHTML =
+      '<div class="vn-darshan-card" style="--deity:' + deity.color + ';--deity-hue:' + deity.hue + '">' +
+        '<button type="button" class="vn-darshan-close" id="vnDarshanClose" aria-label="Close darshan">✕</button>' +
+        '<button type="button" class="vn-darshan-nav vn-darshan-prev" data-darshan-nav="-1" aria-label="Previous deity">‹</button>' +
+        '<button type="button" class="vn-darshan-nav vn-darshan-next" data-darshan-nav="1" aria-label="Next deity">›</button>' +
+        vnDarshanArtHtml(deity) +
+        '<h2 class="vn-darshan-name">' + escapeHtml(deity.name) + '</h2>' +
+        '<p class="vn-darshan-sub">' + deity.sub + '</p>' +
+        '<p class="vn-darshan-mantra">' + deity.mantra + '</p>' +
+        '<p class="vn-darshan-roman">' + escapeHtml(deity.roman) + '</p>' +
+        '<p class="vn-darshan-meaning">' + escapeHtml(deity.meaning) + '</p>' +
+        '<div class="vn-darshan-audio"><button type="button" class="vn-darshan-play" id="vnDarshanPlay" aria-pressed="true">❚❚ Pause</button>' +
+        '<span class="vn-darshan-status" id="vnDarshanStatus">Loading mantra…</span></div>' +
+      '</div>';
+    document.body.appendChild(el);
+    var statusEl = el.querySelector("#vnDarshanStatus");
+    var playBtn = el.querySelector("#vnDarshanPlay");
+    vnStartMantra(deity, statusEl, playBtn);
+
+    function close() { vnStopDarshanAudio(); el.remove(); document.removeEventListener("keydown", onKey); }
+    function go(dir) {
+      var idx = VN_DEITIES.indexOf(deity);
+      var next = VN_DEITIES[(idx + dir + VN_DEITIES.length) % VN_DEITIES.length];
+      close(); vnOpenDarshan(next.key);
+    }
+    function onKey(ev) {
+      if (ev.key === "Escape") close();
+      else if (ev.key === "ArrowLeft") go(-1);
+      else if (ev.key === "ArrowRight") go(1);
+    }
+    el.querySelector("#vnDarshanClose").addEventListener("click", close);
+    el.addEventListener("click", function (ev) { if (ev.target === el) close(); });
+    Array.prototype.forEach.call(el.querySelectorAll("[data-darshan-nav]"), function (b) {
+      b.addEventListener("click", function () { go(Number(b.getAttribute("data-darshan-nav"))); });
+    });
+    playBtn.addEventListener("click", function () {
+      if (vnDarshanAudio && !vnDarshanAudio.paused) { vnDarshanAudio.pause(); playBtn.textContent = "▶ Play mantra"; playBtn.setAttribute("aria-pressed", "false"); statusEl.textContent = "Paused"; }
+      else if (vnDarshanAudio) { vnDarshanAudio.play(); playBtn.textContent = "❚❚ Pause"; playBtn.setAttribute("aria-pressed", "true"); statusEl.textContent = "Now playing the mantra — loop on"; }
+      else if (vnDarshanOm) { vnStopDarshanAudio(); playBtn.textContent = "▶ Play mantra"; playBtn.setAttribute("aria-pressed", "false"); statusEl.textContent = "Stopped"; }
+      else { vnStartMantra(deity, statusEl, playBtn); }
+    });
+    document.addEventListener("keydown", onKey);
+  }
+
   // ---- first-run onboarding ---------------------------------------------
   function vnMaybeShowOnboarding() {
     if (vnLsGet("vednetra.onboarded", "") === "1") return;

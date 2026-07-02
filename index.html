@@ -13,19 +13,19 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.svg">
-  <link rel="stylesheet" href="styles.css?v=47">
+  <link rel="stylesheet" href="styles.css?v=48">
 </head>
 <body>
   <div id="vnSplash" class="vn-splash" role="dialog" aria-label="Welcome to VedNetra">
     <div class="vn-splash-inner">
       <p class="vn-splash-bless">&#10023; With the divine blessings of &#10023;</p>
       <div class="vn-deities">
-        <div class="vn-deity" style="--i:0"><span class="vn-deity-glyph">&#2384;</span><span class="vn-deity-name">Shri Ganesha</span><span class="vn-deity-sub">&#2358;&#2381;&#2352;&#2368; &#2327;&#2339;&#2375;&#2358;</span></div>
-        <div class="vn-deity" style="--i:1"><span class="vn-deity-glyph">&#128305;</span><span class="vn-deity-name">Mahadeva Shiva</span><span class="vn-deity-sub">&#2350;&#2361;&#2366;&#2342;&#2375;&#2357;</span></div>
-        <div class="vn-deity" style="--i:2"><span class="vn-deity-glyph">&#129719;</span><span class="vn-deity-name">Maa Saraswati</span><span class="vn-deity-sub">&#2350;&#2366;&#2305; &#2360;&#2352;&#2360;&#2381;&#2357;&#2340;&#2368;</span></div>
-        <div class="vn-deity" style="--i:3"><span class="vn-deity-glyph">&#9795;</span><span class="vn-deity-name">Guru Brihaspati</span><span class="vn-deity-sub">&#2327;&#2369;&#2352;&#2369; &#2348;&#2371;&#2361;&#2360;&#2381;&#2346;&#2340;&#2367;</span></div>
-        <div class="vn-deity" style="--i:4"><span class="vn-deity-glyph">&#9791;</span><span class="vn-deity-name">Budh Dev</span><span class="vn-deity-sub">&#2348;&#2369;&#2343; &#2342;&#2375;&#2357;</span></div>
-        <div class="vn-deity" style="--i:5"><span class="vn-deity-glyph">&#9739;</span><span class="vn-deity-name">Ketu Maharaj</span><span class="vn-deity-sub">&#2325;&#2375;&#2340;&#2369;</span></div>
+        <button type="button" class="vn-deity" style="--i:0" data-deity="ganesha" aria-label="Darshan of Shri Ganesha"><span class="vn-deity-glyph">&#2384;</span><span class="vn-deity-name">Shri Ganesha</span><span class="vn-deity-sub">&#2358;&#2381;&#2352;&#2368; &#2327;&#2339;&#2375;&#2358;</span></button>
+        <button type="button" class="vn-deity" style="--i:1" data-deity="shiva" aria-label="Darshan of Mahadeva Shiva"><span class="vn-deity-glyph">&#128305;</span><span class="vn-deity-name">Mahadeva Shiva</span><span class="vn-deity-sub">&#2350;&#2361;&#2366;&#2342;&#2375;&#2357;</span></button>
+        <button type="button" class="vn-deity" style="--i:2" data-deity="saraswati" aria-label="Darshan of Maa Saraswati"><span class="vn-deity-glyph">&#129719;</span><span class="vn-deity-name">Maa Saraswati</span><span class="vn-deity-sub">&#2350;&#2366;&#2305; &#2360;&#2352;&#2360;&#2381;&#2357;&#2340;&#2368;</span></button>
+        <button type="button" class="vn-deity" style="--i:3" data-deity="brihaspati" aria-label="Darshan of Guru Brihaspati"><span class="vn-deity-glyph">&#9795;</span><span class="vn-deity-name">Guru Brihaspati</span><span class="vn-deity-sub">&#2327;&#2369;&#2352;&#2369; &#2348;&#2371;&#2361;&#2360;&#2381;&#2346;&#2340;&#2367;</span></button>
+        <button type="button" class="vn-deity" style="--i:4" data-deity="budh" aria-label="Darshan of Budh Dev"><span class="vn-deity-glyph">&#9791;</span><span class="vn-deity-name">Budh Dev</span><span class="vn-deity-sub">&#2348;&#2369;&#2343; &#2342;&#2375;&#2357;</span></button>
+        <button type="button" class="vn-deity" style="--i:5" data-deity="ketu" aria-label="Darshan of Ketu Maharaj"><span class="vn-deity-glyph">&#9739;</span><span class="vn-deity-name">Ketu Maharaj</span><span class="vn-deity-sub">&#2325;&#2375;&#2340;&#2369;</span></button>
       </div>
       <div class="vn-splash-center">
         <span class="vn-aura" aria-hidden="true"></span>
@@ -53,7 +53,7 @@
           <div>
             <h1 class="brand-title">VedNetra</h1>
           </div>
-          <span class="status-pill">v1.47</span>
+          <span class="status-pill">v1.48</span>
         </div>
 
         <form id="birthForm" autocomplete="off">
@@ -442,7 +442,7 @@
           </div>
           <p class="empty-state-tagline">A complete Vedic workbench: divisional charts (D-1 to D-60), Vimshottari dasha, Shadbala, Ashtakavarga, KP, Jaimini and Varshfal — plus a daily dashboard, muhurta windows, numerology, card readings and more. Pick anything below to jump straight in.</p>
           <div id="vnHomeShowcase" class="vn-home-showcase"></div>
-          <p class="empty-state-version" id="appVersionLabel">Version 1.47</p>
+          <p class="empty-state-version" id="appVersionLabel">Version 1.48</p>
         </div>
         <article id="report" class="report hidden"></article>
       </section>
@@ -551,6 +551,6 @@
       </div>
     </div>
   </main>
-  <script src="app.js?v=47"></script>
+  <script src="app.js?v=48"></script>
 </body>
 </html>
