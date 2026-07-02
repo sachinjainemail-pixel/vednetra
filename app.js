@@ -16402,7 +16402,10 @@
     function tryAt(i) {
       if (i >= urls.length) { omFallback(); return; }
       var audio = new Audio();
-      audio.preload = "auto"; audio.loop = true; audio.crossOrigin = "anonymous";
+      // No crossOrigin: we only play the media (never read its samples), so
+      // opaque cross-origin playback works even when the host sends no CORS
+      // headers. Setting crossOrigin would force CORS and break playback.
+      audio.preload = "auto"; audio.loop = true;
       audio.src = urls[i];
       vnDarshanAudio = audio;
       var advanced = false;
