@@ -8236,3 +8236,18 @@ body.report-active .vn-floating-download { display: inline-flex; }
 @media (max-width: 560px) {
   .vn-darshan-photo { width: 148px; height: 148px; }
 }
+
+/* ===== Fix: home cards overlapping on laptop/desktop (short viewports) =====
+   The homepage packs each page's cards into a fixed 100dvh area. On short
+   laptop screens the 9 cards + descriptions don't fit, and align-content:
+   space-between then distributed NEGATIVE free space, overlapping the rows
+   (smeared text). Fix: always stack from the top, and let a page scroll
+   vertically if its cards exceed the available height — never overlap. */
+.vn-home-page .vn-home-grid { align-content: start !important; min-height: 0 !important; }
+@media (min-width: 561px) {
+  .vn-home-carousel { align-items: stretch; }
+  .vn-home-page { overflow-y: auto; overflow-x: hidden; }
+  /* cards clip any spill so long descriptions can never smear across
+     neighbouring cards even on very short windows */
+  .vn-home-card { justify-content: flex-start; overflow: hidden; }
+}
