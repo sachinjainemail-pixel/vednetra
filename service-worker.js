@@ -1,4 +1,4 @@
-const CACHE_NAME = "vednetra-v49";
+const CACHE_NAME = "vednetra-v50";
 const APP_ASSETS = [
   "./",
   "index.html",

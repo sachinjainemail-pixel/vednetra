@@ -2770,15 +2770,47 @@
       });
   }
 
+  // Nuke all caches + service workers and reload — a manual escape hatch for a
+  // home-screen shortcut that got stuck on an old build.
+  function vnForceRefresh() {
+    function reload() { try { window.location.reload(); } catch (e) {} }
+    var jobs = [];
+    try {
+      if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) {
+        jobs.push(navigator.serviceWorker.getRegistrations().then(function (regs) { return Promise.all(regs.map(function (r) { return r.unregister(); })); }).catch(function () {}));
+      }
+      if (window.caches && caches.keys) {
+        jobs.push(caches.keys().then(function (keys) { return Promise.all(keys.map(function (k) { return caches.delete(k); })); }).catch(function () {}));
+      }
+    } catch (e) {}
+    Promise.all(jobs).then(reload, reload);
+    setTimeout(reload, 1500);
+  }
+  function vnWireForceRefresh() {
+    if (typeof document === "undefined") return;
+    ["appVersionLabel"].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el || el._vnRefreshWired) return;
+      el._vnRefreshWired = true;
+      el.style.cursor = "pointer";
+      el.title = "Tap to force-update to the latest version";
+      el.addEventListener("click", function () {
+        if (typeof window !== "undefined" && window.confirm && window.confirm("Update VedNetra to the latest version now? This clears the app cache and reloads.")) vnForceRefresh();
+      });
+    });
+  }
+
   function registerServiceWorker() {
+    try { vnWireForceRefresh(); } catch (e) {}
     if (typeof navigator === "undefined" || !navigator.serviceWorker || typeof window === "undefined") return;
     var host = window.location.hostname;
     var secureEnough = window.location.protocol === "https:" || host === "localhost" || host === "127.0.0.1";
     if (!secureEnough) return;
-    navigator.serviceWorker.register("service-worker.js").then(function (reg) {
-      // Auto-update: when a new service worker takes control, reload once so the
-      // user always sees the latest build without any manual cache clearing.
-      if (reg && reg.update) { try { reg.update(); } catch (_e) {} }
+    // updateViaCache:"none" — never serve the SW script itself from the HTTP
+    // cache, so a new build is always detected.
+    navigator.serviceWorker.register("service-worker.js", { updateViaCache: "none" }).then(function (reg) {
+      function checkForUpdate() { if (reg && reg.update) { try { reg.update(); } catch (_e) {} } }
+      checkForUpdate();
       reg.addEventListener("updatefound", function () {
         var sw = reg.installing;
         if (!sw) return;
@@ -2789,6 +2821,15 @@
           }
         });
       });
+      // Installed home-screen PWAs resume from the background without a fresh
+      // page load, so re-check for a new build whenever the app becomes visible,
+      // regains focus, or on a periodic timer. This is what unsticks iOS/Android
+      // home-screen shortcuts that would otherwise sit on an old version.
+      if (typeof document !== "undefined" && document.addEventListener) {
+        document.addEventListener("visibilitychange", function () { if (!document.hidden) checkForUpdate(); });
+      }
+      window.addEventListener("focus", checkForUpdate);
+      try { setInterval(checkForUpdate, 30 * 60 * 1000); } catch (_e) {}
     }).catch(function () {});
     var hasReloaded = false;
     navigator.serviceWorker.addEventListener("controllerchange", function () {
