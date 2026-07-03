@@ -8251,3 +8251,26 @@ body.report-active .vn-floating-download { display: inline-flex; }
      neighbouring cards even on very short windows */
   .vn-home-card { justify-content: flex-start; overflow: hidden; }
 }
+
+/* ===== Fix: keep the chart toolbar visible (Full Screen / Time Tool / Chart
+   details / Hide input / Download) =====
+   An earlier "hover to reveal" design collapsed #chartInputLayoutBar to a 9px
+   sliver and hid its buttons until hover/focus — on a laptop these controls
+   effectively vanished. Restore a normal, always-visible toolbar. */
+body.report-active #chartInputLayoutBar:not(.hidden) {
+  opacity: 1 !important;
+  height: auto !important;
+  min-height: 48px !important;
+  padding: 6px 12px !important;
+  border-color: rgba(200, 168, 78, 0.5) !important;
+  background: linear-gradient(180deg, rgba(253, 248, 238, 0.97), rgba(250, 244, 225, 0.94)) !important;
+  box-shadow: 0 6px 16px rgba(24, 15, 4, 0.14) !important;
+  overflow: visible !important;
+}
+body.report-active #chartInputLayoutBar:not(.hidden) > * {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  transform: none !important;
+}
+body.report-active #chartInputLayoutBar:not(.hidden)::before { opacity: 0 !important; }
