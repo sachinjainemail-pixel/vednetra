@@ -554,6 +554,7 @@
       wireButtonInteractionPolish();
       wireMobileAccessInfo();
       registerServiceWorker();
+      try { vnWireTopbarLayout(); } catch (e) {}
       // ---- VedNetra tools: language, nav labels, onboarding, home chart ----
       try {
         var langSel = document.getElementById("vnLangSelect");
@@ -2798,6 +2799,43 @@
         if (typeof window !== "undefined" && window.confirm && window.confirm("Update VedNetra to the latest version now? This clears the app cache and reloads.")) vnForceRefresh();
       });
     });
+  }
+
+  // Keep the fixed toolbar sitting just BELOW the nav ribbon (which can wrap to
+  // two rows) instead of overlapping it. Publishes the measured heights as CSS
+  // vars used by the layout rules.
+  function vnSyncTopbarLayout() {
+    try {
+      if (typeof document === "undefined" || !document.documentElement) return;
+      var nav = document.getElementById("chartDataNavRibbon");
+      var bar = document.getElementById("chartInputLayoutBar");
+      var navShown = nav && !nav.classList.contains("hidden") && nav.getBoundingClientRect().height > 0;
+      var barShown = bar && !bar.classList.contains("hidden") && bar.getBoundingClientRect().height > 0;
+      var navH = navShown ? nav.getBoundingClientRect().height : 0;
+      var barH = barShown ? bar.getBoundingClientRect().height : 0;
+      var root = document.documentElement.style;
+      root.setProperty("--vn-nav-h", Math.round(navH) + "px");
+      root.setProperty("--vn-topbar-h", Math.round(navH + barH + 16) + "px");
+    } catch (e) {}
+  }
+  var vnTopbarWired = false;
+  function vnWireTopbarLayout() {
+    if (vnTopbarWired || typeof window === "undefined") return;
+    vnTopbarWired = true;
+    var sync = function () { vnSyncTopbarLayout(); };
+    window.addEventListener("resize", sync);
+    if (window.ResizeObserver) {
+      ["chartDataNavRibbon", "chartInputLayoutBar"].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) { try { new ResizeObserver(sync).observe(el); } catch (e) {} }
+      });
+    }
+    if (window.MutationObserver && document.body) {
+      try { new MutationObserver(sync).observe(document.body, { attributes: true, attributeFilter: ["class"] }); } catch (e) {}
+    }
+    // a few delayed passes catch the first report render / font load
+    sync();
+    [100, 400, 1000].forEach(function (t) { setTimeout(sync, t); });
   }
 
   function registerServiceWorker() {
