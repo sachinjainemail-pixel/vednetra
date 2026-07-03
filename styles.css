@@ -8274,3 +8274,17 @@ body.report-active #chartInputLayoutBar:not(.hidden) > * {
   transform: none !important;
 }
 body.report-active #chartInputLayoutBar:not(.hidden)::before { opacity: 0 !important; }
+
+/* ===== Fix: toolbar overlapping the nav ribbon =====
+   The nav ribbon can wrap to two rows of category tabs, but the toolbar was
+   pinned at a fixed top that assumed a single row, so it overlapped the nav's
+   2nd row. Position it below the nav using its measured height (--vn-nav-h),
+   and reserve the combined height for the content (--vn-topbar-h). JS keeps
+   these vars in sync; the defaults below already clear a 2-row nav. */
+@media (min-width: 561px) {
+  body.report-active #chartInputLayoutBar:not(.hidden) {
+    top: calc(var(--vn-nav-h, 96px) + 6px) !important;
+  }
+  body.report-active .output-panel { padding-top: var(--vn-topbar-h, 150px) !important; }
+  body.report-active::before { height: var(--vn-topbar-h, 150px) !important; }
+}
