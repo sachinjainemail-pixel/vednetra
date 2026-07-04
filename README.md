@@ -33,8 +33,11 @@ It personalises yoga around your Ayurvedic **dosha**:
 - **Dosha quiz** — a 10-question quiz maps your Vata / Pitta / Kapha balance.
 - **My Dosha** — your constitution with balance meters, a rebalancing plan, and a daily routine (dinacharya).
 - **Yoga** — dosha-aligned sequences with a full-screen **guided practice player**: pose timer, progress ring, breath pacer, prev/next, and pause.
+- **Breathe** — breathing exercises / pranayama (box, 4·7·8, coherent, calming, energising, Nadi Shodhana, Bhramari, Sheetali) with a visual pacer.
+- **Meditate** — guided meditations (breath awareness, body scan, loving-kindness, yoga nidra, So-Hum, morning clarity) with a timed player, on-screen prompts and breathing anchor.
 - **Ayurveda** — per-dosha foods to favour/reduce, herbs, daily rituals, and seasonal tips.
-- **Breathe** — guided pranayama (box breathing, 4·7·8, calming, energising) with a visual pacer.
+- **DIYs** — Ayurvedic home remedies (abhyanga oil, ubtan mask, tongue scraping + oil pulling, hair oil, dry brushing, CCF tea) with ingredients, steps and cautions.
+- **Recipes** — dosha-friendly health recipes (kitchari, golden milk, CCF tea, stewed apples, mung soup, ojas balls) with ingredients and method.
 - **Progress** — sessions, minutes, day streak, and a 3-week activity heatmap (stored in `localStorage`; nothing is uploaded).
 - **Premium** — a freemium tier layout (Sattva Plus subscription, one-time courses like a *30-Day Dosha Reset*, live sessions) illustrating monetisation. Demo only — no real payments.
 

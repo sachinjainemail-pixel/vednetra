@@ -317,16 +317,120 @@ const AYUR = {
     breath:"Bhastrika / Kapalabhati (energising breath) — builds heat &amp; clears heaviness."}
 };
 
-/* ---------- Meditations / breathing ---------- */
+/* ---------- Breathing exercises (pranayama) ---------- */
 const BREATH = [
-  {id:"box", name:"Box Breathing", desc:"Equal 4-count inhale, hold, exhale, hold. Calms the nervous system.",
+  {id:"box", name:"Box Breathing", tag:"Focus", desc:"Equal 4-count inhale, hold, exhale, hold. Steadies the nervous system and sharpens focus.",
    phases:[["Inhale",4],["Hold",4],["Exhale",4],["Hold",4]], rounds:6},
-  {id:"478", name:"4·7·8 Relax", desc:"Longer exhale to settle the body toward sleep or calm.",
+  {id:"478", name:"4·7·8 Relax", tag:"Sleep", desc:"A long exhale tips the body toward rest — a classic wind-down before sleep.",
    phases:[["Inhale",4],["Hold",7],["Exhale",8]], rounds:5},
-  {id:"calm", name:"Calming Breath", desc:"Gentle 4-in / 6-out to soothe Vata &amp; Pitta.",
+  {id:"calm", name:"Calming Breath", tag:"Vata · Pitta", desc:"Gentle 4-in / 6-out to soothe anxiety and cool an overactive mind.",
    phases:[["Inhale",4],["Exhale",6]], rounds:8},
-  {id:"energize", name:"Energising Breath", desc:"Brisk 2-in / 2-out to lift Kapha heaviness.",
-   phases:[["Inhale",2],["Exhale",2]], rounds:14}
+  {id:"coherent", name:"Coherent 5·5", tag:"Balance", desc:"Even 5-in / 5-out (~6 breaths a minute) to balance heart rate and mood.",
+   phases:[["Inhale",5],["Exhale",5]], rounds:10},
+  {id:"energize", name:"Energising Breath", tag:"Kapha", desc:"Brisk 2-in / 2-out to shake off heaviness and wake the body up.",
+   phases:[["Inhale",2],["Exhale",2]], rounds:14},
+  {id:"nadi", name:"Nadi Shodhana", tag:"Vata", desc:"Alternate-nostril rhythm — inhale, hold, exhale evenly. Balancing and grounding. (Guided by count; use your thumb & ring finger to switch nostrils.)",
+   phases:[["Inhale L",4],["Hold",4],["Exhale R",4],["Inhale R",4],["Hold",4],["Exhale L",4]], rounds:5},
+  {id:"bhramari", name:"Bhramari (Humming)", tag:"Pitta", desc:"Inhale, then hum softly on a long exhale like a bee. Calms heat, anger and racing thoughts.",
+   phases:[["Inhale",4],["Hum out",8]], rounds:7},
+  {id:"sheetali", name:"Sheetali (Cooling)", tag:"Pitta", desc:"Curl the tongue and sip cool air in, exhale through the nose. Cools body and temper.",
+   phases:[["Sip in",4],["Exhale",6]], rounds:8}
+];
+
+/* ---------- Guided meditations ---------- */
+const MEDITATIONS = [
+  {id:"breath-aware", name:"Breath Awareness", tag:"Beginner", mins:5, dosha:"all",
+   desc:"The simplest anchor — rest your attention on the natural breath and return, gently, whenever it wanders.",
+   steps:["Sit tall and comfortable. Soften your shoulders and close your eyes.","Take three slow, deep breaths, letting each exhale be longer than the inhale.","Let the breath return to its natural rhythm. Don't control it — just watch.","Feel the cool air at the nostrils on the inhale, the warm air on the exhale.","When the mind wanders — and it will — kindly notice, and return to the breath.","No judgement. Every return is the practice.","Widen your awareness to the whole body breathing.","Take one more deep breath, and gently open your eyes."]},
+  {id:"body-scan", name:"Body Scan", tag:"Relax", mins:10, dosha:"vata",
+   desc:"Move attention slowly through the body, releasing tension inch by inch. Grounding for restless Vata.",
+   steps:["Lie down or sit and let your body feel heavy and supported.","Bring attention to your feet. Notice any sensation, then let them soften.","Move up through the calves and knees, releasing as you go.","Soften the thighs, hips and lower back.","Let the belly rise and fall freely; relax the chest.","Release the hands, arms and shoulders — let them drop.","Soften the neck, jaw, the space between the eyebrows.","Rest as a whole body, calm and complete. Stay as long as you like."]},
+  {id:"metta", name:"Loving-Kindness", tag:"Heart", mins:8, dosha:"pitta",
+   desc:"Metta — silently offer goodwill to yourself and others. Softens a sharp, critical Pitta mind.",
+   steps:["Settle in, hand on heart if you like. Breathe softly.","Bring yourself to mind. Silently repeat: 'May I be happy. May I be at ease.'","Feel the wish, don't just say it. Let it be warm.","Picture someone you love. Offer them: 'May you be happy. May you be at ease.'","Bring to mind a neutral person — offer the same wishes.","Now someone difficult, if you're ready. 'May you be at ease.'","Widen it to all beings everywhere: 'May all beings be free from suffering.'","Rest in that warmth, then gently return."]},
+  {id:"nidra", name:"Deep Rest (Yoga Nidra)", tag:"Sleep", mins:15, dosha:"vata",
+   desc:"A guided 'yogic sleep' — deeply restorative conscious rest. Beautiful before bed.",
+   steps:["Lie down, palms up, and set an intention for your practice.","Bring awareness to the whole body as one, still and heavy.","Rotate attention: right hand, arm, shoulder… then the left.","Sense both legs, the torso, the face — the whole body sinking.","Notice the breath moving on its own, without any effort.","Welcome any feelings that arise, then let them float away.","Rest in spacious awareness — awake, yet completely at ease.","When ready, deepen the breath and slowly return."]},
+  {id:"sohum", name:"So-Hum Mantra", tag:"Focus", mins:10, dosha:"all",
+   desc:"Ride the breath with a silent mantra — 'So' on the inhale, 'Hum' on the exhale. Steadies a busy mind.",
+   steps:["Sit tall, eyes closed, breath easy and slow.","On the inhale, silently hear the sound 'Soooo'.","On the exhale, silently hear 'Hummm'.","Let the mantra ride the breath — no forcing, just listening.","If thoughts pull you away, return to So… Hum.","Let the sound grow quieter and more subtle.","Rest in the stillness between the sounds.","Release the mantra and sit quietly before opening your eyes."]},
+  {id:"energize-med", name:"Morning Clarity", tag:"Kapha", mins:7, dosha:"kapha",
+   desc:"An upright, bright meditation to lift heaviness and start the day with clear intention.",
+   steps:["Sit up straight and tall — imagine a thread lifting the crown of your head.","Take five brisk, full breaths to bring energy into the body.","Feel alert and awake, eyes softly open or closed.","Bring to mind one clear intention for today.","Picture yourself moving through the day with ease and energy.","Let a small smile come — lightness in body and mind.","Take a deep breath in, and a strong sigh out.","Carry this clarity with you as you begin."]}
+];
+
+/* ---------- Ayurvedic DIYs (home remedies) ---------- */
+const DIYS = [
+  {id:"abhyanga", name:"Abhyanga Self-Massage Oil", dosha:"vata", emoji:"🫗", time:"10 min",
+   purpose:"Warm oil self-massage to calm the nervous system, nourish skin and ground Vata.",
+   ingredients:["1/2 cup organic sesame oil (cured)","5 drops lavender essential oil (optional)"],
+   steps:["Gently warm the oil to body temperature (a bowl in hot water).","Before showering, massage into dry skin — long strokes on limbs, circles on joints and belly.","Spend extra time on feet and scalp.","Let it soak in for 10–15 minutes.","Shower with warm (not hot) water; pat dry."],
+   tip:"Best in the morning. Use coconut oil for Pitta, warming mustard oil for Kapha.",
+   caution:"Avoid on broken skin; skip abhyanga during illness, menstruation or pregnancy unless cleared by a practitioner."},
+  {id:"ubtan", name:"Ubtan Brightening Face Mask", dosha:"all", emoji:"🧖", time:"15 min",
+   purpose:"A traditional gram-flour paste that gently exfoliates and brightens the skin.",
+   ingredients:["2 tbsp chickpea (gram) flour","1/2 tsp turmeric","1 tbsp yogurt (or rose water for Pitta)","A pinch of sandalwood powder (optional)"],
+   steps:["Mix into a smooth paste.","Apply an even layer to clean face and neck, avoiding the eyes.","Leave 10–15 minutes until nearly dry.","Rub off gently with wet fingers in circles, then rinse.","Pat dry and moisturise."],
+   tip:"Use 1–2× a week. Yogurt suits Vata/Kapha; swap for rose water or aloe to cool Pitta.",
+   caution:"Turmeric can lightly stain — do a patch test first."},
+  {id:"tongue", name:"Tongue Scraping + Oil Pulling", dosha:"all", emoji:"🪥", time:"5 min",
+   purpose:"A morning mouth ritual (a core dinacharya step) to clear ama (toxins) and freshen breath.",
+   ingredients:["A copper or steel tongue scraper","1 tbsp organic sesame or coconut oil"],
+   steps:["On waking, before eating or drinking, scrape the tongue front-to-back 5–7 times.","Rinse the scraper between passes.","Then swish 1 tbsp oil around the mouth for 5–10 minutes.","Do not swallow — spit into a bin (not the sink; oil clogs drains).","Rinse with warm water and brush as usual."],
+   tip:"Coconut oil cools Pitta; sesame warms Vata. Do it daily for best effect.",
+   caution:"Spit oil out — swallowing it is not recommended."},
+  {id:"hairoil", name:"Herbal Hair &amp; Scalp Oil", dosha:"vata", emoji:"💆", time:"20 min",
+   purpose:"A nourishing scalp oil to reduce dryness, calm the mind and support hair.",
+   ingredients:["1/4 cup coconut or sesame oil","1 tsp dried bhringraj or amla powder (optional)","2 curry leaves (optional)"],
+   steps:["Warm the oil gently with the herbs for a minute, then let cool to warm.","Strain if using powders.","Massage into the scalp with fingertips for 5 minutes.","Work through to the ends.","Leave 30 min (or overnight with a towel), then shampoo out."],
+   tip:"A scalp massage before bed is deeply calming for Vata and Pitta.",
+   caution:"Patch-test herbs; avoid if you have a scalp condition without advice."},
+  {id:"garshana", name:"Dry Brushing (Garshana)", dosha:"kapha", emoji:"🧴", time:"5 min",
+   purpose:"Dry-skin brushing to stimulate circulation and lymph and lighten Kapha heaviness.",
+   ingredients:["A natural-bristle body brush or raw silk gloves"],
+   steps:["Before showering, on dry skin, brush limbs toward the heart in long strokes.","Use circular strokes on the belly and joints.","Keep it brisk but comfortable — skin should feel warm, not raw.","Spend 3–5 minutes, then shower."],
+   tip:"Ideal in the morning, especially spring, to invigorate a sluggish Kapha.",
+   caution:"Skip over broken skin, rashes or varicose veins. Too vigorous for aggravated Vata/Pitta — go gentle."},
+  {id:"ccf-tea", name:"CCF Detox Tea", dosha:"all", emoji:"🍵", time:"10 min",
+   purpose:"The classic cumin-coriander-fennel tea that gently kindles digestion and settles all three doshas.",
+   ingredients:["1/2 tsp cumin seeds","1/2 tsp coriander seeds","1/2 tsp fennel seeds","3 cups water"],
+   steps:["Add the seeds to water and bring to a boil.","Simmer 5 minutes.","Strain into a flask.","Sip warm throughout the day, especially between meals."],
+   tip:"Truly tridoshic — safe daily. Add a slice of ginger for extra Kapha kick.",
+   caution:"Very gentle, but ease off fennel if pregnant unless cleared by a practitioner."}
+];
+
+/* ---------- Health recipes ---------- */
+const RECIPES = [
+  {id:"kitchari", name:"Healing Kitchari", dosha:"all", emoji:"🍲", time:"35 min", serves:"2",
+   desc:"The cornerstone Ayurvedic meal — a soft, spiced rice-and-mung stew that's easy to digest and deeply nourishing. Tridoshic and perfect for a reset.",
+   ingredients:["1/2 cup basmati rice","1/2 cup split yellow mung dal","4 cups water","1 tbsp ghee","1 tsp cumin seeds","1 tsp turmeric","1 tsp grated ginger","1/2 tsp coriander powder","Pinch of salt","Chopped seasonal veg (optional)"],
+   steps:["Rinse rice and mung dal until the water runs clear.","Warm ghee in a pot; add cumin seeds until they pop.","Stir in ginger, turmeric and coriander for 30 seconds.","Add rice, dal, veg and water. Bring to a boil.","Cover and simmer 25–30 min until soft and porridge-like.","Season with salt; top with fresh coriander."],
+   benefits:"Easy to digest, protein-complete, calming to all doshas. Great for cleanses and recovery."},
+  {id:"golden-milk", name:"Golden Milk", dosha:"vata", emoji:"🥛", time:"10 min", serves:"1",
+   desc:"A warming turmeric latte to soothe the body, calm the mind and support sleep. Grounding for Vata.",
+   ingredients:["1 cup milk (dairy or almond/oat)","1/2 tsp turmeric","1 pinch black pepper","1/4 tsp cinnamon","1 pinch ginger","1 tsp honey or maple (add off heat)"],
+   steps:["Gently warm the milk in a small pot.","Whisk in turmeric, pepper, cinnamon and ginger.","Simmer softly 3–4 minutes — don't boil hard.","Take off the heat; let it cool slightly.","Stir in honey (never add honey to boiling liquid) and sip warm."],
+   benefits:"Anti-inflammatory, calming, sleep-supporting. Black pepper helps your body absorb turmeric."},
+  {id:"ccf", name:"CCF Digestive Tea", dosha:"all", emoji:"🫖", time:"8 min", serves:"3 cups",
+   desc:"Cumin, coriander and fennel — a light, tridoshic tea that kindles digestion and reduces bloating.",
+   ingredients:["1/2 tsp cumin seeds","1/2 tsp coriander seeds","1/2 tsp fennel seeds","3 cups water"],
+   steps:["Boil the seeds in water.","Simmer 5 minutes.","Strain into a flask.","Sip warm between meals through the day."],
+   benefits:"Settles digestion, eases bloating, gently detoxifying. Safe for all doshas, daily."},
+  {id:"stewed-apples", name:"Spiced Stewed Apples", dosha:"vata", emoji:"🍎", time:"15 min", serves:"1",
+   desc:"A warm, gentle breakfast that's kind to digestion first thing — a classic Ayurvedic morning food.",
+   ingredients:["1 apple, peeled and chopped","1/4 cup water","2 cloves","1 pinch cinnamon","1 pinch cardamom","1 tsp ghee (optional)"],
+   steps:["Simmer apple with water and spices, covered, 8–10 minutes.","Cook until soft and fragrant.","Remove the cloves.","Stir in ghee if using, and eat warm."],
+   benefits:"Easy morning food that lubricates digestion and satisfies sweet cravings gently."},
+  {id:"mung-soup", name:"Mung Dal Soup", dosha:"all", emoji:"🥣", time:"30 min", serves:"3",
+   desc:"A light, protein-rich soup that's soothing and simple to digest — comforting for any dosha.",
+   ingredients:["1 cup split yellow mung dal","4 cups water","1 tsp turmeric","1 tsp cumin","1 tsp grated ginger","1 tbsp ghee","Salt, lemon and coriander to finish"],
+   steps:["Rinse the mung dal well.","Boil with water and turmeric until soft, ~25 min.","In a small pan, warm ghee, cumin and ginger until fragrant.","Stir the tempering into the soup.","Finish with salt, a squeeze of lemon and coriander."],
+   benefits:"Light, cleansing and nourishing. A staple for gentle detox days."},
+  {id:"ojas-balls", name:"Ojas Energy Balls", dosha:"vata", emoji:"🟤", time:"15 min", serves:"12",
+   desc:"No-cook date and nut bites that build 'ojas' — Ayurveda's word for vitality and strength.",
+   ingredients:["10 soft Medjool dates, pitted","1/2 cup almonds (soaked & peeled ideally)","2 tbsp shredded coconut","1/4 tsp cardamom","1 tsp ghee"],
+   steps:["Blend dates and almonds into a sticky dough.","Add coconut, cardamom and ghee; pulse to combine.","Roll into small balls.","Coat in extra coconut if you like.","Chill 20 minutes and store in the fridge."],
+   benefits:"Nourishing, grounding energy bites — great for Vata and busy days. Rich, so enjoy in moderation."}
 ];
 
 /* =========================================================
@@ -334,7 +438,9 @@ const BREATH = [
    ========================================================= */
 const TABS = [
   ["home","Home"],["dosha","My Dosha"],["yoga","Yoga"],
-  ["ayurveda","Ayurveda"],["breathe","Breathe"],["progress","Progress"],["premium","Premium"]
+  ["breathe","Breathe"],["meditate","Meditate"],
+  ["ayurveda","Ayurveda"],["diy","DIYs"],["recipes","Recipes"],
+  ["progress","Progress"],["premium","Premium"]
 ];
 let current = "home";
 function renderTabs(){
@@ -668,12 +774,13 @@ function setAyur(k){ ayurTab=k; go('ayurveda'); }
 /* ---------- Breathe ---------- */
 VIEWS.breathe = () => `
   <section class="view">
-    <span class="pill">Pranayama &amp; meditation</span>
-    <h1>Breathe &amp; reset</h1>
-    <p class="lead">Guided breathing practices with a visual pacer. Follow the expanding circle — expand to inhale, contract to exhale.</p>
+    <span class="pill">Pranayama</span>
+    <h1>Breathing exercises</h1>
+    <p class="lead">Guided breathwork with a visual pacer — follow the circle: it expands as you inhale and contracts as you exhale. Choose one for how you want to feel.</p>
     <div class="grid cols-2" style="margin-top:16px">
       ${BREATH.map(b=>`<div class="card">
-        <h3>${b.name}</h3><p class="muted">${b.desc}</p>
+        <div class="row" style="justify-content:space-between"><h3 style="margin:0">${b.name}</h3>${b.tag?`<span class="tag">${b.tag}</span>`:""}</div>
+        <p class="muted">${b.desc}</p>
         <div class="row"><span class="tag">${b.rounds} rounds</span><span class="tag">${b.phases.map(p=>p[1]).join('·')} count</span></div>
         <button class="btn" style="margin-top:12px" onclick="startBreath('${b.id}')">▶ Begin</button>
       </div>`).join("")}
@@ -703,9 +810,13 @@ function runBreath(){
   const rd=document.getElementById("bx-round");
   if(!circle) return;
   ph.textContent=label; rd.textContent=`Round ${bx.round+1} of ${b.rounds}`;
-  const scale = label==="Inhale"?1 : label==="Exhale"?.5 : (label==="Hold"? (parseFloat(getComputedStyle(circle).transform.split(',')[3])||1) : .75);
+  const L=label.toLowerCase();
+  const isIn = L.includes("inhale")||L.includes("sip");
+  const isOut = L.includes("exhale")||L.includes("hum")||L.includes("out");
   circle.style.transition=`transform ${secs}s ease-in-out`;
-  circle.style.transform = label==="Inhale"?"scale(1)" : label==="Exhale"?"scale(.5)" : circle.style.transform||"scale(1)";
+  if(isIn) circle.style.transform="scale(1)";
+  else if(isOut) circle.style.transform="scale(.5)";
+  // "Hold" keeps the current size
   circle.textContent=label;
   let left=secs;
   clearInterval(bx.timer);
@@ -769,6 +880,156 @@ function resetData(){
     Object.assign(store,{dosha:null,scores:null,minutes:0,sessions:0,streak:0,lastDay:null,done:{},premium:false});
     save(); go('home'); toast("All data reset");
   }
+}
+
+/* ---------- Meditation ---------- */
+VIEWS.meditate = () => {
+  const list = store.dosha
+    ? [...MEDITATIONS].sort((a,b)=> (a.dosha===store.dosha?-1:0) - (b.dosha===store.dosha?-1:0))
+    : MEDITATIONS;
+  return `<section class="view">
+    <span class="pill">Stillness</span>
+    <h1>Guided meditation</h1>
+    <p class="lead">Timed, gently guided sessions with on-screen prompts and a soft breathing anchor. Find a quiet spot, press play, and let the words lead.${store.dosha?" Sessions suited to your dosha are shown first.":""}</p>
+    <div class="grid cols-2" style="margin-top:16px">
+      ${list.map(m=>{
+        const rec = store.dosha && m.dosha===store.dosha;
+        const tagd = m.dosha!=="all" ? `<span class="row" style="gap:6px"><span class="dosha-dot ${DOSHAS[m.dosha].cls}"></span>${DOSHAS[m.dosha].name}</span>` : `<span class="tag">All doshas</span>`;
+        return `<div class="card">
+          <div class="row" style="justify-content:space-between">${tagd}<span class="tag">${m.tag}</span></div>
+          <h3 style="margin:.4em 0 .2em">${m.name}${rec?' <span class="pill" style="vertical-align:middle">For you</span>':''}</h3>
+          <p class="muted" style="margin:.2em 0">${m.desc}</p>
+          <div class="row" style="margin:10px 0 14px"><span class="tag">⏱ ${m.mins} min</span><span class="tag">${m.steps.length} prompts</span></div>
+          <button class="btn" onclick="openMed('${m.id}')">▶ Begin</button>
+        </div>`;
+      }).join("")}
+    </div>
+  </section>`;
+};
+let med=null;
+function openMed(id){
+  const m=MEDITATIONS.find(x=>x.id===id);
+  const total=m.mins*60;
+  med={m, total, left:total, step:0, timer:null, paused:false, breathIn:true, bt:null};
+  document.body.insertAdjacentHTML("beforeend",
+   `<div class="player" id="medplayer">
+      <div class="head"><button class="btn ghost sm" onclick="closeMed()">✕ Exit</button><b style="margin-left:auto">${m.name}</b></div>
+      <div class="pose-stage"><div>
+        <div class="breath" id="med-breath" style="width:170px;height:170px;font-size:18px">breathe</div>
+        <div class="ring" id="med-ring" style="--sz:120px;margin-top:18px"><div id="med-clock" style="font-size:26px"></div></div>
+        <h2 id="med-step" class="center" style="max-width:34ch;margin:20px auto 0;font-size:20px"></h2>
+      </div></div>
+      <div class="row" style="justify-content:center">
+        <button class="btn" id="med-pause" onclick="toggleMed()" style="min-width:130px">Pause</button>
+      </div>
+      <p class="center muted" id="med-count" style="margin:12px 0 0"></p>
+    </div>`);
+  medBreath(); paintMed(); runMed();
+}
+function fmt(s){ const m=Math.floor(s/60), ss=s%60; return `${m}:${ss<10?'0':''}${ss}`; }
+function paintMed(){
+  const perStep=Math.max(1,Math.floor(med.total/med.m.steps.length));
+  med.step=Math.min(med.m.steps.length-1, Math.floor((med.total-med.left)/perStep));
+  const stepEl=document.getElementById("med-step"); if(stepEl) stepEl.textContent=med.m.steps[med.step];
+  const clk=document.getElementById("med-clock"); if(clk) clk.textContent=fmt(med.left);
+  const cnt=document.getElementById("med-count"); if(cnt) cnt.textContent=`Prompt ${med.step+1} of ${med.m.steps.length}`;
+  const ring=document.getElementById("med-ring"); if(ring) ring.style.setProperty("--deg",((med.total-med.left)/med.total*360)+"deg");
+}
+function runMed(){
+  clearInterval(med.timer);
+  med.timer=setInterval(()=>{
+    if(med.paused) return;
+    med.left--;
+    if(med.left<=0){ finishMed(); return; }
+    paintMed();
+  },1000);
+}
+function medBreath(){
+  clearInterval(med.bt);
+  const set=()=>{ const b=document.getElementById("med-breath"); if(!b)return; b.style.transform=med.breathIn?"scale(1)":"scale(.55)"; b.textContent=med.breathIn?"inhale":"exhale"; med.breathIn=!med.breathIn; };
+  set(); med.bt=setInterval(set,4000);
+}
+function toggleMed(){ med.paused=!med.paused; document.getElementById("med-pause").textContent=med.paused?"Resume":"Pause"; }
+function closeMed(){ if(med){clearInterval(med.timer);clearInterval(med.bt);} document.getElementById("medplayer")?.remove(); med=null; }
+function finishMed(){
+  const mins=med.m.mins;
+  recordSession(mins); closeMed();
+  document.body.insertAdjacentHTML("beforeend",
+   `<div class="modal" onclick="this.remove()"><div class="box center" onclick="event.stopPropagation()">
+     <div style="font-size:56px">🧘</div><h2>Rest complete</h2>
+     <p class="muted">${mins} minutes of stillness. Carry the calm with you.</p>
+     <button class="btn" onclick="this.closest('.modal').remove();go('progress')">See progress</button></div></div>`);
+}
+
+/* ---------- Ayurvedic DIYs ---------- */
+VIEWS.diy = () => `
+  <section class="view">
+    <span class="pill">Do it yourself</span>
+    <h1>Ayurvedic DIYs</h1>
+    <p class="lead">Simple home rituals and remedies from the Ayurvedic tradition — oils, masks, teas and self-care you can make from your kitchen. Tap one for the full how-to.</p>
+    <div class="grid cols-3" style="margin-top:16px">
+      ${DIYS.map(d=>{
+        const tagd = d.dosha!=="all" ? `<span class="row" style="gap:6px"><span class="dosha-dot ${DOSHAS[d.dosha].cls}"></span>${DOSHAS[d.dosha].name}</span>` : `<span class="tag">All doshas</span>`;
+        return `<div class="card" style="cursor:pointer" onclick="openDetail('diy','${d.id}')">
+          <div style="font-size:34px">${d.emoji}</div>
+          <h3 style="margin:.3em 0 .2em">${d.name}</h3>
+          <p class="muted" style="margin:.2em 0">${d.purpose}</p>
+          <div class="row" style="margin-top:10px">${tagd}<span class="tag">⏱ ${d.time}</span></div>
+        </div>`;
+      }).join("")}
+    </div>
+    <p class="disc" style="margin-top:16px">Do a patch test before using anything new on skin or hair. Herbs and oils can interact with conditions, medications and pregnancy — check with a qualified practitioner if unsure.</p>
+  </section>`;
+
+/* ---------- Health recipes ---------- */
+VIEWS.recipes = () => `
+  <section class="view">
+    <span class="pill">Nourish</span>
+    <h1>Health recipes</h1>
+    <p class="lead">Wholesome, dosha-friendly dishes from the Ayurvedic kitchen — easy to digest, warming, and made to keep you in balance. Tap a recipe for ingredients and method.</p>
+    <div class="grid cols-3" style="margin-top:16px">
+      ${RECIPES.map(r=>{
+        const tagd = r.dosha!=="all" ? `<span class="row" style="gap:6px"><span class="dosha-dot ${DOSHAS[r.dosha].cls}"></span>${DOSHAS[r.dosha].name}</span>` : `<span class="tag">Tri-doshic</span>`;
+        return `<div class="card" style="cursor:pointer" onclick="openDetail('recipe','${r.id}')">
+          <div style="font-size:34px">${r.emoji}</div>
+          <h3 style="margin:.3em 0 .2em">${r.name}</h3>
+          <p class="muted" style="margin:.2em 0">${r.desc}</p>
+          <div class="row" style="margin-top:10px">${tagd}<span class="tag">⏱ ${r.time}</span><span class="tag">🍽 ${r.serves}</span></div>
+        </div>`;
+      }).join("")}
+    </div>
+    <p class="disc" style="margin-top:16px">General wellness recipes — adjust for allergies and dietary needs, and consult a professional for medical or therapeutic diets.</p>
+  </section>`;
+
+/* ---------- Shared detail modal (DIY / recipe) ---------- */
+function openDetail(kind, id){
+  const item = kind==="diy" ? DIYS.find(x=>x.id===id) : RECIPES.find(x=>x.id===id);
+  if(!item) return;
+  const ing = item.ingredients||[];
+  const steps = item.steps||[];
+  const meta = kind==="diy"
+    ? `<span class="tag">⏱ ${item.time}</span>`
+    : `<span class="tag">⏱ ${item.time}</span><span class="tag">🍽 ${item.serves}</span>`;
+  const doshaTag = item.dosha!=="all"
+    ? `<span class="row" style="gap:6px"><span class="dosha-dot ${DOSHAS[item.dosha].cls}"></span>${DOSHAS[item.dosha].name}</span>`
+    : `<span class="tag">All doshas</span>`;
+  const extra = kind==="diy"
+    ? `${item.tip?`<p style="margin:.6em 0 0"><b>💡 Tip:</b> <span class="muted">${item.tip}</span></p>`:""}
+       ${item.caution?`<p class="disc" style="margin-top:8px"><b>⚠ Caution:</b> ${item.caution}</p>`:""}`
+    : `${item.benefits?`<p style="margin:.6em 0 0"><b>🌿 Benefits:</b> <span class="muted">${item.benefits}</span></p>`:""}`;
+  document.body.insertAdjacentHTML("beforeend",
+   `<div class="modal" onclick="this.remove()"><div class="box" onclick="event.stopPropagation()" style="max-width:520px;max-height:86vh;overflow:auto">
+      <div class="row" style="justify-content:space-between"><span style="font-size:40px">${item.emoji}</span>
+        <button class="btn ghost sm" onclick="this.closest('.modal').remove()">✕</button></div>
+      <h2 style="margin:.2em 0">${item.name}</h2>
+      <p class="muted">${item.purpose||item.desc}</p>
+      <div class="row" style="margin:8px 0 14px">${doshaTag}${meta}</div>
+      <h3>${kind==="diy"?"You'll need":"Ingredients"}</h3>
+      <ul style="margin:.2em 0 0;padding-left:20px">${ing.map(i=>`<li style="margin:4px 0">${i}</li>`).join("")}</ul>
+      <h3 style="margin-top:16px">Method</h3>
+      <ol style="margin:.2em 0 0;padding-left:20px">${steps.map(s=>`<li style="margin:5px 0">${s}</li>`).join("")}</ol>
+      ${extra}
+   </div></div>`);
 }
 
 /* ---------- Premium ---------- */
