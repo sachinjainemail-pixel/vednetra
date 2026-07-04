@@ -172,12 +172,10 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-s
 
 /* ---------- animated logo ---------- */
 .logo{display:block}
-.logo .l-ring{transform-origin:50px 50px;animation:l-spin 22s linear infinite}
-.logo .l-sun{transform-origin:50px 54px;animation:l-glow 5s ease-in-out infinite}
-.logo .l-lotus{transform-origin:50px 74px;animation:l-breathe 5s ease-in-out infinite}
-.logo .l-petal{transform-origin:50px 74px}
+.logo .l-rays{transform-origin:50px 58px;animation:l-spin 60s linear infinite}
+.logo .l-sun{transform-origin:50px 58px;animation:l-sunpulse 5s ease-in-out infinite}
 @keyframes l-spin{to{transform:rotate(360deg)}}
-@keyframes l-glow{0%,100%{opacity:.3;transform:scale(.9)}50%{opacity:.6;transform:scale(1.08)}}
+@keyframes l-sunpulse{0%,100%{opacity:.85;transform:scale(.97)}50%{opacity:1;transform:scale(1.05)}}
 @keyframes l-breathe{0%,100%{transform:scale(.96)}50%{transform:scale(1.05)}}
 .logoslot{display:inline-flex;width:34px;height:34px}
 
@@ -216,7 +214,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-s
 @keyframes sway{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
 .pulsecircle{transform-origin:center;animation:l-breathe 3.4s ease-in-out infinite}
 @media(prefers-reduced-motion:reduce){
-  .logo .l-ring,.logo .l-sun,.logo .l-lotus,.feat,.enter-btn,.steam,.steam2,.sway,.pulsecircle{animation:none}
+  .logo .l-rays,.logo .l-sun,.feat,.enter-btn,.steam,.steam2,.sway,.pulsecircle{animation:none}
 }
 </style>
 </head>
@@ -750,9 +748,11 @@ function _pt(x,y,ang,len){ const a=ang*Math.PI/180; return [x+len*Math.cos(a), y
 // pose = [px,py, torso, lThigh,lShin, rThigh,rShin, lUp,lFore, rUp,rFore]  (absolute degrees, y down)
 // Flat-illustration palette (fixed — illustrations read the same in light & dark)
 const FIG_COL={skin:"#f2b58c",skinSh:"#e79f72",cloth:"#d24aa8",clothSh:"#b6338f",hair:"#3b2b31",band:"#f7d6ee"};
-function asanaFigure(n, ground){
+// builds just the figure shapes (no <svg> wrapper); pass `sil` (a colour) for a flat silhouette
+function _figureShapes(n, sil){
   const s=ASANA_POSE[n]; if(!s) return "";
-  const [px,py,t]=s, L=FIG_L, C=FIG_COL;
+  const [px,py,t]=s, L=FIG_L;
+  const C = sil ? {skin:sil,skinSh:sil,cloth:sil,clothSh:sil,hair:sil,band:sil} : FIG_COL;
   const [sx,sy]=_pt(px,py,t,L.torso);                 // shoulders
   const [wx,wy]=_pt(px,py,t,L.torso*0.40);            // waist
   const [clx,cly]=_pt(px,py,t,L.torso*0.62);          // lower chest
@@ -793,9 +793,12 @@ function asanaFigure(n, ground){
     `<ellipse cx="${f(hcx)}" cy="${f(hcy)}" rx="5.3" ry="5.7" fill="${C.hair}"/>`+
     dot(bnx,bny,3.6,C.hair)+
     `<ellipse cx="${f(fcx)}" cy="${f(fcy)}" rx="4.5" ry="4.9" fill="${C.skin}"/>`;
+  return body;
+}
+function asanaFigure(n, ground){
   return `<svg viewBox="0 0 100 100" style="width:100%;height:100%;display:block" role="img" aria-label="${ASANAS[n-1].name} figure">`+
     (ground?`<line x1="6" y1="82" x2="94" y2="82" stroke="#00000018" stroke-width="1.4"/>`:"")+
-    body+`</svg>`;
+    _figureShapes(n)+`</svg>`;
 }
 const ASANA_POSE={
 1:[50,58,-90,83,87,97,93,104,98,76,82],2:[50,44,145,60,60,60,60,122,122,122,122],
@@ -1849,19 +1852,29 @@ function unlockDemo(el){ store.premium=true; save(); el.closest('.modal').remove
 let _logoN=0;
 function logoMark(size){
   const id="lg"+(_logoN++);
-  const petal="M50 74 C41 61 41 41 50 25 C59 41 59 61 50 74 Z";
-  const petals=[-52,-26,0,26,52].map((a,i)=>
-    `<path class="l-petal" d="${petal}" transform="rotate(${a} 50 74)" fill="#ffffff" fill-opacity="${i===2?0.96:0.8}"/>`).join("");
-  return `<svg class="logo" viewBox="0 0 100 100" width="${size}" height="${size}" role="img" aria-label="Yoga-Fi logo">
+  // early-morning sun rays radiating from the sun centre, covering the whole badge
+  const cxs=50, cys=58;
+  const rays=Array.from({length:16},(_,i)=>{const a=i*22.5*Math.PI/180;
+    return `<line x1="${cxs}" y1="${cys}" x2="${(cxs+62*Math.cos(a)).toFixed(1)}" y2="${(cys+62*Math.sin(a)).toFixed(1)}" stroke="#fff0c2" stroke-width="${i%2?2:3.4}" stroke-linecap="round" stroke-opacity=".6"/>`;}).join("");
+  // Aditi in Tree pose, as a warm dark silhouette backlit by the sun
+  const yogi=`<g transform="translate(10 3) scale(0.80)">${_figureShapes(9,"#123f39")}</g>`;
+  return `<svg class="logo" viewBox="0 0 100 100" width="${size}" height="${size}" role="img" aria-label="Yoga-Fi logo — sunrise yoga">
     <defs>
-      <radialGradient id="${id}b" cx="38%" cy="30%" r="80%">
-        <stop offset="0" style="stop-color:var(--brand-2)"/><stop offset="1" style="stop-color:var(--brand)"/>
+      <linearGradient id="${id}sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" style="stop-color:#bfe6dc"/><stop offset=".5" style="stop-color:#ffe6b0"/><stop offset="1" style="stop-color:#ffb877"/>
+      </linearGradient>
+      <radialGradient id="${id}sun" cx="50%" cy="58%" r="55%">
+        <stop offset="0" style="stop-color:#fff8dc"/><stop offset=".55" style="stop-color:#ffdc8f"/><stop offset="1" style="stop-color:#ffdc8f" stop-opacity="0"/>
       </radialGradient>
+      <clipPath id="${id}clip"><circle cx="50" cy="50" r="48"/></clipPath>
     </defs>
-    <circle cx="50" cy="50" r="48" fill="url(#${id}b)"/>
-    <circle class="l-ring" cx="50" cy="50" r="43" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="1.4" stroke-dasharray="3 7" stroke-linecap="round"/>
-    <circle class="l-sun" cx="50" cy="40" r="15" fill="var(--accent)" fill-opacity=".55"/>
-    <g class="l-lotus">${petals}<circle cx="50" cy="74" r="3.4" fill="var(--accent)"/></g>
+    <g clip-path="url(#${id}clip)">
+      <circle cx="50" cy="50" r="48" fill="url(#${id}sky)"/>
+      <g class="l-rays">${rays}</g>
+      <circle class="l-sun" cx="${cxs}" cy="${cys}" r="34" fill="url(#${id}sun)"/>
+      ${yogi}
+    </g>
+    <circle cx="50" cy="50" r="47" fill="none" stroke="#ffffff" stroke-opacity=".55" stroke-width="2"/>
   </svg>`;
 }
 function paintLogos(){ document.querySelectorAll(".logoslot").forEach(el=>{ el.innerHTML=logoMark(34); }); }
