@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#0f766e" />
-<title>Sattva · Yoga & Ayurveda</title>
+<title>Yogify · Yoga & Ayurveda</title>
 <meta name="description" content="Personalised yoga and Ayurveda guided by your dosha — daily routines, dosha-aligned sequences, food & ritual tips, and breathing practices." />
 <style>
 :root{
@@ -177,7 +177,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-s
   <div class="wrap">
     <button class="menubtn" id="menuBtn" onclick="openNav()" aria-label="Open menu" aria-expanded="false">☰</button>
     <div class="brand" onclick="go('home')">
-      <span class="mark">☾</span><span>Sattva</span>
+      <span class="mark">☾</span><span>Yogify</span>
     </div>
     <span class="cur" id="curTitle"></span>
   </div>
@@ -185,7 +185,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-s
 
 <aside class="sidebar" id="sidebar" aria-label="Sections">
   <div class="side-head">
-    <div class="brand" onclick="go('home')"><span class="mark">☾</span><span>Sattva</span></div>
+    <div class="brand" onclick="go('home')"><span class="mark">☾</span><span>Yogify</span></div>
     <button class="menubtn" onclick="closeNav()" aria-label="Close menu">✕</button>
   </div>
   <nav class="tabs" id="tabs"></nav>
@@ -195,7 +195,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-s
 <main class="wrap" id="app"></main>
 
 <footer>
-  <div>Sattva · Yoga &amp; Ayurveda — a self-contained demo experience.</div>
+  <div>Yogify · Yoga &amp; Ayurveda — a self-contained demo experience.</div>
   <div class="disc">Wellness &amp; educational content only. Ayurvedic and yoga guidance here is general and not a substitute for professional medical advice. Consult a qualified doctor or registered Ayurvedic practitioner before starting new practices, herbs, or diets — especially if pregnant, injured, or managing a health condition.</div>
 </footer>
 
@@ -203,7 +203,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-s
 
 <script>
 /* =========================================================
-   Sattva — Yoga & Ayurveda  (single-file, no dependencies)
+   Yogify — Yoga & Ayurveda  (single-file, no dependencies)
    State persists in localStorage.
    ========================================================= */
 const LS_KEY = "sattva.v1";
@@ -653,22 +653,30 @@ function asanaFigure(n, ground){
   const [rk,rky]=_pt(px,py,s[5],L.thigh),[rf,rfy]=_pt(rk,rky,s[6],L.shin);
   const [le,ley]=_pt(sx,sy,s[7],L.upper),[lh,lhy]=_pt(le,ley,s[8],L.fore);
   const [re,rey]=_pt(sx,sy,s[9],L.upper),[rh,rhy]=_pt(re,rey,s[10],L.fore);
-  // chest sits partway up the torso; neck a little beyond the shoulders
-  const [cx,cy]=_pt(px,py,t,L.torso*0.62);
-  const [nx,ny]=_pt(sx,sy,t,L.neck);
+  // waist sits partway up the trunk; neck base just above the shoulders
+  const [wx,wy]=_pt(px,py,t,L.torso*0.45);
+  const [nbx,nby]=_pt(sx,sy,t,L.neck*0.5);        // neck base
+  const [hbx,hby]=_pt(sx,sy,t,L.neck+1);          // head base
+  const [hcx,hcy]=_pt(sx,sy,t,L.neck+L.head+0.5); // head centre
   const f=x=>x.toFixed(1);
-  const seg=(a,b,c,e,w)=>`<path d="M${f(a)} ${f(b)} L${f(c)} ${f(e)}" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round"/>`;
+  // tapered "capsule" — a filled limb that narrows from radius ra at A to rb at B, with rounded ends
+  const cap=(ax,ay,ra,bx,by,rb)=>{
+    const dx=bx-ax,dy=by-ay,len=Math.hypot(dx,dy)||0.001, ux=dx/len,uy=dy/len, ox=-uy,oy=ux;
+    return `<path d="M${f(ax+ox*ra)} ${f(ay+oy*ra)} L${f(bx+ox*rb)} ${f(by+oy*rb)} `+
+      `L${f(bx-ox*rb)} ${f(by-oy*rb)} L${f(ax-ox*ra)} ${f(ay-oy*ra)} Z" fill="currentColor"/>`+
+      `<circle cx="${f(ax)}" cy="${f(ay)}" r="${f(ra)}" fill="currentColor"/>`+
+      `<circle cx="${f(bx)}" cy="${f(by)}" r="${f(rb)}" fill="currentColor"/>`;
+  };
+  const R={hip:4.9,waist:4.0,chest:5.4,thighTop:4.4,knee:3.2,ankle:2.1,
+           shoulder:3.4,elbow:2.5,wrist:1.8,neck:2.4};
   const body=
-    seg(px,py,sx,sy,9.5)+                                   // trunk
-    seg(px,py,lk,lky,7)+seg(lk,lky,lf,lfy,5)+              // left leg (thigh→shin)
-    seg(px,py,rk,rky,7)+seg(rk,rky,rf,rfy,5)+              // right leg
-    seg(sx,sy,le,ley,5)+seg(le,ley,lh,lhy,3.8)+           // left arm (upper→fore)
-    seg(sx,sy,re,rey,5)+seg(re,rey,rh,rhy,3.8)+           // right arm
-    `<circle cx="${f(px)}" cy="${f(py)}" r="4.6" fill="currentColor"/>`+   // pelvis/hips
-    `<circle cx="${f(cx)}" cy="${f(cy)}" r="4.3" fill="currentColor"/>`+   // mid-torso
-    `<circle cx="${f(sx)}" cy="${f(sy)}" r="4.8" fill="currentColor"/>`+   // shoulders
-    seg(sx,sy,nx,ny,4)+                                     // neck
-    `<circle cx="${f(hx)}" cy="${f(hy)}" r="6" fill="currentColor"/>`;     // head
+    cap(px,py,R.hip, wx,wy,R.waist)+cap(wx,wy,R.waist, sx,sy,R.chest)+   // torso (hips→waist→chest)
+    cap(px,py,R.thighTop, lk,lky,R.knee)+cap(lk,lky,R.knee, lf,lfy,R.ankle)+  // left leg
+    cap(px,py,R.thighTop, rk,rky,R.knee)+cap(rk,rky,R.knee, rf,rfy,R.ankle)+  // right leg
+    cap(sx,sy,R.shoulder, le,ley,R.elbow)+cap(le,ley,R.elbow, lh,lhy,R.wrist)+ // left arm
+    cap(sx,sy,R.shoulder, re,rey,R.elbow)+cap(re,rey,R.elbow, rh,rhy,R.wrist)+ // right arm
+    cap(nbx,nby,R.neck, hbx,hby,R.neck)+                                 // neck
+    `<ellipse cx="${f(hcx)}" cy="${f(hcy)}" rx="4.7" ry="5.2" fill="currentColor"/>`; // head
   return `<svg viewBox="0 0 100 100" style="width:100%;height:100%;display:block" role="img" aria-label="${ASANAS[n-1].name} figure">`+
     (ground?`<line x1="6" y1="82" x2="94" y2="82" stroke="currentColor" stroke-opacity=".16" stroke-width="1.4"/>`:"")+
     body+`</svg>`;
@@ -761,15 +769,16 @@ const TABS = [
   ["home","Home"],["dosha","My Dosha"],["panchang","Panchang"],["yoga","Yoga"],["asanas","Asanas"],
   ["breathe","Breathe"],["meditate","Meditate"],
   ["ayurveda","Ayurveda"],["food","Food"],["herbs","Herbs"],["diy","DIYs"],["recipes","Recipes"],
-  ["progress","Progress"],["premium","Premium"]
+  ["progress","Progress"],["premium","Premium"],["creators","Creators"]
 ];
 let current = "home";
-const NAV_ICONS={home:"🏠",dosha:"🧭",panchang:"🗓️",yoga:"🧘",asanas:"🤸",breathe:"🌬️",meditate:"🧠",ayurveda:"🌿",food:"🍽️",herbs:"🌱",diy:"🫗",recipes:"🍲",progress:"📈",premium:"⭐"};
+const NAV_ICONS={home:"🏠",dosha:"🧭",panchang:"🗓️",yoga:"🧘",asanas:"🤸",breathe:"🌬️",meditate:"🧠",ayurveda:"🌿",food:"🍽️",herbs:"🌱",diy:"🫗",recipes:"🍲",progress:"📈",premium:"⭐",creators:"👩‍🏫"};
 const NAV_GROUPS=[
   ["Daily",["home","dosha","panchang"]],
   ["Practice",["yoga","asanas","breathe","meditate"]],
   ["Ayurveda",["ayurveda","food","herbs","diy","recipes"]],
-  ["You",["progress","premium"]]
+  ["You",["progress","premium"]],
+  ["About",["creators"]]
 ];
 const tabLabel=id=>(TABS.find(t=>t[0]===id)||[,id])[1];
 function renderTabs(){
@@ -804,7 +813,7 @@ VIEWS.home = () => {
       <span class="lotus">🪷</span>
       <span class="pill">Yoga · Ayurveda · Balance</span>
       <h1>Practice that fits<br/>your true nature.</h1>
-      <p class="lead">Sattva blends yoga with Ayurveda — the ancient science of balance. Discover your <b>dosha</b>, then get daily routines, dosha-aligned sequences, food &amp; ritual guidance, and breathwork tuned to <em>you</em>.</p>
+      <p class="lead">Yogify blends yoga with Ayurveda — the ancient science of balance. Discover your <b>dosha</b>, then get daily routines, dosha-aligned sequences, food &amp; ritual guidance, and breathwork tuned to <em>you</em>.</p>
       <div class="row" style="margin-top:22px">
         ${d
           ? `<button class="btn" onclick="go('dosha')">Your type: ${d.name} ${d.emoji}</button>
@@ -828,7 +837,7 @@ VIEWS.home = () => {
       <div class="row" style="margin-top:10px"><button class="btn ghost sm" onclick="go('panchang')">Today's Panchang →</button><button class="btn ghost sm" onclick="go('food')">What to eat today →</button></div>
     </div>
 
-    <h2>How Sattva works</h2>
+    <h2>How Yogify works</h2>
     <div class="grid cols-3">
       <div class="card"><div style="font-size:34px">🧭</div><h3>1 · Find your dosha</h3><p class="muted">A short quiz maps your Vata, Pitta &amp; Kapha balance — the foundation for everything else.</p></div>
       <div class="card"><div style="font-size:34px">🧘</div><h3>2 · Practice aligned</h3><p class="muted">Guided sequences and a daily routine chosen to bring your constitution back into balance.</p></div>
@@ -1537,12 +1546,73 @@ function openHerb(id){
    </div></div>`);
 }
 
+/* ---------- Creators ---------- */
+VIEWS.creators = () => `
+  <section class="view">
+    <span class="pill">The people behind Yogify</span>
+    <h1>Creators</h1>
+    <p class="lead">Yogify is shaped by teachers who live these practices every day. Meet the creator guiding its yoga and Ayurveda.</p>
+
+    <div class="card" style="margin-top:18px;display:flex;gap:22px;align-items:center;flex-wrap:wrap;
+      background:radial-gradient(120% 140% at 90% 10%, color-mix(in srgb,var(--accent) 16%,transparent), transparent 60%), var(--panel)">
+      <div style="width:104px;height:104px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;
+        color:#fff;font-weight:800;font-size:34px;letter-spacing:1px;
+        background:radial-gradient(circle at 32% 28%, var(--brand-2), var(--brand))">AJ</div>
+      <div style="flex:1;min-width:220px">
+        <h2 style="margin:0">Aditi Jain</h2>
+        <p style="margin:.15em 0 0;color:var(--brand-2);font-weight:700">Founder &amp; Lead Creator</p>
+        <p class="muted" style="margin:.15em 0 0">Yoga Teacher (500-hr RYT) · Ayurvedic Wellness Coach</p>
+        <div class="row" style="margin-top:12px">
+          <span class="tag">🧘 12+ years teaching</span>
+          <span class="tag">🌿 Ayurvedic lifestyle</span>
+          <span class="tag">🌸 5,000+ students</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid cols-2" style="margin-top:16px">
+      <div class="card">
+        <h3>Her journey</h3>
+        <p class="muted">Aditi's path began over a decade ago in the foothills of Rishikesh, where she trained in classical Hatha and Vinyasa yoga and immersed herself in the living tradition of Ayurveda. What started as a personal search for balance became a lifelong calling to help others feel at home in their bodies.</p>
+        <p class="muted">Since then she has led hundreds of workshops, retreats and teacher-training modules across India and online — always returning to the same idea: that yoga and Ayurveda are most powerful when they're practical, personal and woven into everyday life.</p>
+      </div>
+      <div class="card">
+        <h3>Ayurveda &amp; yoga expertise</h3>
+        <p class="muted">Aditi blends dosha-based Ayurvedic guidance with movement, breath and stillness — designing routines that meet each person's constitution, season and season of life. Her students describe her teaching as warm, precise and deeply grounding.</p>
+        <div class="row" style="margin-top:10px">
+          <span class="tag">Dosha-based lifestyle design</span>
+          <span class="tag">Pranayama &amp; meditation</span>
+          <span class="tag">Restorative &amp; prenatal yoga</span>
+          <span class="tag">Ayurvedic nutrition</span>
+          <span class="tag">Seasonal cleanses</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;border-left:4px solid var(--accent)">
+      <p style="font-size:19px;margin:0;font-style:italic">“Balance isn't something you achieve once — it's a daily conversation with your body. My work is simply to help you hear it more clearly.”</p>
+      <p class="muted" style="margin:.5em 0 0">— Aditi Jain</p>
+    </div>
+
+    <div class="grid cols-3" style="margin-top:16px">
+      <div class="card center"><b style="font-size:30px">12+</b><div class="muted">years of practice &amp; teaching</div></div>
+      <div class="card center"><b style="font-size:30px">300+</b><div class="muted">workshops &amp; retreats led</div></div>
+      <div class="card center"><b style="font-size:30px">500-hr</b><div class="muted">registered yoga teacher</div></div>
+    </div>
+
+    <div class="card" style="margin-top:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+      <div><h3 style="margin:0">Practice with Aditi's approach</h3><p class="muted" style="margin:.2em 0 0">Start with your dosha, then flow.</p></div>
+      <button class="btn" onclick="${store.dosha?"go('yoga')":"startQuiz()"}">${store.dosha?'Go to practice':'Find your dosha'}</button>
+    </div>
+    <p class="disc" style="margin-top:16px">Creator profile shown for this demo experience.</p>
+  </section>`;
+
 /* ---------- Premium ---------- */
 VIEWS.premium = () => `
   <section class="view">
-    <span class="pill">Sattva Plus</span>
+    <span class="pill">Yogify Plus</span>
     <h1>Go deeper with premium</h1>
-    <p class="lead">Everything here is free. Sattva Plus unlocks personalised, guided, and expert-led content — the kind of value that supports the practice long-term.</p>
+    <p class="lead">Everything here is free. Yogify Plus unlocks personalised, guided, and expert-led content — the kind of value that supports the practice long-term.</p>
 
     <div class="grid cols-3" style="margin-top:18px">
       <div class="card tier">
@@ -1553,7 +1623,7 @@ VIEWS.premium = () => `
       </div>
       <div class="card tier feat">
         <span class="ribbon">Popular</span>
-        <span class="pill">Sattva Plus</span>
+        <span class="pill">Yogify Plus</span>
         <div class="price">$9<span style="font-size:16px" class="muted">/mo</span></div><p class="muted">or $79/yr</p>
         <ul>
           <li>AI plans that adapt to mood &amp; goals</li>
@@ -1563,7 +1633,7 @@ VIEWS.premium = () => `
           <li>Seasonal &amp; themed challenges</li>
           <li>Wellness journal</li>
         </ul>
-        <button class="btn" onclick="fakeBuy('Sattva Plus')">${store.premium?'✓ Subscribed':'Start 7-day free trial'}</button>
+        <button class="btn" onclick="fakeBuy('Yogify Plus')">${store.premium?'✓ Subscribed':'Start 7-day free trial'}</button>
       </div>
       <div class="card tier">
         <span class="pill">Courses &amp; live</span>
