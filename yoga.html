@@ -37,17 +37,33 @@ header.top{
   background:color-mix(in srgb, var(--bg) 82%, transparent);
   border-bottom:1px solid var(--line);
 }
-.top .wrap{display:flex; align-items:center; gap:14px; height:60px}
+.top .wrap{display:flex; align-items:center; gap:12px; height:60px}
 .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.2px; cursor:pointer}
 .mark{width:30px;height:30px;border-radius:50%;
   background:radial-gradient(circle at 30% 30%, var(--brand-2), var(--brand));
   display:grid;place-items:center;color:#fff;font-size:16px}
-nav.tabs{margin-left:auto; display:flex; gap:4px; overflow-x:auto; scrollbar-width:none}
-nav.tabs::-webkit-scrollbar{display:none}
+.menubtn{border:1.5px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;
+  width:40px;height:40px;border-radius:12px;font-size:18px;display:grid;place-items:center;flex:0 0 auto}
+.menubtn:hover{border-color:var(--brand-2);color:var(--brand-2)}
+.cur{margin-left:auto;color:var(--muted);font-weight:700;font-size:15px}
+
+/* ---------- left sidebar drawer ---------- */
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:264px;max-width:82vw;z-index:120;
+  background:var(--panel);border-right:1px solid var(--line);box-shadow:var(--shadow);
+  display:flex;flex-direction:column;padding:14px;overflow-y:auto;
+  transform:translateX(-106%);transition:transform .28s ease}
+.sidebar.open{transform:none}
+.side-head{display:flex;align-items:center;justify-content:space-between;margin:2px 4px 14px}
+.side-sect{font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin:14px 8px 4px}
+nav.tabs{display:flex;flex-direction:column;gap:3px}
 .tab{border:0;background:transparent;color:var(--muted);font:inherit;font-weight:600;
-  padding:8px 12px;border-radius:999px;cursor:pointer;white-space:nowrap}
+  padding:11px 14px;border-radius:12px;cursor:pointer;text-align:left;width:100%;display:flex;align-items:center;gap:10px}
+.tab .ti{width:22px;text-align:center;font-size:16px}
 .tab.active{background:var(--brand);color:#fff}
-.tab:hover:not(.active){color:var(--ink)}
+.tab:hover:not(.active){background:color-mix(in srgb,var(--brand) 9%,transparent);color:var(--ink)}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:110;opacity:0;visibility:hidden;transition:.25s}
+.scrim.open{opacity:1;visibility:visible}
+@media(prefers-reduced-motion:reduce){.sidebar,.scrim{transition:none}}
 
 /* ---------- generic ---------- */
 section.view{padding:26px 0 90px; animation:fade .35s ease}
@@ -159,12 +175,22 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-s
 
 <header class="top">
   <div class="wrap">
+    <button class="menubtn" id="menuBtn" onclick="openNav()" aria-label="Open menu" aria-expanded="false">☰</button>
     <div class="brand" onclick="go('home')">
       <span class="mark">☾</span><span>Sattva</span>
     </div>
-    <nav class="tabs" id="tabs"></nav>
+    <span class="cur" id="curTitle"></span>
   </div>
 </header>
+
+<aside class="sidebar" id="sidebar" aria-label="Sections">
+  <div class="side-head">
+    <div class="brand" onclick="go('home')"><span class="mark">☾</span><span>Sattva</span></div>
+    <button class="menubtn" onclick="closeNav()" aria-label="Close menu">✕</button>
+  </div>
+  <nav class="tabs" id="tabs"></nav>
+</aside>
+<div class="scrim" id="scrim" onclick="closeNav()"></div>
 
 <main class="wrap" id="app"></main>
 
@@ -738,11 +764,29 @@ const TABS = [
   ["progress","Progress"],["premium","Premium"]
 ];
 let current = "home";
+const NAV_ICONS={home:"🏠",dosha:"🧭",panchang:"🗓️",yoga:"🧘",asanas:"🤸",breathe:"🌬️",meditate:"🧠",ayurveda:"🌿",food:"🍽️",herbs:"🌱",diy:"🫗",recipes:"🍲",progress:"📈",premium:"⭐"};
+const NAV_GROUPS=[
+  ["Daily",["home","dosha","panchang"]],
+  ["Practice",["yoga","asanas","breathe","meditate"]],
+  ["Ayurveda",["ayurveda","food","herbs","diy","recipes"]],
+  ["You",["progress","premium"]]
+];
+const tabLabel=id=>(TABS.find(t=>t[0]===id)||[,id])[1];
 function renderTabs(){
-  document.getElementById("tabs").innerHTML = TABS.map(([id,label])=>
-    `<button class="tab ${id===current?'active':''}" onclick="go('${id}')">${label}</button>`).join("");
+  document.getElementById("tabs").innerHTML = NAV_GROUPS.map(([g,ids])=>
+    `<div class="side-sect">${g}</div>`+ids.map(id=>
+      `<button class="tab ${id===current?'active':''}" onclick="go('${id}')"><span class="ti">${NAV_ICONS[id]||''}</span>${tabLabel(id)}</button>`).join("")
+  ).join("");
 }
-function go(id){ current=id; renderTabs(); window.scrollTo(0,0); document.getElementById("app").innerHTML = VIEWS[id](); if(AFTER[id]) AFTER[id](); }
+function openNav(){ document.getElementById("sidebar").classList.add("open"); document.getElementById("scrim").classList.add("open"); const b=document.getElementById("menuBtn"); if(b) b.setAttribute("aria-expanded","true"); }
+function closeNav(){ document.getElementById("sidebar").classList.remove("open"); document.getElementById("scrim").classList.remove("open"); const b=document.getElementById("menuBtn"); if(b) b.setAttribute("aria-expanded","false"); }
+function go(id){
+  current=id; renderTabs(); closeNav();
+  const ct=document.getElementById("curTitle"); if(ct) ct.textContent=tabLabel(id);
+  window.scrollTo(0,0);
+  document.getElementById("app").innerHTML = VIEWS[id](); if(AFTER[id]) AFTER[id]();
+}
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeNav(); });
 
 function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),2200); }
 
@@ -1584,6 +1628,7 @@ function unlockDemo(el){ store.premium=true; save(); el.closest('.modal').remove
 /* ---------- boot ---------- */
 renderTabs();
 go('home');
+openNav();   // show the sidebar on first load so all sections are visible; it auto-hides on selection
 
 /* register the site's service worker if present (offline support) */
 if('serviceWorker' in navigator){ try{ navigator.serviceWorker.register('service-worker.js').catch(()=>{}); }catch(e){} }
