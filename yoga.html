@@ -6,6 +6,15 @@
 <meta name="theme-color" content="#0f766e" />
 <title>Yoga-Fi · Yoga & Ayurveda</title>
 <meta name="description" content="Personalised yoga and Ayurveda guided by your dosha — daily routines, dosha-aligned sequences, food & ritual tips, and breathing practices." />
+<!-- PWA / add-to-home-screen: Aditi sunrise logo as the app icon -->
+<link rel="manifest" href="yoga.webmanifest" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="Yoga-Fi" />
+<link rel="apple-touch-icon" sizes="180x180" href="yoga-apple-touch.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="yoga-icon-192.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="yoga-icon-512.png" />
 <style>
 :root{
   --bg:#f6f4ef; --panel:#ffffff; --ink:#1f2a2a; --muted:#5f6f6d;
@@ -2173,7 +2182,7 @@ paintLogos();
 buildLanding();
 
 /* register the site's service worker if present (offline support) */
-if('serviceWorker' in navigator){ try{ navigator.serviceWorker.register('service-worker.js').catch(()=>{}); }catch(e){} }
+if('serviceWorker' in navigator){ try{ navigator.serviceWorker.register('yoga-sw.js').catch(()=>{}); }catch(e){} }
 </script>
 </body>
 </html>

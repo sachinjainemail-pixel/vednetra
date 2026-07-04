@@ -1,0 +1,16 @@
+{
+  "name": "Yoga-Fi — Yoga & Ayurveda",
+  "short_name": "Yoga-Fi",
+  "description": "Personalised yoga and Ayurveda guided by your dosha — routines, 50 illustrated asanas, breathwork, meditation, chakras, food, herbs and more.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f6f4ef",
+  "theme_color": "#0f766e",
+  "icons": [
+    { "src": "yoga-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "yoga-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "yoga-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
