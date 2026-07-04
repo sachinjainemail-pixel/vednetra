@@ -831,7 +831,13 @@ function _figureShapes(n, sil){
   const dot=(x,y,rr,col)=>`<circle cx="${f(x)}" cy="${f(y)}" r="${rr}" fill="${col}"/>`;
   const R={hip:5.0,waist:3.8,chestLow:4.3,chest:5.3,thigh:4.5,knee:3.3,ankle:2.3,foot:2.5,
            up:3.0,elbow:2.5,wrist:1.9,neck:2.5};
+  // Aditi's signature long, loose dark hair falls with gravity (screen +y) from the head
+  const longHair = cap(hcx, hcy-0.5, 5.6, hcx-1.2, hcy+16, 3.0, C.hair)
+                 + cap(hcx, hcy-0.5, 5.2, hcx+2.0, hcy+13, 2.4, C.hair);
+  const bindi = sil ? "" : dot(_pt(sx,sy,t,L.neck+L.head+1.6)[0], _pt(sx,sy,t,L.neck+L.head+1.6)[1], 1.1, "#8a1f43");
   const body=
+    // long hair drawn first so the body sits in front of it
+    longHair+
     // legs — leggings, bare feet
     cap(px,py,R.thigh, lk,lky,R.knee,C.cloth)+cap(lk,lky,R.knee, lf,lfy,R.ankle,C.cloth)+dot(lf,lfy,R.foot,C.skin)+
     cap(px,py,R.thigh, rk,rky,R.knee,C.cloth)+cap(rk,rky,R.knee, rf,rfy,R.ankle,C.cloth)+dot(rf,rfy,R.foot,C.skin)+
@@ -842,11 +848,11 @@ function _figureShapes(n, sil){
     // arms — bare skin, magenta wrist cuff
     cap(sx,sy,R.up, le,ley,R.elbow,C.skin)+cap(le,ley,R.elbow, lh,lhy,R.wrist,C.skin)+dot(lh,lhy,R.wrist+0.5,C.band)+
     cap(sx,sy,R.up, re,rey,R.elbow,C.skin)+cap(re,rey,R.elbow, rh,rhy,R.wrist,C.skin)+dot(rh,rhy,R.wrist+0.5,C.band)+
-    // neck + hair (behind) + face + bun
+    // neck + hair (scalp framing the face) + face + bindi
     cap(nbx,nby,R.neck, hbx,hby,R.neck,C.skin)+
-    `<ellipse cx="${f(hcx)}" cy="${f(hcy)}" rx="5.3" ry="5.7" fill="${C.hair}"/>`+
-    dot(bnx,bny,3.6,C.hair)+
-    `<ellipse cx="${f(fcx)}" cy="${f(fcy)}" rx="4.5" ry="4.9" fill="${C.skin}"/>`;
+    `<ellipse cx="${f(hcx)}" cy="${f(hcy)}" rx="5.7" ry="6.0" fill="${C.hair}"/>`+
+    `<ellipse cx="${f(fcx)}" cy="${f(fcy)}" rx="4.4" ry="4.8" fill="${C.skin}"/>`+
+    bindi;
   return body;
 }
 function asanaFigure(n, ground){
