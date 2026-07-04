@@ -1,0 +1,857 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0f766e" />
+<title>Sattva · Yoga & Ayurveda</title>
+<meta name="description" content="Personalised yoga and Ayurveda guided by your dosha — daily routines, dosha-aligned sequences, food & ritual tips, and breathing practices." />
+<style>
+:root{
+  --bg:#f6f4ef; --panel:#ffffff; --ink:#1f2a2a; --muted:#5f6f6d;
+  --line:#e7e2d8; --brand:#0f766e; --brand-2:#0d9488; --accent:#c2703d;
+  --vata:#7c6cc4; --pitta:#d1603a; --kapha:#3f8f6a;
+  --shadow:0 10px 30px rgba(20,40,38,.08); --radius:18px;
+  --maxw:1080px;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#0e1413; --panel:#151e1d; --ink:#e9efec; --muted:#9fb0ac;
+    --line:#26302e; --brand:#2dd4bf; --brand-2:#14b8a6; --accent:#e0925f;
+    --shadow:0 10px 30px rgba(0,0,0,.35); }
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.55;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+a{color:var(--brand-2);text-decoration:none}
+img{max-width:100%}
+.wrap{max-width:var(--maxw); margin:0 auto; padding:0 18px}
+.hidden{display:none !important}
+
+/* ---------- top bar ---------- */
+header.top{
+  position:sticky; top:0; z-index:50; backdrop-filter:saturate(1.4) blur(10px);
+  background:color-mix(in srgb, var(--bg) 82%, transparent);
+  border-bottom:1px solid var(--line);
+}
+.top .wrap{display:flex; align-items:center; gap:14px; height:60px}
+.brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.2px; cursor:pointer}
+.mark{width:30px;height:30px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%, var(--brand-2), var(--brand));
+  display:grid;place-items:center;color:#fff;font-size:16px}
+nav.tabs{margin-left:auto; display:flex; gap:4px; overflow-x:auto; scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+.tab{border:0;background:transparent;color:var(--muted);font:inherit;font-weight:600;
+  padding:8px 12px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.tab.active{background:var(--brand);color:#fff}
+.tab:hover:not(.active){color:var(--ink)}
+
+/* ---------- generic ---------- */
+section.view{padding:26px 0 90px; animation:fade .35s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+h1{font-size:clamp(28px,5vw,44px);line-height:1.1;margin:.2em 0 .3em}
+h2{font-size:22px;margin:1.6em 0 .6em}
+h3{margin:.2em 0 .4em}
+.lead{color:var(--muted);font-size:18px;max-width:60ch}
+.grid{display:grid;gap:16px}
+.cols-3{grid-template-columns:repeat(3,1fr)}
+.cols-2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:760px){.cols-3,.cols-2{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+  padding:20px;box-shadow:var(--shadow)}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;
+  padding:4px 10px;border-radius:999px;background:color-mix(in srgb,var(--brand) 12%,transparent);
+  color:var(--brand-2);text-transform:uppercase;letter-spacing:.5px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;cursor:pointer;
+  font:inherit;font-weight:700;padding:12px 20px;border-radius:999px;
+  background:var(--brand);color:#fff;transition:transform .12s ease, filter .12s}
+.btn:hover{filter:brightness(1.06)}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn.sm{padding:8px 14px;font-size:14px}
+.muted{color:var(--muted)}
+.center{text-align:center}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.tag{font-size:12px;font-weight:700;padding:3px 9px;border-radius:8px;border:1px solid var(--line);color:var(--muted)}
+.dosha-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.v{background:var(--vata)} .p{background:var(--pitta)} .k{background:var(--kapha)}
+.badge-v{color:var(--vata)} .badge-p{color:var(--pitta)} .badge-k{color:var(--kapha)}
+
+/* ---------- hero ---------- */
+.hero{position:relative;border-radius:26px;overflow:hidden;
+  background:
+   radial-gradient(120% 120% at 85% 10%, color-mix(in srgb,var(--brand) 22%,transparent), transparent 60%),
+   radial-gradient(120% 120% at 10% 90%, color-mix(in srgb,var(--accent) 20%,transparent), transparent 55%),
+   var(--panel);
+  border:1px solid var(--line); padding:44px 34px}
+.hero .lotus{position:absolute;right:-40px;bottom:-40px;font-size:220px;opacity:.08;line-height:1;pointer-events:none}
+.stat-strip{display:flex;gap:26px;flex-wrap:wrap;margin-top:22px}
+.stat b{font-size:26px;display:block}
+.stat span{color:var(--muted);font-size:13px}
+
+/* ---------- quiz ---------- */
+.progressbar{height:8px;background:var(--line);border-radius:999px;overflow:hidden;margin:10px 0 26px}
+.progressbar>i{display:block;height:100%;background:linear-gradient(90deg,var(--brand-2),var(--brand));transition:width .3s}
+.opt{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:var(--panel);
+  border:1.5px solid var(--line);border-radius:14px;padding:16px;margin:10px 0;cursor:pointer;font:inherit;
+  transition:border-color .15s, background .15s}
+.opt:hover{border-color:var(--brand-2)}
+.opt.sel{border-color:var(--brand);background:color-mix(in srgb,var(--brand) 8%,transparent)}
+.opt .k{flex:0 0 auto}
+
+/* dosha result meters */
+.meter{margin:12px 0}
+.meter .lab{display:flex;justify-content:space-between;font-weight:700;font-size:14px;margin-bottom:6px}
+.meter .bar{height:12px;border-radius:999px;background:var(--line);overflow:hidden}
+.meter .bar>i{display:block;height:100%;transition:width .6s ease}
+
+/* ---------- sequence player ---------- */
+.player{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;flex-direction:column;
+  padding:calc(18px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom))}
+.player .head{display:flex;align-items:center;gap:12px}
+.pose-stage{flex:1;display:grid;place-items:center;text-align:center}
+.pose-emoji{font-size:120px;line-height:1;filter:drop-shadow(0 8px 20px rgba(0,0,0,.15))}
+.ring{--sz:180px;width:var(--sz);height:var(--sz);border-radius:50%;display:grid;place-items:center;margin:6px auto 0;
+  background:conic-gradient(var(--brand) var(--deg,0deg), var(--line) 0);transition:background .4s linear}
+.ring>div{width:calc(var(--sz) - 22px);height:calc(var(--sz) - 22px);border-radius:50%;background:var(--bg);
+  display:grid;place-items:center;font-size:40px;font-weight:800}
+.breath{width:150px;height:150px;border-radius:50%;margin:14px auto;
+  background:radial-gradient(circle at 40% 35%,var(--brand-2),var(--brand));
+  display:grid;place-items:center;color:#fff;font-weight:700;transition:transform 4s ease-in-out;transform:scale(.55)}
+.timeline{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:12px 0}
+.timeline i{width:26px;height:6px;border-radius:999px;background:var(--line)}
+.timeline i.done{background:var(--brand)} .timeline i.now{background:var(--accent)}
+
+/* ---------- food lists ---------- */
+.foodcol h4{margin:.2em 0 .5em}
+.foodcol ul{margin:0;padding-left:18px}
+.foodcol li{margin:3px 0}
+.favor{color:var(--kapha)} .reduce{color:var(--pitta)}
+
+/* ---------- premium ---------- */
+.tier{position:relative;overflow:hidden}
+.tier.feat{border-color:var(--brand);box-shadow:0 12px 34px color-mix(in srgb,var(--brand) 22%,transparent)}
+.tier .price{font-size:34px;font-weight:800}
+.tier ul{list-style:none;padding:0;margin:14px 0}
+.tier li{padding:7px 0 7px 26px;position:relative;border-top:1px solid var(--line)}
+.tier li:before{content:"✓";position:absolute;left:0;color:var(--brand-2);font-weight:800}
+.ribbon{position:absolute;top:14px;right:-34px;transform:rotate(45deg);background:var(--accent);color:#fff;
+  font-size:11px;font-weight:800;padding:4px 40px;letter-spacing:.5px}
+.lock{filter:blur(4px);pointer-events:none;user-select:none}
+.locked-wrap{position:relative}
+.locked-badge{position:absolute;inset:0;display:grid;place-items:center;z-index:2}
+
+/* ---------- toast / modal ---------- */
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;
+  background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;z-index:200;transition:.25s;font-weight:600}
+.toast.show{opacity:1;transform:translateX(-50%)}
+.modal{position:fixed;inset:0;z-index:150;background:rgba(0,0,0,.5);display:grid;place-items:center;padding:18px;animation:fade .2s}
+.modal .box{background:var(--panel);border-radius:20px;max-width:440px;width:100%;padding:26px;border:1px solid var(--line)}
+
+footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:14px}
+.disc{font-size:12px;color:var(--muted);max-width:70ch;margin-top:8px}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand" onclick="go('home')">
+      <span class="mark">☾</span><span>Sattva</span>
+    </div>
+    <nav class="tabs" id="tabs"></nav>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<footer>
+  <div>Sattva · Yoga &amp; Ayurveda — a self-contained demo experience.</div>
+  <div class="disc">Wellness &amp; educational content only. Ayurvedic and yoga guidance here is general and not a substitute for professional medical advice. Consult a qualified doctor or registered Ayurvedic practitioner before starting new practices, herbs, or diets — especially if pregnant, injured, or managing a health condition.</div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   Sattva — Yoga & Ayurveda  (single-file, no dependencies)
+   State persists in localStorage.
+   ========================================================= */
+const LS_KEY = "sattva.v1";
+const store = Object.assign(
+  { dosha:null, scores:null, minutes:0, sessions:0, streak:0, lastDay:null, done:{}, premium:false },
+  JSON.parse(localStorage.getItem(LS_KEY) || "{}")
+);
+function save(){ localStorage.setItem(LS_KEY, JSON.stringify(store)); }
+
+const DOSHAS = {
+  vata:  {key:"vata",  name:"Vata",  cls:"v", color:"var(--vata)",  elements:"Air & Ether", emoji:"🌬️",
+    trait:"Creative, quick, energetic — and prone to feeling scattered, dry, or anxious when out of balance.",
+    balance:"Ground, warm, and moisten. Favour routine, warmth, and calm."},
+  pitta: {key:"pitta", name:"Pitta", cls:"p", color:"var(--pitta)", elements:"Fire & Water", emoji:"🔥",
+    trait:"Focused, driven, sharp — and prone to heat, irritability, or burnout when out of balance.",
+    balance:"Cool, soften, and slow down. Favour moderation, shade, and play."},
+  kapha: {key:"kapha", name:"Kapha", cls:"k", color:"var(--kapha)", elements:"Earth & Water", emoji:"⛰️",
+    trait:"Calm, steady, nurturing — and prone to heaviness, sluggishness, or attachment when out of balance.",
+    balance:"Stimulate, lighten, and move. Favour energy, warmth, and variety."}
+};
+
+/* ---------- Dosha quiz ---------- */
+const QUIZ = [
+  {q:"Your natural body frame is…", a:[
+    ["Thin, light, hard to gain weight","vata"],
+    ["Medium, athletic, well-proportioned","pitta"],
+    ["Solid, sturdy, gains weight easily","kapha"]]},
+  {q:"Your skin tends to be…", a:[
+    ["Dry, cool, rough","vata"],
+    ["Warm, sensitive, prone to redness","pitta"],
+    ["Thick, smooth, oily","kapha"]]},
+  {q:"Under stress you usually feel…", a:[
+    ["Anxious, worried, restless","vata"],
+    ["Irritable, frustrated, intense","pitta"],
+    ["Withdrawn, heavy, avoidant","kapha"]]},
+  {q:"Your appetite &amp; digestion are…", a:[
+    ["Irregular — sometimes hungry, sometimes not","vata"],
+    ["Strong &amp; sharp — I get 'hangry'","pitta"],
+    ["Slow &amp; steady — I can skip meals easily","kapha"]]},
+  {q:"Your sleep is typically…", a:[
+    ["Light, easily disturbed","vata"],
+    ["Moderate but sound","pitta"],
+    ["Deep, long, hard to wake","kapha"]]},
+  {q:"How do you learn &amp; remember?", a:[
+    ["Learn fast, forget fast","vata"],
+    ["Sharp, focused, good memory","pitta"],
+    ["Learn slowly, never forget","kapha"]]},
+  {q:"Your energy through the day is…", a:[
+    ["Comes in bursts, then dips","vata"],
+    ["Intense &amp; goal-driven","pitta"],
+    ["Steady &amp; enduring","kapha"]]},
+  {q:"In conversation you're…", a:[
+    ["Talkative, quick, tangential","vata"],
+    ["Precise, persuasive, direct","pitta"],
+    ["Calm, slow, thoughtful","kapha"]]},
+  {q:"Weather you dislike most…", a:[
+    ["Cold, dry, windy","vata"],
+    ["Hot, humid, bright sun","pitta"],
+    ["Cold, damp, heavy","kapha"]]},
+  {q:"When making decisions you…", a:[
+    ["Change your mind often","vata"],
+    ["Decide quickly &amp; firmly","pitta"],
+    ["Take your time, prefer not to rush","kapha"]]}
+];
+
+/* ---------- Yoga sequences ---------- */
+const POSES = {
+  child:{n:"Child's Pose",s:"Balasana",e:"🧎"},
+  cat:{n:"Cat–Cow",s:"Marjaryasana",e:"🐈"},
+  down:{n:"Downward Dog",s:"Adho Mukha Svanasana",e:"🐕"},
+  warrior1:{n:"Warrior I",s:"Virabhadrasana I",e:"⚔️"},
+  warrior2:{n:"Warrior II",s:"Virabhadrasana II",e:"🗡️"},
+  tree:{n:"Tree Pose",s:"Vrksasana",e:"🌳"},
+  triangle:{n:"Triangle",s:"Trikonasana",e:"📐"},
+  cobra:{n:"Cobra",s:"Bhujangasana",e:"🐍"},
+  bridge:{n:"Bridge",s:"Setu Bandha",e:"🌉"},
+  seatedfold:{n:"Seated Forward Fold",s:"Paschimottanasana",e:"🙇"},
+  twist:{n:"Supine Twist",s:"Supta Matsyendrasana",e:"🌀"},
+  legsup:{n:"Legs Up the Wall",s:"Viparita Karani",e:"🦵"},
+  chair:{n:"Chair Pose",s:"Utkatasana",e:"🪑"},
+  plank:{n:"Plank",s:"Phalakasana",e:"🪵"},
+  boat:{n:"Boat",s:"Navasana",e:"⛵"},
+  sun:{n:"Sun Salutation",s:"Surya Namaskar",e:"🌅"},
+  mountain:{n:"Mountain",s:"Tadasana",e:"⛰️"},
+  corpse:{n:"Savasana",s:"Corpse Pose",e:"🌙"},
+  pigeon:{n:"Pigeon",s:"Eka Pada Kapotasana",e:"🕊️"},
+  camel:{n:"Camel",s:"Ustrasana",e:"🐪"}
+};
+function seq(list){ return list.map(([k,sec])=>({...POSES[k], sec})); }
+
+const SEQUENCES = [
+  {id:"vata-ground", name:"Grounding Flow", dosha:"vata", level:"Gentle", goal:"Calm & steady",
+   desc:"Slow, warming, and grounding — long holds to settle a restless Vata mind and body.",
+   poses:seq([["child",40],["cat",40],["down",30],["warrior2",40],["tree",30],["seatedfold",45],["twist",40],["legsup",60],["corpse",60]])},
+  {id:"vata-warm", name:"Warm Morning Wake-Up", dosha:"vata", level:"Gentle", goal:"Energy",
+   desc:"Fluid, warming movement to gently rouse the body without over-stimulating.",
+   poses:seq([["cat",40],["down",30],["warrior1",35],["triangle",35],["bridge",40],["twist",40],["corpse",50]])},
+  {id:"pitta-cool", name:"Cooling Release", dosha:"pitta", level:"Moderate", goal:"Cool down",
+   desc:"Open the chest and release heat — playful, non-competitive, with softening forward folds.",
+   poses:seq([["cat",30],["down",30],["triangle",35],["warrior2",35],["camel",30],["seatedfold",45],["twist",40],["legsup",60],["corpse",60]])},
+  {id:"pitta-open", name:"Heart-Opening Flow", dosha:"pitta", level:"Moderate", goal:"Let go",
+   desc:"Backbends and hip openers to release tension and cool an overheated, driven mind.",
+   poses:seq([["child",30],["cobra",30],["bridge",40],["camel",30],["pigeon",45],["twist",40],["corpse",60]])},
+  {id:"kapha-energize", name:"Energising Sun Flow", dosha:"kapha", level:"Vigorous", goal:"Wake up",
+   desc:"Fast, heating, and stimulating — build heat to lift Kapha heaviness and sluggishness.",
+   poses:seq([["sun",50],["chair",30],["warrior1",35],["warrior2",35],["plank",30],["boat",30],["cobra",25],["twist",30],["corpse",40]])},
+  {id:"kapha-strength", name:"Strong & Light", dosha:"kapha", level:"Vigorous", goal:"Build strength",
+   desc:"Standing strength and core work to invigorate and lighten body and mood.",
+   poses:seq([["sun",40],["chair",35],["warrior1",35],["triangle",35],["plank",35],["boat",35],["bridge",35],["corpse",40]])},
+  {id:"all-reset", name:"Anytime Reset", dosha:"all", level:"Gentle", goal:"Balance",
+   desc:"A tri-doshic, all-levels sequence to reset at any time of day.",
+   poses:seq([["mountain",25],["cat",35],["down",30],["warrior2",35],["tree",30],["bridge",35],["seatedfold",40],["corpse",50]])}
+];
+
+/* ---------- Ayurveda data per dosha ---------- */
+const AYUR = {
+  vata:{
+    routine:["Wake gently by 6–7am; avoid rushing.","Warm oil self-massage (abhyanga) with sesame oil.","Warm, cooked breakfast — never skip meals.","Keep a steady daily rhythm — same times for meals & sleep.","Wind down early; screens off 1 hr before bed."],
+    favor:["Warm, cooked, moist foods","Sweet, sour & salty tastes","Ghee & healthy oils","Cooked oats, rice, root veg","Warm milk, ginger, cinnamon","Ripe, sweet fruit"],
+    reduce:["Raw salads & cold foods","Dry crackers, chips, popcorn","Excess caffeine","Carbonated drinks","Beans in excess","Very bitter or astringent foods"],
+    herbs:["Ashwagandha — calming, grounding","Triphala — gentle digestion","Ginger — warms &amp; kindles agni","Licorice — soothing, moistening"],
+    seasonal:"Vata rises in autumn &amp; early winter (cold, dry, windy). Double down on warmth, oil, routine, and rest.",
+    breath:"Nadi Shodhana (alternate-nostril) — balancing &amp; calming."},
+  pitta:{
+    routine:["Rise before the sun heats up (~6am).","Cooling coconut-oil massage.","Don't skip meals — eat lunch as the main meal at midday.","Take real breaks; avoid working through mealtimes.","Cool, calm evening — moonlight walks, no heated debates."],
+    favor:["Cooling, fresh foods","Sweet, bitter & astringent tastes","Cucumber, leafy greens, melon","Coconut, mint, cilantro","Sweet ripe fruit","Milk, ghee (in moderation)"],
+    reduce:["Spicy, fried, very salty food","Sour & fermented foods","Excess coffee & alcohol","Red meat in excess","Nightshades in excess","Skipping meals (fuels the fire)"],
+    herbs:["Brahmi — cools &amp; steadies the mind","Amalaki (amla) — cooling antioxidant","Aloe vera — soothing to Pitta","Coriander/fennel — cooling digestives"],
+    seasonal:"Pitta peaks in summer (hot, sharp). Favour cooling foods, shade, hydration, and easing your intensity.",
+    breath:"Sheetali (cooling breath) — draws in cool air to calm heat."},
+  kapha:{
+    routine:["Wake early — before 6am — and get moving.","Dry brushing (garshana) to stimulate circulation.","Light or no breakfast; make lunch the main meal.","Vigorous exercise most days — break a sweat.","Avoid daytime naps; keep the day active &amp; varied."],
+    favor:["Light, warm, dry foods","Pungent, bitter & astringent tastes","Plenty of vegetables & legumes","Ginger, black pepper, turmeric, chili","Honey (raw, not heated)","Light grains — millet, barley, buckwheat"],
+    reduce:["Heavy, oily, fried foods","Sweets & excess sugar","Dairy & cheese","Cold drinks & iced foods","Over-eating & late-night meals","Excess salt"],
+    herbs:["Trikatu (ginger, pepper, long pepper) — kindles digestion","Turmeric — warming &amp; cleansing","Guggulu — supports metabolism","Tulsi (holy basil) — energising"],
+    seasonal:"Kapha accumulates in late winter &amp; spring (cold, damp, heavy). Get vigorous, light, warm, and stimulating.",
+    breath:"Bhastrika / Kapalabhati (energising breath) — builds heat &amp; clears heaviness."}
+};
+
+/* ---------- Meditations / breathing ---------- */
+const BREATH = [
+  {id:"box", name:"Box Breathing", desc:"Equal 4-count inhale, hold, exhale, hold. Calms the nervous system.",
+   phases:[["Inhale",4],["Hold",4],["Exhale",4],["Hold",4]], rounds:6},
+  {id:"478", name:"4·7·8 Relax", desc:"Longer exhale to settle the body toward sleep or calm.",
+   phases:[["Inhale",4],["Hold",7],["Exhale",8]], rounds:5},
+  {id:"calm", name:"Calming Breath", desc:"Gentle 4-in / 6-out to soothe Vata &amp; Pitta.",
+   phases:[["Inhale",4],["Exhale",6]], rounds:8},
+  {id:"energize", name:"Energising Breath", desc:"Brisk 2-in / 2-out to lift Kapha heaviness.",
+   phases:[["Inhale",2],["Exhale",2]], rounds:14}
+];
+
+/* =========================================================
+   Router
+   ========================================================= */
+const TABS = [
+  ["home","Home"],["dosha","My Dosha"],["yoga","Yoga"],
+  ["ayurveda","Ayurveda"],["breathe","Breathe"],["progress","Progress"],["premium","Premium"]
+];
+let current = "home";
+function renderTabs(){
+  document.getElementById("tabs").innerHTML = TABS.map(([id,label])=>
+    `<button class="tab ${id===current?'active':''}" onclick="go('${id}')">${label}</button>`).join("");
+}
+function go(id){ current=id; renderTabs(); window.scrollTo(0,0); document.getElementById("app").innerHTML = VIEWS[id](); if(AFTER[id]) AFTER[id](); }
+
+function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),2200); }
+
+/* =========================================================
+   Views
+   ========================================================= */
+const VIEWS = {};
+const AFTER = {};
+
+VIEWS.home = () => {
+  const d = store.dosha ? DOSHAS[store.dosha] : null;
+  return `
+  <section class="view">
+    <div class="hero">
+      <span class="lotus">🪷</span>
+      <span class="pill">Yoga · Ayurveda · Balance</span>
+      <h1>Practice that fits<br/>your true nature.</h1>
+      <p class="lead">Sattva blends yoga with Ayurveda — the ancient science of balance. Discover your <b>dosha</b>, then get daily routines, dosha-aligned sequences, food &amp; ritual guidance, and breathwork tuned to <em>you</em>.</p>
+      <div class="row" style="margin-top:22px">
+        ${d
+          ? `<button class="btn" onclick="go('dosha')">Your type: ${d.name} ${d.emoji}</button>
+             <button class="btn ghost" onclick="go('yoga')">Today's practice</button>`
+          : `<button class="btn" onclick="startQuiz()">Discover your dosha →</button>
+             <button class="btn ghost" onclick="go('yoga')">Browse yoga</button>`}
+      </div>
+      <div class="stat-strip">
+        <div class="stat"><b>${store.sessions}</b><span>sessions practiced</span></div>
+        <div class="stat"><b>${store.minutes}</b><span>total minutes</span></div>
+        <div class="stat"><b>${store.streak}🔥</b><span>day streak</span></div>
+      </div>
+    </div>
+
+    <h2>How Sattva works</h2>
+    <div class="grid cols-3">
+      <div class="card"><div style="font-size:34px">🧭</div><h3>1 · Find your dosha</h3><p class="muted">A short quiz maps your Vata, Pitta &amp; Kapha balance — the foundation for everything else.</p></div>
+      <div class="card"><div style="font-size:34px">🧘</div><h3>2 · Practice aligned</h3><p class="muted">Guided sequences and a daily routine chosen to bring your constitution back into balance.</p></div>
+      <div class="card"><div style="font-size:34px">🌿</div><h3>3 · Live in rhythm</h3><p class="muted">Food, herb, ritual &amp; seasonal tips so the whole day supports your practice.</p></div>
+    </div>
+
+    <h2>The three doshas</h2>
+    <div class="grid cols-3">
+      ${Object.values(DOSHAS).map(x=>`
+        <div class="card">
+          <div class="row"><span class="dosha-dot ${x.cls}"></span><b>${x.name}</b> <span class="tag">${x.elements}</span></div>
+          <p style="font-size:34px;margin:.2em 0">${x.emoji}</p>
+          <p class="muted">${x.trait}</p>
+        </div>`).join("")}
+    </div>
+
+    <div class="card" style="margin-top:26px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
+      <div><h3 style="margin:0">Ready to begin?</h3><p class="muted" style="margin:.2em 0 0">Takes about two minutes.</p></div>
+      <button class="btn" onclick="${store.dosha?"go('dosha')":"startQuiz()"}">${store.dosha?'View my plan':'Take the dosha quiz'}</button>
+    </div>
+  </section>`;
+};
+
+/* ---------- Dosha view (quiz + result) ---------- */
+let quizState = null; // {i, answers:[]}
+function startQuiz(){ quizState = {i:0, answers:[]}; go('dosha'); }
+VIEWS.dosha = () => {
+  if(quizState) return quizView();
+  if(store.dosha) return resultView();
+  // no result yet, not mid-quiz
+  return `<section class="view center">
+    <span class="pill">Prakriti · your constitution</span>
+    <h1>Discover your dosha</h1>
+    <p class="lead" style="margin:0 auto 22px">Answer ${QUIZ.length} quick questions about your body and mind. We'll map your Vata–Pitta–Kapha balance and personalise your practice.</p>
+    <button class="btn" onclick="startQuiz()">Start the quiz →</button>
+  </section>`;
+};
+function quizView(){
+  const {i} = quizState, q = QUIZ[i];
+  const pct = Math.round((i/QUIZ.length)*100);
+  return `<section class="view">
+    <span class="pill">Question ${i+1} of ${QUIZ.length}</span>
+    <div class="progressbar"><i style="width:${pct}%"></i></div>
+    <h1 style="font-size:26px">${q.q}</h1>
+    ${q.a.map((opt,idx)=>`
+      <button class="opt ${quizState.answers[i]===opt[1]?'sel':''}" onclick="answer(${idx})">
+        <span class="dosha-dot ${DOSHAS[opt[1]].cls}"></span>
+        <span>${opt[0]}</span>
+      </button>`).join("")}
+    <div class="row" style="margin-top:18px">
+      ${i>0?`<button class="btn ghost sm" onclick="quizBack()">← Back</button>`:""}
+      <span class="muted" style="margin-left:auto">Choose the closest match</span>
+    </div>
+  </section>`;
+}
+function answer(idx){
+  const {i} = quizState;
+  quizState.answers[i] = QUIZ[i].a[idx][1];
+  if(i < QUIZ.length-1){ quizState.i++; go('dosha'); }
+  else finishQuiz();
+}
+function quizBack(){ if(quizState.i>0){ quizState.i--; go('dosha'); } }
+function finishQuiz(){
+  const s={vata:0,pitta:0,kapha:0};
+  quizState.answers.forEach(a=>s[a]++);
+  const total=quizState.answers.length;
+  const scores={vata:Math.round(s.vata/total*100),pitta:Math.round(s.pitta/total*100),kapha:Math.round(s.kapha/total*100)};
+  const dominant=Object.keys(s).sort((a,b)=>s[b]-s[a])[0];
+  store.dosha=dominant; store.scores=scores; save();
+  quizState=null; go('dosha');
+  toast("Your dosha: "+DOSHAS[dominant].name+" "+DOSHAS[dominant].emoji);
+}
+function resultView(){
+  const d=DOSHAS[store.dosha], sc=store.scores||{vata:0,pitta:0,kapha:0};
+  const a=AYUR[store.dosha];
+  const recs = SEQUENCES.filter(s=>s.dosha===store.dosha).slice(0,2);
+  const meter=(name,key,col)=>`
+    <div class="meter"><div class="lab"><span>${name}</span><span>${sc[key]}%</span></div>
+    <div class="bar"><i style="width:${sc[key]}%;background:${col}"></i></div></div>`;
+  return `<section class="view">
+    <span class="pill">Your prakriti</span>
+    <h1>You're primarily <span class="badge-${d.cls}">${d.name}</span> ${d.emoji}</h1>
+    <p class="lead">${d.trait}</p>
+    <div class="grid cols-2" style="margin-top:20px">
+      <div class="card">
+        <h3>Your balance</h3>
+        ${meter("Vata · air & ether","vata","var(--vata)")}
+        ${meter("Pitta · fire & water","pitta","var(--pitta)")}
+        ${meter("Kapha · earth & water","kapha","var(--kapha)")}
+        <button class="btn ghost sm" onclick="startQuiz()" style="margin-top:10px">Retake quiz</button>
+      </div>
+      <div class="card">
+        <h3>How to rebalance</h3>
+        <p>${d.balance}</p>
+        <p class="muted"><b>Best breath for you:</b> ${a.breath}</p>
+        <p class="muted"><b>This season:</b> ${a.seasonal}</p>
+      </div>
+    </div>
+
+    <h2>Your daily routine <span class="muted" style="font-size:14px;font-weight:400">(dinacharya)</span></h2>
+    <div class="card"><ol style="margin:0;padding-left:20px">${a.routine.map(r=>`<li style="margin:6px 0">${r}</li>`).join("")}</ol></div>
+
+    <h2>Recommended practice</h2>
+    <div class="grid cols-2">${recs.map(seqCard).join("")}</div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn" onclick="go('yoga')">All ${d.name} sequences →</button>
+      <button class="btn ghost" onclick="go('ayurveda')">Food &amp; herbs for ${d.name} →</button>
+    </div>
+  </section>`;
+}
+
+/* ---------- Yoga library ---------- */
+let yogaFilter="mine";
+VIEWS.yoga = () => {
+  const filters=[["mine","For me"],["vata","Vata"],["pitta","Pitta"],["kapha","Kapha"],["all","All"]];
+  let list;
+  if(yogaFilter==="mine"){
+    list = store.dosha ? SEQUENCES.filter(s=>s.dosha===store.dosha||s.dosha==="all") : SEQUENCES;
+  } else if(yogaFilter==="all"){ list=SEQUENCES; }
+  else { list=SEQUENCES.filter(s=>s.dosha===yogaFilter||s.dosha==="all"); }
+  return `<section class="view">
+    <span class="pill">Guided practice</span>
+    <h1>Yoga sequences</h1>
+    <p class="lead">Tap any sequence for a guided, timed practice with a built-in breath pacer.${store.dosha?"":" Take the dosha quiz to personalise these."}</p>
+    <div class="row" style="margin:16px 0">
+      ${filters.map(([k,l])=>`<button class="tab ${yogaFilter===k?'active':''}" onclick="setYoga('${k}')">${l}</button>`).join("")}
+    </div>
+    <div class="grid cols-2">${list.map(seqCard).join("")}</div>
+  </section>`;
+};
+function setYoga(k){ yogaFilter=k; go('yoga'); }
+function totalMin(s){ return Math.max(1, Math.round(s.poses.reduce((a,p)=>a+p.sec,0)/60)); }
+function seqCard(s){
+  const dot = s.dosha==="all" ? `<span class="tag">Tri-doshic</span>` :
+    `<span class="row" style="gap:6px"><span class="dosha-dot ${DOSHAS[s.dosha].cls}"></span>${DOSHAS[s.dosha].name}</span>`;
+  return `<div class="card">
+    <div class="row" style="justify-content:space-between">${dot}<span class="tag">${s.level}</span></div>
+    <h3 style="margin:.4em 0 .2em">${s.name}</h3>
+    <p class="muted" style="margin:.2em 0">${s.desc}</p>
+    <div class="row" style="margin:10px 0 14px"><span class="tag">⏱ ${totalMin(s)} min</span><span class="tag">${s.poses.length} poses</span><span class="tag">🎯 ${s.goal}</span></div>
+    <button class="btn" onclick="openPlayer('${s.id}')">▶ Start practice</button>
+  </div>`;
+}
+
+/* ---------- Practice player ---------- */
+let player=null;
+function openPlayer(id){
+  const s=SEQUENCES.find(x=>x.id===id);
+  player={s, idx:0, left:s.poses[0].sec, total:s.poses[0].sec, paused:false, elapsed:0, timer:null};
+  document.body.insertAdjacentHTML("beforeend", playerHTML());
+  tickBreath();
+  runPlayer();
+}
+function playerHTML(){
+  return `<div class="player" id="player">
+    <div class="head">
+      <button class="btn ghost sm" onclick="closePlayer()">✕ Exit</button>
+      <b style="margin-left:auto">${player.s.name}</b>
+    </div>
+    <div class="pose-stage">
+      <div>
+        <div class="timeline" id="pl-timeline"></div>
+        <div class="pose-emoji" id="pl-emoji"></div>
+        <h2 id="pl-name" style="margin:.2em 0 0"></h2>
+        <p class="muted" id="pl-sanskrit" style="margin:.1em 0 0"></p>
+        <div class="ring" id="pl-ring"><div id="pl-count"></div></div>
+        <div class="breath" id="pl-breath">breathe</div>
+      </div>
+    </div>
+    <div class="row" style="justify-content:center">
+      <button class="btn ghost" onclick="prevPose()">⏮</button>
+      <button class="btn" id="pl-pause" onclick="togglePause()" style="min-width:130px">Pause</button>
+      <button class="btn ghost" onclick="nextPose()">⏭</button>
+    </div>
+    <p class="center muted" style="margin:12px 0 0" id="pl-progress"></p>
+  </div>`;
+}
+function paintPlayer(){
+  const p=player, pose=p.s.poses[p.idx];
+  document.getElementById("pl-emoji").textContent=pose.e;
+  document.getElementById("pl-name").textContent=pose.n;
+  document.getElementById("pl-sanskrit").textContent=pose.s;
+  document.getElementById("pl-count").textContent=p.left;
+  const deg=(1-(p.left/p.total))*360;
+  document.getElementById("pl-ring").style.setProperty("--deg",deg+"deg");
+  document.getElementById("pl-timeline").innerHTML=p.s.poses.map((_,i)=>
+    `<i class="${i<p.idx?'done':i===p.idx?'now':''}"></i>`).join("");
+  document.getElementById("pl-progress").textContent=`Pose ${p.idx+1} of ${p.s.poses.length}`;
+}
+function runPlayer(){
+  paintPlayer();
+  clearInterval(player.timer);
+  player.timer=setInterval(()=>{
+    if(player.paused) return;
+    player.left--; player.elapsed++;
+    if(player.left<=0){ nextPose(true); return; }
+    document.getElementById("pl-count").textContent=player.left;
+    const deg=(1-(player.left/player.total))*360;
+    document.getElementById("pl-ring").style.setProperty("--deg",deg+"deg");
+  },1000);
+}
+let breathIntv=null, breathIn=true;
+function tickBreath(){
+  const el=()=>document.getElementById("pl-breath");
+  clearInterval(breathIntv);
+  const set=()=>{ const b=el(); if(!b)return; b.style.transform=breathIn?"scale(1)":"scale(.55)"; b.textContent=breathIn?"inhale":"exhale"; breathIn=!breathIn; };
+  set(); breathIntv=setInterval(set,4000);
+}
+function nextPose(auto){
+  const p=player;
+  if(p.idx<p.s.poses.length-1){ p.idx++; p.total=p.s.poses[p.idx].sec; p.left=p.total; runPlayer(); }
+  else finishPractice();
+}
+function prevPose(){ const p=player; if(p.idx>0){ p.idx--; p.total=p.s.poses[p.idx].sec; p.left=p.total; runPlayer(); } }
+function togglePause(){ player.paused=!player.paused; document.getElementById("pl-pause").textContent=player.paused?"Resume":"Pause"; }
+function closePlayer(){ clearInterval(player.timer); clearInterval(breathIntv); document.getElementById("player")?.remove(); player=null; }
+function finishPractice(){
+  const mins=Math.max(1,Math.round(player.elapsed/60));
+  recordSession(mins);
+  closePlayer();
+  showComplete(mins);
+}
+function recordSession(mins){
+  store.sessions++; store.minutes+=mins;
+  const today=new Date().toISOString().slice(0,10);
+  if(store.lastDay!==today){
+    const y=new Date(Date.now()-864e5).toISOString().slice(0,10);
+    store.streak = (store.lastDay===y) ? store.streak+1 : 1;
+    store.lastDay=today;
+  }
+  store.done[today]=(store.done[today]||0)+1;
+  save();
+}
+function showComplete(mins){
+  document.body.insertAdjacentHTML("beforeend",
+   `<div class="modal" onclick="this.remove()"><div class="box center" onclick="event.stopPropagation()">
+     <div style="font-size:60px">🙏</div>
+     <h2 style="margin:.2em 0">Namaste</h2>
+     <p class="muted">You practised ${mins} minute${mins>1?'s':''}. Streak: ${store.streak} day${store.streak>1?'s':''} 🔥</p>
+     <button class="btn" onclick="this.closest('.modal').remove();go('progress')">See progress</button>
+   </div></div>`);
+}
+
+/* ---------- Ayurveda ---------- */
+let ayurTab = null;
+VIEWS.ayurveda = () => {
+  const active = ayurTab || store.dosha || "vata";
+  const d=DOSHAS[active], a=AYUR[active];
+  return `<section class="view">
+    <span class="pill">Ayurveda · the science of life</span>
+    <h1>Eat &amp; live for balance</h1>
+    <p class="lead">Ayurveda pairs each dosha with the foods, herbs, and rituals that steady it. Pick a constitution:</p>
+    <div class="row" style="margin:16px 0">
+      ${Object.values(DOSHAS).map(x=>`<button class="tab ${active===x.key?'active':''}" onclick="setAyur('${x.key}')"><span class="dosha-dot ${x.cls}"></span>&nbsp;${x.name}</button>`).join("")}
+    </div>
+
+    <div class="card"><div class="row"><span style="font-size:34px">${d.emoji}</span>
+      <div><h3 style="margin:0">${d.name} · ${d.elements}</h3><p class="muted" style="margin:.1em 0 0">${d.balance}</p></div></div>
+    </div>
+
+    <div class="grid cols-2" style="margin-top:16px">
+      <div class="card foodcol">
+        <h3>🍽️ Foods</h3>
+        <h4 class="favor">Favour</h4><ul>${a.favor.map(f=>`<li>${f}</li>`).join("")}</ul>
+        <h4 class="reduce">Reduce</h4><ul>${a.reduce.map(f=>`<li>${f}</li>`).join("")}</ul>
+      </div>
+      <div class="card">
+        <h3>🌿 Herbs &amp; supports</h3>
+        <ul>${a.herbs.map(h=>`<li style="margin:6px 0">${h}</li>`).join("")}</ul>
+        <p class="disc">Herbs can interact with medications and conditions. Check with a qualified practitioner before use.</p>
+      </div>
+    </div>
+
+    <div class="grid cols-2" style="margin-top:16px">
+      <div class="card">
+        <h3>🕰️ Daily rituals</h3>
+        <ol style="margin:0;padding-left:18px">${a.routine.map(r=>`<li style="margin:6px 0">${r}</li>`).join("")}</ol>
+      </div>
+      <div class="card">
+        <h3>🍂 Seasonal tip</h3>
+        <p>${a.seasonal}</p>
+        <h3 style="margin-top:14px">🌬️ Breath</h3>
+        <p class="muted">${a.breath}</p>
+        <button class="btn ghost sm" onclick="go('breathe')" style="margin-top:8px">Practice breathing →</button>
+      </div>
+    </div>
+  </section>`;
+};
+function setAyur(k){ ayurTab=k; go('ayurveda'); }
+
+/* ---------- Breathe ---------- */
+VIEWS.breathe = () => `
+  <section class="view">
+    <span class="pill">Pranayama &amp; meditation</span>
+    <h1>Breathe &amp; reset</h1>
+    <p class="lead">Guided breathing practices with a visual pacer. Follow the expanding circle — expand to inhale, contract to exhale.</p>
+    <div class="grid cols-2" style="margin-top:16px">
+      ${BREATH.map(b=>`<div class="card">
+        <h3>${b.name}</h3><p class="muted">${b.desc}</p>
+        <div class="row"><span class="tag">${b.rounds} rounds</span><span class="tag">${b.phases.map(p=>p[1]).join('·')} count</span></div>
+        <button class="btn" style="margin-top:12px" onclick="startBreath('${b.id}')">▶ Begin</button>
+      </div>`).join("")}
+    </div>
+  </section>`;
+let bx=null;
+function startBreath(id){
+  const b=BREATH.find(x=>x.id===id);
+  bx={b, round:0, phase:0, timer:null};
+  document.body.insertAdjacentHTML("beforeend",
+   `<div class="player" id="breathplayer">
+      <div class="head"><button class="btn ghost sm" onclick="closeBreath()">✕ Exit</button><b style="margin-left:auto">${b.name}</b></div>
+      <div class="pose-stage"><div>
+        <div class="breath" id="bx-circle" style="width:200px;height:200px;font-size:22px">Ready</div>
+        <h2 id="bx-phase" class="center" style="margin:18px 0 0">Get comfortable</h2>
+        <p class="center muted" id="bx-round"></p>
+      </div></div>
+      <p class="center muted">Sit tall. Relax your shoulders. Let the breath be smooth.</p>
+    </div>`);
+  setTimeout(runBreath,900);
+}
+function runBreath(){
+  if(!bx) return;
+  const {b}=bx, [label,secs]=b.phases[bx.phase];
+  const circle=document.getElementById("bx-circle");
+  const ph=document.getElementById("bx-phase");
+  const rd=document.getElementById("bx-round");
+  if(!circle) return;
+  ph.textContent=label; rd.textContent=`Round ${bx.round+1} of ${b.rounds}`;
+  const scale = label==="Inhale"?1 : label==="Exhale"?.5 : (label==="Hold"? (parseFloat(getComputedStyle(circle).transform.split(',')[3])||1) : .75);
+  circle.style.transition=`transform ${secs}s ease-in-out`;
+  circle.style.transform = label==="Inhale"?"scale(1)" : label==="Exhale"?"scale(.5)" : circle.style.transform||"scale(1)";
+  circle.textContent=label;
+  let left=secs;
+  clearInterval(bx.timer);
+  bx.timer=setInterval(()=>{
+    left--; if(circle) circle.textContent=`${label} · ${left+1}`;
+    if(left<=0){
+      clearInterval(bx.timer);
+      bx.phase++;
+      if(bx.phase>=b.phases.length){ bx.phase=0; bx.round++; }
+      if(bx.round>=b.rounds){ finishBreath(); return; }
+      runBreath();
+    }
+  },1000);
+}
+function finishBreath(){
+  const dur=bx.b.phases.reduce((a,p)=>a+p[1],0)*bx.b.rounds;
+  recordSession(Math.max(1,Math.round(dur/60)));
+  closeBreath();
+  document.body.insertAdjacentHTML("beforeend",
+   `<div class="modal" onclick="this.remove()"><div class="box center" onclick="event.stopPropagation()">
+     <div style="font-size:56px">🌿</div><h2>Well done</h2>
+     <p class="muted">Breathing complete. Notice how you feel.</p>
+     <button class="btn" onclick="this.closest('.modal').remove()">Close</button></div></div>`);
+}
+function closeBreath(){ if(bx){clearInterval(bx.timer);} document.getElementById("breathplayer")?.remove(); bx=null; }
+
+/* ---------- Progress ---------- */
+VIEWS.progress = () => {
+  // build last 21-day heat row
+  const days=[];
+  for(let i=20;i>=0;i--){ const dt=new Date(Date.now()-i*864e5).toISOString().slice(0,10); days.push([dt, store.done[dt]||0]); }
+  const max=Math.max(1,...days.map(d=>d[1]));
+  const cells=days.map(([dt,n])=>{
+    const op = n? (0.25+0.75*(n/max)) : 0;
+    return `<div title="${dt}: ${n} session(s)" style="width:100%;aspect-ratio:1;border-radius:6px;background:${n?`color-mix(in srgb,var(--brand) ${Math.round(op*100)}%, var(--line))`:'var(--line)'}"></div>`;
+  }).join("");
+  return `<section class="view">
+    <span class="pill">Your journey</span>
+    <h1>Progress</h1>
+    <div class="grid cols-3" style="margin-top:8px">
+      <div class="card center"><b style="font-size:34px">${store.sessions}</b><div class="muted">sessions</div></div>
+      <div class="card center"><b style="font-size:34px">${store.minutes}</b><div class="muted">minutes practiced</div></div>
+      <div class="card center"><b style="font-size:34px">${store.streak}🔥</b><div class="muted">day streak</div></div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h3>Last 3 weeks</h3>
+      <div style="display:grid;grid-template-columns:repeat(21,1fr);gap:5px;margin-top:8px">${cells}</div>
+      <p class="muted" style="margin-top:10px;font-size:13px">Each square is a day; darker means more sessions. Practise today to keep your streak alive.</p>
+    </div>
+    <div class="card" style="margin-top:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+      <div><h3 style="margin:0">Keep going</h3><p class="muted" style="margin:.2em 0 0">Even five mindful minutes counts.</p></div>
+      <button class="btn" onclick="go('yoga')">Practice now →</button>
+    </div>
+    <p class="disc" style="margin-top:18px">Your data is stored only in this browser (localStorage) — nothing is uploaded. <a href="#" onclick="resetData();return false">Reset all data</a></p>
+  </section>`;
+};
+function resetData(){
+  if(confirm("Reset your dosha, progress and streak? This can't be undone.")){
+    localStorage.removeItem(LS_KEY);
+    for(const k in store) delete store[k];
+    Object.assign(store,{dosha:null,scores:null,minutes:0,sessions:0,streak:0,lastDay:null,done:{},premium:false});
+    save(); go('home'); toast("All data reset");
+  }
+}
+
+/* ---------- Premium ---------- */
+VIEWS.premium = () => `
+  <section class="view">
+    <span class="pill">Sattva Plus</span>
+    <h1>Go deeper with premium</h1>
+    <p class="lead">Everything here is free. Sattva Plus unlocks personalised, guided, and expert-led content — the kind of value that supports the practice long-term.</p>
+
+    <div class="grid cols-3" style="margin-top:18px">
+      <div class="card tier">
+        <span class="pill">Free</span>
+        <div class="price">$0</div><p class="muted">Forever</p>
+        <ul><li>Dosha quiz &amp; profile</li><li>Core yoga sequences</li><li>Ayurveda food &amp; ritual guides</li><li>Breathwork library</li><li>Progress &amp; streaks</li></ul>
+        <button class="btn ghost" disabled>Your current plan</button>
+      </div>
+      <div class="card tier feat">
+        <span class="ribbon">Popular</span>
+        <span class="pill">Sattva Plus</span>
+        <div class="price">$9<span style="font-size:16px" class="muted">/mo</span></div><p class="muted">or $79/yr</p>
+        <ul>
+          <li>AI plans that adapt to mood &amp; goals</li>
+          <li>Full premium sequence &amp; video library</li>
+          <li>Guided meditation series</li>
+          <li>Personalised dosha meal plans</li>
+          <li>Seasonal &amp; themed challenges</li>
+          <li>Wellness journal</li>
+        </ul>
+        <button class="btn" onclick="fakeBuy('Sattva Plus')">${store.premium?'✓ Subscribed':'Start 7-day free trial'}</button>
+      </div>
+      <div class="card tier">
+        <span class="pill">Courses &amp; live</span>
+        <div class="price">$29+</div><p class="muted">One-time / add-on</p>
+        <ul>
+          <li>“30-Day Dosha Reset” program</li>
+          <li>1-on-1 live sessions with instructors</li>
+          <li>Live Q&amp;A &amp; workshops</li>
+          <li>Guest-expert masterclasses</li>
+          <li>Practitioner consultations</li>
+        </ul>
+        <button class="btn ghost" onclick="fakeBuy('a course')">Browse courses</button>
+      </div>
+    </div>
+
+    <h2>A peek inside Plus</h2>
+    <div class="grid cols-2">
+      <div class="card locked-wrap">
+        <div class="lock">
+          <span class="pill">Challenge</span><h3>30-Day Dosha Reset</h3>
+          <p class="muted">Day 1 · Grounding &amp; intention. Day 2 · Warm morning flow. Day 3 · Kitchari cleanse...</p>
+        </div>
+        <div class="locked-badge"><button class="btn sm" onclick="fakeBuy('the 30-Day Dosha Reset')">🔒 Unlock</button></div>
+      </div>
+      <div class="card locked-wrap">
+        <div class="lock">
+          <span class="pill">Meditation series</span><h3>Deep Rest · 10 nights</h3>
+          <p class="muted">Yoga nidra &amp; guided sleep meditations tuned to calm Vata and cool Pitta before bed.</p>
+        </div>
+        <div class="locked-badge"><button class="btn sm" onclick="fakeBuy('the Deep Rest series')">🔒 Unlock</button></div>
+      </div>
+    </div>
+    <p class="disc" style="margin-top:16px">This is a demo. No payment is processed and no purchase is made — the buttons illustrate how premium content and monetisation would work.</p>
+  </section>`;
+function fakeBuy(what){
+  document.body.insertAdjacentHTML("beforeend",
+   `<div class="modal" onclick="this.remove()"><div class="box" onclick="event.stopPropagation()">
+     <span class="pill">Demo</span>
+     <h2 style="margin:.3em 0">Checkout preview</h2>
+     <p class="muted">In a live app this would start ${what}. This demo doesn't process real payments — but you can preview the unlocked state.</p>
+     <div class="row" style="margin-top:14px">
+       <button class="btn" onclick="unlockDemo(this)">Preview unlocked</button>
+       <button class="btn ghost" onclick="this.closest('.modal').remove()">Maybe later</button>
+     </div>
+   </div></div>`);
+}
+function unlockDemo(el){ store.premium=true; save(); el.closest('.modal').remove(); go('premium'); toast("Premium preview unlocked ✨"); }
+
+/* ---------- boot ---------- */
+renderTabs();
+go('home');
+
+/* register the site's service worker if present (offline support) */
+if('serviceWorker' in navigator){ try{ navigator.serviceWorker.register('service-worker.js').catch(()=>{}); }catch(e){} }
+</script>
+</body>
+</html>

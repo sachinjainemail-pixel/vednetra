@@ -20,6 +20,25 @@ Birth chart (D-1) + all divisional charts to D-60, Vimshottari dasha (down to Pr
 | `.nojekyll` | Tells GitHub Pages to serve files as-is (skip Jekyll) |
 | `.gitignore` | Ignores OS / editor junk |
 | `.github/workflows/deploy.yml` | Auto-deploys to GitHub Pages on every push to `main` |
+| `yoga.html` | **Sattva** — a standalone Yoga & Ayurveda app (self-contained; open directly) |
+
+---
+
+## Sattva — Yoga &amp; Ayurveda app
+
+`yoga.html` is a separate, self-contained single-file app (inline CSS + JS, no build, no dependencies). Open it directly at `/yoga.html`.
+
+It personalises yoga around your Ayurvedic **dosha**:
+
+- **Dosha quiz** — a 10-question quiz maps your Vata / Pitta / Kapha balance.
+- **My Dosha** — your constitution with balance meters, a rebalancing plan, and a daily routine (dinacharya).
+- **Yoga** — dosha-aligned sequences with a full-screen **guided practice player**: pose timer, progress ring, breath pacer, prev/next, and pause.
+- **Ayurveda** — per-dosha foods to favour/reduce, herbs, daily rituals, and seasonal tips.
+- **Breathe** — guided pranayama (box breathing, 4·7·8, calming, energising) with a visual pacer.
+- **Progress** — sessions, minutes, day streak, and a 3-week activity heatmap (stored in `localStorage`; nothing is uploaded).
+- **Premium** — a freemium tier layout (Sattva Plus subscription, one-time courses like a *30-Day Dosha Reset*, live sessions) illustrating monetisation. Demo only — no real payments.
+
+All wellness content is educational and not a substitute for professional medical advice.
 
 ---
 
