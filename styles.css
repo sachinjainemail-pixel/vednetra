@@ -8281,10 +8281,60 @@ body.report-active #chartInputLayoutBar:not(.hidden)::before { opacity: 0 !impor
    2nd row. Position it below the nav using its measured height (--vn-nav-h),
    and reserve the combined height for the content (--vn-topbar-h). JS keeps
    these vars in sync; the defaults below already clear a 2-row nav. */
-@media (min-width: 561px) {
+/* Applies at all widths — on phones the nav ribbon shows Home + the section
+   picker, and the toolbar must still clear it. */
+body.report-active #chartInputLayoutBar:not(.hidden) {
+  top: calc(var(--vn-nav-h, 96px) + 6px) !important;
+}
+body.report-active .output-panel { padding-top: var(--vn-topbar-h, 150px) !important; }
+body.report-active::before { height: var(--vn-topbar-h, 150px) !important; }
+
+/* ===== Fix: cramped mobile toolbar =====
+   Making the toolbar always-visible left its buttons full-width and stacked on
+   phones, eating the whole screen before the chart. Lay them out compactly
+   (two-up, wrapping) with a small identity strip so the chart is visible. */
+@media (max-width: 560px) {
   body.report-active #chartInputLayoutBar:not(.hidden) {
-    top: calc(var(--vn-nav-h, 96px) + 6px) !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 6px 8px !important;
+    min-height: 0 !important;
+    row-gap: 6px !important;
   }
-  body.report-active .output-panel { padding-top: var(--vn-topbar-h, 150px) !important; }
-  body.report-active::before { height: var(--vn-topbar-h, 150px) !important; }
+  body.report-active #chartInputLayoutBar:not(.hidden) .input-toggle-btn {
+    width: auto !important;
+    flex: 1 1 42% !important;
+    min-width: 0 !important;
+    padding: 8px 6px !important;
+    font-size: 12px !important;
+    white-space: nowrap;
+  }
+  body.report-active #chartInputLayoutBar:not(.hidden) .vn-lang-toggle {
+    flex: 1 1 42% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+  }
+  body.report-active #chartInputLayoutBar:not(.hidden) .vn-lang-toggle select {
+    width: 100% !important;
+    font-size: 12px !important;
+    padding: 7px 8px !important;
+  }
+  /* compact one-line identity strip (birth details stay in the report header) */
+  body.report-active .part-a-identity-strip {
+    flex: 1 1 100% !important;
+    order: 99 !important;
+    min-width: 0 !important;
+    padding: 4px 6px !important;
+    gap: 8px !important;
+  }
+  .part-a-identity-strip .part-a-brand-mini img { width: 20px; height: 20px; }
+  .part-a-identity-strip .part-a-brand-mini strong { font-size: 13px; }
+  .part-a-identity-strip .part-a-native-summary {
+    font-size: 10px !important;
+    line-height: 1.25 !important;
+    max-height: 2.6em;
+    overflow: hidden;
+  }
 }
