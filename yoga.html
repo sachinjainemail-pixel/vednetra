@@ -433,13 +433,194 @@ const RECIPES = [
    benefits:"Nourishing, grounding energy bites — great for Vata and busy days. Rich, so enjoy in moderation."}
 ];
 
+/* ---------- Ayurvedic tips (tip of the day) ---------- */
+const TIPS = [
+  "Sip warm water through the day — it kindles digestion (agni) and gently flushes toxins.",
+  "Eat your largest meal at midday when digestive fire is strongest; keep dinner light and early.",
+  "Scrape your tongue each morning to clear overnight toxins and freshen the palate.",
+  "Never drink iced water with meals — it dampens the digestive fire. Warm or room-temperature is best.",
+  "Rise before sunrise (brahma muhurta) for a calmer, clearer mind all day.",
+  "Add a pinch of ginger and a squeeze of lime before meals to spark appetite and digestion.",
+  "Favour freshly cooked food over leftovers — Ayurveda prizes prana (life force), which fades with time.",
+  "Warm sesame-oil self-massage (abhyanga) before a shower calms the nerves and nourishes the skin.",
+  "Eat in a calm setting, without screens — how you eat matters as much as what you eat.",
+  "Golden milk (turmeric + warm milk + pepper) before bed soothes the body and supports sleep.",
+  "Chew each mouthful well; digestion begins in the mouth, not the stomach.",
+  "Leave one-third of your stomach empty at meals to give digestion room to work.",
+  "Ghee in moderation lubricates tissues, carries herbs deeper, and steadies Vata and Pitta.",
+  "Triphala at night is a gentle, time-honoured support for regular, healthy digestion.",
+  "Match your routine to the sun: active at midday, winding down as the light fades.",
+  "Cooling foods — cucumber, coconut, mint, sweet fruit — calm summer heat and Pitta.",
+  "Warm, moist, grounding foods (soups, stews, root veg) steady an anxious, airy Vata.",
+  "Light, spiced, dry foods lift a heavy, sluggish Kapha — go easy on dairy and sweets.",
+  "A short walk after meals (even 10 minutes) aids digestion far more than sitting still.",
+  "Fennel or CCF tea after eating eases bloating and settles the stomach.",
+  "Oil a few drops in the nostrils (nasya) can soothe dryness and clear the head.",
+  "Honey is medicinal — but never heat it; add to warm, not hot, drinks.",
+  "Go to bed by 10pm; the hours before midnight are the most restorative for the body.",
+  "Seasonal eating keeps you in balance — favour local, in-season produce as nature intends."
+];
+
+/* ---------- Herb library ---------- */
+const HERBS = [
+  {id:"ashwagandha", name:"Ashwagandha", sanskrit:"Withania somnifera", emoji:"🌱", dosha:["vata","kapha"],
+   benefit:"A grounding adaptogen that calms stress, supports steady energy, sleep and strength.",
+   use:"1/2 tsp powder in warm milk at night, or as directed on a standardised supplement.",
+   caution:"Avoid in pregnancy and with hyperthyroid conditions; can interact with sedatives and thyroid meds."},
+  {id:"triphala", name:"Triphala", sanskrit:"Three fruits", emoji:"🟤", dosha:["vata","pitta","kapha"],
+   benefit:"A gentle tridoshic blend (amla, bibhitaki, haritaki) supporting digestion, regularity and detox.",
+   use:"1/2–1 tsp in warm water before bed.",
+   caution:"May loosen stools at higher doses; avoid in pregnancy or with diarrhoea."},
+  {id:"brahmi", name:"Brahmi", sanskrit:"Bacopa monnieri", emoji:"🍃", dosha:["pitta","vata"],
+   benefit:"Cools and sharpens the mind — traditionally used for memory, focus and mental calm.",
+   use:"As tea, powder or supplement; often taken with a little ghee.",
+   caution:"Can interact with thyroid and sedative medications; introduce slowly."},
+  {id:"turmeric", name:"Turmeric", sanskrit:"Haridra / Curcuma", emoji:"🟡", dosha:["kapha","pitta"],
+   benefit:"Warming and cleansing; a classic anti-inflammatory that supports skin, joints and digestion.",
+   use:"Cook into food, or take as golden milk with black pepper (which boosts absorption).",
+   caution:"High doses may thin blood — care with blood thinners and before surgery."},
+  {id:"tulsi", name:"Tulsi (Holy Basil)", sanskrit:"Ocimum sanctum", emoji:"🌿", dosha:["kapha","vata"],
+   benefit:"An uplifting adaptogen for stress, immunity and clear breathing; lightly energising.",
+   use:"As a daily tea, 1–2 cups.",
+   caution:"May lower blood sugar; avoid large amounts in pregnancy."},
+  {id:"ginger", name:"Ginger", sanskrit:"Adrak / Shunthi", emoji:"🫚", dosha:["vata","kapha"],
+   benefit:"Kindles digestive fire, eases nausea and warms the body from within.",
+   use:"Fresh slices in hot water before meals, or dried powder in cooking.",
+   caution:"Can aggravate Pitta / acidity in excess; care with blood thinners."},
+  {id:"amla", name:"Amla (Amalaki)", sanskrit:"Emblica officinalis", emoji:"🫐", dosha:["pitta","vata","kapha"],
+   benefit:"A cooling, vitamin-C-rich rejuvenative for skin, hair, eyes and digestion.",
+   use:"As powder in water, juice, or part of Triphala/chyawanprash.",
+   caution:"Generally well tolerated; very sour — dilute well."},
+  {id:"shatavari", name:"Shatavari", sanskrit:"Asparagus racemosus", emoji:"🌾", dosha:["pitta","vata"],
+   benefit:"A cooling, nourishing tonic traditionally used to support women's health and vitality.",
+   use:"1/2 tsp powder in warm milk.",
+   caution:"Avoid with estrogen-sensitive conditions; check with a practitioner in pregnancy."},
+  {id:"trikatu", name:"Trikatu", sanskrit:"Three pungents", emoji:"🌶️", dosha:["kapha"],
+   benefit:"Ginger, black & long pepper — a heating blend that fires up slow digestion and metabolism.",
+   use:"A small pinch with honey before meals.",
+   caution:"Heating — avoid with high Pitta, acidity, ulcers or in pregnancy."},
+  {id:"licorice", name:"Licorice (Yashtimadhu)", sanskrit:"Glycyrrhiza glabra", emoji:"🪵", dosha:["vata","pitta"],
+   benefit:"Soothing and moistening for throat, lungs and digestion; naturally sweet.",
+   use:"As tea, or powder in small amounts.",
+   caution:"Can raise blood pressure and lower potassium with prolonged use; avoid in hypertension and pregnancy."}
+];
+
+/* ---------- Food-to-eat guidance (per dosha) ---------- */
+const FOOD_GUIDE = {
+  vata:{ tastes:"Favour sweet, sour & salty · reduce bitter, astringent & pungent",
+    meals:{ Breakfast:"Warm spiced oatmeal or stewed apples with ghee and cinnamon.",
+      Lunch:"Kitchari or rice with cooked root vegetables, dal and a little ghee.",
+      Dinner:"A warm, soupy meal — light but nourishing; avoid raw or cold.",
+      Snack:"Soaked almonds, dates, or warm spiced milk." },
+    note:"Warm, moist, grounding and well-spiced. Regular mealtimes matter most for Vata." },
+  pitta:{ tastes:"Favour sweet, bitter & astringent · reduce sour, salty & pungent",
+    meals:{ Breakfast:"Sweet ripe fruit, soaked oats, or coconut-milk porridge.",
+      Lunch:"Basmati rice, leafy greens, cucumber, and cooling coriander.",
+      Dinner:"Light, cooling — steamed veg, mung dal, a little cilantro.",
+      Snack:"Sweet fruit, dates, or a handful of soaked seeds." },
+    note:"Cooling, fresh and moderate. Don't skip meals — hunger stokes Pitta's fire." },
+  kapha:{ tastes:"Favour pungent, bitter & astringent · reduce sweet, sour & salty",
+    meals:{ Breakfast:"Light or skip; a warm ginger tea or stewed apple if hungry.",
+      Lunch:"Make this the main meal — spiced legumes, plenty of vegetables, millet or barley.",
+      Dinner:"Light and early — a brothy vegetable soup with warming spices.",
+      Snack:"Only if truly hungry — a little fruit or spiced tea." },
+    note:"Light, warm, dry and well-spiced. Go easy on dairy, sweets and heavy oils." }
+};
+
+/* ---------- Premium services ---------- */
+const SERVICES = [
+  {id:"counsel", name:"1:1 Expert Counselling", emoji:"🧑‍⚕️", price:"$59", unit:"/ 45-min session",
+   desc:"A private video consultation with a qualified Ayurvedic practitioner to assess your constitution and concerns and build a personal plan.",
+   bullets:["Detailed prakriti & vikriti assessment","Lifestyle, diet & herb recommendations","Written summary after the call","Follow-up message support for 7 days"], cta:"Book a session"},
+  {id:"diet21", name:"21-Day Diet Program", emoji:"📅", price:"$129", unit:"one-time",
+   desc:"A guided three-week dosha-based eating reset with daily menus, shopping lists and check-ins to rebuild digestion and energy.",
+   bullets:["Personalised 21-day meal plan","Weekly shopping lists & prep guides","Daily habit & recipe prompts","2 group check-in calls"], cta:"Join the program"},
+  {id:"workshop", name:"One-Day Workshop", emoji:"🎟️", price:"$39", unit:"/ ticket",
+   desc:"An immersive live day of yoga, Ayurvedic cooking and breathwork with guest experts — online or in person.",
+   bullets:["Live yoga & pranayama sessions","Hands-on Ayurvedic cooking demo","Q&A with practitioners","Recording & recipe pack included"], cta:"Reserve a spot"},
+  {id:"chart", name:"Customised Diet Chart", emoji:"📋", price:"$45", unit:"one-time",
+   desc:"A tailored, printable diet chart mapping exactly what to eat (and avoid) for your dosha, season and goals.",
+   bullets:["Meal-by-meal daily chart","Foods to favour & foods to reduce","Spice & herb pairings","Seasonal adjustment guide"], cta:"Get my chart"}
+];
+
+/* ---------- Daily Panchang (computed) ---------- */
+const PANCHANG_NAMES = {
+  tithi:["Pratipada","Dvitiya","Tritiya","Chaturthi","Panchami","Shashthi","Saptami","Ashtami","Navami","Dashami","Ekadashi","Dwadashi","Trayodashi","Chaturdashi","Purnima"],
+  nakshatra:["Ashwini","Bharani","Krittika","Rohini","Mrigashira","Ardra","Punarvasu","Pushya","Ashlesha","Magha","Purva Phalguni","Uttara Phalguni","Hasta","Chitra","Swati","Vishakha","Anuradha","Jyeshtha","Mula","Purva Ashadha","Uttara Ashadha","Shravana","Dhanishta","Shatabhisha","Purva Bhadrapada","Uttara Bhadrapada","Revati"],
+  yoga:["Vishkambha","Priti","Ayushman","Saubhagya","Shobhana","Atiganda","Sukarma","Dhriti","Shula","Ganda","Vriddhi","Dhruva","Vyaghata","Harshana","Vajra","Siddhi","Vyatipata","Variyana","Parigha","Shiva","Siddha","Sadhya","Shubha","Shukla","Brahma","Indra","Vaidhriti"],
+  movKarana:["Bava","Balava","Kaulava","Taitila","Gara","Vanija","Vishti (Bhadra)"],
+  vara:[{n:"Ravivara (Sunday)",p:"Sun ☀️",seg:8},{n:"Somavara (Monday)",p:"Moon 🌙",seg:2},{n:"Mangalavara (Tuesday)",p:"Mars ♂️",seg:7},{n:"Budhavara (Wednesday)",p:"Mercury ☿️",seg:5},{n:"Guruvara (Thursday)",p:"Jupiter ♃",seg:6},{n:"Shukravara (Friday)",p:"Venus ♀️",seg:4},{n:"Shanivara (Saturday)",p:"Saturn ♄",seg:3}]
+};
+function _jd(date){
+  let y=date.getUTCFullYear(), m=date.getUTCMonth()+1, d=date.getUTCDate();
+  const hr=date.getUTCHours()+date.getUTCMinutes()/60+date.getUTCSeconds()/3600;
+  if(m<=2){ y-=1; m+=12; }
+  const A=Math.floor(y/100), B=2-A+Math.floor(A/4);
+  return Math.floor(365.25*(y+4716))+Math.floor(30.6001*(m+1))+d+B-1524.5+hr/24;
+}
+function _norm(x){ return ((x%360)+360)%360; }
+function _sunLong(jd){
+  const T=(jd-2451545)/36525;
+  const L0=280.46646+36000.76983*T+0.0003032*T*T;
+  const M=(357.52911+35999.05029*T-0.0001537*T*T)*Math.PI/180;
+  const C=(1.914602-0.004817*T-0.000014*T*T)*Math.sin(M)+(0.019993-0.000101*T)*Math.sin(2*M)+0.000289*Math.sin(3*M);
+  return _norm(L0+C);
+}
+function _moonLong(jd){
+  const T=(jd-2451545)/36525, r=Math.PI/180;
+  const Lp=218.3164477+481267.88123421*T;
+  const D=297.8501921+445267.1114034*T;
+  const M=357.5291092+35999.0502909*T;
+  const Mp=134.9633964+477198.8675055*T;
+  const F=93.272095+483202.0175233*T;
+  let l=Lp
+    +6.288774*Math.sin(Mp*r)+1.274027*Math.sin((2*D-Mp)*r)+0.658314*Math.sin(2*D*r)
+    +0.213618*Math.sin(2*Mp*r)-0.185116*Math.sin(M*r)-0.114332*Math.sin(2*F*r)
+    +0.058793*Math.sin((2*D-2*Mp)*r)+0.057066*Math.sin((2*D-M-Mp)*r)
+    +0.053322*Math.sin((2*D+Mp)*r)+0.045758*Math.sin((2*D-M)*r);
+  return _norm(l);
+}
+function computePanchang(date){
+  const jd=_jd(date);
+  const sun=_sunLong(jd), moon=_moonLong(jd);
+  const ayan=23.85+0.013972*(date.getUTCFullYear()-2000);          // Lahiri approximation
+  const sunS=_norm(sun-ayan), moonS=_norm(moon-ayan);
+  // Tithi
+  const diff=_norm(moon-sun);
+  const ti=Math.floor(diff/12);                                    // 0..29
+  const paksha = ti<15 ? "Shukla (waxing)" : "Krishna (waning)";
+  let tName = PANCHANG_NAMES.tithi[ti%15];
+  if(ti===29) tName="Amavasya";                                    // new moon
+  const tithiPct=Math.round(((diff%12)/12)*100);
+  // Nakshatra
+  const nak=Math.floor(moonS/(360/27));
+  // Yoga
+  const yoga=Math.floor(_norm(sunS+moonS)/(360/27));
+  // Karana
+  const kn=Math.floor(diff/6);                                     // 0..59
+  let kName;
+  if(kn===0) kName="Kimstughna"; else if(kn===57) kName="Shakuni";
+  else if(kn===58) kName="Chatushpada"; else if(kn===59) kName="Naga";
+  else kName=PANCHANG_NAMES.movKarana[(kn-1)%7];
+  // Vara + Rahu Kaal (standard 6:00–18:00 day, eight 90-min parts)
+  const vara=PANCHANG_NAMES.vara[date.getDay()];
+  const rs=6*60+(vara.seg-1)*90, re=rs+90;
+  const fmtT=(m)=>{ let h=Math.floor(m/60), mm=m%60; const ap=h<12?"AM":"PM"; h=h%12||12; return `${h}:${mm<10?'0':''}${mm} ${ap}`; };
+  const moonPhase = diff<180 ? Math.round(diff/180*100) : Math.round((360-diff)/180*100);
+  return { paksha, tithi:tName, tithiPct, nakshatra:PANCHANG_NAMES.nakshatra[nak],
+    yoga:PANCHANG_NAMES.yoga[yoga], karana:kName, vara:vara.n, planet:vara.p,
+    rahu:`${fmtT(rs)} – ${fmtT(re)}`, illum:moonPhase, waxing:diff<180 };
+}
+function dayIndex(){ const d=new Date(); const s=new Date(d.getFullYear(),0,0); return Math.floor((d-s)/864e5); }
+function tipOfDay(){ return TIPS[dayIndex()%TIPS.length]; }
+
 /* =========================================================
    Router
    ========================================================= */
 const TABS = [
-  ["home","Home"],["dosha","My Dosha"],["yoga","Yoga"],
+  ["home","Home"],["dosha","My Dosha"],["panchang","Panchang"],["yoga","Yoga"],
   ["breathe","Breathe"],["meditate","Meditate"],
-  ["ayurveda","Ayurveda"],["diy","DIYs"],["recipes","Recipes"],
+  ["ayurveda","Ayurveda"],["food","Food"],["herbs","Herbs"],["diy","DIYs"],["recipes","Recipes"],
   ["progress","Progress"],["premium","Premium"]
 ];
 let current = "home";
@@ -478,6 +659,15 @@ VIEWS.home = () => {
         <div class="stat"><b>${store.minutes}</b><span>total minutes</span></div>
         <div class="stat"><b>${store.streak}🔥</b><span>day streak</span></div>
       </div>
+    </div>
+
+    <div class="card" style="margin-top:20px;border-left:4px solid var(--accent)">
+      <div class="row" style="justify-content:space-between">
+        <span class="pill" style="background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent)">💡 Ayurvedic tip of the day</span>
+        <span class="muted" style="font-size:13px">${new Date().toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'})}</span>
+      </div>
+      <p style="font-size:18px;margin:.6em 0 0">${tipOfDay()}</p>
+      <div class="row" style="margin-top:10px"><button class="btn ghost sm" onclick="go('panchang')">Today's Panchang →</button><button class="btn ghost sm" onclick="go('food')">What to eat today →</button></div>
     </div>
 
     <h2>How Sattva works</h2>
@@ -1032,6 +1222,125 @@ function openDetail(kind, id){
    </div></div>`);
 }
 
+/* ---------- Daily Panchang ---------- */
+VIEWS.panchang = () => {
+  const now=new Date();
+  const p=computePanchang(now);
+  const dateStr=now.toLocaleDateString(undefined,{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const limb=(icon,label,val,sub)=>`<div class="card"><div class="row" style="gap:8px"><span style="font-size:26px">${icon}</span><div><div class="muted" style="font-size:12px;text-transform:uppercase;letter-spacing:.5px">${label}</div><b style="font-size:19px">${val}</b>${sub?`<div class="muted" style="font-size:13px">${sub}</div>`:""}</div></div></div>`;
+  return `<section class="view">
+    <span class="pill">Vedic almanac</span>
+    <h1>Daily Panchang</h1>
+    <p class="lead">The five limbs (panch-anga) of the Vedic day — computed for today. Traditionally used to time practice, fasting and meals in harmony with the moon.</p>
+
+    <div class="card" style="margin:16px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;background:
+      radial-gradient(120% 140% at 90% 10%, color-mix(in srgb,var(--brand) 16%,transparent), transparent 60%), var(--panel)">
+      <div><div class="muted">${dateStr}</div><h3 style="margin:.15em 0 0">${p.vara}</h3><div class="muted">Ruled by ${p.planet}</div></div>
+      <div class="center"><div style="font-size:40px">${p.waxing?'🌔':'🌘'}</div><div class="muted" style="font-size:13px">Moon ~${p.illum}% · ${p.waxing?'waxing':'waning'}</div></div>
+    </div>
+
+    <div class="grid cols-3">
+      ${limb("🌙","Tithi",p.tithi,`${p.paksha} · ${p.tithiPct}% elapsed`)}
+      ${limb("⭐","Nakshatra",p.nakshatra,"Moon's lunar mansion")}
+      ${limb("🧘","Yoga",p.yoga,"Sun–Moon combination")}
+      ${limb("⏳","Karana",p.karana,"Half-tithi")}
+      ${limb("📅","Vara",p.vara.split(" ")[0],"Weekday")}
+      ${limb("⚠️","Rahu Kaal",p.rahu,"Inauspicious — avoid new starts")}
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h3>💡 Today's alignment</h3>
+      <p class="muted">${p.waxing
+        ? "The waxing moon favours building, beginning and growth — a good time to start new practices, plans and nourishing routines."
+        : "The waning moon favours releasing, cleansing and letting go — a good time for detox, decluttering and gentle, restorative practice."}</p>
+      <p class="muted" style="margin-top:6px">Ayurvedic tip: ${tipOfDay()}</p>
+    </div>
+
+    <p class="disc" style="margin-top:16px">This Panchang is computed from geocentric lunar &amp; solar positions (Lahiri ayanamsa, approximate) and a standard 6:00 AM–6:00 PM day for Rahu Kaal — it is not localised to your exact sunrise or timezone. For ritual precision, cross-check with a location-specific almanac.</p>
+  </section>`;
+};
+
+/* ---------- Food to eat ---------- */
+let foodTab=null;
+VIEWS.food = () => {
+  const active=foodTab||store.dosha||"vata";
+  const d=DOSHAS[active], a=AYUR[active], g=FOOD_GUIDE[active];
+  const hr=new Date().getHours();
+  const period = hr<11?"Breakfast":hr<16?"Lunch":hr<21?"Dinner":"Snack";
+  return `<section class="view">
+    <span class="pill">Eat for balance</span>
+    <h1>Food to eat</h1>
+    <p class="lead">What to put on your plate for your dosha — right now and through the day. ${store.dosha?"":"Take the dosha quiz to personalise this."}</p>
+    <div class="row" style="margin:16px 0">
+      ${Object.values(DOSHAS).map(x=>`<button class="tab ${active===x.key?'active':''}" onclick="setFood('${x.key}')"><span class="dosha-dot ${x.cls}"></span>&nbsp;${x.name}</button>`).join("")}
+    </div>
+
+    <div class="card" style="border-left:4px solid ${d.color}">
+      <span class="pill">Right now · ${period}</span>
+      <p style="font-size:18px;margin:.5em 0 0">${g.meals[period]}</p>
+      <p class="muted" style="margin-top:6px">${g.tastes}</p>
+    </div>
+
+    <h2>Through the day</h2>
+    <div class="grid cols-2">
+      ${Object.entries(g.meals).map(([meal,txt])=>`<div class="card"><div class="row" style="justify-content:space-between"><b>${meal}</b>${meal===period?'<span class="tag">now</span>':''}</div><p class="muted" style="margin:.4em 0 0">${txt}</p></div>`).join("")}
+    </div>
+
+    <h2>Favour &amp; reduce</h2>
+    <div class="grid cols-2">
+      <div class="card foodcol"><h3 class="favor">✓ Eat freely</h3><ul>${a.favor.map(f=>`<li>${f}</li>`).join("")}</ul></div>
+      <div class="card foodcol"><h3 class="reduce">✕ Go easy on</h3><ul>${a.reduce.map(f=>`<li>${f}</li>`).join("")}</ul></div>
+    </div>
+    <div class="card" style="margin-top:16px"><p style="margin:0"><b>Guiding principle:</b> <span class="muted">${g.note}</span></p></div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn" onclick="go('recipes')">Browse recipes →</button>
+      <button class="btn ghost" onclick="go('herbs')">Herbal recommendations →</button>
+    </div>
+  </section>`;
+};
+function setFood(k){ foodTab=k; go('food'); }
+
+/* ---------- Herbal recommendations ---------- */
+let herbFilter="mine";
+VIEWS.herbs = () => {
+  const filters=[["mine","For me"],["vata","Vata"],["pitta","Pitta"],["kapha","Kapha"],["all","All"]];
+  let list=HERBS;
+  if(herbFilter==="mine" && store.dosha) list=HERBS.filter(h=>h.dosha.includes(store.dosha));
+  else if(["vata","pitta","kapha"].includes(herbFilter)) list=HERBS.filter(h=>h.dosha.includes(herbFilter));
+  return `<section class="view">
+    <span class="pill">Herbal recommendations</span>
+    <h1>Herbs &amp; adaptogens</h1>
+    <p class="lead">Time-honoured Ayurvedic herbs, what they're traditionally used for, and how to take them. ${store.dosha?`Showing herbs suited to <b>${DOSHAS[store.dosha].name}</b> by default.`:"Take the dosha quiz to see herbs suited to you."} Tap a herb for full details.</p>
+    <div class="row" style="margin:16px 0">
+      ${filters.map(([k,l])=>`<button class="tab ${herbFilter===k?'active':''}" onclick="setHerb('${k}')">${l}</button>`).join("")}
+    </div>
+    <div class="grid cols-3">
+      ${list.map(h=>`<div class="card" style="cursor:pointer" onclick="openHerb('${h.id}')">
+        <div style="font-size:32px">${h.emoji}</div>
+        <h3 style="margin:.3em 0 .1em">${h.name}</h3>
+        <p class="muted" style="font-size:13px;margin:0 0 .5em">${h.sanskrit}</p>
+        <p class="muted" style="margin:0">${h.benefit}</p>
+        <div class="row" style="margin-top:10px">${h.dosha.map(x=>`<span class="tag"><span class="dosha-dot ${DOSHAS[x].cls}"></span>&nbsp;${DOSHAS[x].name}</span>`).join("")}</div>
+      </div>`).join("")}
+    </div>
+    <p class="disc" style="margin-top:16px">Educational only. Herbs are potent and can interact with medications, pregnancy and health conditions — consult a qualified practitioner or doctor before starting any herb.</p>
+  </section>`;
+};
+function setHerb(k){ herbFilter=k; go('herbs'); }
+function openHerb(id){
+  const h=HERBS.find(x=>x.id===id); if(!h) return;
+  document.body.insertAdjacentHTML("beforeend",
+   `<div class="modal" onclick="this.remove()"><div class="box" onclick="event.stopPropagation()" style="max-width:480px">
+      <div class="row" style="justify-content:space-between"><span style="font-size:40px">${h.emoji}</span><button class="btn ghost sm" onclick="this.closest('.modal').remove()">✕</button></div>
+      <h2 style="margin:.2em 0 0">${h.name}</h2>
+      <p class="muted" style="margin:.1em 0 .6em">${h.sanskrit}</p>
+      <div class="row" style="margin-bottom:12px">${h.dosha.map(x=>`<span class="tag"><span class="dosha-dot ${DOSHAS[x].cls}"></span>&nbsp;Balances ${DOSHAS[x].name}</span>`).join("")}</div>
+      <p><b>Benefits:</b> <span class="muted">${h.benefit}</span></p>
+      <p style="margin-top:8px"><b>How to use:</b> <span class="muted">${h.use}</span></p>
+      <p class="disc" style="margin-top:10px"><b>⚠ Caution:</b> ${h.caution}</p>
+   </div></div>`);
+}
+
 /* ---------- Premium ---------- */
 VIEWS.premium = () => `
   <section class="view">
@@ -1072,6 +1381,19 @@ VIEWS.premium = () => `
         </ul>
         <button class="btn ghost" onclick="fakeBuy('a course')">Browse courses</button>
       </div>
+    </div>
+
+    <h2>Premium services</h2>
+    <p class="lead" style="font-size:16px">One-to-one and live offerings from qualified practitioners — book what you need.</p>
+    <div class="grid cols-2">
+      ${SERVICES.map(s=>`<div class="card tier">
+        <div class="row" style="justify-content:space-between"><span style="font-size:32px">${s.emoji}</span>
+          <div class="center"><div class="price" style="font-size:26px">${s.price}</div><div class="muted" style="font-size:12px">${s.unit}</div></div></div>
+        <h3 style="margin:.3em 0 .2em">${s.name}</h3>
+        <p class="muted" style="margin:.2em 0">${s.desc}</p>
+        <ul>${s.bullets.map(b=>`<li>${b}</li>`).join("")}</ul>
+        <button class="btn" onclick="fakeBuy('${s.name.replace(/'/g,"")}')">${s.cta}</button>
+      </div>`).join("")}
     </div>
 
     <h2>A peek inside Plus</h2>

@@ -35,9 +35,14 @@ It personalises yoga around your Ayurvedic **dosha**:
 - **Yoga** — dosha-aligned sequences with a full-screen **guided practice player**: pose timer, progress ring, breath pacer, prev/next, and pause.
 - **Breathe** — breathing exercises / pranayama (box, 4·7·8, coherent, calming, energising, Nadi Shodhana, Bhramari, Sheetali) with a visual pacer.
 - **Meditate** — guided meditations (breath awareness, body scan, loving-kindness, yoga nidra, So-Hum, morning clarity) with a timed player, on-screen prompts and breathing anchor.
+- **Panchang** — a computed daily Vedic almanac: tithi, nakshatra, yoga, karana, vara, moon phase and Rahu Kaal, with a daily alignment note (approximate; Lahiri ayanamsa).
 - **Ayurveda** — per-dosha foods to favour/reduce, herbs, daily rituals, and seasonal tips.
+- **Food** — "food to eat" guidance: what to eat right now by time of day, a full-day meal plan, tastes to favour, and a favour/reduce board per dosha.
+- **Herbs** — a herbal-recommendations library (ashwagandha, triphala, brahmi, turmeric, tulsi, ginger, amla, shatavari, trikatu, licorice) with benefits, usage and cautions in a detail modal.
 - **DIYs** — Ayurvedic home remedies (abhyanga oil, ubtan mask, tongue scraping + oil pulling, hair oil, dry brushing, CCF tea) with ingredients, steps and cautions.
 - **Recipes** — dosha-friendly health recipes (kitchari, golden milk, CCF tea, stewed apples, mung soup, ojas balls) with ingredients and method.
+- **Ayurvedic tip of the day** — a rotating daily tip featured on the Home screen and the Panchang view.
+- **Premium services** — 1:1 expert counselling, a 21-day diet program, a one-day workshop, and a customised diet chart, alongside the freemium tiers (demo only).
 - **Progress** — sessions, minutes, day streak, and a 3-week activity heatmap (stored in `localStorage`; nothing is uploaded).
 - **Premium** — a freemium tier layout (Sattva Plus subscription, one-time courses like a *30-Day Dosha Reset*, live sessions) illustrating monetisation. Demo only — no real payments.
 
