@@ -8289,52 +8289,85 @@ body.report-active #chartInputLayoutBar:not(.hidden) {
 body.report-active .output-panel { padding-top: var(--vn-topbar-h, 150px) !important; }
 body.report-active::before { height: var(--vn-topbar-h, 150px) !important; }
 
-/* ===== Fix: cramped mobile toolbar =====
-   Making the toolbar always-visible left its buttons full-width and stacked on
-   phones, eating the whole screen before the chart. Lay them out compactly
-   (two-up, wrapping) with a small identity strip so the chart is visible. */
+/* ===== Compact mobile chrome =====
+   The nav bar, toolbar and identity strip were oversized and ate most of the
+   phone screen before the chart. Shrink them aggressively (small fonts, tight
+   padding, buttons three-up) so the chart/body gets the space. The measured
+   --vn-topbar-h var makes the content follow the reduced height automatically. */
 @media (max-width: 560px) {
+  /* --- nav: Home + section picker on ONE tight row --- */
+  body.report-active.report-view-chartData .chart-data-nav:not(.hidden) {
+    grid-template-columns: auto 1fr !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 5px 7px !important;
+  }
+  body.report-active #mobileHomeBtn.mobile-home-btn {
+    min-height: 36px !important;
+    padding: 6px 12px !important;
+    font-size: 13px !important;
+    margin: 0 !important;
+  }
+  body.report-active .mobile-drilldown-label {
+    gap: 0 !important;
+    font-size: 0 !important;                 /* hide the "SECTION" caption row */
+  }
+  body.report-active .mobile-drilldown-select {
+    min-height: 36px !important;
+    font-size: 14px !important;
+    padding: 6px 10px !important;
+  }
+
+  /* --- toolbar: small pills, three per row --- */
   body.report-active #chartInputLayoutBar:not(.hidden) {
     display: flex !important;
     flex-wrap: wrap !important;
     align-items: center !important;
-    gap: 6px !important;
-    padding: 6px 8px !important;
+    gap: 5px !important;
+    row-gap: 5px !important;
+    padding: 5px 7px !important;
     min-height: 0 !important;
-    row-gap: 6px !important;
   }
   body.report-active #chartInputLayoutBar:not(.hidden) .input-toggle-btn {
     width: auto !important;
-    flex: 1 1 42% !important;
+    flex: 1 1 30% !important;
     min-width: 0 !important;
-    padding: 8px 6px !important;
-    font-size: 12px !important;
+    min-height: 32px !important;
+    padding: 6px 6px !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
     white-space: nowrap;
   }
   body.report-active #chartInputLayoutBar:not(.hidden) .vn-lang-toggle {
-    flex: 1 1 42% !important;
+    flex: 1 1 30% !important;
     min-width: 0 !important;
     margin: 0 !important;
   }
   body.report-active #chartInputLayoutBar:not(.hidden) .vn-lang-toggle select {
     width: 100% !important;
-    font-size: 12px !important;
-    padding: 7px 8px !important;
+    min-height: 32px !important;
+    font-size: 11px !important;
+    padding: 5px 6px !important;
   }
-  /* compact one-line identity strip (birth details stay in the report header) */
-  body.report-active .part-a-identity-strip {
-    flex: 1 1 100% !important;
-    order: 99 !important;
-    min-width: 0 !important;
-    padding: 4px 6px !important;
-    gap: 8px !important;
+
+  /* drop controls that only waste space on a phone: the input-hide toggle
+     (there is no side input panel on mobile) and the identity strip (the chart
+     name is already in the report header just below). */
+  body.report-active #chartInputLayoutBar [data-chart-input-toggle] { display: none !important; }
+  body.report-active .part-a-identity-strip { display: none !important; }
+}
+
+/* ===== Slightly tighter report toolbar on desktop too ===== */
+@media (min-width: 561px) {
+  body.report-active #chartInputLayoutBar:not(.hidden) .input-toggle-btn {
+    min-height: 34px !important;
+    padding: 6px 12px !important;
+    font-size: 13px !important;
   }
-  .part-a-identity-strip .part-a-brand-mini img { width: 20px; height: 20px; }
-  .part-a-identity-strip .part-a-brand-mini strong { font-size: 13px; }
-  .part-a-identity-strip .part-a-native-summary {
-    font-size: 10px !important;
-    line-height: 1.25 !important;
-    max-height: 2.6em;
-    overflow: hidden;
+  body.report-active #chartInputLayoutBar:not(.hidden) .vn-lang-toggle select {
+    min-height: 34px !important;
+    font-size: 13px !important;
+    padding: 6px 10px !important;
   }
 }
