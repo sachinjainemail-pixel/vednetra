@@ -1,11 +1,12 @@
-const CACHE_NAME = "vednetra-v57";
+const CACHE_NAME = "vednetra-v58";
 const APP_ASSETS = [
   "./",
   "index.html",
   "styles.css",
   "app.js",
   "manifest.webmanifest",
-  "icon.svg"
+  "icon.svg",
+  "assets/ganesha-mantra.mp3"
 ];
 
 self.addEventListener("install", (event) => {

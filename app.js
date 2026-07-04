@@ -16402,7 +16402,7 @@
       img: vnCommonsImg("Ganesha%20Basohli%20miniature%20circa%201730%20Dubost%20p73.jpg"),
       mantra: "ॐ गं गणपतये नमः", roman: "Om Gaṃ Gaṇapataye Namaḥ",
       meaning: "Salutations to Ganesha, remover of obstacles and lord of beginnings.",
-      audio: ["https://archive.org/download/GaneshMantra_201709/GaneshMantra.mp3", "https://archive.org/download/OmGamGanapatayeNamaha/OmGamGanapatayeNamaha.mp3", "https://archive.org/download/ganesha-maha-mantra-vakratunda-mahakaya/Ganesha%20Maha%20Mantra.mp3"] },
+      audio: ["assets/ganesha-mantra.mp3", "https://archive.org/download/GaneshMantra_201709/GaneshMantra.mp3", "https://archive.org/download/OmGamGanapatayeNamaha/OmGamGanapatayeNamaha.mp3"] },
     { key: "shiva", name: "Mahadeva Shiva", sub: "महादेव", color: "#7fb4e6", hue: 205,
       hero: "🔱", orbit: ["🌙", "🐍", "🕊️"],
       img: vnCommonsImg("Ravi%20Varma-Descent%20of%20Ganga.jpg"),
