@@ -33,6 +33,7 @@ It personalises yoga around your Ayurvedic **dosha**:
 - **Dosha quiz** — a 10-question quiz maps your Vata / Pitta / Kapha balance.
 - **My Dosha** — your constitution with balance meters, a rebalancing plan, and a daily routine (dinacharya).
 - **Yoga** — dosha-aligned sequences with a full-screen **guided practice player**: pose timer, progress ring, breath pacer, prev/next, and pause.
+- **Asanas** — an illustrated reference of **50 essential poses**, each drawn as a self-contained human-figure SVG (generated from a parametric pose engine), grouped into Standing/Balancing, Seated/Twisting and Backbends/Inversions, with Sanskrit name, benefit and how-to in a detail modal.
 - **Breathe** — breathing exercises / pranayama (box, 4·7·8, coherent, calming, energising, Nadi Shodhana, Bhramari, Sheetali) with a visual pacer.
 - **Meditate** — guided meditations (breath awareness, body scan, loving-kindness, yoga nidra, So-Hum, morning clarity) with a timed player, on-screen prompts and breathing anchor.
 - **Panchang** — a computed daily Vedic almanac: tithi, nakshatra, yoga, karana, vara, moon phase and Rahu Kaal, with a daily alignment note (approximate; Lahiri ayanamsa).

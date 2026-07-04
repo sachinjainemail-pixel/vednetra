@@ -614,11 +614,125 @@ function computePanchang(date){
 function dayIndex(){ const d=new Date(); const s=new Date(d.getFullYear(),0,0); return Math.floor((d-s)/864e5); }
 function tipOfDay(){ return TIPS[dayIndex()%TIPS.length]; }
 
+/* ---------- 50 Asanas: parametric figure engine ---------- */
+const FIG_L={thigh:15,shin:15,torso:20,upper:10,fore:10,neck:4,head:5};
+function _pt(x,y,ang,len){ const a=ang*Math.PI/180; return [x+len*Math.cos(a), y+len*Math.sin(a)]; }
+// pose = [px,py, torso, lThigh,lShin, rThigh,rShin, lUp,lFore, rUp,rFore]  (absolute degrees, y down)
+function asanaFigure(n, ground){
+  const s=ASANA_POSE[n]; if(!s) return "";
+  const [px,py,t]=s, L=FIG_L;
+  const [sx,sy]=_pt(px,py,t,L.torso);
+  const [hx,hy]=_pt(sx,sy,t,L.neck+L.head);
+  const [lk,lky]=_pt(px,py,s[3],L.thigh),[lf,lfy]=_pt(lk,lky,s[4],L.shin);
+  const [rk,rky]=_pt(px,py,s[5],L.thigh),[rf,rfy]=_pt(rk,rky,s[6],L.shin);
+  const [le,ley]=_pt(sx,sy,s[7],L.upper),[lh,lhy]=_pt(le,ley,s[8],L.fore);
+  const [re,rey]=_pt(sx,sy,s[9],L.upper),[rh,rhy]=_pt(re,rey,s[10],L.fore);
+  // chest sits partway up the torso; neck a little beyond the shoulders
+  const [cx,cy]=_pt(px,py,t,L.torso*0.62);
+  const [nx,ny]=_pt(sx,sy,t,L.neck);
+  const f=x=>x.toFixed(1);
+  const seg=(a,b,c,e,w)=>`<path d="M${f(a)} ${f(b)} L${f(c)} ${f(e)}" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round"/>`;
+  const body=
+    seg(px,py,sx,sy,9.5)+                                   // trunk
+    seg(px,py,lk,lky,7)+seg(lk,lky,lf,lfy,5)+              // left leg (thigh→shin)
+    seg(px,py,rk,rky,7)+seg(rk,rky,rf,rfy,5)+              // right leg
+    seg(sx,sy,le,ley,5)+seg(le,ley,lh,lhy,3.8)+           // left arm (upper→fore)
+    seg(sx,sy,re,rey,5)+seg(re,rey,rh,rhy,3.8)+           // right arm
+    `<circle cx="${f(px)}" cy="${f(py)}" r="4.6" fill="currentColor"/>`+   // pelvis/hips
+    `<circle cx="${f(cx)}" cy="${f(cy)}" r="4.3" fill="currentColor"/>`+   // mid-torso
+    `<circle cx="${f(sx)}" cy="${f(sy)}" r="4.8" fill="currentColor"/>`+   // shoulders
+    seg(sx,sy,nx,ny,4)+                                     // neck
+    `<circle cx="${f(hx)}" cy="${f(hy)}" r="6" fill="currentColor"/>`;     // head
+  return `<svg viewBox="0 0 100 100" style="width:100%;height:100%;display:block" role="img" aria-label="${ASANAS[n-1].name} figure">`+
+    (ground?`<line x1="6" y1="82" x2="94" y2="82" stroke="currentColor" stroke-opacity=".16" stroke-width="1.4"/>`:"")+
+    body+`</svg>`;
+}
+const ASANA_POSE={
+1:[50,58,-90,83,87,97,93,104,98,76,82],2:[50,44,145,60,60,60,60,122,122,122,122],
+3:[46,56,-86,60,86,128,120,-82,-82,-98,-98],4:[50,54,-90,138,138,52,90,178,178,2,2],
+5:[40,50,-8,176,176,92,90,-6,-6,-6,-6],6:[52,54,-58,142,142,40,40,-66,-66,92,92],
+7:[52,54,-42,140,140,56,92,-34,-34,120,120],8:[44,52,-16,4,4,92,90,-92,-92,96,96],
+9:[50,58,-90,150,18,95,92,-84,-84,-96,-96],10:[50,58,-74,62,95,74,95,-78,-78,-102,-102],
+11:[50,56,-88,94,84,98,92,-48,-72,-132,-108],12:[50,50,120,60,60,100,100,120,120,100,100],
+13:[50,52,150,62,62,100,100,150,150,150,150],14:[48,54,120,150,150,40,40,118,118,118,118],
+15:[50,40,140,150,150,30,30,120,120,120,120],16:[46,54,-92,58,88,132,128,-80,-80,-100,-100],
+17:[46,58,-90,150,150,60,96,-80,-80,-100,-100],18:[50,66,-90,150,196,30,-16,120,120,60,60],
+19:[50,66,-90,155,205,25,-25,-84,-84,-96,-96],20:[50,64,-90,4,4,176,176,88,90,92,90],
+21:[50,64,10,6,6,174,174,6,6,6,6],22:[50,64,4,20,20,176,176,4,4,6,6],
+23:[50,66,-90,150,150,30,30,120,120,60,60],24:[50,64,-80,-6,120,176,176,-22,-28,125,150],
+25:[50,64,-78,-8,122,174,174,-18,-24,130,150],26:[50,66,-62,-32,-32,-30,-30,-12,-12,-12,-12],
+27:[50,64,-90,132,176,48,4,100,96,80,84],28:[50,64,-90,150,20,30,160,-60,140,120,-40],
+29:[50,58,-90,55,120,125,60,-84,-84,-96,-96],30:[46,60,-40,178,178,40,86,120,120,-30,-30],
+31:[54,62,-42,178,178,178,178,130,120,-30,-30],32:[54,58,-48,176,176,176,176,120,90,-60,-60],
+33:[56,64,-20,178,178,178,178,150,180,150,180],34:[50,58,-46,200,250,200,250,150,210,150,210],
+35:[52,62,10,182,182,178,178,150,150,150,150],36:[50,64,-30,30,74,30,74,100,96,80,84],
+37:[50,46,122,62,120,62,120,120,152,120,152],38:[50,52,-58,96,182,96,178,34,60,26,54],
+39:[54,62,6,174,174,174,174,96,96,96,96],40:[54,66,4,174,174,174,174,100,80,100,80],
+41:[52,60,-30,150,150,150,150,-90,-90,90,90],42:[50,52,60,130,60,130,60,100,150,80,30],
+43:[50,60,-140,-84,-84,-96,-96,150,150,150,150],44:[50,44,90,-89,-89,-91,-91,-70,-18,-110,-162],
+45:[56,34,150,200,120,200,120,150,150,150,150],46:[50,45,90,-88,-88,-92,-92,152,150,28,30],
+47:[50,66,-90,-60,-10,-120,-170,-30,20,-150,-20],48:[56,74,184,-58,-118,-122,-62,150,150,150,150],
+49:[50,60,150,45,45,45,45,150,150,150,150],50:[50,70,4,6,6,174,174,20,20,160,160]
+};
+const ASANAS=[
+ {n:1,name:"Mountain Pose",sk:"Tadasana",grp:"stand",ben:"Grounding & posture alignment",cue:"Stand with big toes touching, heels slightly apart. Ground through all four corners of the feet, engage the thighs, lengthen the spine and lift through the crown; roll the shoulders back and down."},
+ {n:2,name:"Downward-Facing Dog",sk:"Adho Mukha Svanasana",grp:"stand",ben:"Full-body stretch & inversion",cue:"From hands and knees, spread the fingers, tuck the toes and lift the hips up and back into an inverted V. Keep the spine long — a soft bend in the knees is fine."},
+ {n:3,name:"Warrior I",sk:"Virabhadrasana I",grp:"stand",ben:"Hip-flexor stretch & strength",cue:"From a lunge, turn the back foot in ~45°, square the hips forward, bend the front knee over the ankle and reach both arms overhead."},
+ {n:4,name:"Warrior II",sk:"Virabhadrasana II",grp:"stand",ben:"Hip opening & leg strength",cue:"Step the feet wide, turn the front foot out 90°, bend the front knee over the ankle and extend the arms parallel to the floor, gazing over the front hand."},
+ {n:5,name:"Warrior III",sk:"Virabhadrasana III",grp:"stand",ben:"Balance & core strength",cue:"From standing, hinge forward and lift one leg straight back to hip height, reaching the arms forward so body and leg form one line parallel to the floor."},
+ {n:6,name:"Triangle Pose",sk:"Trikonasana",grp:"stand",ben:"Side-body stretch & hamstring flexibility",cue:"Legs wide and straight, front foot out. Reach forward and tip from the hip, lowering the front hand to shin or floor and stacking the top arm skyward."},
+ {n:7,name:"Extended Side Angle",sk:"Utthita Parsvakonasana",grp:"stand",ben:"Stamina & deep hip stretch",cue:"From Warrior II, rest the front forearm on the thigh (or hand to floor) and sweep the top arm over the ear — one long line from back foot to fingertips."},
+ {n:8,name:"Half Moon Pose",sk:"Ardha Chandrasana",grp:"stand",ben:"Balance & lateral stretch",cue:"From Triangle, bend the front knee, step the back foot in and lift it to hip height; balance on the bottom hand as the top arm rises."},
+ {n:9,name:"Tree Pose",sk:"Vrksasana",grp:"stand",ben:"Focus & ankle stabilization",cue:"Root down through one leg; place the other foot on the inner calf or thigh (never the knee). Press foot and leg together and bring the hands to the heart or overhead."},
+ {n:10,name:"Chair Pose",sk:"Utkatasana",grp:"stand",ben:"Quad strength & core heat",cue:"From Mountain, bend the knees and sit the hips back as if into a chair, weight in the heels, chest lifted, arms reaching alongside the ears."},
+ {n:11,name:"Eagle Pose",sk:"Garudasana",grp:"stand",ben:"Joint opening & focus",cue:"Cross one thigh over the other (hook the foot if you can), then cross the opposite arm under and wrap the forearms, lifting the elbows as you sink the hips."},
+ {n:12,name:"Standing Forward Bend",sk:"Uttanasana",grp:"stand",ben:"Hamstring stretch & mental calm",cue:"From standing, hinge at the hips and fold over the legs, letting the head and arms hang; soften the knees to protect the hamstrings."},
+ {n:13,name:"Half Forward Fold",sk:"Ardha Uttanasana",grp:"stand",ben:"Spinal extension & posture prep",cue:"From a forward fold, lift the chest halfway, fingertips to shins, and lengthen the spine to a flat back."},
+ {n:14,name:"Pyramid Pose",sk:"Parsvottanasana",grp:"stand",ben:"Deep hamstring & calf stretch",cue:"Feet hip-width, one foot forward and hips square; fold over the front leg with a long spine."},
+ {n:15,name:"Wide-Legged Forward Fold",sk:"Prasarita Padottanasana",grp:"stand",ben:"Inner-thigh stretch & mild inversion",cue:"Step the feet wide and parallel, hinge from the hips and fold, crown toward the floor, hands on the floor or ankles."},
+ {n:16,name:"High Lunge",sk:"Ashta Chandrasana",grp:"stand",ben:"Psoas stretch & dynamic balance",cue:"Step one foot back with the heel lifted, front knee over the ankle; lift the torso and reach the arms overhead."},
+ {n:17,name:"Low Lunge",sk:"Anjaneyasana",grp:"stand",ben:"Deep hip-flexor release",cue:"From a lunge, lower the back knee to the floor and sink the hips forward and down; reach the arms up to open the front hip."},
+ {n:18,name:"Easy Pose",sk:"Sukhasana",grp:"seat",ben:"Meditation seat & hip opening",cue:"Sit cross-legged with the shins crossed, sit bones grounded and spine tall — a simple seat for breath and meditation."},
+ {n:19,name:"Lotus Pose",sk:"Padmasana",grp:"seat",ben:"Advanced meditation seat",cue:"Place each foot on the opposite thigh, soles up, knees toward the floor, spine tall. Never force the knees."},
+ {n:20,name:"Staff Pose",sk:"Dandasana",grp:"seat",ben:"Core engagement & postural awareness",cue:"Sit with legs straight in front, feet flexed, hands beside the hips, spine tall — the seated equivalent of Mountain."},
+ {n:21,name:"Seated Forward Bend",sk:"Paschimottanasana",grp:"seat",ben:"Posterior-chain stretch & cooling",cue:"Sit with legs extended; inhale to lengthen, exhale and hinge at the hips to fold over the legs with a long spine."},
+ {n:22,name:"Head-to-Knee Forward Bend",sk:"Janu Sirsasana",grp:"seat",ben:"Asymmetrical hamstring stretch",cue:"Extend one leg, sole of the other foot to the inner thigh; fold over the straight leg, squaring the chest toward the knee."},
+ {n:23,name:"Bound Angle / Butterfly",sk:"Baddha Konasana",grp:"seat",ben:"Groin & inner-thigh release",cue:"Bring the soles of the feet together, letting the knees fall open; hold the feet and lengthen the spine."},
+ {n:24,name:"Half Lord of the Fishes",sk:"Ardha Matsyendrasana",grp:"seat",ben:"Spinal mobility & digestion",cue:"Cross one foot outside the opposite thigh; twist toward the top knee, hooking the elbow and looking over the back shoulder."},
+ {n:25,name:"Marichi's Pose",sk:"Marichyasana",grp:"seat",ben:"Deep seated twist & shoulder stretch",cue:"With one knee bent and foot flat, wrap the arm around the shin and twist deeply toward the bent knee."},
+ {n:26,name:"Boat Pose",sk:"Navasana",grp:"seat",ben:"Core strength & hip-flexor endurance",cue:"Balance on the sit bones, lift the legs and lean the torso back to form a V, reaching the arms forward alongside the shins."},
+ {n:27,name:"Hero Pose",sk:"Virasana",grp:"seat",ben:"Knee & ankle stretch",cue:"Kneel with the hips settling between the heels, tops of the feet on the floor, spine tall."},
+ {n:28,name:"Cow Face Pose",sk:"Gomukhasana",grp:"seat",ben:"Outer-hip & deep shoulder opening",cue:"Stack the knees, one over the other; reach one arm up and the other behind, clasping the hands to open the shoulders."},
+ {n:29,name:"Garland Pose / Squat",sk:"Malasana",grp:"seat",ben:"Lower-back release & hip mobility",cue:"Squat with the feet a little wider than the hips, heels down if you can; press the elbows against the inner knees, palms at the heart."},
+ {n:30,name:"Pigeon Pose",sk:"Kapotasana",grp:"seat",ben:"Intense glute & piriformis stretch",cue:"From all fours, bring one shin forward and extend the back leg straight behind; square the hips and fold over the front shin."},
+ {n:31,name:"Cobra Pose",sk:"Bhujangasana",grp:"back",ben:"Spinal extension & chest opening",cue:"Lie on the belly, hands under the shoulders and elbows hugging the ribs; inhale and lift the chest using the back, low ribs staying down."},
+ {n:32,name:"Upward-Facing Dog",sk:"Urdhva Mukha Svanasana",grp:"back",ben:"Arm strength & deep backbend",cue:"Press into the hands to straighten the arms, lifting the chest and thighs off the floor, shoulders over the wrists."},
+ {n:33,name:"Sphinx Pose",sk:"Salamba Bhujangasana",grp:"back",ben:"Gentle lower-back compression",cue:"Lie on the belly and prop up on the forearms, elbows under the shoulders, for a gentle supported backbend."},
+ {n:34,name:"Bow Pose",sk:"Dhanurasana",grp:"back",ben:"Front-body stretch & spine strength",cue:"On the belly, bend the knees and reach back to hold the ankles; kick the feet into the hands to lift the chest and thighs."},
+ {n:35,name:"Locust Pose",sk:"Salabhasana",grp:"back",ben:"Posterior-chain strengthening",cue:"Lie face down, arms alongside; lift the chest, arms and legs away from the floor, strengthening the whole back body."},
+ {n:36,name:"Bridge Pose",sk:"Setu Bandhasana",grp:"back",ben:"Glute engagement & heart opening",cue:"On the back, knees bent and feet hip-width; press into the feet to lift the hips, clasping the hands beneath the back."},
+ {n:37,name:"Wheel Pose",sk:"Urdhva Dhanurasana",grp:"back",ben:"Advanced full front-body opening",cue:"Place the hands by the ears and press up into a full backbend, arms and legs straight, chest opening. Warm up well first."},
+ {n:38,name:"Camel Pose",sk:"Ustrasana",grp:"back",ben:"Deep core & chest stretch",cue:"Kneel hip-width; hands to the low back or heels, lift the chest and arch back, hips pressing forward over the knees."},
+ {n:39,name:"Plank Pose",sk:"Phalakasana",grp:"back",ben:"Full-body integration & core stability",cue:"Extend the legs back and hold the body in one straight line, core engaged, shoulders over the wrists."},
+ {n:40,name:"Four-Limbed Staff",sk:"Chaturanga Dandasana",grp:"back",ben:"Tricep & core strength",cue:"From Plank, shift forward and lower halfway with the elbows hugging the ribs, body straight and strong."},
+ {n:41,name:"Side Plank",sk:"Vasisthasana",grp:"back",ben:"Oblique strength & lateral balance",cue:"From Plank, roll onto one hand and the outer edge of the foot, stacking the hips and reaching the top arm skyward."},
+ {n:42,name:"Crow Pose",sk:"Bakasana",grp:"back",ben:"Arm strength, wrist stability & focus",cue:"Squat, plant the hands, bend the elbows into a shelf and rest the knees on the upper arms; lean forward until the feet float."},
+ {n:43,name:"Legs-Up-The-Wall",sk:"Viparita Karani",grp:"back",ben:"Circulation & deep relaxation",cue:"Lie on the back and rest the legs straight up a wall, arms relaxed — a deeply restorative inversion."},
+ {n:44,name:"Supported Shoulderstand",sk:"Salamba Sarvangasana",grp:"back",ben:"Thyroid stimulation & inversion",cue:"Lift the legs and hips overhead, supporting the low back with the hands, body stacking toward vertical. Protect the neck."},
+ {n:45,name:"Plow Pose",sk:"Halasana",grp:"back",ben:"Neck & upper-back stretch",cue:"From Shoulderstand, lower the straight legs overhead toward the floor behind the head, hands supporting or extended."},
+ {n:46,name:"Headstand",sk:"Sirsasana",grp:"back",ben:"Advanced balance & core control",cue:"Forearms down, crown lightly on the floor; walk the feet in and lift the legs to vertical, core engaged. Build up slowly."},
+ {n:47,name:"Happy Baby Pose",sk:"Ananda Balasana",grp:"back",ben:"Lower-back release & hip stretch",cue:"On the back, draw the knees toward the armpits and hold the outer feet, gently rocking to release the hips and low back."},
+ {n:48,name:"Reclining Bound Angle",sk:"Supta Baddha Konasana",grp:"back",ben:"Passive hip & chest opening",cue:"Lie back with the soles of the feet together and knees falling open; rest the arms and let gravity open the hips and chest."},
+ {n:49,name:"Child's Pose",sk:"Balasana",grp:"back",ben:"Resting posture & spinal stretch",cue:"Kneel and fold the torso over the thighs, forehead to the floor, arms forward or by the sides — a restful reset."},
+ {n:50,name:"Corpse Pose",sk:"Savasana",grp:"back",ben:"Final relaxation & integration",cue:"Lie flat on the back, legs and arms relaxed and open, palms up; release all effort and breathe naturally."}
+];
+const ASANA_GROUPS=[["all","All 50"],["stand","Standing & Balancing"],["seat","Seated & Twisting"],["back","Backbends & Inversions"]];
+
 /* =========================================================
    Router
    ========================================================= */
 const TABS = [
-  ["home","Home"],["dosha","My Dosha"],["panchang","Panchang"],["yoga","Yoga"],
+  ["home","Home"],["dosha","My Dosha"],["panchang","Panchang"],["yoga","Yoga"],["asanas","Asanas"],
   ["breathe","Breathe"],["meditate","Meditate"],
   ["ayurveda","Ayurveda"],["food","Food"],["herbs","Herbs"],["diy","DIYs"],["recipes","Recipes"],
   ["progress","Progress"],["premium","Premium"]
@@ -813,6 +927,44 @@ function seqCard(s){
     <div class="row" style="margin:10px 0 14px"><span class="tag">⏱ ${totalMin(s)} min</span><span class="tag">${s.poses.length} poses</span><span class="tag">🎯 ${s.goal}</span></div>
     <button class="btn" onclick="openPlayer('${s.id}')">▶ Start practice</button>
   </div>`;
+}
+
+/* ---------- 50 Asanas library ---------- */
+let asanaFilter="all";
+const GRP_LABEL={stand:"Standing",seat:"Seated",back:"Backbend / Inversion"};
+VIEWS.asanas = () => {
+  const list = asanaFilter==="all" ? ASANAS : ASANAS.filter(a=>a.grp===asanaFilter);
+  return `<section class="view">
+    <span class="pill">Illustrated guide</span>
+    <h1>50 essential asanas</h1>
+    <p class="lead">A complete illustrated reference of 50 key yoga poses — each with a figure, its Sanskrit name, primary benefit and how to do it. Tap any pose for the full guide.</p>
+    <div class="row" style="margin:16px 0">
+      ${ASANA_GROUPS.map(([k,l])=>`<button class="tab ${asanaFilter===k?'active':''}" onclick="setAsana('${k}')">${l}</button>`).join("")}
+    </div>
+    <div class="grid cols-3">
+      ${list.map(a=>`<div class="card" style="cursor:pointer;color:var(--brand-2)" onclick="openAsana(${a.n})">
+        <div style="height:120px;background:color-mix(in srgb,var(--brand) 7%,transparent);border-radius:12px;padding:8px">${asanaFigure(a.n,true)}</div>
+        <div class="row" style="justify-content:space-between;margin-top:10px"><b style="color:var(--ink)">${a.n}. ${a.name}</b></div>
+        <p class="muted" style="margin:.1em 0 .3em;font-style:italic">${a.sk}</p>
+        <p class="muted" style="margin:0;font-size:13px">${a.ben}</p>
+      </div>`).join("")}
+    </div>
+    <p class="disc" style="margin-top:16px">Figures are simplified reference illustrations. Move within a comfortable range, warm up first, and skip or modify anything that causes pain — seek a qualified teacher for advanced poses (inversions, deep backbends, arm balances).</p>
+  </section>`;
+};
+function setAsana(k){ asanaFilter=k; go('asanas'); }
+function openAsana(n){
+  const a=ASANAS[n-1]; if(!a) return;
+  document.body.insertAdjacentHTML("beforeend",
+   `<div class="modal" onclick="this.remove()"><div class="box" onclick="event.stopPropagation()" style="max-width:460px">
+      <div class="row" style="justify-content:space-between"><span class="tag">${GRP_LABEL[a.grp]}</span><button class="btn ghost sm" onclick="this.closest('.modal').remove()">✕</button></div>
+      <div style="height:180px;color:var(--brand-2);background:color-mix(in srgb,var(--brand) 7%,transparent);border-radius:14px;margin:12px 0;padding:10px">${asanaFigure(n,true)}</div>
+      <h2 style="margin:0">${a.n}. ${a.name}</h2>
+      <p class="muted" style="margin:.1em 0 .6em;font-style:italic">${a.sk}</p>
+      <p><b>Benefit:</b> <span class="muted">${a.ben}</span></p>
+      <h3 style="margin-top:12px">How to do it</h3>
+      <p class="muted" style="margin:.2em 0 0">${a.cue}</p>
+   </div></div>`);
 }
 
 /* ---------- Practice player ---------- */
