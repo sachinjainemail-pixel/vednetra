@@ -853,11 +853,18 @@ function _figureShapes(n, sil){
     `<ellipse cx="${f(hcx)}" cy="${f(hcy)}" rx="5.7" ry="6.0" fill="${C.hair}"/>`+
     `<ellipse cx="${f(fcx)}" cy="${f(fcy)}" rx="4.4" ry="4.8" fill="${C.skin}"/>`+
     bindi;
-  return body;
+  // auto-fit: scale each pose so it fills the frame (poses vary in size)
+  const pts=[[lf,lfy],[rf,rfy],[lk,lky],[rk,rky],[lh,lhy],[rh,rhy],[le,ley],[re,rey],
+             [px,py],[sx,sy],[hcx,hcy],[hcx,hcy+15],[wx,wy],[clx,cly]];
+  let minX=1e9,minY=1e9,maxX=-1e9,maxY=-1e9;
+  for(const [x,y] of pts){ if(x<minX)minX=x; if(x>maxX)maxX=x; if(y<minY)minY=y; if(y>maxY)maxY=y; }
+  const pad=6.5; minX-=pad; minY-=pad; maxX+=pad; maxY+=pad;
+  const bw=maxX-minX, bh=maxY-minY, sc=92/Math.max(bw,bh,1);
+  const tx=50-sc*(minX+bw/2), ty=50-sc*(minY+bh/2);
+  return `<g transform="translate(${tx.toFixed(2)} ${ty.toFixed(2)}) scale(${sc.toFixed(3)})">${body}</g>`;
 }
-function asanaFigure(n, ground){
+function asanaFigure(n){
   return `<svg viewBox="0 0 100 100" style="width:100%;height:100%;display:block" role="img" aria-label="${ASANAS[n-1].name} figure">`+
-    (ground?`<line x1="6" y1="82" x2="94" y2="82" stroke="#00000018" stroke-width="1.4"/>`:"")+
     _figureShapes(n)+`</svg>`;
 }
 const ASANA_POSE={
@@ -1175,7 +1182,7 @@ VIEWS.asanas = () => {
     </div>
     <div class="grid cols-3">
       ${list.map(a=>`<div class="card" style="cursor:pointer;color:var(--brand-2)" onclick="openAsana(${a.n})">
-        <div style="height:120px;background:color-mix(in srgb,var(--brand) 7%,transparent);border-radius:12px;padding:8px">${asanaFigure(a.n,true)}</div>
+        <div style="height:172px;background:color-mix(in srgb,var(--brand) 7%,transparent);border-radius:12px;padding:6px">${asanaFigure(a.n)}</div>
         <div class="row" style="justify-content:space-between;margin-top:10px"><b style="color:var(--ink)">${a.n}. ${a.name}</b></div>
         <p class="muted" style="margin:.1em 0 .3em;font-style:italic">${a.sk}</p>
         <p class="muted" style="margin:0;font-size:13px">${a.ben}</p>
@@ -1190,7 +1197,7 @@ function openAsana(n){
   document.body.insertAdjacentHTML("beforeend",
    `<div class="modal" onclick="this.remove()"><div class="box" onclick="event.stopPropagation()" style="max-width:460px">
       <div class="row" style="justify-content:space-between"><span class="tag">${GRP_LABEL[a.grp]}</span><button class="btn ghost sm" onclick="this.closest('.modal').remove()">✕</button></div>
-      <div style="height:180px;color:var(--brand-2);background:color-mix(in srgb,var(--brand) 7%,transparent);border-radius:14px;margin:12px 0;padding:10px">${asanaFigure(n,true)}</div>
+      <div style="height:230px;color:var(--brand-2);background:color-mix(in srgb,var(--brand) 7%,transparent);border-radius:14px;margin:12px 0;padding:10px">${asanaFigure(n)}</div>
       <h2 style="margin:0">${a.n}. ${a.name}</h2>
       <p class="muted" style="margin:.1em 0 .6em;font-style:italic">${a.sk}</p>
       <p><b>Benefit:</b> <span class="muted">${a.ben}</span></p>
