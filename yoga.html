@@ -725,6 +725,50 @@ const CHAKRAS = [
    activate:"Silent meditation, Savasana, cultivating stillness and surrender, and resting attention at the crown."}
 ];
 
+/* ---------- On the Go (travel, per dosha) ---------- */
+const ONGO = {
+  vata:{
+    eat:["Carry warm, moist, grounding snacks — soaked nuts, dates, banana, nut butter.","Favour cooked, warm meals over cold sandwiches and raw salads.","Sip warm water, ginger or CCF tea; go easy on coffee.","Never skip meals — keep a regular rhythm even across time zones.","A little ghee or good oil keeps you lubricated and settled."],
+    move:["Seated stretches, ankle and wrist rolls on long flights.","Slow forward folds and a short grounding standing sequence at stops.","5 minutes of Nadi Shodhana or long-exhale breathing to calm the nerves.","Legs-up-the-wall against a hotel wall to reset after travel."],
+    fit:["Keep warm — scarf and socks; Vata hates cold and wind.","Hold your routine: similar sleep and meal times where you can.","Warm-oil foot self-massage before bed to ground yourself.","Prioritise rest and early nights — travel depletes Vata fast."]},
+  pitta:{
+    eat:["Carry cooling snacks — sweet fruit, coconut water, soaked raisins.","Don't skip meals; hunger makes Pitta irritable and sharp.","Go easy on spicy, fried, fermented and very salty travel food.","Hydrate with cool (not iced) water, mint or fennel tea.","Favour sweet, bitter and astringent tastes; fresh over fried."],
+    move:["Keep it non-competitive — a relaxed walk or gentle swim.","Cooling breath (Sheetali) and gentle flows instead of hard workouts in heat.","Avoid midday-sun exercise; move early morning or evening.","Twists and forward folds to release built-up heat and tension."],
+    fit:["Stay cool and shaded; don't over-pack the itinerary.","Build in real downtime — Pitta over-plans and burns out.","Cool showers and time near water reset you.","Loosen the schedule and ease your intensity."]},
+  kapha:{
+    eat:["Keep it light — skip heavy airport/hotel meals; choose soups and veg.","Carry light, dry, spiced snacks — roasted chickpeas, spiced nuts, fruit.","Warm ginger or CCF tea to keep digestion moving.","Avoid dairy, sweets, fried food and iced drinks on the move.","Make lunch the main meal; keep dinner light and early."],
+    move:["Move often — walk the aisle or terminal, take the stairs.","Energising practice: sun salutations and standing strength poses.","Kapalabhati or Bhastrika breath to shake off heaviness.","A brisk 15-minute walk on arrival beats a nap."],
+    fit:["Avoid daytime naps; stay active to counter travel lethargy.","Get sunlight and fresh air soon after you arrive.","Dry-brush and take a warm (not hot) shower to invigorate.","Seek variety and stimulation — Kapha thrives on novelty."]}
+};
+
+/* ---------- How To-Now (by time of day, per dosha) ---------- */
+const HOWNOW = {
+  early:{label:"Early morning",range:"4:30–7 AM",
+    eat:{v:"Warm water with a little lemon, or a soaked date — light and warming to settle Vata.",p:"Cool or room-temp water; a few soaked raisins if hungry — nothing heating yet.",k:"Warm water with ginger and honey to kindle a slow system; skip food."},
+    move:{v:"Gentle grounding yoga, slow sun salutations and calming Nadi Shodhana.",p:"Cooling, steady practice or a calm walk — don't push hard.",k:"Brisk, energising sun salutations and Kapalabhati to wake the body."},
+    fit:{v:"Meditate and set an intention; stay warm and unhurried.",p:"Meditate and plan the day without over-scheduling.",k:"Rise before 6 and get moving — the best time to beat Kapha heaviness."}},
+  morning:{label:"Morning",range:"7–11 AM",
+    eat:{v:"A warm, cooked breakfast — spiced oats or stewed fruit with ghee.",p:"A moderate breakfast — soaked oats or sweet fruit; don't skip it.",k:"Light or no breakfast — fruit or ginger tea is plenty."},
+    move:{v:"Steady strengthening yoga; avoid over-exertion.",p:"A solid but non-competitive workout before the day heats up.",k:"Your best window for vigorous exercise — cardio, strong flow, sweat."},
+    fit:{v:"Do focused work now; stay warm and hydrated.",p:"Channel the morning drive into productive work.",k:"Stay active and avoid heavy snacking; keep the momentum."}},
+  midday:{label:"Midday",range:"11 AM–2 PM",
+    eat:{v:"Eat your main, warm, nourishing meal now — digestion is strongest.",p:"Lunch is your biggest meal — cooling, fresh, balanced; never skip.",k:"Make lunch the main meal — spiced, lighter, plenty of vegetables."},
+    move:{v:"Rest and digest — only a short gentle walk.",p:"Avoid intense midday-sun exercise; a gentle stroll after eating.",k:"A brisk walk after lunch to counter post-meal heaviness."},
+    fit:{v:"Take a real lunch break; eat calmly, not on the go.",p:"Step out of the heat; don't work through lunch.",k:"Don't nap after lunch — a short walk keeps you light."}},
+  afternoon:{label:"Afternoon",range:"2–5 PM",
+    eat:{v:"A warm snack — spiced nuts or herbal tea — to steady the Vata dip.",p:"Sweet fruit or a cooling drink to avoid the 'hangry' slump.",k:"Only if truly hungry — a light, warm, spiced snack or tea."},
+    move:{v:"Gentle movement and breathwork to refocus a scattered mind.",p:"A calm walk or restorative stretch as the day cools.",k:"A short burst of movement to fight the afternoon slump."},
+    fit:{v:"Do creative or detailed work; take grounding breaks.",p:"Ease the intensity; hydrate and cool down.",k:"Keep moving; skip the sugary pick-me-ups."}},
+  evening:{label:"Evening",range:"5–9 PM",
+    eat:{v:"A warm, light, early dinner — soup or kitchari; nothing raw or cold.",p:"A light, cooling dinner; avoid heavy or spicy food late.",k:"A very light, early, warm dinner; skip dairy and sweets."},
+    move:{v:"Slow, calming yin yoga and long exhales to unwind.",p:"Gentle, cooling yoga or a moonlight walk to release the day.",k:"Light evening yoga is fine — keep some movement after dinner."},
+    fit:{v:"Wind down early; screens off; warm-oil foot massage.",p:"Cool the mind — no heated debates or late work.",k:"Avoid heavy late meals; relax without oversleeping."}},
+  night:{label:"Night",range:"9 PM–4:30 AM",
+    eat:{v:"Nothing heavy — warm spiced milk only if needed to sleep.",p:"Avoid eating; a cool drink only if genuinely thirsty.",k:"No food — let the body rest and lighten overnight."},
+    move:{v:"No exercise — gentle stretches, a few breaths, then sleep.",p:"Rest; a few calming breaths to cool an active mind.",k:"Be in bed by 10; late workouts disturb sleep."},
+    fit:{v:"Sleep by ~10 PM; keep a calm, consistent bedtime.",p:"Wind fully down — this is repair time; protect your sleep.",k:"Sleep well but don't oversleep; plan an early rise."}}
+};
+
 /* ---------- Daily Panchang (computed) ---------- */
 const PANCHANG_NAMES = {
   tithi:["Pratipada","Dvitiya","Tritiya","Chaturthi","Panchami","Shashthi","Saptami","Ashtami","Navami","Dashami","Ekadashi","Dwadashi","Trayodashi","Chaturdashi","Purnima"],
@@ -802,9 +846,10 @@ function _pt(x,y,ang,len){ const a=ang*Math.PI/180; return [x+len*Math.cos(a), y
 // pose = [px,py, torso, lThigh,lShin, rThigh,rShin, lUp,lFore, rUp,rFore]  (absolute degrees, y down)
 // Flat-illustration palette (fixed — illustrations read the same in light & dark)
 const FIG_COL={skin:"#f2b58c",skinSh:"#e79f72",cloth:"#d24aa8",clothSh:"#b6338f",hair:"#3b2b31",band:"#f7d6ee"};
-// builds just the figure shapes (no <svg> wrapper); pass `sil` (a colour) for a flat silhouette
+// builds just the figure shapes (no <svg> wrapper); pass `sil` (a colour) for a flat silhouette.
+// `n` may be an asana index or a raw pose array.
 function _figureShapes(n, sil){
-  const s=ASANA_POSE[n]; if(!s) return "";
+  const s = Array.isArray(n) ? n : ASANA_POSE[n]; if(!s) return "";
   const [px,py,t]=s, L=FIG_L;
   const C = sil ? {skin:sil,skinSh:sil,cloth:sil,clothSh:sil,hair:sil,band:sil} : FIG_COL;
   const [sx,sy]=_pt(px,py,t,L.torso);                 // shoulders
@@ -834,7 +879,6 @@ function _figureShapes(n, sil){
   // Aditi's signature long, loose dark hair falls with gravity (screen +y) from the head
   const longHair = cap(hcx, hcy-0.5, 5.6, hcx-1.2, hcy+16, 3.0, C.hair)
                  + cap(hcx, hcy-0.5, 5.2, hcx+2.0, hcy+13, 2.4, C.hair);
-  const bindi = sil ? "" : dot(_pt(sx,sy,t,L.neck+L.head+1.6)[0], _pt(sx,sy,t,L.neck+L.head+1.6)[1], 1.1, "#8a1f43");
   const body=
     // long hair drawn first so the body sits in front of it
     longHair+
@@ -848,11 +892,10 @@ function _figureShapes(n, sil){
     // arms — bare skin, magenta wrist cuff
     cap(sx,sy,R.up, le,ley,R.elbow,C.skin)+cap(le,ley,R.elbow, lh,lhy,R.wrist,C.skin)+dot(lh,lhy,R.wrist+0.5,C.band)+
     cap(sx,sy,R.up, re,rey,R.elbow,C.skin)+cap(re,rey,R.elbow, rh,rhy,R.wrist,C.skin)+dot(rh,rhy,R.wrist+0.5,C.band)+
-    // neck + hair (scalp framing the face) + face + bindi
+    // neck + hair (scalp framing the face) + face
     cap(nbx,nby,R.neck, hbx,hby,R.neck,C.skin)+
     `<ellipse cx="${f(hcx)}" cy="${f(hcy)}" rx="5.7" ry="6.0" fill="${C.hair}"/>`+
-    `<ellipse cx="${f(fcx)}" cy="${f(fcy)}" rx="4.4" ry="4.8" fill="${C.skin}"/>`+
-    bindi;
+    `<ellipse cx="${f(fcx)}" cy="${f(fcy)}" rx="4.4" ry="4.8" fill="${C.skin}"/>`;
   // auto-fit: scale each pose so it fills the frame (poses vary in size)
   const pts=[[lf,lfy],[rf,rfy],[lk,lky],[rk,rky],[lh,lhy],[rh,rhy],[le,ley],[re,rey],
              [px,py],[sx,sy],[hcx,hcy],[hcx,hcy+15],[wx,wy],[clx,cly]];
@@ -955,14 +998,16 @@ const TABS = [
   ["home","Home"],["dosha","My Dosha"],["panchang","Panchang"],["yoga","Yoga"],["asanas","Asanas"],
   ["breathe","Breathe"],["meditate","Meditate"],["chakras","7 Chakras"],
   ["ayurveda","Ayurveda"],["food","Food"],["herbs","Herbs"],["drinks","Herbal Drinks"],["diy","DIYs"],["recipes","Recipes"],
+  ["ongo","On the Go"],["hownow","How To-Now"],
   ["progress","Progress"],["premium","Premium"],["creators","Creators"]
 ];
 let current = "home";
-const NAV_ICONS={home:"🏠",dosha:"🧭",panchang:"🗓️",yoga:"🧘",asanas:"🤸",breathe:"🌬️",meditate:"🧠",chakras:"🌀",ayurveda:"🌿",food:"🍽️",herbs:"🌱",drinks:"🍵",diy:"🫗",recipes:"🍲",progress:"📈",premium:"⭐",creators:"👩‍🏫"};
+const NAV_ICONS={home:"🏠",dosha:"🧭",panchang:"🗓️",yoga:"🧘",asanas:"🤸",breathe:"🌬️",meditate:"🧠",chakras:"🌀",ayurveda:"🌿",food:"🍽️",herbs:"🌱",drinks:"🍵",diy:"🫗",recipes:"🍲",ongo:"🧳",hownow:"⏰",progress:"📈",premium:"⭐",creators:"👩‍🏫"};
 const NAV_GROUPS=[
   ["Daily",["home","dosha","panchang"]],
   ["Practice",["yoga","asanas","breathe","meditate","chakras"]],
   ["Ayurveda",["ayurveda","food","herbs","drinks","diy","recipes"]],
+  ["Anytime",["ongo","hownow"]],
   ["You",["progress","premium"]],
   ["About",["creators"]]
 ];
@@ -1765,6 +1810,30 @@ function openHerb(id){
 }
 
 /* ---------- 7 Chakras ---------- */
+// traditional chakra symbol: a lotus of N petals around a central yantra glyph
+function chakraSymbol(color, n){
+  const petalCount={1:4,2:6,3:10,4:12,5:16,6:2,7:16}[n]||8;
+  let petals="";
+  for(let i=0;i<petalCount;i++){
+    petals+=`<ellipse cx="50" cy="20" rx="4.6" ry="11" fill="${color}" fill-opacity=".9" transform="rotate(${(i/petalCount*360).toFixed(1)} 50 50)"/>`;
+  }
+  // an extra sparse outer ring for the crown's "thousand petals"
+  if(n===7){ for(let i=0;i<16;i++) petals=`<ellipse cx="50" cy="9" rx="2.6" ry="6" fill="${color}" fill-opacity=".5" transform="rotate(${(i/16*360+11).toFixed(1)} 50 50)"/>`+petals; }
+  const glyph={
+    1:`<path d="M42 45 L58 45 L50 59 Z" fill="${color}"/>`,
+    2:`<path d="M44 45 a8.5 8.5 0 1 0 8 9 a6 6 0 1 1 -8 -9 Z" fill="${color}"/>`,
+    3:`<path d="M42 45 L58 45 L50 59 Z" fill="${color}"/>`,
+    4:`<path d="M42 47 L58 47 L50 59 Z" fill="none" stroke="${color}" stroke-width="2.4"/><path d="M42 55 L58 55 L50 43 Z" fill="none" stroke="${color}" stroke-width="2.4"/>`,
+    5:`<path d="M42 45 L58 45 L50 59 Z" fill="none" stroke="${color}" stroke-width="2.4"/><circle cx="50" cy="50" r="3.4" fill="${color}"/>`,
+    6:`<path d="M40 45 L60 45 L50 60 Z" fill="${color}"/>`,
+    7:`<circle cx="50" cy="50" r="4.6" fill="${color}"/>`
+  }[n];
+  return `<svg viewBox="0 0 100 100" style="width:100%;height:100%;display:block" role="img" aria-label="${n===7?'Crown':''} chakra symbol">
+    <circle cx="50" cy="50" r="20" fill="#fff"/><circle cx="50" cy="50" r="20" fill="${color}" fill-opacity=".16"/>
+    ${petals}
+    <circle cx="50" cy="50" r="18" fill="none" stroke="${color}" stroke-width="1.6" stroke-opacity=".55"/>
+    ${glyph}</svg>`;
+}
 VIEWS.chakras = () => `
   <section class="view">
     <span class="pill">Subtle energy</span>
@@ -1781,10 +1850,9 @@ VIEWS.chakras = () => `
         <div class="card" style="border-left:6px solid ${c.color}">
           <div class="row" style="justify-content:space-between;align-items:flex-start">
             <div class="row" style="gap:12px">
-              <span style="width:40px;height:40px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;color:#fff;font-weight:800;
-                background:radial-gradient(circle at 32% 30%, ${c.color}, ${c.color}cc);box-shadow:0 4px 12px ${c.color}66">${c.n}</span>
+              <span style="width:58px;height:58px;flex:0 0 auto;filter:drop-shadow(0 3px 8px ${c.color}55)">${chakraSymbol(c.color,c.n)}</span>
               <div>
-                <h3 style="margin:0">${c.name} Chakra</h3>
+                <h3 style="margin:0">${c.n}. ${c.name} Chakra</h3>
                 <p class="muted" style="margin:.1em 0 0;font-style:italic">${c.sk} · ${c.loc}</p>
               </div>
             </div>
@@ -1814,6 +1882,80 @@ VIEWS.chakras = () => `
     </div>
     <p class="disc" style="margin-top:16px">Chakras are part of yoga's traditional subtle-body philosophy, offered here for wellness and self-reflection — not medical treatment.</p>
   </section>`;
+
+/* ---------- On the Go ---------- */
+let ongoDosha=null;
+VIEWS.ongo = () => {
+  const dz=ongoDosha||store.dosha||"vata", g=ONGO[dz];
+  const list=arr=>`<ul style="margin:.3em 0 0;padding-left:18px">${arr.map(x=>`<li style="margin:6px 0">${x}</li>`).join("")}</ul>`;
+  return `<section class="view">
+    <span class="pill">Travel &amp; movement</span>
+    <h1>On the Go</h1>
+    <p class="lead">Staying balanced while travelling or on the move — eating, exercise and fitness tuned to your dosha.${store.dosha?"":" Take the dosha quiz to personalise this."}</p>
+    <div class="row" style="margin:16px 0">
+      ${["vata","pitta","kapha"].map(k=>`<button class="tab ${dz===k?'active':''}" onclick="setOngoDosha('${k}')"><span class="dosha-dot ${DOSHAS[k].cls}"></span>&nbsp;${DOSHAS[k].name}</button>`).join("")}
+    </div>
+    <div class="grid cols-3">
+      <div class="card" style="border-top:4px solid ${DOSHAS[dz].color}"><h3>🍽️ What to eat</h3>${list(g.eat)}</div>
+      <div class="card" style="border-top:4px solid ${DOSHAS[dz].color}"><h3>🧘 What to exercise</h3>${list(g.move)}</div>
+      <div class="card" style="border-top:4px solid ${DOSHAS[dz].color}"><h3>💪 How to stay fit</h3>${list(g.fit)}</div>
+    </div>
+    <p class="disc" style="margin-top:16px">General wellness guidance for ${DOSHAS[dz].name} — adjust to your needs and any medical advice.</p>
+  </section>`;
+};
+function setOngoDosha(k){ ongoDosha=k; go('ongo'); }
+
+/* ---------- How To-Now (time + dosha) ---------- */
+let hnDosha=null, hnTime=null;
+function nowHHMM(){ const d=new Date(); return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; }
+function hnPeriod(t){ const [h,m]=(t||"08:00").split(':').map(Number); const x=(h*60+(m||0));
+  if(x>=270&&x<420) return "early"; if(x>=420&&x<660) return "morning"; if(x>=660&&x<840) return "midday";
+  if(x>=840&&x<1020) return "afternoon"; if(x>=1020&&x<1260) return "evening"; return "night"; }
+VIEWS.hownow = () => {
+  const dz=hnDosha||store.dosha||"vata";
+  hnTime = hnTime || nowHHMM();
+  return `<section class="view">
+    <span class="pill">Right now</span>
+    <h1>How To-Now</h1>
+    <p class="lead">Enter a time and pick your dosha — get exactly what to eat, how to move and how to stay fit for that moment of the day.</p>
+    <div class="row" style="margin:16px 0">
+      ${["vata","pitta","kapha"].map(k=>`<button class="tab ${dz===k?'active':''}" onclick="setHnDosha('${k}')"><span class="dosha-dot ${DOSHAS[k].cls}"></span>&nbsp;${DOSHAS[k].name}</button>`).join("")}
+    </div>
+    <div class="card">
+      <div class="row" style="gap:10px;align-items:center">
+        <b>Time</b>
+        <input id="hnTime" type="time" value="${hnTime}" oninput="renderHnResult()"
+          style="font:inherit;padding:9px 11px;border:1.5px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink)"/>
+        <button class="btn ghost sm" onclick="hnNow()">Now</button>
+      </div>
+      <div class="row" style="margin-top:12px"><span class="muted" style="align-self:center">Or jump to:</span>
+        ${Object.entries(HOWNOW).map(([k,P])=>`<button class="tab" onclick="hnJump('${k}')">${P.label}</button>`).join("")}
+      </div>
+    </div>
+    <div id="hnResult" style="margin-top:8px"></div>
+  </section>`;
+};
+AFTER.hownow = () => renderHnResult();
+function setHnDosha(k){ hnDosha=k; go('hownow'); }
+function hnNow(){ hnTime=nowHHMM(); const i=document.getElementById('hnTime'); if(i) i.value=hnTime; renderHnResult(); }
+function hnJump(k){ const rep={early:"05:30",morning:"08:30",midday:"12:30",afternoon:"15:30",evening:"19:00",night:"22:00"}[k];
+  hnTime=rep; const i=document.getElementById('hnTime'); if(i) i.value=rep; renderHnResult(); }
+function renderHnResult(){
+  const el=document.getElementById('hnResult'); if(!el) return;
+  const dz=hnDosha||store.dosha||"vata";
+  const t=(document.getElementById('hnTime')&&document.getElementById('hnTime').value)||hnTime||nowHHMM(); hnTime=t;
+  const P=HOWNOW[hnPeriod(t)], dk={vata:"v",pitta:"p",kapha:"k"}[dz], col=DOSHAS[dz].color;
+  el.innerHTML=
+    `<div class="card" style="border-left:4px solid ${col};margin-top:12px">
+       <span class="pill">${P.label} · ${P.range}</span>
+       <p style="margin:.5em 0 0">For <b>${DOSHAS[dz].name}</b> at <b>${t}</b> (${P.label.toLowerCase()}):</p>
+     </div>
+     <div class="grid cols-3" style="margin-top:12px">
+       <div class="card" style="border-top:4px solid ${col}"><h3>🍽️ Eat</h3><p class="muted" style="margin:.3em 0 0">${P.eat[dk]}</p></div>
+       <div class="card" style="border-top:4px solid ${col}"><h3>🧘 Exercise</h3><p class="muted" style="margin:.3em 0 0">${P.move[dk]}</p></div>
+       <div class="card" style="border-top:4px solid ${col}"><h3>💪 Stay fit</h3><p class="muted" style="margin:.3em 0 0">${P.fit[dk]}</p></div>
+     </div>`;
+}
 
 /* ---------- Creators ---------- */
 VIEWS.creators = () => `
@@ -1976,7 +2118,9 @@ function logoMark(size){
   const rays=Array.from({length:16},(_,i)=>{const a=i*22.5*Math.PI/180;
     return `<line x1="${cxs}" y1="${cys}" x2="${(cxs+62*Math.cos(a)).toFixed(1)}" y2="${(cys+62*Math.sin(a)).toFixed(1)}" stroke="#fff0c2" stroke-width="${i%2?2:3.4}" stroke-linecap="round" stroke-opacity=".6"/>`;}).join("");
   // Aditi in Tree pose, as a warm dark silhouette backlit by the sun
-  const yogi=`<g transform="translate(10 3) scale(0.80)">${_figureShapes(9,"#123f39")}</g>`;
+  // seated meditation (Dhyaan mudra) — crossed legs, spine tall, hands resting on the knees
+  const DHYANA=[50,58,-90, 152,26, 28,154, 116,150, 64,30];
+  const yogi=`<g transform="translate(12 6) scale(0.76)">${_figureShapes(DHYANA,"#123f39")}</g>`;
   return `<svg class="logo" viewBox="0 0 100 100" width="${size}" height="${size}" role="img" aria-label="Yoga-Fi logo — sunrise yoga">
     <defs>
       <linearGradient id="${id}sky" x1="0" y1="0" x2="0" y2="1">
