@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#0f766e" />
-<title>Yogafy · Yoga & Ayurveda</title>
+<title>Yoga-Fi · Yoga & Ayurveda</title>
 <meta name="description" content="Personalised yoga and Ayurveda guided by your dosha — daily routines, dosha-aligned sequences, food & ritual tips, and breathing practices." />
 <style>
 :root{
@@ -226,7 +226,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-s
   <div class="wrap">
     <button class="menubtn" id="menuBtn" onclick="openNav()" aria-label="Open menu" aria-expanded="false">☰</button>
     <div class="brand" onclick="go('home')">
-      <span class="logoslot"></span><span>Yogafy</span>
+      <span class="logoslot"></span><span>Yoga-Fi</span>
     </div>
     <span class="cur" id="curTitle"></span>
   </div>
@@ -234,7 +234,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-s
 
 <aside class="sidebar" id="sidebar" aria-label="Sections">
   <div class="side-head">
-    <div class="brand" onclick="go('home')"><span class="logoslot"></span><span>Yogafy</span></div>
+    <div class="brand" onclick="go('home')"><span class="logoslot"></span><span>Yoga-Fi</span></div>
     <button class="menubtn" onclick="closeNav()" aria-label="Close menu">✕</button>
   </div>
   <nav class="tabs" id="tabs"></nav>
@@ -246,7 +246,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-s
 <main class="wrap" id="app"></main>
 
 <footer>
-  <div>Yogafy · Yoga &amp; Ayurveda — a self-contained demo experience.</div>
+  <div>Yoga-Fi · Yoga &amp; Ayurveda — a self-contained demo experience.</div>
   <div class="disc">Wellness &amp; educational content only. Ayurvedic and yoga guidance here is general and not a substitute for professional medical advice. Consult a qualified doctor or registered Ayurvedic practitioner before starting new practices, herbs, or diets — especially if pregnant, injured, or managing a health condition.</div>
 </footer>
 
@@ -254,7 +254,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-s
 
 <script>
 /* =========================================================
-   Yogafy — Yoga & Ayurveda  (single-file, no dependencies)
+   Yoga-Fi — Yoga & Ayurveda  (single-file, no dependencies)
    State persists in localStorage.
    ========================================================= */
 const LS_KEY = "sattva.v1";
@@ -929,7 +929,7 @@ VIEWS.home = () => {
       <span class="lotus">🪷</span>
       <span class="pill">Yoga · Ayurveda · Balance</span>
       <h1>Practice that fits<br/>your true nature.</h1>
-      <p class="lead">Yogafy blends yoga with Ayurveda — the ancient science of balance. Discover your <b>dosha</b>, then get daily routines, dosha-aligned sequences, food &amp; ritual guidance, and breathwork tuned to <em>you</em>.</p>
+      <p class="lead">Yoga-Fi blends yoga with Ayurveda — the ancient science of balance. Discover your <b>dosha</b>, then get daily routines, dosha-aligned sequences, food &amp; ritual guidance, and breathwork tuned to <em>you</em>.</p>
       <div class="row" style="margin-top:22px">
         ${d
           ? `<button class="btn" onclick="go('dosha')">Your type: ${d.name} ${d.emoji}</button>
@@ -953,7 +953,7 @@ VIEWS.home = () => {
       <div class="row" style="margin-top:10px"><button class="btn ghost sm" onclick="go('panchang')">Today's Panchang →</button><button class="btn ghost sm" onclick="go('food')">What to eat today →</button></div>
     </div>
 
-    <h2>How Yogafy works</h2>
+    <h2>How Yoga-Fi works</h2>
     <div class="grid cols-3">
       <div class="card"><div style="font-size:34px">🧭</div><h3>1 · Find your dosha</h3><p class="muted">A short quiz maps your Vata, Pitta &amp; Kapha balance — the foundation for everything else.</p></div>
       <div class="card"><div style="font-size:34px">🧘</div><h3>2 · Practice aligned</h3><p class="muted">Guided sequences and a daily routine chosen to bring your constitution back into balance.</p></div>
@@ -1697,9 +1697,9 @@ function openHerb(id){
 /* ---------- Creators ---------- */
 VIEWS.creators = () => `
   <section class="view">
-    <span class="pill">The people behind Yogafy</span>
+    <span class="pill">The people behind Yoga-Fi</span>
     <h1>Creators</h1>
-    <p class="lead">Yogafy is shaped by teachers who live these practices every day. Meet the creator guiding its yoga and Ayurveda.</p>
+    <p class="lead">Yoga-Fi is shaped by teachers who live these practices every day. Meet the creator guiding its yoga and Ayurveda.</p>
 
     <div class="card" style="margin-top:18px;display:flex;gap:22px;align-items:center;flex-wrap:wrap;
       background:radial-gradient(120% 140% at 90% 10%, color-mix(in srgb,var(--accent) 16%,transparent), transparent 60%), var(--panel)">
@@ -1760,9 +1760,9 @@ VIEWS.creators = () => `
 /* ---------- Premium ---------- */
 VIEWS.premium = () => `
   <section class="view">
-    <span class="pill">Yogafy Plus</span>
+    <span class="pill">Yoga-Fi Plus</span>
     <h1>Go deeper with premium</h1>
-    <p class="lead">Everything here is free. Yogafy Plus unlocks personalised, guided, and expert-led content — the kind of value that supports the practice long-term.</p>
+    <p class="lead">Everything here is free. Yoga-Fi Plus unlocks personalised, guided, and expert-led content — the kind of value that supports the practice long-term.</p>
 
     <div class="grid cols-3" style="margin-top:18px">
       <div class="card tier">
@@ -1773,7 +1773,7 @@ VIEWS.premium = () => `
       </div>
       <div class="card tier feat">
         <span class="ribbon">Popular</span>
-        <span class="pill">Yogafy Plus</span>
+        <span class="pill">Yoga-Fi Plus</span>
         <div class="price">$9<span style="font-size:16px" class="muted">/mo</span></div><p class="muted">or $79/yr</p>
         <ul>
           <li>AI plans that adapt to mood &amp; goals</li>
@@ -1783,7 +1783,7 @@ VIEWS.premium = () => `
           <li>Seasonal &amp; themed challenges</li>
           <li>Wellness journal</li>
         </ul>
-        <button class="btn" onclick="fakeBuy('Yogafy Plus')">${store.premium?'✓ Subscribed':'Start 7-day free trial'}</button>
+        <button class="btn" onclick="fakeBuy('Yoga-Fi Plus')">${store.premium?'✓ Subscribed':'Start 7-day free trial'}</button>
       </div>
       <div class="card tier">
         <span class="pill">Courses &amp; live</span>
@@ -1852,7 +1852,7 @@ function logoMark(size){
   const petal="M50 74 C41 61 41 41 50 25 C59 41 59 61 50 74 Z";
   const petals=[-52,-26,0,26,52].map((a,i)=>
     `<path class="l-petal" d="${petal}" transform="rotate(${a} 50 74)" fill="#ffffff" fill-opacity="${i===2?0.96:0.8}"/>`).join("");
-  return `<svg class="logo" viewBox="0 0 100 100" width="${size}" height="${size}" role="img" aria-label="Yogafy logo">
+  return `<svg class="logo" viewBox="0 0 100 100" width="${size}" height="${size}" role="img" aria-label="Yoga-Fi logo">
     <defs>
       <radialGradient id="${id}b" cx="38%" cy="30%" r="80%">
         <stop offset="0" style="stop-color:var(--brand-2)"/><stop offset="1" style="stop-color:var(--brand)"/>
@@ -1888,7 +1888,7 @@ function buildLanding(){
   const el=document.getElementById("landing"); if(!el) return;
   el.innerHTML=`<div class="lwrap">
     <div style="width:96px;height:96px">${logoMark(96)}</div>
-    <div class="land-title">Yogafy</div>
+    <div class="land-title">Yoga-Fi</div>
     <p class="land-sub">Where ancient yoga and Ayurveda meet your everyday — personalised to your body, season and rhythm.</p>
     <div class="land-figure" id="landFigure">${asanaFigure(9,false)}</div>
     <div class="feat-grid">
