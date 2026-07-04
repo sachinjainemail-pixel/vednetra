@@ -36,6 +36,8 @@ It opens on an animated **landing/intro** screen (animated lotus-and-sun logo, a
 - **Asanas** — an illustrated reference of **50 essential poses**, each drawn as a self-contained human-figure SVG (generated from a parametric pose engine), grouped into Standing/Balancing, Seated/Twisting and Backbends/Inversions, with Sanskrit name, benefit and how-to in a detail modal.
 - **Breathe** — breathing exercises / pranayama (box, 4·7·8, coherent, calming, energising, Nadi Shodhana, Bhramari, Sheetali) with a visual pacer.
 - **Meditate** — guided meditations (breath awareness, body scan, loving-kindness, yoga nidra, So-Hum, morning clarity) with a timed player, on-screen prompts and breathing anchor.
+- **7 Chakras** — the seven energy centres (root → crown), each colour-coded with its Sanskrit name, location, element, seed mantra, what it governs, signs of balance/imbalance, and how to **activate** it (pose + breath + practice).
+- **Creators** — Aditi Jain's profile. To show her photo, place a file named `aditi.jpg` next to `index.html` (the avatar falls back to an "AJ" monogram if it's absent).
 - **Panchang** — a computed daily Vedic almanac: tithi, nakshatra, yoga, karana, vara, moon phase and Rahu Kaal, with a daily alignment note (approximate; Lahiri ayanamsa).
 - **Ayurveda** — per-dosha foods to favour/reduce, herbs, daily rituals, and seasonal tips.
 - **Food** — "food to eat" guidance: what to eat right now by time of day, a full-day meal plan, tastes to favour, and a favour/reduce board per dosha.

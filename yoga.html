@@ -262,9 +262,10 @@ const store = Object.assign(
 );
 function save(){ localStorage.setItem(LS_KEY, JSON.stringify(store)); }
 
-/* Aditi Jain's profile photo — paste a data URI here (data:image/jpeg;base64,....) to show her face.
-   Left empty falls back to the "AJ" monogram avatar. */
-const ADITI_PHOTO = "";
+/* Aditi Jain's profile photo. By default it loads a file named "aditi.jpg" placed next to
+   index.html in the repo; if that file is missing it falls back to the "AJ" monogram.
+   You can also paste a data URI (data:image/jpeg;base64,....) here to embed the photo inline. */
+const ADITI_PHOTO = "aditi.jpg";
 
 const DOSHAS = {
   vata:  {key:"vata",  name:"Vata",  cls:"v", color:"var(--vata)",  elements:"Air & Ether", emoji:"🌬️",
@@ -671,6 +672,59 @@ const DRINKS = [
    benefits:"Cooling and probiotic; a traditional midday drink to aid digestion and calm Pitta."}
 ];
 
+/* ---------- The 7 Chakras ---------- */
+const CHAKRAS = [
+  {n:1, name:"Root", sk:"Muladhara", color:"#e5484d", loc:"Base of the spine", element:"Earth", bija:"LAM",
+   governs:"Safety, stability, grounding and your sense of survival and belonging.",
+   balanced:"Grounded, secure, calm, at home in your body.",
+   imbalance:"Anxiety, restlessness, insecurity, fatigue, feeling ungrounded.",
+   asana:"Mountain, Malasana (squat), Warrior I & II, Bridge",
+   breath:"Slow, deep belly breathing; long exhales",
+   activate:"Grounding standing poses, walking barefoot on the earth, root-down meditation, red/root foods, and chanting the seed sound LAM."},
+  {n:2, name:"Sacral", sk:"Svadhisthana", color:"#f76b15", loc:"Lower abdomen, below the navel", element:"Water", bija:"VAM",
+   governs:"Creativity, emotions, pleasure, and the ability to flow and adapt.",
+   balanced:"Creative, emotionally fluid, playful, comfortable with change.",
+   imbalance:"Emotional ups and downs, creative block, guilt, tight hips.",
+   asana:"Baddha Konasana (butterfly), Pigeon, Low Lunge, Goddess",
+   breath:"Flowing breath synced with gentle movement",
+   activate:"Hip-opening poses, fluid 'watery' movement, time near water, orange foods, and chanting VAM."},
+  {n:3, name:"Solar Plexus", sk:"Manipura", color:"#f5b301", loc:"Upper abdomen / navel", element:"Fire", bija:"RAM",
+   governs:"Confidence, willpower, personal power and digestion (agni).",
+   balanced:"Confident, motivated, disciplined, strong digestion.",
+   imbalance:"Low self-esteem, control issues, poor digestion, or over-domination.",
+   asana:"Boat, Plank, Warrior III, seated & twisting poses",
+   breath:"Kapalabhati (skull-shining) and Bhastrika (bellows)",
+   activate:"Core-building poses, twists, heating breathwork, sunlight, yellow foods, and chanting RAM."},
+  {n:4, name:"Heart", sk:"Anahata", color:"#2fab5a", loc:"Centre of the chest", element:"Air", bija:"YAM",
+   governs:"Love, compassion, connection and forgiveness.",
+   balanced:"Open-hearted, compassionate, connected, able to give and receive love.",
+   imbalance:"Grief, isolation, jealousy, difficulty trusting or forgiving.",
+   asana:"Cobra, Camel, Bridge, Wheel, Cow Face",
+   breath:"Smooth even breathing; coherent 5·5",
+   activate:"Chest-opening backbends, loving-kindness (metta) meditation, gentle pranayama, green foods, and chanting YAM."},
+  {n:5, name:"Throat", sk:"Vishuddha", color:"#2f97d6", loc:"Throat", element:"Ether / Space", bija:"HAM",
+   governs:"Communication, truth, and authentic self-expression.",
+   balanced:"Clear, honest expression; a good listener; speaks and lives their truth.",
+   imbalance:"Fear of speaking up, gossip, feeling unheard, throat tension.",
+   asana:"Shoulderstand, Fish, Plow, gentle neck stretches",
+   breath:"Bhramari (humming) and Ujjayi (ocean breath)",
+   activate:"Throat-opening poses, chanting and humming, honest journaling, blue foods, and the seed sound HAM."},
+  {n:6, name:"Third Eye", sk:"Ajna", color:"#4653c4", loc:"Between the eyebrows", element:"Light / Mind", bija:"OM",
+   governs:"Intuition, insight, imagination and clarity.",
+   balanced:"Clear-minded, intuitive, focused, trusting your inner wisdom.",
+   imbalance:"Overthinking, confusion, poor focus, or disconnection from intuition.",
+   asana:"Child's Pose (forehead down), Dolphin, forward folds",
+   breath:"Nadi Shodhana (alternate-nostril breathing)",
+   activate:"Stillness and meditation, Trataka (candle gazing), forehead-to-earth poses, and chanting OM."},
+  {n:7, name:"Crown", sk:"Sahasrara", color:"#8a52c9", loc:"Top of the head", element:"Consciousness", bija:"OM / silence",
+   governs:"Awareness, connection to something greater, and spiritual union.",
+   balanced:"Peaceful, aware, connected, a sense of unity and purpose.",
+   imbalance:"Disconnection, cynicism, apathy, or living only in the head.",
+   asana:"Headstand, Rabbit, Savasana, seated meditation",
+   breath:"Soft, silent, natural breath — or simply witnessing it",
+   activate:"Silent meditation, Savasana, cultivating stillness and surrender, and resting attention at the crown."}
+];
+
 /* ---------- Daily Panchang (computed) ---------- */
 const PANCHANG_NAMES = {
   tithi:["Pratipada","Dvitiya","Tritiya","Chaturthi","Panchami","Shashthi","Saptami","Ashtami","Navami","Dashami","Ekadashi","Dwadashi","Trayodashi","Chaturdashi","Purnima"],
@@ -886,15 +940,15 @@ const ASANA_GROUPS=[["all","All 50"],["stand","Standing & Balancing"],["seat","S
    ========================================================= */
 const TABS = [
   ["home","Home"],["dosha","My Dosha"],["panchang","Panchang"],["yoga","Yoga"],["asanas","Asanas"],
-  ["breathe","Breathe"],["meditate","Meditate"],
+  ["breathe","Breathe"],["meditate","Meditate"],["chakras","7 Chakras"],
   ["ayurveda","Ayurveda"],["food","Food"],["herbs","Herbs"],["drinks","Herbal Drinks"],["diy","DIYs"],["recipes","Recipes"],
   ["progress","Progress"],["premium","Premium"],["creators","Creators"]
 ];
 let current = "home";
-const NAV_ICONS={home:"🏠",dosha:"🧭",panchang:"🗓️",yoga:"🧘",asanas:"🤸",breathe:"🌬️",meditate:"🧠",ayurveda:"🌿",food:"🍽️",herbs:"🌱",drinks:"🍵",diy:"🫗",recipes:"🍲",progress:"📈",premium:"⭐",creators:"👩‍🏫"};
+const NAV_ICONS={home:"🏠",dosha:"🧭",panchang:"🗓️",yoga:"🧘",asanas:"🤸",breathe:"🌬️",meditate:"🧠",chakras:"🌀",ayurveda:"🌿",food:"🍽️",herbs:"🌱",drinks:"🍵",diy:"🫗",recipes:"🍲",progress:"📈",premium:"⭐",creators:"👩‍🏫"};
 const NAV_GROUPS=[
   ["Daily",["home","dosha","panchang"]],
-  ["Practice",["yoga","asanas","breathe","meditate"]],
+  ["Practice",["yoga","asanas","breathe","meditate","chakras"]],
   ["Ayurveda",["ayurveda","food","herbs","drinks","diy","recipes"]],
   ["You",["progress","premium"]],
   ["About",["creators"]]
@@ -1697,6 +1751,57 @@ function openHerb(id){
    </div></div>`);
 }
 
+/* ---------- 7 Chakras ---------- */
+VIEWS.chakras = () => `
+  <section class="view">
+    <span class="pill">Subtle energy</span>
+    <h1>The 7 Chakras</h1>
+    <p class="lead">Chakras are seven energy centres running from the base of the spine to the crown. When they flow freely you feel balanced, clear and alive; when blocked, energy stagnates. Yoga, breath and meditation help clear and <b>activate</b> each one.</p>
+
+    <div class="card" style="margin-top:16px">
+      <h3>How to activate your chakras</h3>
+      <p class="muted">Work upward from the root to the crown. For each centre, combine three things: a <b>posture</b> that opens the area, a <b>breath</b> that moves energy there, and its <b>seed sound (bija mantra)</b> chanted with attention on that spot. A little each day — plus meditation and a balanced Ayurvedic lifestyle — keeps the whole system flowing.</p>
+    </div>
+
+    <div class="grid" style="margin-top:16px">
+      ${CHAKRAS.map(c=>`
+        <div class="card" style="border-left:6px solid ${c.color}">
+          <div class="row" style="justify-content:space-between;align-items:flex-start">
+            <div class="row" style="gap:12px">
+              <span style="width:40px;height:40px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;color:#fff;font-weight:800;
+                background:radial-gradient(circle at 32% 30%, ${c.color}, ${c.color}cc);box-shadow:0 4px 12px ${c.color}66">${c.n}</span>
+              <div>
+                <h3 style="margin:0">${c.name} Chakra</h3>
+                <p class="muted" style="margin:.1em 0 0;font-style:italic">${c.sk} · ${c.loc}</p>
+              </div>
+            </div>
+            <span class="tag" style="border-color:${c.color};color:${c.color}">${c.bija}</span>
+          </div>
+          <p style="margin:.7em 0 .2em"><b>Governs:</b> <span class="muted">${c.governs}</span></p>
+          <div class="grid cols-2" style="gap:8px;margin-top:6px">
+            <div><span class="tag">Element · ${c.element}</span></div>
+            <div><span class="tag" style="border-color:${c.color}66">Seed sound · ${c.bija}</span></div>
+          </div>
+          <p style="margin:.7em 0 .2em"><b style="color:${c.color}">✓ Balanced:</b> <span class="muted">${c.balanced}</span></p>
+          <p style="margin:.2em 0"><b class="reduce">⚠ Out of balance:</b> <span class="muted">${c.imbalance}</span></p>
+          <div class="card" style="margin-top:8px;background:${c.color}12;border-color:${c.color}44">
+            <b>Activate it</b>
+            <p class="muted" style="margin:.3em 0 0">${c.activate}</p>
+            <div class="row" style="margin-top:8px">
+              <span class="tag">🧘 ${c.asana}</span>
+              <span class="tag">🌬️ ${c.breath}</span>
+            </div>
+          </div>
+        </div>`).join("")}
+    </div>
+
+    <div class="card" style="margin-top:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+      <div><h3 style="margin:0">Balance them through practice</h3><p class="muted" style="margin:.2em 0 0">Flow, breathe and sit — a little every day.</p></div>
+      <div class="row"><button class="btn ghost" onclick="go('asanas')">Poses →</button><button class="btn" onclick="go('meditate')">Meditate →</button></div>
+    </div>
+    <p class="disc" style="margin-top:16px">Chakras are part of yoga's traditional subtle-body philosophy, offered here for wellness and self-reflection — not medical treatment.</p>
+  </section>`;
+
 /* ---------- Creators ---------- */
 VIEWS.creators = () => `
   <section class="view">
@@ -1706,19 +1811,20 @@ VIEWS.creators = () => `
 
     <div class="card" style="margin-top:18px;display:flex;gap:22px;align-items:center;flex-wrap:wrap;
       background:radial-gradient(120% 140% at 90% 10%, color-mix(in srgb,var(--accent) 16%,transparent), transparent 60%), var(--panel)">
-      ${ADITI_PHOTO
-        ? `<img src="${ADITI_PHOTO}" alt="Aditi Jain" style="width:104px;height:104px;border-radius:50%;object-fit:cover;flex:0 0 auto;box-shadow:0 6px 18px rgba(0,0,0,.18)"/>`
-        : `<div style="width:104px;height:104px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;
-            color:#fff;font-weight:800;font-size:34px;letter-spacing:1px;
-            background:radial-gradient(circle at 32% 28%, var(--brand-2), var(--brand))">AJ</div>`}
+      <div style="width:104px;height:104px;flex:0 0 auto;position:relative;border-radius:50%;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.18)">
+        <div style="position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-weight:800;font-size:34px;letter-spacing:1px;
+          background:radial-gradient(circle at 32% 28%, var(--brand-2), var(--brand))">AJ</div>
+        ${ADITI_PHOTO?`<img src="${ADITI_PHOTO}" alt="Aditi Jain" onerror="this.style.display='none'"
+          style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"/>`:""}
+      </div>
       <div style="flex:1;min-width:220px">
         <h2 style="margin:0">Aditi Jain</h2>
         <p style="margin:.15em 0 0;color:var(--brand-2);font-weight:700">Founder &amp; Lead Creator</p>
         <p class="muted" style="margin:.15em 0 0">Yoga Teacher (500-hr RYT) · Ayurvedic Wellness Coach</p>
         <div class="row" style="margin-top:12px">
-          <span class="tag">🧘 12+ years teaching</span>
+          <span class="tag">🧘 7 years teaching</span>
           <span class="tag">🌿 Ayurvedic lifestyle</span>
-          <span class="tag">🌸 5,000+ students</span>
+          <span class="tag">🌸 250+ students</span>
         </div>
       </div>
     </div>
@@ -1726,8 +1832,8 @@ VIEWS.creators = () => `
     <div class="grid cols-2" style="margin-top:16px">
       <div class="card">
         <h3>Her journey</h3>
-        <p class="muted">Aditi's path began over a decade ago in the foothills of Rishikesh, where she trained in classical Hatha and Vinyasa yoga and immersed herself in the living tradition of Ayurveda. What started as a personal search for balance became a lifelong calling to help others feel at home in their bodies.</p>
-        <p class="muted">Since then she has led hundreds of workshops, retreats and teacher-training modules across India and online — always returning to the same idea: that yoga and Ayurveda are most powerful when they're practical, personal and woven into everyday life.</p>
+        <p class="muted">Aditi's path began seven years ago in the foothills of Rishikesh, where she trained in classical Hatha and Vinyasa yoga and immersed herself in the living tradition of Ayurveda. What started as a personal search for balance became a calling to help others feel at home in their bodies.</p>
+        <p class="muted">Since then she has guided more than 250 students through workshops, retreats and one-to-one programmes across India and online — always returning to the same idea: that yoga and Ayurveda are most powerful when they're practical, personal and woven into everyday life.</p>
       </div>
       <div class="card">
         <h3>Ayurveda &amp; yoga expertise</h3>
@@ -1748,8 +1854,8 @@ VIEWS.creators = () => `
     </div>
 
     <div class="grid cols-3" style="margin-top:16px">
-      <div class="card center"><b style="font-size:30px">12+</b><div class="muted">years of practice &amp; teaching</div></div>
-      <div class="card center"><b style="font-size:30px">300+</b><div class="muted">workshops &amp; retreats led</div></div>
+      <div class="card center"><b style="font-size:30px">7</b><div class="muted">years of practice &amp; teaching</div></div>
+      <div class="card center"><b style="font-size:30px">250+</b><div class="muted">students guided</div></div>
       <div class="card center"><b style="font-size:30px">500-hr</b><div class="muted">registered yoga teacher</div></div>
     </div>
 
