@@ -169,6 +169,55 @@ h3{margin:.2em 0 .4em}
 
 footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:14px}
 .disc{font-size:12px;color:var(--muted);max-width:70ch;margin-top:8px}
+
+/* ---------- animated logo ---------- */
+.logo{display:block}
+.logo .l-ring{transform-origin:50px 50px;animation:l-spin 22s linear infinite}
+.logo .l-sun{transform-origin:50px 54px;animation:l-glow 5s ease-in-out infinite}
+.logo .l-lotus{transform-origin:50px 74px;animation:l-breathe 5s ease-in-out infinite}
+.logo .l-petal{transform-origin:50px 74px}
+@keyframes l-spin{to{transform:rotate(360deg)}}
+@keyframes l-glow{0%,100%{opacity:.3;transform:scale(.9)}50%{opacity:.6;transform:scale(1.08)}}
+@keyframes l-breathe{0%,100%{transform:scale(.96)}50%{transform:scale(1.05)}}
+.logoslot{display:inline-flex;width:34px;height:34px}
+
+/* ---------- landing / intro ---------- */
+.landing{position:fixed;inset:0;z-index:300;overflow-y:auto;
+  background:
+   radial-gradient(90% 70% at 80% 0%, color-mix(in srgb,var(--brand) 30%,transparent), transparent 60%),
+   radial-gradient(90% 70% at 0% 100%, color-mix(in srgb,var(--accent) 26%,transparent), transparent 55%),
+   var(--bg);
+  opacity:1;transition:opacity .55s ease}
+.landing.gone{opacity:0;pointer-events:none}
+.landing .lwrap{max-width:960px;margin:0 auto;padding:38px 20px 60px;text-align:center;min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.land-title{font-size:clamp(40px,9vw,84px);font-weight:900;letter-spacing:-1px;margin:14px 0 0;
+  background:linear-gradient(120deg,var(--brand-2),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent}
+.land-sub{color:var(--muted);font-size:clamp(16px,2.4vw,21px);max-width:44ch;margin:10px auto 0}
+.land-figure{width:200px;height:200px;color:var(--brand-2);margin:6px auto -6px;
+  filter:drop-shadow(0 14px 26px color-mix(in srgb,var(--brand) 30%,transparent))}
+.land-figure svg{transition:opacity .5s ease}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;margin:26px 0 8px}
+@media(max-width:680px){.feat-grid{grid-template-columns:repeat(2,1fr)}}
+.feat{background:color-mix(in srgb,var(--panel) 78%,transparent);border:1px solid var(--line);border-radius:16px;
+  padding:16px 12px;backdrop-filter:blur(4px);animation:bob 5s ease-in-out infinite}
+.feat:nth-child(2){animation-delay:.5s}.feat:nth-child(3){animation-delay:1s}
+.feat:nth-child(4){animation-delay:1.5s}.feat:nth-child(5){animation-delay:.8s}.feat:nth-child(6){animation-delay:.3s}
+.feat .fi{width:52px;height:52px;margin:0 auto 8px;color:var(--brand-2)}
+.feat b{display:block;font-size:15px}
+.feat span{color:var(--muted);font-size:12px}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.enter-btn{margin-top:30px;font-size:18px;padding:16px 34px;letter-spacing:.5px;
+  box-shadow:0 14px 34px color-mix(in srgb,var(--brand) 40%,transparent);animation:pulse 2.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+.steam{animation:steam 2.4s ease-in-out infinite}
+.steam2{animation:steam 2.4s ease-in-out infinite .8s}
+@keyframes steam{0%{opacity:0;transform:translateY(3px)}40%{opacity:.7}100%{opacity:0;transform:translateY(-7px)}}
+.sway{transform-origin:50px 88px;animation:sway 4s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+.pulsecircle{transform-origin:center;animation:l-breathe 3.4s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){
+  .logo .l-ring,.logo .l-sun,.logo .l-lotus,.feat,.enter-btn,.steam,.steam2,.sway,.pulsecircle{animation:none}
+}
 </style>
 </head>
 <body>
@@ -177,7 +226,7 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-s
   <div class="wrap">
     <button class="menubtn" id="menuBtn" onclick="openNav()" aria-label="Open menu" aria-expanded="false">☰</button>
     <div class="brand" onclick="go('home')">
-      <span class="mark">☾</span><span>Yogify</span>
+      <span class="logoslot"></span><span>Yogify</span>
     </div>
     <span class="cur" id="curTitle"></span>
   </div>
@@ -185,12 +234,14 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-s
 
 <aside class="sidebar" id="sidebar" aria-label="Sections">
   <div class="side-head">
-    <div class="brand" onclick="go('home')"><span class="mark">☾</span><span>Yogify</span></div>
+    <div class="brand" onclick="go('home')"><span class="logoslot"></span><span>Yogify</span></div>
     <button class="menubtn" onclick="closeNav()" aria-label="Close menu">✕</button>
   </div>
   <nav class="tabs" id="tabs"></nav>
 </aside>
 <div class="scrim" id="scrim" onclick="closeNav()"></div>
+
+<div class="landing" id="landing"></div>
 
 <main class="wrap" id="app"></main>
 
@@ -569,6 +620,55 @@ const SERVICES = [
    bullets:["Meal-by-meal daily chart","Foods to favour & foods to reduce","Spice & herb pairings","Seasonal adjustment guide"], cta:"Get my chart"}
 ];
 
+/* ---------- Herbal drinks ---------- */
+const DRINKS = [
+  {id:"golden-milk-d", name:"Golden Milk", emoji:"🥛", dosha:"vata", time:"10 min", serves:"1", when:"Evening",
+   desc:"A warm, soothing turmeric latte that calms the body and supports restful sleep — grounding for Vata.",
+   ingredients:["1 cup milk (dairy or plant)","1/2 tsp turmeric","1 pinch black pepper","1/4 tsp cinnamon","1 pinch ginger","1 tsp honey (off heat)"],
+   steps:["Warm the milk gently.","Whisk in turmeric, pepper, cinnamon and ginger.","Simmer softly 3–4 minutes; don't boil hard.","Cool slightly, stir in honey and sip warm."],
+   benefits:"Anti-inflammatory and calming; black pepper boosts turmeric absorption."},
+  {id:"tulsi-tea", name:"Tulsi Tea", emoji:"🌿", dosha:"kapha", time:"7 min", serves:"2", when:"Morning",
+   desc:"An uplifting holy-basil infusion for stress, clear breathing and steady immunity.",
+   ingredients:["1 tbsp fresh tulsi leaves (or 1 tsp dried)","2 cups water","1 slice ginger","Honey to taste (off heat)"],
+   steps:["Boil water with ginger.","Add tulsi, cover and steep 5 minutes.","Strain, add honey once warm and sip."],
+   benefits:"Adaptogenic and immune-supporting; gently energising for Kapha."},
+  {id:"ccf-drink", name:"CCF Tea", emoji:"🫖", dosha:"all", time:"8 min", serves:"3 cups", when:"Between meals",
+   desc:"Cumin, coriander and fennel — the classic tri-doshic digestive that eases bloating.",
+   ingredients:["1/2 tsp cumin seeds","1/2 tsp coriander seeds","1/2 tsp fennel seeds","3 cups water"],
+   steps:["Boil the seeds in water.","Simmer 5 minutes.","Strain into a flask and sip warm through the day."],
+   benefits:"Kindles digestion and reduces bloating; safe daily for every dosha."},
+  {id:"kadha", name:"Immunity Kadha", emoji:"🍵", dosha:"kapha", time:"15 min", serves:"2", when:"Morning / cold days",
+   desc:"A warming Ayurvedic decoction of spices traditionally taken to support immunity in cold, damp weather.",
+   ingredients:["2 cups water","4 tulsi leaves","1/2 tsp grated ginger","2 cloves","1 small cinnamon stick","2 black peppercorns","Honey / jaggery to taste"],
+   steps:["Add all spices to water and bring to a boil.","Simmer until reduced by half (~8–10 min).","Strain, sweeten lightly once warm and sip.","Best warm and fresh."],
+   benefits:"Warming and decongesting; classic seasonal immune support. Ease off if Pitta/acidity is high."},
+  {id:"ginger-lemon", name:"Ginger–Lemon–Honey", emoji:"🍋", dosha:"kapha", time:"6 min", serves:"1", when:"Morning",
+   desc:"A bright, warming morning tonic to wake up digestion and refresh the system.",
+   ingredients:["1 cup hot water","2 thin slices fresh ginger","1 tsp lemon juice","1 tsp honey (off heat)"],
+   steps:["Steep ginger in hot water 5 minutes.","Add lemon juice.","Once warm (not boiling), stir in honey and sip."],
+   benefits:"Stimulating and cleansing; a gentle metabolism wake-up for Kapha mornings."},
+  {id:"moon-milk", name:"Ashwagandha Moon Milk", emoji:"🌙", dosha:"vata", time:"10 min", serves:"1", when:"Before bed",
+   desc:"A calming bedtime milk with ashwagandha and warming spices to settle the mind for sleep.",
+   ingredients:["1 cup warm milk (dairy or plant)","1/2 tsp ashwagandha powder","1/4 tsp cinnamon","1 pinch nutmeg","1 pinch cardamom","1 tsp honey (off heat)"],
+   steps:["Warm the milk gently.","Whisk in ashwagandha and spices.","Simmer softly 3 minutes.","Cool slightly, add honey and sip before bed."],
+   benefits:"Ashwagandha is a grounding adaptogen; nutmeg supports sleep. Avoid ashwagandha in pregnancy."},
+  {id:"mint-cooler", name:"Mint–Fennel Cooler", emoji:"🥤", dosha:"pitta", time:"10 min + chill", serves:"2", when:"Afternoon (warm days)",
+   desc:"A cooling, refreshing drink to soothe summer heat and calm an overheated Pitta.",
+   ingredients:["2 cups water","1 tsp fennel seeds","10 fresh mint leaves","1 tsp lime juice","A little maple or rock sugar"],
+   steps:["Boil water with fennel, then cool.","Blend or steep with mint leaves.","Strain, add lime and a touch of sweetness.","Serve cool (not ice-cold)."],
+   benefits:"Cooling and calming for Pitta; fennel and mint settle digestion and refresh."},
+  {id:"jeera-water", name:"Jeera (Cumin) Water", emoji:"💧", dosha:"all", time:"5 min + steep", serves:"3 cups", when:"Through the day",
+   desc:"Simple cumin-infused water — a light daily drink to support digestion and hydration.",
+   ingredients:["1 tsp cumin seeds","3 cups water"],
+   steps:["Dry-roast the cumin lightly for aroma (optional).","Boil in water and simmer 3 minutes.","Steep 10 minutes, strain and sip warm or at room temperature."],
+   benefits:"Gently supports digestion and metabolism; light enough for daily use by any dosha."},
+  {id:"rose-lassi", name:"Rose Lassi", emoji:"🌸", dosha:"pitta", time:"8 min", serves:"2", when:"With lunch",
+   desc:"A cooling rose-scented yogurt drink that soothes digestion and calms the heat of Pitta.",
+   ingredients:["1 cup plain yogurt","1 cup cool water","1 tbsp rose water","1 tsp honey or sugar","1 pinch cardamom"],
+   steps:["Whisk yogurt and water until smooth.","Stir in rose water, sweetener and cardamom.","Serve cool with lunch."],
+   benefits:"Cooling and probiotic; a traditional midday drink to aid digestion and calm Pitta."}
+];
+
 /* ---------- Daily Panchang (computed) ---------- */
 const PANCHANG_NAMES = {
   tithi:["Pratipada","Dvitiya","Tritiya","Chaturthi","Panchami","Shashthi","Saptami","Ashtami","Navami","Dashami","Ekadashi","Dwadashi","Trayodashi","Chaturdashi","Purnima"],
@@ -768,15 +868,15 @@ const ASANA_GROUPS=[["all","All 50"],["stand","Standing & Balancing"],["seat","S
 const TABS = [
   ["home","Home"],["dosha","My Dosha"],["panchang","Panchang"],["yoga","Yoga"],["asanas","Asanas"],
   ["breathe","Breathe"],["meditate","Meditate"],
-  ["ayurveda","Ayurveda"],["food","Food"],["herbs","Herbs"],["diy","DIYs"],["recipes","Recipes"],
+  ["ayurveda","Ayurveda"],["food","Food"],["herbs","Herbs"],["drinks","Herbal Drinks"],["diy","DIYs"],["recipes","Recipes"],
   ["progress","Progress"],["premium","Premium"],["creators","Creators"]
 ];
 let current = "home";
-const NAV_ICONS={home:"🏠",dosha:"🧭",panchang:"🗓️",yoga:"🧘",asanas:"🤸",breathe:"🌬️",meditate:"🧠",ayurveda:"🌿",food:"🍽️",herbs:"🌱",diy:"🫗",recipes:"🍲",progress:"📈",premium:"⭐",creators:"👩‍🏫"};
+const NAV_ICONS={home:"🏠",dosha:"🧭",panchang:"🗓️",yoga:"🧘",asanas:"🤸",breathe:"🌬️",meditate:"🧠",ayurveda:"🌿",food:"🍽️",herbs:"🌱",drinks:"🍵",diy:"🫗",recipes:"🍲",progress:"📈",premium:"⭐",creators:"👩‍🏫"};
 const NAV_GROUPS=[
   ["Daily",["home","dosha","panchang"]],
   ["Practice",["yoga","asanas","breathe","meditate"]],
-  ["Ayurveda",["ayurveda","food","herbs","diy","recipes"]],
+  ["Ayurveda",["ayurveda","food","herbs","drinks","diy","recipes"]],
   ["You",["progress","premium"]],
   ["About",["creators"]]
 ];
@@ -1396,14 +1496,46 @@ VIEWS.recipes = () => `
     <p class="disc" style="margin-top:16px">General wellness recipes — adjust for allergies and dietary needs, and consult a professional for medical or therapeutic diets.</p>
   </section>`;
 
-/* ---------- Shared detail modal (DIY / recipe) ---------- */
+/* ---------- Herbal drinks ---------- */
+let drinkFilter="all";
+VIEWS.drinks = () => {
+  const filters=[["all","All"],["vata","Vata"],["pitta","Pitta"],["kapha","Kapha"]];
+  const list = drinkFilter==="all" ? DRINKS : DRINKS.filter(d=>d.dosha===drinkFilter||d.dosha==="all");
+  return `<section class="view">
+    <span class="pill">Sip your way to balance</span>
+    <h1>Herbal drinks</h1>
+    <p class="lead">Teas, tonics and infusions from the Ayurvedic kitchen — each one chosen to warm, cool, calm or energise. Tap a drink for the full recipe, timing and benefits.</p>
+    <div class="row" style="margin:16px 0">
+      ${filters.map(([k,l])=>`<button class="tab ${drinkFilter===k?'active':''}" onclick="setDrink('${k}')">${l}</button>`).join("")}
+    </div>
+    <div class="grid cols-3">
+      ${list.map(d=>{
+        const tagd = d.dosha!=="all" ? `<span class="row" style="gap:6px"><span class="dosha-dot ${DOSHAS[d.dosha].cls}"></span>${DOSHAS[d.dosha].name}</span>` : `<span class="tag">All doshas</span>`;
+        return `<div class="card" style="cursor:pointer" onclick="openDetail('drink','${d.id}')">
+          <div style="font-size:34px">${d.emoji}</div>
+          <h3 style="margin:.3em 0 .2em">${d.name}</h3>
+          <p class="muted" style="margin:.2em 0">${d.desc}</p>
+          <div class="row" style="margin-top:10px">${tagd}<span class="tag">🕐 ${d.when}</span></div>
+        </div>`;
+      }).join("")}
+    </div>
+    <p class="disc" style="margin-top:16px">Herbs and spices can interact with medications, conditions and pregnancy — check with a qualified practitioner before making any drink a daily habit. Never add honey to boiling liquid.</p>
+  </section>`;
+};
+function setDrink(k){ drinkFilter=k; go('drinks'); }
+
+/* ---------- Shared detail modal (DIY / recipe / drink) ---------- */
 function openDetail(kind, id){
-  const item = kind==="diy" ? DIYS.find(x=>x.id===id) : RECIPES.find(x=>x.id===id);
+  const item = kind==="diy" ? DIYS.find(x=>x.id===id)
+    : kind==="drink" ? DRINKS.find(x=>x.id===id)
+    : RECIPES.find(x=>x.id===id);
   if(!item) return;
   const ing = item.ingredients||[];
   const steps = item.steps||[];
   const meta = kind==="diy"
     ? `<span class="tag">⏱ ${item.time}</span>`
+    : kind==="drink"
+    ? `<span class="tag">⏱ ${item.time}</span><span class="tag">🍽 ${item.serves}</span>${item.when?`<span class="tag">🕐 ${item.when}</span>`:""}`
     : `<span class="tag">⏱ ${item.time}</span><span class="tag">🍽 ${item.serves}</span>`;
   const doshaTag = item.dosha!=="all"
     ? `<span class="row" style="gap:6px"><span class="dosha-dot ${DOSHAS[item.dosha].cls}"></span>${DOSHAS[item.dosha].name}</span>`
@@ -1695,10 +1827,79 @@ function fakeBuy(what){
 }
 function unlockDemo(el){ store.premium=true; save(); el.closest('.modal').remove(); go('premium'); toast("Premium preview unlocked ✨"); }
 
+/* ---------- animated logo (lotus + sun badge) ---------- */
+let _logoN=0;
+function logoMark(size){
+  const id="lg"+(_logoN++);
+  const petal="M50 74 C41 61 41 41 50 25 C59 41 59 61 50 74 Z";
+  const petals=[-52,-26,0,26,52].map((a,i)=>
+    `<path class="l-petal" d="${petal}" transform="rotate(${a} 50 74)" fill="#ffffff" fill-opacity="${i===2?0.96:0.8}"/>`).join("");
+  return `<svg class="logo" viewBox="0 0 100 100" width="${size}" height="${size}" role="img" aria-label="Yogify logo">
+    <defs>
+      <radialGradient id="${id}b" cx="38%" cy="30%" r="80%">
+        <stop offset="0" style="stop-color:var(--brand-2)"/><stop offset="1" style="stop-color:var(--brand)"/>
+      </radialGradient>
+    </defs>
+    <circle cx="50" cy="50" r="48" fill="url(#${id}b)"/>
+    <circle class="l-ring" cx="50" cy="50" r="43" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="1.4" stroke-dasharray="3 7" stroke-linecap="round"/>
+    <circle class="l-sun" cx="50" cy="40" r="15" fill="var(--accent)" fill-opacity=".55"/>
+    <g class="l-lotus">${petals}<circle cx="50" cy="74" r="3.4" fill="var(--accent)"/></g>
+  </svg>`;
+}
+function paintLogos(){ document.querySelectorAll(".logoslot").forEach(el=>{ el.innerHTML=logoMark(34); }); }
+
+/* ---------- landing / intro screen ---------- */
+const FEAT_ICONS={
+  dosha:`<svg viewBox="0 0 100 100" class="fi"><circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" stroke-width="5" stroke-opacity=".3"/><g class="l-ring" style="transform-origin:50px 50px"><circle cx="50" cy="20" r="7" fill="currentColor"/></g><circle cx="50" cy="50" r="6" fill="currentColor"/></svg>`,
+  asana:`<svg viewBox="0 0 100 100" class="fi" id="__feat_asana"></svg>`,
+  breath:`<svg viewBox="0 0 100 100" class="fi"><circle class="pulsecircle" cx="50" cy="50" r="26" fill="currentColor" fill-opacity=".18"/><circle class="pulsecircle" cx="50" cy="50" r="15" fill="currentColor"/></svg>`,
+  drink:`<svg viewBox="0 0 100 100" class="fi"><path class="steam" d="M40 22 q6 -8 0 -16" stroke="currentColor" stroke-width="3.5" fill="none" stroke-linecap="round"/><path class="steam2" d="M56 22 q6 -8 0 -16" stroke="currentColor" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M28 34 h44 v16 a22 22 0 0 1 -44 0 Z" fill="currentColor"/><path d="M72 36 h8 a8 8 0 0 1 0 16 h-6" fill="none" stroke="currentColor" stroke-width="5"/><rect x="30" y="74" width="40" height="6" rx="3" fill="currentColor"/></svg>`,
+  herb:`<svg viewBox="0 0 100 100" class="fi"><g class="sway"><path d="M50 88 V44" stroke="currentColor" stroke-width="5" stroke-linecap="round"/><path d="M50 52 C34 50 26 38 30 26 C46 28 54 40 50 52 Z" fill="currentColor"/><path d="M50 66 C66 64 74 52 70 40 C54 42 46 54 50 66 Z" fill="currentColor" fill-opacity=".85"/></g></svg>`,
+  panchang:`<svg viewBox="0 0 100 100" class="fi"><circle cx="50" cy="50" r="26" fill="currentColor" fill-opacity=".18"/><path d="M50 24 a26 26 0 1 0 18 44 a20 20 0 1 1 -18 -44 Z" fill="currentColor"/><g class="l-ring" style="transform-origin:50px 50px"><circle cx="50" cy="16" r="4" fill="currentColor"/></g></svg>`
+};
+const FEATURES=[
+  ["dosha","Your Dosha","A quiz that personalises everything"],
+  ["asana","50 Asanas","Illustrated pose-by-pose guide"],
+  ["breath","Breathe & Meditate","Guided pranayama and calm"],
+  ["drink","Food & Herbal Drinks","Eat and sip for your type"],
+  ["herb","Ayurveda & Herbs","Rituals, remedies and tips"],
+  ["panchang","Daily Panchang","Live in rhythm with the day"]
+];
+let _poseTimer=null;
+function buildLanding(){
+  const el=document.getElementById("landing"); if(!el) return;
+  el.innerHTML=`<div class="lwrap">
+    <div style="width:96px;height:96px">${logoMark(96)}</div>
+    <div class="land-title">Yogify</div>
+    <p class="land-sub">Where ancient yoga and Ayurveda meet your everyday — personalised to your body, season and rhythm.</p>
+    <div class="land-figure" id="landFigure">${asanaFigure(9,false)}</div>
+    <div class="feat-grid">
+      ${FEATURES.map(([k,t,s])=>`<div class="feat"><div class="fi">${FEAT_ICONS[k]}</div><b>${t}</b><span>${s}</span></div>`).join("")}
+    </div>
+    <button class="btn enter-btn" onclick="enterApp()">Enter the healthy world →</button>
+  </div>`;
+  // inject a live yoga figure into the asana feature tile
+  const at=document.getElementById("__feat_asana"); if(at) at.outerHTML=asanaFigure(4,false).replace('class="','class="fi ');
+  // cycle the big hero figure through a series of poses = a "dynamic image"
+  const seq=[9,4,6,1,26,36,2,16,23,46];
+  let i=0;
+  clearInterval(_poseTimer);
+  _poseTimer=setInterval(()=>{
+    const f=document.getElementById("landFigure"); if(!f){ clearInterval(_poseTimer); return; }
+    i=(i+1)%seq.length; f.innerHTML=asanaFigure(seq[i],false);
+  },1700);
+}
+function enterApp(){
+  const el=document.getElementById("landing");
+  if(el){ el.classList.add("gone"); setTimeout(()=>{ el.remove(); clearInterval(_poseTimer); },600); }
+  openNav();   // reveal the sections once inside
+}
+
 /* ---------- boot ---------- */
 renderTabs();
 go('home');
-openNav();   // show the sidebar on first load so all sections are visible; it auto-hides on selection
+paintLogos();
+buildLanding();
 
 /* register the site's service worker if present (offline support) */
 if('serviceWorker' in navigator){ try{ navigator.serviceWorker.register('service-worker.js').catch(()=>{}); }catch(e){} }

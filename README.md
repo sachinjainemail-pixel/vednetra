@@ -28,7 +28,7 @@ Birth chart (D-1) + all divisional charts to D-60, Vimshottari dasha (down to Pr
 
 `yoga.html` is a separate, self-contained single-file app (inline CSS + JS, no build, no dependencies). Open it directly at `/yoga.html`.
 
-It personalises yoga around your Ayurvedic **dosha**. Sections are reached from a left **sidebar** (☰ menu) that auto-hides when you pick one:
+It opens on an animated **landing/intro** screen (animated lotus-and-sun logo, a cycling yoga figure and animated feature tiles) with an **“Enter the healthy world”** button. Inside, sections are reached from a left **sidebar** (☰ menu) that auto-hides when you pick one:
 
 - **Dosha quiz** — a 10-question quiz maps your Vata / Pitta / Kapha balance.
 - **My Dosha** — your constitution with balance meters, a rebalancing plan, and a daily routine (dinacharya).
@@ -42,6 +42,7 @@ It personalises yoga around your Ayurvedic **dosha**. Sections are reached from 
 - **Herbs** — a herbal-recommendations library (ashwagandha, triphala, brahmi, turmeric, tulsi, ginger, amla, shatavari, trikatu, licorice) with benefits, usage and cautions in a detail modal.
 - **DIYs** — Ayurvedic home remedies (abhyanga oil, ubtan mask, tongue scraping + oil pulling, hair oil, dry brushing, CCF tea) with ingredients, steps and cautions.
 - **Recipes** — dosha-friendly health recipes (kitchari, golden milk, CCF tea, stewed apples, mung soup, ojas balls) with ingredients and method.
+- **Herbal Drinks** — teas, tonics and infusions (golden milk, tulsi tea, CCF tea, immunity kadha, ginger–lemon–honey, ashwagandha moon milk, mint–fennel cooler, jeera water, rose lassi) with recipe, timing and benefits, filterable by dosha.
 - **Ayurvedic tip of the day** — a rotating daily tip featured on the Home screen and the Panchang view.
 - **Premium services** — 1:1 expert counselling, a 21-day diet program, a one-day workshop, and a customised diet chart, alongside the freemium tiers (demo only).
 - **Progress** — sessions, minutes, day streak, and a 3-week activity heatmap (stored in `localStorage`; nothing is uploaded).
