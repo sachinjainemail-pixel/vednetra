@@ -20,11 +20,11 @@ Birth chart (D-1) + all divisional charts to D-60, Vimshottari dasha (down to Pr
 | `.nojekyll` | Tells GitHub Pages to serve files as-is (skip Jekyll) |
 | `.gitignore` | Ignores OS / editor junk |
 | `.github/workflows/deploy.yml` | Auto-deploys to GitHub Pages on every push to `main` |
-| `yoga.html` | **Yogify** — a standalone Yoga & Ayurveda app (self-contained; open directly) |
+| `yoga.html` | **Yogafy** — a standalone Yoga & Ayurveda app (self-contained; open directly) |
 
 ---
 
-## Yogify — Yoga &amp; Ayurveda app
+## Yogafy — Yoga &amp; Ayurveda app
 
 `yoga.html` is a separate, self-contained single-file app (inline CSS + JS, no build, no dependencies). Open it directly at `/yoga.html`.
 
@@ -46,7 +46,7 @@ It opens on an animated **landing/intro** screen (animated lotus-and-sun logo, a
 - **Ayurvedic tip of the day** — a rotating daily tip featured on the Home screen and the Panchang view.
 - **Premium services** — 1:1 expert counselling, a 21-day diet program, a one-day workshop, and a customised diet chart, alongside the freemium tiers (demo only).
 - **Progress** — sessions, minutes, day streak, and a 3-week activity heatmap (stored in `localStorage`; nothing is uploaded).
-- **Premium** — a freemium tier layout (Yogify Plus subscription, one-time courses like a *30-Day Dosha Reset*, live sessions) illustrating monetisation. Demo only — no real payments.
+- **Premium** — a freemium tier layout (Yogafy Plus subscription, one-time courses like a *30-Day Dosha Reset*, live sessions) illustrating monetisation. Demo only — no real payments.
 - **Creators** — a creator profile for **Aditi Jain** (founder & lead creator) with her Ayurveda & yoga background, expertise and highlights.
 
 All wellness content is educational and not a substitute for professional medical advice.
