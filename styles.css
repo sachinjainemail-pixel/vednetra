@@ -8405,3 +8405,151 @@ body.report-active::before { height: var(--vn-topbar-h, 150px) !important; }
   margin-bottom: 9px !important;
   padding-bottom: 6px !important;
 }
+
+/* =========================================================================
+   v60 — LEFT AUTO-HIDE NAV SIDEBAR + moderate chart spacing
+   ========================================================================= */
+
+/* ---- Chart spacing: charts were stretching to fill the row and drifting far
+   apart. Cap chart panels to a moderate width, pack them from the left, and
+   use a modest gap so neighbouring charts sit close without crowding. ------- */
+#chartDataReportView .report-grid:has(.chart-panel),
+#chartDataReportView .sudarshan-grid,
+#chartDataReportView .transit-chart-grid,
+#chartDataReportView .varshfal-grid,
+#chartDataReportView .kp-chart-grid,
+#chartDataReportView .compatibility-chart-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 330px)) !important;
+  justify-content: start !important;
+  gap: 12px !important;
+}
+/* keep the single featured/top chart from ballooning to the full panel width */
+#chartDataReportView .chart-panel-featured { max-width: 460px; }
+
+/* ---- Left drawer: the section ribbon, pinned vertically to the left edge,
+   tucked off-screen until hovered or toggled. -------------------------------- */
+:root { --vn-drawer-w: 264px; }
+
+body.vn-nav-left #chartDataNavRibbon.chart-data-nav {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  width: var(--vn-drawer-w) !important;
+  max-width: 86vw !important;
+  margin: 0 !important;
+  z-index: 1400 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-content: start !important;
+  gap: 6px !important;
+  grid-template-columns: none !important;
+  padding: 14px 12px 20px !important;
+  border-radius: 0 12px 12px 0 !important;
+  border-left: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  transform: translateX(-102%);
+  transition: transform 0.22s ease;
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+}
+body.vn-nav-left.vn-nav-open #chartDataNavRibbon.chart-data-nav {
+  transform: translateX(0);
+  box-shadow: 8px 0 32px rgba(0, 0, 0, 0.5);
+}
+
+/* categories stack; their action lists expand inline as an accordion instead
+   of floating as absolute dropdowns (which would overflow a narrow drawer) */
+body.vn-nav-left #chartDataNavRibbon .nav-category { width: 100%; }
+body.vn-nav-left #chartDataNavRibbon .nav-category-title {
+  text-align: left !important;
+  min-height: 32px !important;
+  padding: 8px 10px !important;
+}
+body.vn-nav-left #chartDataNavRibbon .nav-category-actions {
+  position: static !important;
+  display: none;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 4px 0 6px 8px !important;
+  padding: 4px 0 4px 8px !important;
+  border: 0 !important;
+  border-left: 2px solid rgba(200, 168, 78, 0.4) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  gap: 3px !important;
+}
+body.vn-nav-left #chartDataNavRibbon .nav-category-open .nav-category-actions {
+  display: flex !important;
+}
+body.vn-nav-left #chartDataNavRibbon .nav-category-actions button {
+  text-align: left !important;
+  width: 100% !important;
+  min-height: 30px !important;
+  font-size: 12px !important;
+}
+/* the mobile drilldown <select> is redundant with the accordion drawer */
+body.vn-nav-left #chartDataNavRibbon .mobile-drilldown-label { display: none !important; }
+body.vn-nav-left #chartDataNavRibbon #mobileHomeBtn {
+  display: inline-flex !important;
+  order: -1;
+  margin: 0 0 8px !important;
+}
+
+/* ---- Floating handle + edge hot-strip (only while a report is on screen) -- */
+.vn-nav-handle, .vn-nav-edge { display: none; }
+body.report-active.vn-nav-left .vn-nav-handle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1401;
+  padding: 10px 12px 10px 9px;
+  border: 1px solid rgba(200, 168, 78, 0.7);
+  border-left: 0;
+  border-radius: 0 12px 12px 0;
+  background: linear-gradient(180deg, rgba(30, 32, 56, 0.97), rgba(22, 24, 46, 0.97));
+  color: #e7c477;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  box-shadow: 3px 0 14px rgba(0, 0, 0, 0.4);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transition: left 0.22s ease, background 0.2s ease;
+}
+body.report-active.vn-nav-left .vn-nav-handle .vn-nav-handle-ico {
+  writing-mode: horizontal-tb;
+  font-size: 15px;
+}
+body.vn-nav-open .vn-nav-handle { left: var(--vn-drawer-w) !important; }
+body.report-active.vn-nav-left .vn-nav-edge {
+  display: block;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 14px;
+  height: 100vh;
+  height: 100dvh;
+  z-index: 1399;
+}
+
+/* On phones the drawer takes most of the width; keep it usable */
+@media (max-width: 560px) {
+  :root { --vn-drawer-w: 250px; }
+  body.report-active.vn-nav-left .vn-nav-handle {
+    writing-mode: horizontal-tb;
+    top: auto;
+    bottom: 14px;
+    transform: none;
+    border-radius: 0 12px 12px 0;
+  }
+}

@@ -554,6 +554,7 @@
       wireButtonInteractionPolish();
       wireMobileAccessInfo();
       registerServiceWorker();
+      try { vnWireLeftNav(); } catch (e) {}
       try { vnWireTopbarLayout(); } catch (e) {}
       // ---- VedNetra tools: language, nav labels, onboarding, home chart ----
       try {
@@ -2811,13 +2812,85 @@
       var bar = document.getElementById("chartInputLayoutBar");
       var navShown = nav && !nav.classList.contains("hidden") && nav.getBoundingClientRect().height > 0;
       var barShown = bar && !bar.classList.contains("hidden") && bar.getBoundingClientRect().height > 0;
-      var navH = navShown ? nav.getBoundingClientRect().height : 0;
+      // In left-sidebar mode the nav is a fixed drawer down the left edge, so it
+      // no longer occupies any space at the TOP — the toolbar/content start at 0.
+      var leftMode = document.body && document.body.classList.contains("vn-nav-left");
+      var navH = (navShown && !leftMode) ? nav.getBoundingClientRect().height : 0;
       var barH = barShown ? bar.getBoundingClientRect().height : 0;
       var root = document.documentElement.style;
       root.setProperty("--vn-nav-h", Math.round(navH) + "px");
       root.setProperty("--vn-topbar-h", Math.round(navH + barH + 16) + "px");
     } catch (e) {}
   }
+  // ---- Left auto-hide navigation sidebar ---------------------------------
+  // Turns the horizontal section ribbon into a vertical drawer pinned to the
+  // left edge that stays tucked away until the user hovers the edge or taps the
+  // handle, then slides out. Reclaims the whole top strip for chart content.
+  var vnLeftNavWired = false;
+  function vnCloseLeftNav() {
+    if (document.body) document.body.classList.remove("vn-nav-open");
+  }
+  function vnOpenLeftNav() {
+    if (document.body) document.body.classList.add("vn-nav-open");
+  }
+  function vnWireLeftNav() {
+    if (vnLeftNavWired || typeof document === "undefined" || !document.body) return;
+    vnLeftNavWired = true;
+    document.body.classList.add("vn-nav-left");
+
+    var ribbon = document.getElementById("chartDataNavRibbon");
+
+    // Floating handle button that toggles the drawer (always reachable).
+    var handle = document.createElement("button");
+    handle.type = "button";
+    handle.id = "vnNavHandle";
+    handle.className = "vn-nav-handle";
+    handle.setAttribute("aria-label", "Sections menu");
+    handle.innerHTML = '<span class="vn-nav-handle-ico">&#9776;</span><span class="vn-nav-handle-txt">Sections</span>';
+    handle.addEventListener("click", function (e) {
+      e.preventDefault();
+      if (document.body.classList.contains("vn-nav-open")) vnCloseLeftNav();
+      else vnOpenLeftNav();
+    });
+    document.body.appendChild(handle);
+
+    // Thin invisible hot-strip along the very left edge: hovering it opens the
+    // drawer, so it behaves like a true auto-hide sidebar on desktop.
+    var edge = document.createElement("div");
+    edge.className = "vn-nav-edge";
+    edge.setAttribute("aria-hidden", "true");
+    edge.addEventListener("mouseenter", vnOpenLeftNav);
+    document.body.appendChild(edge);
+
+    if (ribbon) {
+      // Leaving the drawer with the pointer tucks it away again.
+      var closeTimer = null;
+      ribbon.addEventListener("mouseleave", function () {
+        if (closeTimer) clearTimeout(closeTimer);
+        closeTimer = setTimeout(vnCloseLeftNav, 220);
+      });
+      ribbon.addEventListener("mouseenter", function () {
+        if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
+      });
+      // Picking any destination closes the drawer.
+      ribbon.addEventListener("click", function (e) {
+        var t = e.target && e.target.closest ? e.target.closest("[data-view-a-target],[data-chart-setup-action]") : null;
+        if (t) setTimeout(vnCloseLeftNav, 60);
+      });
+    }
+
+    // Escape key and clicks outside the drawer dismiss it.
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") vnCloseLeftNav();
+    });
+    document.addEventListener("click", function (e) {
+      if (!document.body.classList.contains("vn-nav-open")) return;
+      var insideNav = ribbon && ribbon.contains(e.target);
+      var onHandle = e.target && e.target.closest && e.target.closest("#vnNavHandle");
+      if (!insideNav && !onHandle) vnCloseLeftNav();
+    });
+  }
+
   var vnTopbarWired = false;
   function vnWireTopbarLayout() {
     if (vnTopbarWired || typeof window === "undefined") return;
