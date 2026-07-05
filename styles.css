@@ -8510,7 +8510,7 @@ body.report-active.vn-nav-left .vn-nav-handle {
   left: 0;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 1401;
+  z-index: 9100;
   padding: 10px 12px 10px 9px;
   border: 1px solid rgba(200, 168, 78, 0.7);
   border-left: 0;
@@ -8552,4 +8552,65 @@ body.report-active.vn-nav-left .vn-nav-edge {
     transform: none;
     border-radius: 0 12px 12px 0;
   }
+}
+
+/* =========================================================================
+   v61 — fix the two regressions reported on mobile
+   ========================================================================= */
+
+/* (A) Chart boxes were locked to min-height:520px when stacked single-column,
+   but the chart SVG is only ~298px tall on a phone — leaving ~220px of dead
+   cream space inside every chart box. Let the box hug its chart instead. */
+@media (max-width: 980px) {
+  #chartDataReportView .top-chart-grid > .chart-panel,
+  #chartDataReportView .varga-chart-grid > .chart-panel,
+  #chartDataReportView .top-chart-grid > .chart-panel-featured,
+  #chartDataReportView .varga-chart-grid > .chart-panel-featured {
+    min-height: 0 !important;
+  }
+}
+
+/* (B) The left drawer was empty on phones/tablets: the <=1080px rule hides all
+   .nav-category buttons (swapping in the <select>), and the v60 drawer then
+   hid the <select> too. In drawer mode, force the vertical accordion (and its
+   category + action buttons) visible at every width, and drop the <select>. */
+body.vn-nav-left #chartDataNavRibbon .nav-category { display: block !important; }
+body.vn-nav-left #chartDataNavRibbon .nav-category-title { display: block !important; }
+body.vn-nav-left #chartDataNavRibbon .nav-category-open .nav-category-actions { display: flex !important; }
+body.vn-nav-left #chartDataNavRibbon .nav-category-actions button { display: block !important; }
+body.vn-nav-left #chartDataNavRibbon #mobileHomeBtn { display: inline-flex !important; }
+body.vn-nav-left #chartDataNavRibbon .mobile-drilldown-label { display: none !important; }
+
+/* (C) The nav has a dozen high-specificity !important rules (top-bar mode) that
+   force left/right/top and stretch it full width into a horizontal row. Beat
+   ALL of them (they top out at 1 id + 4 classes) with a 1 id + 5 class selector
+   so the drawer geometry + vertical column actually apply on every screen. */
+body.vn-nav-left.report-active.report-view-chartData #chartDataNavRibbon:not(.hidden).chart-data-nav,
+body.vn-nav-left.report-active #chartDataNavRibbon:not(.hidden).chart-data-nav {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: auto !important;
+  bottom: 0 !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  width: var(--vn-drawer-w) !important;
+  max-width: 86vw !important;
+  margin: 0 !important;
+  z-index: 9050 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  flex-wrap: nowrap !important;
+  align-items: stretch !important;
+  gap: 6px !important;
+  grid-template-columns: none !important;
+  border-radius: 0 12px 12px 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  transform: translateX(-102%) !important;
+  transition: transform 0.22s ease !important;
+}
+body.vn-nav-left.vn-nav-open.report-active #chartDataNavRibbon:not(.hidden).chart-data-nav {
+  transform: translateX(0) !important;
+  box-shadow: 8px 0 32px rgba(0, 0, 0, 0.5) !important;
 }
