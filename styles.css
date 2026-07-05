@@ -8371,3 +8371,37 @@ body.report-active::before { height: var(--vn-topbar-h, 150px) !important; }
     padding: 6px 10px !important;
   }
 }
+
+/* =========================================================================
+   DECLUTTER PASS (v59): strip decorative verbiage that eats vertical space
+   without carrying information — section eyebrows, badge pills, per-chart
+   "North Indian - Asc N" chips, the redundant report-header subtitle + tag,
+   and the stray collapse "-" toggle (the section head itself still toggles).
+   The real titles (.chart-title-strip, .section-head h3) are untouched.
+   ========================================================================= */
+
+/* 1. Kill the little uppercase caption that sits above almost every heading */
+#chartDataReportView .eyebrow { display: none !important; }
+
+/* 2. Kill the badge pills in section headers (e.g. "TECHNICAL DOSSIER",
+      "D-1 TO D-60", "SUMMARY") — pure decoration next to the real h3 title */
+#chartDataReportView .section-head .small-pill { display: none !important; }
+
+/* 3. Kill the per-chart meta chip ("North Indian - Asc 10" etc.) — the chart
+      title strip already names the chart; the ascendant is drawn in the grid */
+#chartDataReportView .chart-meta { display: none !important; }
+
+/* 4. Report header: drop the descriptive subtitle line and the corner tag pill.
+      Keep the brand row, the eyebrow is already hidden, and the h2 title stays. */
+#chartDataReportView .report-head h2 + p { display: none !important; }
+#chartDataReportView .report-head .tag { display: none !important; }
+#chartDataReportView .report-head > div:last-child:empty { display: none !important; }
+
+/* 5. Drop the standalone "-" collapse button; clicking the header still works */
+#chartDataReportView .section-collapse-toggle { display: none !important; }
+
+/* 6. Reclaim the space the pills/eyebrows used to reserve in the section head */
+#chartDataReportView .section-head {
+  margin-bottom: 9px !important;
+  padding-bottom: 6px !important;
+}
