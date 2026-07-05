@@ -2181,8 +2181,14 @@ go('home');
 paintLogos();
 buildLanding();
 
-/* register the site's service worker if present (offline support) */
-if('serviceWorker' in navigator){ try{ navigator.serviceWorker.register('yoga-sw.js').catch(()=>{}); }catch(e){} }
+/* No service worker: unregister any old one and clear its caches so the app
+   always loads the freshest files (prevents stale/"not updating" issues). */
+if('serviceWorker' in navigator){
+  try{
+    navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister())).catch(()=>{});
+    if(window.caches && caches.keys) caches.keys().then(ks=>ks.forEach(k=>caches.delete(k))).catch(()=>{});
+  }catch(e){}
+}
 </script>
 </body>
 </html>
