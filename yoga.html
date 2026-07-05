@@ -779,6 +779,22 @@ const HOWNOW = {
     fit:{v:"Sleep by ~10 PM; keep a calm, consistent bedtime.",p:"Wind fully down — this is repair time; protect your sleep.",k:"Sleep well but don't oversleep; plan an early rise."}}
 };
 
+/* ---------- 108 Surya Namaskar: the 12 mantras ---------- */
+const SURYA_MANTRAS = [
+  {s:"Oṃ Mitrāya Namaḥ", m:"to the friend of all"},
+  {s:"Oṃ Ravaye Namaḥ", m:"to the radiant, shining one"},
+  {s:"Oṃ Sūryāya Namaḥ", m:"to the dispeller of darkness"},
+  {s:"Oṃ Bhānave Namaḥ", m:"to the one who illumines"},
+  {s:"Oṃ Khagāya Namaḥ", m:"to the one who moves through the sky"},
+  {s:"Oṃ Pūṣṇe Namaḥ", m:"to the nourisher of all"},
+  {s:"Oṃ Hiraṇyagarbhāya Namaḥ", m:"to the golden cosmic self"},
+  {s:"Oṃ Marīcaye Namaḥ", m:"to the giver of light and rays"},
+  {s:"Oṃ Ādityāya Namaḥ", m:"to the son of Aditi, the infinite"},
+  {s:"Oṃ Savitre Namaḥ", m:"to the awakening, stimulating power"},
+  {s:"Oṃ Arkāya Namaḥ", m:"to the one worthy of praise"},
+  {s:"Oṃ Bhāskarāya Namaḥ", m:"to the giver of cosmic wisdom"}
+];
+
 /* ---------- Daily Panchang (computed) ---------- */
 const PANCHANG_NAMES = {
   tithi:["Pratipada","Dvitiya","Tritiya","Chaturthi","Panchami","Shashthi","Saptami","Ashtami","Navami","Dashami","Ekadashi","Dwadashi","Trayodashi","Chaturdashi","Purnima"],
@@ -1006,16 +1022,16 @@ const ASANA_GROUPS=[["all","All 50"],["stand","Standing & Balancing"],["seat","S
    ========================================================= */
 const TABS = [
   ["home","Home"],["dosha","My Dosha"],["panchang","Panchang"],["yoga","Yoga"],["asanas","Asanas"],
-  ["breathe","Breathe"],["meditate","Meditate"],["chakras","7 Chakras"],
+  ["surya","Surya 108"],["breathe","Breathe"],["meditate","Meditate"],["chakras","7 Chakras"],
   ["ayurveda","Ayurveda"],["food","Food"],["herbs","Herbs"],["drinks","Herbal Drinks"],["diy","DIYs"],["recipes","Recipes"],
   ["ongo","On the Go"],["hownow","How To-Now"],
   ["progress","Progress"],["premium","Premium"],["creators","Creators"]
 ];
 let current = "home";
-const NAV_ICONS={home:"🏠",dosha:"🧭",panchang:"🗓️",yoga:"🧘",asanas:"🤸",breathe:"🌬️",meditate:"🧠",chakras:"🌀",ayurveda:"🌿",food:"🍽️",herbs:"🌱",drinks:"🍵",diy:"🫗",recipes:"🍲",ongo:"🧳",hownow:"⏰",progress:"📈",premium:"⭐",creators:"👩‍🏫"};
+const NAV_ICONS={home:"🏠",dosha:"🧭",panchang:"🗓️",yoga:"🧘",asanas:"🤸",surya:"🌞",breathe:"🌬️",meditate:"🧠",chakras:"🌀",ayurveda:"🌿",food:"🍽️",herbs:"🌱",drinks:"🍵",diy:"🫗",recipes:"🍲",ongo:"🧳",hownow:"⏰",progress:"📈",premium:"⭐",creators:"👩‍🏫"};
 const NAV_GROUPS=[
   ["Daily",["home","dosha","panchang"]],
-  ["Practice",["yoga","asanas","breathe","meditate","chakras"]],
+  ["Practice",["yoga","asanas","surya","breathe","meditate","chakras"]],
   ["Ayurveda",["ayurveda","food","herbs","drinks","diy","recipes"]],
   ["Anytime",["ongo","hownow"]],
   ["You",["progress","premium"]],
@@ -1031,6 +1047,7 @@ function renderTabs(){
 function openNav(){ document.getElementById("sidebar").classList.add("open"); document.getElementById("scrim").classList.add("open"); const b=document.getElementById("menuBtn"); if(b) b.setAttribute("aria-expanded","true"); }
 function closeNav(){ document.getElementById("sidebar").classList.remove("open"); document.getElementById("scrim").classList.remove("open"); const b=document.getElementById("menuBtn"); if(b) b.setAttribute("aria-expanded","false"); }
 function go(id){
+  if(current==="surya" && id!=="surya" && typeof suryaStopSound==="function") suryaStopSound(); // stop mantra on leave
   current=id; renderTabs(); closeNav();
   const ct=document.getElementById("curTitle"); if(ct) ct.textContent=tabLabel(id);
   window.scrollTo(0,0);
@@ -1516,6 +1533,133 @@ function resetData(){
     Object.assign(store,{dosha:null,scores:null,minutes:0,sessions:0,streak:0,lastDay:null,done:{},premium:false});
     save(); go('home'); toast("All data reset");
   }
+}
+
+/* ---------- 108 Surya Namaskar ---------- */
+let suryaCount=0;
+VIEWS.surya = () => {
+  return `<section class="view">
+    <span class="pill">Sun salutations</span>
+    <h1>108 Surya Namaskar</h1>
+    <p class="lead">The classic sadhana: 108 rounds of Surya Namaskar. Tap the sun each time you complete a round — the counter climbs to 108 while the Surya mantra plays and cycles through the twelve salutations to the sun.</p>
+
+    <div class="card center" style="margin-top:16px">
+      <div class="ring" id="su-ring" style="--sz:220px;margin:6px auto 0">
+        <div style="display:flex;flex-direction:column;line-height:1">
+          <b id="su-count" style="font-size:64px">0</b>
+          <span class="muted" style="font-size:14px">of 108</span>
+        </div>
+      </div>
+      <div class="row" style="justify-content:center;margin-top:18px">
+        <button class="btn" id="su-count-btn" onclick="suryaInc()" style="min-width:170px;font-size:18px;padding:16px 26px">🌞 Count +1</button>
+      </div>
+      <div class="row" style="justify-content:center;margin-top:12px">
+        <button class="btn ghost sm" onclick="suryaUndo()">− Undo</button>
+        <button class="btn ghost sm" id="su-sound" onclick="suryaToggleSound()">🔇 Mantra off</button>
+        <button class="btn ghost sm" onclick="suryaReset()">↺ Reset</button>
+      </div>
+      <p class="muted" style="margin-top:12px;font-size:13px">Tip: on a phone you can also tap the sun circle. Keep it playing while you flow.</p>
+    </div>
+
+    <div class="card" style="margin-top:16px;border-left:4px solid var(--accent);text-align:center">
+      <span class="pill" style="background:color-mix(in srgb,var(--accent) 16%,transparent);color:var(--accent)">Mantra · round <span id="su-mnum">1</span> of 12</span>
+      <h2 id="su-mantra" style="margin:.3em 0 .1em">${SURYA_MANTRAS[0].s}</h2>
+      <p class="muted" id="su-mmean" style="margin:0">${SURYA_MANTRAS[0].m}</p>
+    </div>
+
+    <details class="card" style="margin-top:16px">
+      <summary style="cursor:pointer;font-weight:700">The twelve Surya mantras</summary>
+      <ol style="margin:.6em 0 0;padding-left:22px">${SURYA_MANTRAS.map(x=>`<li style="margin:5px 0"><b>${x.s}</b> <span class="muted">— ${x.m}</span></li>`).join("")}</ol>
+    </details>
+
+    <audio id="su-audio" loop preload="none" playsinline>
+      <source src="assets/surya-mantra.mp3" type="audio/mpeg" />
+      <source src="surya-mantra.mp3" type="audio/mpeg" />
+    </audio>
+    <p class="disc" style="margin-top:16px">The background sound is a meditative Oṃ drone generated in your browser (no download needed). To play a recorded chant instead, add an audio file named <b>surya-mantra.mp3</b> to your site (root or an <code>assets/</code> folder) and it will play automatically. Move within your comfort — 108 rounds is demanding; rest whenever needed.</p>
+  </section>`;
+};
+AFTER.surya = () => {
+  suryaPaint(); suryaSoundLabel();
+  const ring=document.getElementById("su-ring");
+  if(ring) ring.onclick=()=>suryaInc();
+};
+function suryaPaint(){
+  const c=document.getElementById("su-count"); if(c) c.textContent=suryaCount;
+  const ring=document.getElementById("su-ring"); if(ring) ring.style.setProperty("--deg",(Math.min(suryaCount,108)/108*360)+"deg");
+  const idx=suryaCount>0 ? (suryaCount-1)%12 : 0;
+  const mn=document.getElementById("su-mnum"); if(mn) mn.textContent=idx+1;
+  const m=document.getElementById("su-mantra"); if(m) m.textContent=SURYA_MANTRAS[idx].s;
+  const mm=document.getElementById("su-mmean"); if(mm) mm.textContent=SURYA_MANTRAS[idx].m;
+}
+function suryaInc(){
+  if(suryaCount>=108){ return; }
+  suryaCount++; suryaPaint(); suryaBell();
+  if(!suryaSoundOn) suryaStartSound();      // first count starts the mantra
+  if(suryaCount===108) suryaComplete();
+}
+function suryaUndo(){ if(suryaCount>0){ suryaCount--; suryaPaint(); } }
+function suryaReset(){ suryaCount=0; suryaPaint(); }
+function suryaComplete(){
+  recordSession(20);
+  document.body.insertAdjacentHTML("beforeend",
+   `<div class="modal" onclick="this.remove()"><div class="box center" onclick="event.stopPropagation()">
+     <div style="font-size:60px">🌅</div><h2 style="margin:.2em 0">108 complete 🙏</h2>
+     <p class="muted">You offered 108 salutations to the sun. Rest in Savasana and feel the warmth. Sūrya devāya namaḥ.</p>
+     <button class="btn" onclick="this.closest('.modal').remove();go('progress')">See progress</button>
+   </div></div>`);
+}
+
+/* --- background mantra: recorded file if present, else a live Oṃ drone --- */
+let suryaSoundOn=false, sctx=null, sdrone=null, suUsingFile=false;
+function suryaEnsureCtx(){
+  if(!sctx){ const AC=window.AudioContext||window.webkitAudioContext; if(AC) sctx=new AC(); }
+  if(sctx && sctx.state==="suspended") sctx.resume();
+}
+function suryaStartSound(){
+  suryaSoundOn=true; suryaSoundLabel();
+  const a=document.getElementById("su-audio");
+  if(a){
+    a.volume=0.9;
+    a.play().then(()=>{ suUsingFile=true; suryaDroneStop(); }).catch(()=>{ suUsingFile=false; suryaEnsureCtx(); suryaDroneStart(); });
+  } else { suryaEnsureCtx(); suryaDroneStart(); }
+}
+function suryaStopSound(){
+  suryaSoundOn=false; suryaSoundLabel();
+  const a=document.getElementById("su-audio"); if(a){ try{a.pause();}catch(e){} }
+  suryaDroneStop();
+}
+function suryaToggleSound(){ if(suryaSoundOn) suryaStopSound(); else suryaStartSound(); }
+function suryaSoundLabel(){ const b=document.getElementById("su-sound"); if(b) b.textContent = suryaSoundOn?"🔊 Mantra on":"🔇 Mantra off"; }
+function suryaDroneStart(){
+  if(!sctx || sdrone) return;
+  const t=sctx.currentTime;
+  const master=sctx.createGain(); master.gain.value=0; master.connect(sctx.destination);
+  const filter=sctx.createBiquadFilter(); filter.type="lowpass"; filter.frequency.value=850; filter.connect(master);
+  const base=136.1, oscs=[];                 // 136.1 Hz — the traditional "Oṃ" pitch
+  [[base,0.5],[base*1.5,0.26],[base*2,0.15],[base*3,0.06]].forEach(([f,g])=>{
+    const o=sctx.createOscillator(); o.type="sine"; o.frequency.value=f;
+    const og=sctx.createGain(); og.gain.value=g; o.connect(og); og.connect(filter); o.start(); oscs.push(o);
+  });
+  const lfo=sctx.createOscillator(); lfo.frequency.value=0.14;
+  const lg=sctx.createGain(); lg.gain.value=0.05; lfo.connect(lg); lg.connect(master.gain); lfo.start();
+  master.gain.setValueAtTime(0,t); master.gain.linearRampToValueAtTime(0.16,t+2.5);
+  sdrone={master,oscs,lfo};
+}
+function suryaDroneStop(){
+  if(!sdrone||!sctx) return;
+  const d=sdrone, t=sctx.currentTime;
+  try{ d.master.gain.cancelScheduledValues(t); d.master.gain.setValueAtTime(d.master.gain.value,t); d.master.gain.linearRampToValueAtTime(0,t+1.0); }catch(e){}
+  setTimeout(()=>{ try{ d.oscs.forEach(o=>o.stop()); d.lfo.stop(); }catch(e){} }, 1200);
+  sdrone=null;
+}
+function suryaBell(){
+  if(suUsingFile) return;                    // don't bell over a recorded chant
+  suryaEnsureCtx(); if(!sctx) return;
+  const t=sctx.currentTime, o=sctx.createOscillator(), g=sctx.createGain();
+  o.type="sine"; o.frequency.value=528;
+  g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.22,t+0.01); g.gain.exponentialRampToValueAtTime(0.0001,t+1.6);
+  o.connect(g); g.connect(sctx.destination); o.start(t); o.stop(t+1.7);
 }
 
 /* ---------- Meditation ---------- */
