@@ -556,6 +556,7 @@
       registerServiceWorker();
       try { vnWireLeftNav(); } catch (e) {}
       try { vnWireTopbarLayout(); } catch (e) {}
+      try { vnWireFitText(); } catch (e) {}
       // ---- VedNetra tools: language, nav labels, onboarding, home chart ----
       try {
         var langSel = document.getElementById("vnLangSelect");
@@ -2889,6 +2890,88 @@
       var onHandle = e.target && e.target.closest && e.target.closest("#vnNavHandle");
       if (!insideNav && !onHandle) vnCloseLeftNav();
     });
+  }
+
+  // ---- Auto-fit text -----------------------------------------------------
+  // When a label has more text than its box is wide (tight columns, long
+  // names, narrow phones, minimized panels), the tool used to clip it or show
+  // an ellipsis. Instead, shrink the font-size just enough to fit and stay
+  // readable. Applied to the chrome elements most prone to overflow, and
+  // re-run on resize and whenever the report re-renders.
+  var VN_FIT_SELECTOR = [
+    ".part-a-native-summary span",
+    ".panel-focus-popup-head",
+    ".panel-focus-popup-title",
+    ".panel-focus-popup-actions button",
+    ".chart-title-strip",
+    ".nav-category-title",
+    ".nav-category-actions button",
+    ".chart-data-nav button",
+    ".input-toggle-btn",
+    ".mobile-home-btn",
+    ".vn-home-bar-btn",
+    ".status-pill",
+    ".report-brand",
+    ".worksheet-cfg-btn",
+    ".pill",
+    ".tag",
+    "[data-fit-text]"
+  ].join(",");
+
+  function vnFitOne(el) {
+    if (!el || !el.style) return;
+    el.style.fontSize = "";              // start from the natural size
+    var cw = el.clientWidth, sw = el.scrollWidth;
+    if (cw <= 0 || sw <= cw + 1) return; // fits already — nothing to do
+    var min = parseFloat(el.getAttribute("data-fit-min"));
+    if (!(min > 0)) min = 7;
+    var size = parseFloat((typeof getComputedStyle === "function" ? getComputedStyle(el).fontSize : "")) || 14;
+    if (size <= min) return;
+    // one proportional estimate, then a few half-pixel corrections
+    var scaled = Math.max(min, Math.floor(size * (cw / sw) * 10) / 10);
+    el.style.fontSize = scaled + "px";
+    size = scaled;
+    var guard = 0;
+    while (el.scrollWidth > el.clientWidth + 1 && size > min && guard < 14) {
+      size = Math.max(min, size - 0.5);
+      el.style.fontSize = size + "px";
+      guard++;
+    }
+  }
+
+  function vnFitText() {
+    try {
+      var els = document.querySelectorAll(VN_FIT_SELECTOR);
+      for (var i = 0; i < els.length; i++) vnFitOne(els[i]);
+    } catch (e) {}
+  }
+
+  var vnFitPending = false;
+  function vnScheduleFit() {
+    if (vnFitPending) return;
+    vnFitPending = true;
+    var run = function () { vnFitPending = false; vnFitText(); };
+    if (typeof window !== "undefined" && window.requestAnimationFrame) window.requestAnimationFrame(run);
+    else setTimeout(run, 16);
+  }
+
+  var vnFitWired = false;
+  function vnWireFitText() {
+    if (vnFitWired || typeof window === "undefined") return;
+    vnFitWired = true;
+    var t = null;
+    var debounced = function (delay) {
+      return function () { if (t) clearTimeout(t); t = setTimeout(vnScheduleFit, delay); };
+    };
+    window.addEventListener("resize", debounced(120));
+    window.addEventListener("orientationchange", debounced(160));
+    // Re-fit after any DOM render. We watch only childList/subtree (NOT
+    // attributes), so our own font-size writes can never retrigger this.
+    if (window.MutationObserver && document.body) {
+      try { new MutationObserver(debounced(220)).observe(document.body, { childList: true, subtree: true }); } catch (e) {}
+    }
+    vnScheduleFit();
+    [200, 700, 1600].forEach(function (d) { setTimeout(vnScheduleFit, d); });
   }
 
   var vnTopbarWired = false;

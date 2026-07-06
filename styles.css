@@ -8614,3 +8614,34 @@ body.vn-nav-left.vn-nav-open.report-active #chartDataNavRibbon:not(.hidden).char
   transform: translateX(0) !important;
   box-shadow: 8px 0 32px rgba(0, 0, 0, 0.5) !important;
 }
+
+/* =========================================================================
+   v62 — text auto-fit support: give overflow-prone rows room so the JS
+   font-shrink has something to work with, and let the identity strip wrap
+   instead of being crushed to a sliver on mid-width screens.
+   ========================================================================= */
+
+/* The birth-details strip competes with the toolbar buttons and gets squeezed
+   to a sliver when inline (it was crushed to ~8px even on a 1400px laptop).
+   Give it its own full-width row and let its fields wrap, so each field shows
+   at a readable size and the JS font-fit only trims genuinely long ones. */
+.part-a-identity-strip { flex-basis: 100% !important; order: 2 !important; }
+.part-a-native-summary {
+  justify-content: flex-start !important;
+  flex-wrap: wrap !important;
+  white-space: normal !important;
+  overflow: visible !important;
+}
+.part-a-native-summary span {
+  flex: 0 0 auto;
+  max-width: 100%;
+}
+
+/* Never let a fitted label spill its box before the JS runs (or if JS is off):
+   these single-line chrome labels clip cleanly as the last resort. */
+.chart-title-strip,
+.nav-category-title,
+.panel-focus-popup-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
