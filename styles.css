@@ -8776,3 +8776,33 @@ input.vn-wide, select.vn-wide, textarea.vn-wide,
   justify-content: start;
   gap: 8px 14px !important;
 }
+
+/* =========================================================================
+   v66 — focus/pop-out window chart must FIT the window, not crop. The chart
+   was locked to a fixed width, so when the window is shorter than the chart
+   is tall, only a middle band showed. Make the body a flex column and let the
+   chart scale down to the remaining height while keeping its square ratio.
+   ========================================================================= */
+.panel-focus-popup-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.panel-focus-popup-body > * { flex: 0 0 auto; }
+.panel-focus-popup-body .focus-popup-chart-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+.panel-focus-popup-body .focus-popup-chart-panel .north-chart,
+.panel-focus-popup.is-large .focus-popup-chart-panel .north-chart {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+}
