@@ -8645,3 +8645,98 @@ body.vn-nav-left.vn-nav-open.report-active #chartDataNavRibbon:not(.hidden).char
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* =========================================================================
+   v63 — DENSITY PASS: kill dead space below charts, stop input fields from
+   sprawling, compact the header/report brand, and tidy the pop-out windows.
+   ========================================================================= */
+
+/* ---- (1) Dead space below charts, everywhere ---------------------------- */
+/* Panels were pinned to min-height:610px (desktop) / 520px (mobile) and the
+   grids stretched them, leaving ~300px of blank cream under every chart.
+   Let every chart panel hug its chart instead. */
+#chartDataReportView .chart-panel,
+#chartDataReportView .chart-panel-featured {
+  min-height: 0 !important;
+  align-self: start !important;
+}
+
+/* Divisional / top chart grids: many compact charts packed from the left
+   rather than 2 huge stretched columns. */
+#chartDataReportView .top-chart-grid,
+#chartDataReportView .varga-chart-grid {
+  grid-template-columns: repeat(auto-fit, minmax(230px, 300px)) !important;
+  justify-content: start !important;
+  align-items: start !important;
+  gap: 12px !important;
+}
+#chartDataReportView .top-chart-grid > .chart-panel .north-chart,
+#chartDataReportView .varga-chart-grid > .chart-panel .north-chart,
+#chartDataReportView .varga-chart-grid > .chart-panel-featured .north-chart {
+  max-width: 100% !important;
+}
+
+/* ---- (2) Input fields were half-the-screen wide ------------------------- */
+/* Cap each field to a sane width and pack as many as fit per row, so short
+   values (year, age) don't sprawl and forms need far fewer rows. */
+.grid-2,
+.grid-3 {
+  grid-template-columns: repeat(auto-fit, minmax(170px, 300px)) !important;
+  justify-content: start;
+  gap: 8px 14px !important;
+}
+input,
+select,
+textarea {
+  min-height: 36px;
+  padding: 6px 9px;
+}
+label {
+  margin-bottom: 8px;
+  gap: 4px;
+  font-size: 12.5px;
+}
+
+/* ---- (3) Compact header: toolbar buttons, report brand ------------------ */
+@media (min-width: 561px) {
+  body.report-active #chartInputLayoutBar:not(.hidden) .input-toggle-btn {
+    min-height: 32px !important;
+    padding: 5px 10px !important;
+    font-size: 12.5px !important;
+  }
+}
+.report-head { margin-bottom: 10px !important; padding-bottom: 10px !important; }
+.report-brand { margin-bottom: 6px !important; padding: 4px 10px 4px 6px !important; }
+.report-brand-logo { width: 34px !important; height: 34px !important; }
+.part-a-brand-mini img { width: 26px !important; height: 26px !important; }
+.part-a-identity-strip { padding: 4px 8px !important; }
+.part-a-native-summary { gap: 6px 14px !important; font-size: 12px !important; }
+
+/* ---- (4) Pop-out / focus windows --------------------------------------- */
+/* Strip the same decorative chrome we removed from the report (these popups
+   live outside #chartDataReportView, so they kept the pills/eyebrows). */
+.panel-focus-popup .chart-meta,
+.panel-focus-popup .eyebrow,
+.panel-focus-popup .section-head .small-pill { display: none !important; }
+.panel-focus-popup .chart-panel { min-height: 0 !important; }
+.panel-focus-popup-head { padding: 6px 10px !important; }
+
+/* Minimized window: it collapsed to 200px and clipped its buttons + title.
+   Drop the pointless "New Window" button, let it size to content, and wrap the
+   title onto its own line so the full section name stays readable. */
+.panel-focus-popup.is-minimized {
+  width: auto !important;
+  max-width: min(320px, calc(100vw - 20px)) !important;
+  min-width: 150px !important;
+}
+.panel-focus-popup.is-minimized [data-focus-popup-popout] { display: none !important; }
+.panel-focus-popup.is-minimized .panel-focus-popup-head {
+  flex-wrap: wrap !important;
+  gap: 6px 8px !important;
+}
+.panel-focus-popup.is-minimized .panel-focus-popup-title {
+  flex: 1 1 100% !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
