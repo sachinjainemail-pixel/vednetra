@@ -6853,11 +6853,16 @@
     var availableWidth = Math.max(320, (window.innerWidth || 1280) - railReserve - gap * 2);
     var availableHeight = Math.max(280, (window.innerHeight || 800) - topStart - gap);
     var columns = availableWidth >= 1320 ? 3 : (availableWidth >= 820 ? 2 : 1);
+    // never use more columns/rows than there are windows, so a single window is
+    // a comfortable size instead of being squished into a tiny tile.
+    columns = Math.max(1, Math.min(columns, layers.length));
     var panelWidth = Math.floor((availableWidth - gap * (columns - 1)) / columns);
-    panelWidth = Math.max(300, Math.min(panelWidth, 470));
-    var rowsVisible = Math.max(1, Math.floor(availableHeight / 245));
+    panelWidth = Math.max(300, Math.min(panelWidth, layers.length <= 1 ? 560 : 470));
+    var neededRows = Math.ceil(layers.length / columns);
+    var rowsVisible = Math.max(1, Math.min(neededRows, Math.floor(availableHeight / 245)));
     var panelHeight = Math.floor((availableHeight - gap * Math.max(0, rowsVisible - 1)) / rowsVisible);
-    panelHeight = Math.max(230, Math.min(panelHeight, 360));
+    // a lone row can be tall (room for a full chart); multi-row tiles stay compact.
+    panelHeight = Math.max(230, Math.min(panelHeight, rowsVisible <= 1 ? 640 : 360));
     layers.forEach(function (layer, index) {
       if (!force && layer.dataset.userPositioned === "1" && layer !== preferredLayer) return;
       var col = index % columns;
