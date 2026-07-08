@@ -8806,3 +8806,68 @@ input.vn-wide, select.vn-wide, textarea.vn-wide,
   max-width: 100% !important;
   max-height: 100% !important;
 }
+
+/* =========================================================================
+   v67 — explanatory text as hover tooltips. Long "what this is about" help
+   paragraphs (.fine-print, .step-commentary) are tucked into a hover "ⓘ" chip
+   by vnTooltipify(), reclaiming the page space they used to occupy.
+   ========================================================================= */
+.vn-tip {
+  position: relative;
+  display: inline-flex;
+  vertical-align: middle;
+  margin: 2px 0;
+}
+.vn-tip-icon {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: help;
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  min-height: 0;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(140, 92, 18, 0.5);
+  color: #8a5c12;
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 700;
+  background: rgba(200, 168, 78, 0.16);
+}
+.vn-tip-icon:hover,
+.vn-tip-icon:focus-visible { background: rgba(200, 168, 78, 0.34); outline: none; }
+.vn-tip-box {
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 3000;
+  width: max-content;
+  max-width: min(360px, 82vw);
+  padding: 9px 12px;
+  border: 1px solid #d7b56a;
+  border-radius: 8px;
+  background: #1c1e3c;
+  color: #f3ead2;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.42);
+  font-size: 12px;
+  line-height: 1.45;
+  font-weight: 500;
+  white-space: normal;
+  text-align: left;
+}
+.vn-tip:hover .vn-tip-box,
+.vn-tip:focus-within .vn-tip-box { display: block; }
+.vn-tip-box .vn-tip-content {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: inherit !important;
+  font-size: inherit !important;
+  max-width: none !important;
+  text-align: left !important;
+}
+.vn-tip-box .vn-tip-content strong { color: #e7c477; display: block; margin-bottom: 3px; }
+/* near the right edge, open the tooltip to the left so it doesn't overflow */
+.section-head .vn-tip .vn-tip-box { left: auto; right: 0; }

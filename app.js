@@ -2946,11 +2946,51 @@
     } catch (e) {}
   }
 
+  // ---- Tooltipify explanatory text --------------------------------------
+  // Long "what this chart/field is about" paragraphs eat page space. Collapse
+  // each into a small hover "ⓘ" chip: the text is tucked into a tooltip that
+  // only appears on hover/focus, otherwise it takes no room. The original node
+  // is preserved (moved into the tooltip) so any JS that updates its text by id
+  // keeps working. Opt out with .vn-no-tip.
+  var VN_TIP_SELECTOR = ".fine-print, .step-commentary";
+  function vnTooltipify(scope) {
+    try {
+      var els = (scope || document).querySelectorAll(VN_TIP_SELECTOR);
+      for (var i = 0; i < els.length; i++) {
+        var el = els[i];
+        if (!el || el.dataset.vnTip === "1") continue;
+        if (el.classList.contains("vn-no-tip") || el.closest(".vn-tip-box")) continue;
+        var txt = el.textContent ? el.textContent.trim() : "";
+        if (!txt) continue;
+        // Only collapse genuine explanatory prose: long sentences that aren't
+        // brief status lines or per-row notes inside data tables. Short notes
+        // (< ~64 chars) and anything inside a table cell stay inline.
+        if (txt.length < 64) continue;
+        if (el.closest("td, th, .vn-tip-box")) continue;
+        el.dataset.vnTip = "1";
+        var wrap = document.createElement("span");
+        wrap.className = "vn-tip";
+        var icon = document.createElement("button");
+        icon.type = "button";
+        icon.className = "vn-tip-icon";
+        icon.setAttribute("aria-label", "More info");
+        icon.textContent = "ⓘ"; // ⓘ
+        var box = document.createElement("span");
+        box.className = "vn-tip-box";
+        if (el.parentNode) el.parentNode.insertBefore(wrap, el);
+        wrap.appendChild(icon);
+        wrap.appendChild(box);
+        box.appendChild(el);       // move original node into the tooltip
+        el.classList.add("vn-tip-content");
+      }
+    } catch (e) {}
+  }
+
   var vnFitPending = false;
   function vnScheduleFit() {
     if (vnFitPending) return;
     vnFitPending = true;
-    var run = function () { vnFitPending = false; vnFitText(); };
+    var run = function () { vnFitPending = false; vnTooltipify(); vnFitText(); };
     if (typeof window !== "undefined" && window.requestAnimationFrame) window.requestAnimationFrame(run);
     else setTimeout(run, 16);
   }
