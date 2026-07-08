@@ -10002,18 +10002,20 @@
   function allVargaChartsSection(chart, externalVarga, topicDivision) {
     var html = '<section id="viewA-vargas" class="section"><div class="section-head"><div><p class="eyebrow">Divisional Charts</p><h3>North Indian Chart Set</h3></div><span class="small-pill">D-1 to D-60</span></div>';
     html += '<div class="report-grid varga-chart-grid">';
+    // Keep the divisional charts flowing together so they pack many-per-row and
+    // fill the width. The wide Bhava Chalit / Sudarshan panels used to be
+    // injected right after D-9, which broke the row and left D-1/D-9 alone with
+    // blank space beside them — they are now appended AFTER the chart grid.
     [1, 9].concat(vargaDivisions().filter(function (division) { return division !== 1 && division !== 9; })).forEach(function (division) {
       var varga = tableVarga(chart, division);
       html += chartBox("D-" + division + " " + vargaName(division), varga.ascendant.sign, varga.planets, { featured: division === 1 || division === 9, division: division, rootChart: chart, showAscDegree: true, ascDegree: varga.ascendant.deg });
-      if (division === 9) {
-        html += bhavaChalitSripatiPanel(chart);
-        html += sudarshanChakraPanel(chart);
-      }
     });
     if (externalVarga && externalVarga.division === topicDivision) {
       html += chartBox((externalVarga.source || "Manual import") + " D-" + topicDivision, externalVarga.ascendant.sign, externalVarga.planets, { division: topicDivision, showAscDegree: Number.isFinite(externalVarga.ascendant.deg), ascDegree: externalVarga.ascendant.deg });
     }
     html += "</div>";
+    html += bhavaChalitSripatiPanel(chart);
+    html += sudarshanChakraPanel(chart);
     html += commentaryBox("Divisional Chart Commentary", "This chart data report keeps the computed D-1 and divisional chart placements in a technical dossier, so raw chart facts can be checked clearly.");
     html += "</section>";
     return html;
