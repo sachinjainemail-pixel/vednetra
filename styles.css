@@ -8871,3 +8871,55 @@ input.vn-wide, select.vn-wide, textarea.vn-wide,
 .vn-tip-box .vn-tip-content strong { color: #e7c477; display: block; margin-bottom: 3px; }
 /* near the right edge, open the tooltip to the left so it doesn't overflow */
 .section-head .vn-tip .vn-tip-box { left: auto; right: 0; }
+
+/* =========================================================================
+   v68 — flow form fields into as FEW rows as possible. These control panels
+   grouped fields into separate .grid-2/.grid-3 blocks, each forcing its own
+   row, so a form spanned 4-5 rows and pushed the charts far down. Dissolve the
+   sub-grids (display:contents) and let every field pack into one wrapping flow.
+   ========================================================================= */
+.transit-controls,
+.varshfal-controls,
+.current-panchang-controls,
+.ephemeris-controls,
+.dasha-range-controls {
+  display: flex !important;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px 14px !important;
+  grid-template-columns: none !important;
+}
+.transit-controls > .grid-2,
+.transit-controls > .grid-3,
+.varshfal-controls > .grid-2,
+.varshfal-controls > .grid-3,
+.current-panchang-controls > .grid-2,
+.current-panchang-controls > .grid-3,
+.ephemeris-controls > .grid-2,
+.ephemeris-controls > .grid-3,
+.dasha-range-controls > .grid-2,
+.dasha-range-controls > .grid-3 {
+  display: contents !important;
+}
+/* every field / button in these panels: compact, uniform, wraps to fill rows */
+.transit-controls label,
+.transit-controls .button-label,
+.varshfal-controls label,
+.varshfal-controls .button-label,
+.current-panchang-controls label,
+.current-panchang-controls .button-label,
+.ephemeris-controls label,
+.ephemeris-controls .button-label,
+.dasha-range-controls label,
+.dasha-range-controls .button-label {
+  flex: 1 1 190px;
+  max-width: 280px;
+  min-width: 150px;
+  margin-bottom: 0 !important;
+}
+/* the ⓘ help chip just tucks in at the end without taking a whole field slot */
+.transit-controls > .vn-tip,
+.varshfal-controls > .vn-tip,
+.current-panchang-controls > .vn-tip,
+.ephemeris-controls > .vn-tip,
+.dasha-range-controls > .vn-tip { flex: 0 0 auto; align-self: center; }
