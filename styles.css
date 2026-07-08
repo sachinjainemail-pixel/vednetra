@@ -8740,3 +8740,39 @@ label {
   overflow: visible !important;
   text-overflow: clip !important;
 }
+
+/* =========================================================================
+   v65 — GLOBAL field-width cap. The earlier cap only touched .grid-2/.grid-3,
+   so fields in standalone <label>s or custom "-controls" grids (transit,
+   ephemeris, dasha, panchang, ...) still sprawled the full screen width.
+   Cap the CONTROL itself so NO field is ever absurdly wide, in any container,
+   any section, desktop or mobile. Opt out with .vn-wide / .field-wide.
+   ========================================================================= */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="hidden"]),
+select,
+textarea {
+  max-width: 340px;
+}
+textarea { max-width: 680px; }
+
+/* a handful of controls genuinely want the full width — let them opt out */
+.vn-wide, .field-wide,
+.vn-wide input, .vn-wide select, .vn-wide textarea,
+input.vn-wide, select.vn-wide, textarea.vn-wide,
+.mobile-drilldown-select { max-width: none; }
+
+/* Pack the custom form-control grids the same way grid-2/grid-3 are packed,
+   so fields sit side by side and forms need far fewer rows. */
+.transit-controls .grid-2,
+.transit-controls .grid-3,
+.vn-controls,
+.varshfal-controls,
+.ephemeris-controls,
+.ephemeris-location-fields,
+.dasha-range-controls,
+.current-panchang-controls {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 300px)) !important;
+  justify-content: start;
+  gap: 8px 14px !important;
+}
