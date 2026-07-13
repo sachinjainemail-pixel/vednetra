@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VedNetra Prediction Engine</title>
+<style>
+:root{
+  --bg:#140f2e; --bg2:#1d1642; --card:#241a55; --card2:#2c2064; --ink:#f4f0ff; --muted:#b9b0e6;
+  --gold:#f4c95d; --line:#3a2f78; --good:#4ecb8f; --warn:#f2a65a; --bad:#f27b7b;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background:radial-gradient(1200px 700px at 50% -10%,#2a1f63 0%,var(--bg) 55%);color:var(--ink);
+  line-height:1.5;padding:0 0 60px}
+.wrap{max-width:920px;margin:0 auto;padding:20px 16px}
+header{text-align:center;padding:18px 0 6px}
+header h1{margin:0;font-size:1.6rem;color:var(--gold);letter-spacing:.5px}
+header p{margin:6px 0 0;color:var(--muted);font-size:.92rem}
+.banner{background:rgba(244,201,93,.1);border:1px solid var(--line);border-radius:12px;padding:10px 14px;
+  margin:14px 0;font-size:.85rem;color:var(--muted)}
+.card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);
+  border-radius:16px;padding:16px 16px;margin:14px 0;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+label{display:block;font-size:.8rem;color:var(--muted);margin:10px 0 4px;text-transform:uppercase;letter-spacing:.4px}
+input,select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--line);
+  background:var(--bg2);color:var(--ink);font-size:1rem}
+.grid{display:grid;gap:10px}
+@media(min-width:560px){.grid.two{grid-template-columns:1fr 1fr}.grid.three{grid-template-columns:1fr 1fr 1fr}}
+button.go{margin-top:16px;width:100%;padding:14px;border:0;border-radius:12px;font-size:1.05rem;font-weight:700;
+  background:linear-gradient(90deg,#f4c95d,#e8a92e);color:#2a1a03;cursor:pointer}
+button.go:active{transform:translateY(1px)}
+.small{font-size:.8rem;color:var(--muted)}
+details.manual{margin-top:10px}
+details.manual summary{cursor:pointer;color:var(--gold);font-size:.85rem}
+.result h2{color:var(--gold);font-size:1.1rem;border-bottom:1px solid var(--line);padding-bottom:6px;margin:22px 0 6px}
+.topic{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0}
+.topic .thead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.topic .tname{font-size:.78rem;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)}
+.topic .ans{font-size:1.08rem;font-weight:650;margin:6px 0}
+.badge{font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.b-high{background:rgba(78,203,143,.18);color:var(--good);border:1px solid rgba(78,203,143,.4)}
+.b-med{background:rgba(242,166,90,.16);color:var(--warn);border:1px solid rgba(242,166,90,.4)}
+.b-low{background:rgba(242,123,123,.15);color:var(--bad);border:1px solid rgba(242,123,123,.4)}
+.reasons{margin:6px 0 0;padding-left:18px}
+.reasons li{font-size:.86rem;color:var(--muted);margin:2px 0}
+table{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:6px}
+th,td{text-align:left;padding:5px 8px;border-bottom:1px solid var(--line)}
+th{color:var(--muted);font-weight:600}
+.chip{display:inline-block;font-size:.72rem;color:var(--gold);border:1px solid var(--line);border-radius:8px;padding:1px 6px;margin-left:4px}
+.err{color:var(--bad);font-weight:600}
+.scroll{overflow-x:auto}
+footer{text-align:center;color:var(--muted);font-size:.78rem;margin-top:24px}
+a{color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>✦ VedNetra Prediction Engine ✦</h1>
+    <p>Enter any native. Chart is computed with the VedNetra engine (Raman ayanamsha), then the back-tested methodology is applied automatically.</p>
+  </header>
+
+  <div class="banner">
+    Each answer carries a <b>confidence tier</b> from the 55-chart back-test. Lead with <span class="badge b-high">High</span> topics; treat
+    <span class="badge b-low">Low</span> ones as a hedge, not a verdict. No method is 100% — see <a href="VEDNETRA_PREDICTION_METHODOLOGY.md">the methodology</a>.
+  </div>
+
+  <div class="card">
+    <div class="grid two">
+      <div><label>Native name (optional)</label><input id="pname" placeholder="e.g. Ramesh"></div>
+      <div><label>Gender</label>
+        <select id="pgender"><option value="male">Male</option><option value="female">Female</option></select>
+      </div>
+    </div>
+    <div class="grid two">
+      <div><label>Date of birth</label><input id="pdate" type="date"></div>
+      <div><label>Time of birth</label><input id="ptime" type="time" step="60"></div>
+    </div>
+    <label>Place of birth</label>
+    <input id="pplace" list="cityList" placeholder="Start typing a city, e.g. Surat, India" autocomplete="off">
+    <datalist id="cityList"></datalist>
+    <div class="small" id="placeStatus">Pick from the list, or set coordinates manually below.</div>
+
+    <details class="manual">
+      <summary>Set latitude / longitude / timezone manually</summary>
+      <div class="grid three">
+        <div><label>Latitude (decimal, +N/−S)</label><input id="plat" type="number" step="0.0001" placeholder="21.17"></div>
+        <div><label>Longitude (decimal, +E/−W)</label><input id="plon" type="number" step="0.0001" placeholder="72.83"></div>
+        <div><label>Timezone (hours)</label><input id="ptz" type="number" step="0.25" value="5.5"></div>
+      </div>
+    </details>
+
+    <button class="go" id="goBtn">Predict</button>
+  </div>
+
+  <div id="out" class="result"></div>
+
+  <footer>
+    VedNetra Prediction Engine · Raman ayanamsha · rules derived from 55 quiz charts · this is a study aid, not a certainty.
+  </footer>
+</div>
+
+<script src="app.js"></script>
+<script src="cities.js"></script>
+<script src="prediction-engine.js"></script>
+<script>
+(function(){
+  var CITY = window.CITY_DB || [];
+  // populate datalist
+  var dl=document.getElementById('cityList');
+  CITY.forEach(function(c){ var o=document.createElement('option'); o.value=c.name; dl.appendChild(o); });
+
+  function findCity(str){
+    if(!str) return null;
+    var s=str.trim().toLowerCase();
+    var exact=CITY.filter(function(c){return c.name.toLowerCase()===s;});
+    if(exact.length) return exact[0];
+    var city=s.split(',')[0].trim();
+    var m=CITY.filter(function(c){return c.name.split(',')[0].trim().toLowerCase()===city;});
+    if(m.length) return m[0];
+    var pre=CITY.filter(function(c){return c.name.toLowerCase().indexOf(s)===0;});
+    return pre.length?pre[0]:null;
+  }
+
+  function badge(conf){
+    var c=(conf||'').toLowerCase();
+    if(c.indexOf('high')>=0 && c.indexOf('low')<0) return '<span class="badge b-high">'+conf+'</span>';
+    if(c.indexOf('low')>=0 && c.indexOf('high')<0) return '<span class="badge b-low">'+conf+'</span>';
+    return '<span class="badge b-med">'+conf+'</span>';
+  }
+  function topicCard(name, r){
+    if(!r) return '';
+    var reasons=(r.reasons||[]).map(function(x){return '<li>'+esc(x)+'</li>';}).join('');
+    return '<div class="topic"><div class="thead"><span class="tname">'+esc(name)+'</span>'+badge(r.confidence)+'</div>'+
+      '<div class="ans">'+esc(r.answer)+'</div><ul class="reasons">'+reasons+'</ul></div>';
+  }
+  function esc(s){ return String(s).replace(/[&<>]/g,function(m){return{'&':'&amp;','<':'&lt;','>':'&gt;'}[m];}); }
+
+  function chartCard(s){
+    var pr=s.planets.map(function(p){
+      var tags=[]; if(p.dignity)tags.push(p.dignity); if(p.combust)tags.push('combust'); if(p.retro)tags.push('retro');
+      return '<tr><td>'+p.name+'</td><td>'+p.sign+'</td><td>'+p.house+'</td><td>'+p.deg+'°</td><td class="small">'+tags.join(', ')+'</td><td class="small">'+p.nak+' / '+p.pada+'</td></tr>';
+    }).join('');
+    var hl=s.houses.map(function(h){return h.house+':'+h.lord;}).join('  ');
+    return '<div class="topic"><div class="tname">Computed chart (Raman)</div>'+
+      '<div class="ans">Lagna '+s.lagna+' '+s.lagnaDeg+'° · Lagna-lord '+s.lagnaLord+
+      (s.manglik?' <span class="chip">Manglik</span>':'')+'</div>'+
+      '<div class="scroll"><table><tr><th>Planet</th><th>Sign</th><th>House</th><th>Deg</th><th>State</th><th>Nakshatra/Pada</th></tr>'+pr+'</table></div>'+
+      '<div class="small" style="margin-top:8px">House lords: '+hl+'</div>'+
+      '<div class="small">Dasha balance at birth: '+(s.balanceLord||'?')+' · Running now: '+(s.dashaNow||[]).slice(0,3).join(' / ')+'</div></div>';
+  }
+
+  function run(){
+    var out=document.getElementById('out'); out.innerHTML='';
+    if(!(window.VedicCore&&window.VedicCore.buildChart)){ out.innerHTML='<div class="card err">Engine not loaded (app.js). Reload the page.</div>'; return; }
+    var name=document.getElementById('pname').value||'Native';
+    var gender=document.getElementById('pgender').value;
+    var date=document.getElementById('pdate').value;
+    var time=document.getElementById('ptime').value||'12:00';
+    var place=document.getElementById('pplace').value;
+    if(!date){ out.innerHTML='<div class="card err">Please enter the date of birth.</div>'; return; }
+
+    var lat=parseFloat(document.getElementById('plat').value);
+    var lon=parseFloat(document.getElementById('plon').value);
+    var tz=parseFloat(document.getElementById('ptz').value);
+    var resolvedName=place;
+    if(isNaN(lat)||isNaN(lon)){
+      var city=findCity(place);
+      if(!city){ out.innerHTML='<div class="card err">Couldn\'t find "'+esc(place)+'". Pick a city from the list or enter coordinates manually.</div>'; return; }
+      lat=city.lat; lon=city.lon; tz=isNaN(tz)?city.tz:tz; resolvedName=city.name;
+    }
+    if(isNaN(tz)) tz=5.5;
+
+    try{
+      var utc=window.VedicCore.localDateTimeToUtc(date, (time.length===5?time+':00':time), tz);
+      var chart=window.VedicCore.buildChart(utc, lat, lon, tz, {ayanamshaKey:'raman'});
+      var pred=window.VedPredict.predict(chart, gender, window.VedicCore);
+
+      var html='<div class="card">';
+      html+='<h2>'+esc(name)+' — '+esc(gender)+', '+esc(date)+' '+esc(time)+', '+esc(resolvedName)+'</h2>';
+      html+=chartCard(pred.chartSummary);
+      html+=topicCard('Education', pred.education);
+      html+=topicCard('Career / livelihood', pred.career);
+      html+=topicCard('Marriage', pred.marriage);
+      html+=topicCard('Children', pred.children);
+      html+=topicCard('Residence / foreign', pred.foreign);
+      html+=topicCard('Health', pred.health);
+      html+=topicCard('Parents', pred.parents);
+      html+=topicCard('Siblings', pred.siblings);
+      html+=topicCard('Timing — active dasha themes', pred.timing);
+      html+='</div>';
+      out.innerHTML=html;
+      out.scrollIntoView({behavior:'smooth',block:'start'});
+    }catch(e){
+      out.innerHTML='<div class="card err">Computation error: '+esc(e.message)+'</div>';
+    }
+  }
+  document.getElementById('goBtn').addEventListener('click', run);
+})();
+</script>
+</body>
+</html>
