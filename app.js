@@ -13670,7 +13670,7 @@
   }
 
   // ---- Gulika / Mandi (day-night 8-part method, ascendant at start of Saturn's part) ----
-  function standingGulika(chart, input) {
+  function standingGulika(chart, input, opts) {
     try {
       var tz = Number(input.timezone || 0);
       var local = new Date(input.birthInstant.getTime() + tz * 3600000);
@@ -13692,7 +13692,9 @@
       }
       var saturnIdx = WEEKDAY_LORDS.indexOf("Saturn");
       var partForSaturn = (((saturnIdx - lordStartIndex) % 7) + 7) % 7;
-      var gulikaMin = startMin + partForSaturn * partLen;
+      // Gulika = ascendant at the START of Saturn's part; Mandi (opts.atEnd) =
+      // ascendant at the END of Saturn's part (one part-length later).
+      var gulikaMin = startMin + (partForSaturn + ((opts && opts.atEnd) ? 1 : 0)) * partLen;
       var dayOffset = Math.floor(gulikaMin / 1440);
       var within = gulikaMin % 1440;
       var localG = new Date(Date.UTC(local.getUTCFullYear(), local.getUTCMonth(), local.getUTCDate() + dayOffset, Math.floor(within / 60), Math.floor(within % 60), 0));
@@ -18025,6 +18027,33 @@
     return L.join("\n");
   }
 
+  // ---- True functional benefic/malefic per ascendant (classical Parashari) --
+  // trikona/lagna (1,5,9) lords = benefic · trishadaya + dusthana (3,6,8,11,12)
+  // lords = malefic · yogakaraka = owns a kendra (4/7/10) AND a trikona (5/9) ·
+  // kendra-only lords per Kendradhipati (natural benefic → malefic, natural
+  // malefic → neutral) · nodes adopt their dispositor.
+  function vnFuncLabel(chart, planetName) {
+    if (planetName === "Rahu" || planetName === "Ketu") {
+      var node = chart.planetsByName[planetName];
+      var disp = node && node.dispositor;
+      if (disp && disp !== planetName) return "Node → " + vnFuncLabel(chart, disp).replace(/^Func\. /, "func. ");
+      return "Node (context)";
+    }
+    var L = lordshipsForPlanet(chart.ascendant.sign, planetName);
+    if (!L.length) return "—";
+    var yogaK = L.some(function (h) { return [4, 7, 10].indexOf(h) >= 0; }) && L.some(function (h) { return [5, 9].indexOf(h) >= 0; });
+    if (yogaK && planetName !== "Sun" && planetName !== "Moon") return "Yogakaraka";
+    var hasBen = L.some(function (h) { return [1, 5, 9].indexOf(h) >= 0; });
+    var hasMal = L.some(function (h) { return [3, 6, 8, 11, 12].indexOf(h) >= 0; });
+    if (hasBen && !hasMal) return "Func. benefic";
+    if (hasMal && !hasBen) return "Func. malefic";
+    if (hasBen && hasMal) return "Mixed";
+    if (L.some(function (h) { return [4, 7, 10].indexOf(h) >= 0; })) {
+      var natBen = (planetName === "Jupiter" || planetName === "Venus" || planetName === "Mercury" || (planetName === "Moon" && chart.moonStrength === "Bright"));
+      return natBen ? "Func. malefic (Kendradhipati)" : "Neutral (kendra)";
+    }
+    return "Neutral (maraka)";
+  }
   // ---- 64th Navamsa from the Moon (63 navamsas ahead = 7 signs on) --------
   function vnSixtyFourthNavamsa(chart) {
     var moonNavSign = vargaSign(chart.planetsByName.Moon.lon, 9);
@@ -18085,9 +18114,9 @@
 
     // §2
     L.push("## 2. Planetary positions — D1 Rasi");
-    L.push(row(["Graha", "Rasi", "Degree", "House", "Retro", "Combust", "Nakshatra", "Pada", "Nak-lord", "Dignity", "Func. nature", "Speed/Avastha", "Vargottama"])); L.push(sep(13));
+    L.push(row(["Graha", "Rasi", "Degree", "House", "Retro", "Combust", "Nakshatra", "Pada", "Nak-lord", "Dignity", "Func. nature (for lagna)", "Speed/Avastha", "Vargottama"])); L.push(sep(13));
     d.planets.forEach(function (p) {
-      L.push(row([p.name, p.signName, vnCcDms(p.deg), p.house, (p.retro ? "R" : "–"), (p.combust ? "Y" : "N"), p.nakshatra, p.pada, p.nakLord, p.dignity, p.nature, p.speed, (p.vargottama ? "Y" : "N")]));
+      L.push(row([p.name, p.signName, vnCcDms(p.deg), p.house, (p.retro ? "R" : "–"), (p.combust ? "Y" : "N"), p.nakshatra, p.pada, p.nakLord, p.dignity, vnFuncLabel(chart, p.name), p.speed, (p.vargottama ? "Y" : "N")]));
     });
     var an = nakshatraInfo(asc.lon);
     L.push(row(["Ascendant", asc.signName, vnCcDms(asc.deg), 1, "–", "–", NAKSHATRAS[an.index], an.pada, NAK_LORDS[an.index], "—", "—", "—", (vargaSign(asc.lon, 9) === asc.sign ? "Y" : "N")]));
@@ -18118,10 +18147,10 @@
     L.push(row(["Point", "Sign", "Degree", "House", "Used by"])); L.push(sep(5));
     try {
       var gul = standingGulika(chart, input);
-      if (gul) {
-        L.push(row(["Gulika", gul.signName, vnCcDms(gul.deg), gul.house, "disease, death, general malefic"]));
-        L.push(row(["Mandi (= Gulika in this build)", gul.signName, vnCcDms(gul.deg), gul.house, "disease, death"]));
-      } else { L.push(row(["Gulika / Mandi", "—", "—", "—", "sunrise/sunset unavailable"])); }
+      var mandi = standingGulika(chart, input, { atEnd: true, name: "Mandi" });
+      if (gul) L.push(row(["Gulika (start of Saturn's part)", gul.signName, vnCcDms(gul.deg), gul.house, "disease, death, general malefic"]));
+      if (mandi) L.push(row(["Mandi (end of Saturn's part)", mandi.signName, vnCcDms(mandi.deg), mandi.house, "disease, death"]));
+      if (!gul && !mandi) L.push(row(["Gulika / Mandi", "—", "—", "—", "sunrise/sunset unavailable"]));
     } catch (e) { L.push(row(["Gulika / Mandi", "—", "—", "—", "—"])); }
     try {
       var d22 = twentySecondDrekkana(chart);
@@ -18136,13 +18165,19 @@
       L.push(row(["Sarpa Drekkana? (Lagna)", (sarpa.hit ? "Yes — " + sarpa.label : "No"), "—", "—", "disease/death"]));
     } catch (e) {}
     try {
-      var sph = sphutaSupport(chart, gender);
-      var sphLon = (gender === "female")
-        ? normalize(chart.planetsByName.Jupiter.lon + chart.planetsByName.Moon.lon + chart.planetsByName.Mars.lon)
-        : normalize(chart.planetsByName.Sun.lon + chart.planetsByName.Venus.lon + chart.planetsByName.Jupiter.lon);
-      var sphSign = signIndex(sphLon);
-      var sphLabel = gender === "female" ? "Kshetra Sphuta (females)" : "Beeja Sphuta (males)";
-      L.push(row([sphLabel, SIGNS[sphSign].name, vnCcDms(sphLon - sphSign * 30), houseFromSign(asc.sign, sphSign), "progeny fertility — parity " + (sph.support ? "supportive" : "not ideal")]));
+      // Beeja Sphuta is the male fertility point; Kshetra Sphuta the female one.
+      // Show only the one that applies to this native's sex.
+      if (gender === "female") {
+        var kLon = normalize(chart.planetsByName.Jupiter.lon + chart.planetsByName.Moon.lon + chart.planetsByName.Mars.lon);
+        var kSign = signIndex(kLon), kOk = !isOddSign(kSign) && !isOddSign(vargaSign(kLon, 9));
+        L.push(row(["Kshetra Sphuta (female)", SIGNS[kSign].name, vnCcDms(kLon - kSign * 30), houseFromSign(asc.sign, kSign), "progeny fertility — should be even sign; parity " + (kOk ? "supportive" : "not ideal")]));
+      } else if (gender === "male") {
+        var bLon = normalize(chart.planetsByName.Sun.lon + chart.planetsByName.Venus.lon + chart.planetsByName.Jupiter.lon);
+        var bSign = signIndex(bLon), bOk = isOddSign(bSign) && isOddSign(vargaSign(bLon, 9));
+        L.push(row(["Beeja Sphuta (male)", SIGNS[bSign].name, vnCcDms(bLon - bSign * 30), houseFromSign(asc.sign, bSign), "progeny fertility — should be odd sign; parity " + (bOk ? "supportive" : "not ideal")]));
+      } else {
+        L.push(row(["Beeja / Kshetra Sphuta", "—", "—", "—", "set the native's sex to compute the fertility sphuta"]));
+      }
     } catch (e) {}
     L.push("");
 
@@ -18234,12 +18269,12 @@
       var vcharts = vdefs.map(function (v) { return makeVargaChart(chart, v[1]); });
       L.push("## 12. Divisional charts (Vargas)");
       L.push(row(["Body"].concat(vdefs.map(function (v) { return v[0]; })))); L.push(sep(vdefs.length + 1));
-      L.push(row(["Lagna"].concat(vcharts.map(function (vc) { return vc.ascendant.signName; }))));
+      L.push(row(["Lagna"].concat(vcharts.map(function (vc) { return vc.ascendant.signName + " · H1"; }))));
       order.forEach(function (n) {
-        L.push(row([n].concat(vcharts.map(function (vc) { var vp = vc.planetsByName[n]; return vp ? vp.signName : "—"; }))));
+        L.push(row([n].concat(vcharts.map(function (vc) { var vp = vc.planetsByName[n]; return vp ? (vp.signName + " · H" + vp.house) : "—"; }))));
       });
       L.push("");
-      L.push("_Each cell = the body's sign in that varga. D9 marriage/dharma · D7 progeny · D10 profession · D3 siblings · D30 disease · D24 education · D12 parents · D4 property · D2 wealth · D60 overall._");
+      L.push("_Each cell = the body's sign · house-within-the-varga (house counted from that varga's Lagna). D9 marriage/dharma · D7 progeny · D10 profession · D3 siblings · D30 disease · D24 education · D12 parents · D4 property · D2 wealth · D60 overall._");
       L.push("");
     } catch (e) {}
 
