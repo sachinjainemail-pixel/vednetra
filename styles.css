@@ -8923,3 +8923,17 @@ input.vn-wide, select.vn-wide, textarea.vn-wide,
 .current-panchang-controls > .vn-tip,
 .ephemeris-controls > .vn-tip,
 .dasha-range-controls > .vn-tip { flex: 0 0 auto; align-self: center; }
+
+/* v69 — Native Input Report preview */
+.vn-native-pre {
+  margin: 0;
+  max-height: 70vh;
+  overflow: auto;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: #12132a;
+  color: #ece4cf;
+  font: 12px/1.5 "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+  white-space: pre;
+  -webkit-overflow-scrolling: touch;
+}
