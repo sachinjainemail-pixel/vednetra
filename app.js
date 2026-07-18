@@ -10905,16 +10905,16 @@
   function shadbalaSection(chart) {
     var rows = shadbalaRows(chart);
     return '<section id="viewA-shadbala" class="section shadbala-section"><div class="section-head"><div><p class="eyebrow">Balas & Phalas</p><h3>Shadbala</h3></div><span class="small-pill">Six-fold strength</span></div>' +
-      '<div class="table-wrap"><table><thead><tr><th>Planet</th><th>Sthana</th><th>Dig</th><th>Kala</th><th>Cheshta</th><th>Naisargika</th><th>Drik</th><th>Total</th><th>Judgement</th></tr></thead><tbody>' +
+      '<div class="table-wrap"><table><thead><tr><th>Planet</th><th>Sthana</th><th>Dig</th><th>Kala</th><th>Cheshta</th><th>Naisargika</th><th>Drik</th><th>Total</th><th>Rupas</th><th>Required</th><th>Ratio</th><th>Judgement</th></tr></thead><tbody>' +
       rows.map(function (row) {
-        return "<tr><td><strong>" + escapeHtml(row.planet) + "</strong></td><td>" + row.sthana + "</td><td>" + row.dig + "</td><td>" + row.kala + "</td><td>" + row.cheshta + "</td><td>" + row.naisargika + "</td><td>" + row.drik + "</td><td><strong>" + row.total + "</strong></td><td>" + escapeHtml(row.judgement) + "</td></tr>";
+        return "<tr><td><strong>" + escapeHtml(row.planet) + "</strong></td><td>" + row.sthana + "</td><td>" + row.dig + "</td><td>" + row.kala + "</td><td>" + row.cheshta + "</td><td>" + row.naisargika + "</td><td>" + row.drik + "</td><td><strong>" + row.total + "</strong></td><td>" + row.rupas.toFixed(2) + "</td><td>" + (row.required / 60).toFixed(2) + "</td><td>" + row.ratio.toFixed(2) + "</td><td>" + escapeHtml(row.judgement) + "</td></tr>";
       }).join("") +
-      '</tbody></table></div><div class="panel-box shadbala-graph-panel"><h3>Shadbala Score Graph</h3>' +
+      '</tbody></table></div><div class="panel-box shadbala-graph-panel"><h3>Shadbala Strength Ratio (obtained / required)</h3>' +
       rows.map(function (row) {
-        var percent = Math.round((row.total / 360) * 100);
-        return '<div class="strength-bar-row"><strong>' + escapeHtml(row.planet) + '</strong><div class="strength-track"><span style="width:' + clamp(percent, 0, 100) + '%"></span></div><em>' + row.total + " / 360</em></div>";
+        var percent = Math.round(clamp(row.ratio / 1.5, 0, 1) * 100);
+        return '<div class="strength-bar-row"><strong>' + escapeHtml(row.planet) + '</strong><div class="strength-track"><span style="width:' + percent + '%"></span></div><em>' + row.ratio.toFixed(2) + " &times;</em></div>";
       }).join("") +
-      '</div><p class="fine-print">Classical Shadbala is represented through six computational heads: positional, directional, temporal, motional, natural and aspectual strength. Rahu/Ketu continue to be judged through dispositor, dignity and house logic elsewhere.</p></section>';
+      '</div><p class="fine-print">Classical Shadbala (BPHS / Parashari) in Shashtiamsas: 60 virupas = 1 Rupa. Six heads &mdash; Sthana (Uccha, Saptavargaja, Ojayugma, Kendradi, Drekkana), Dig, Kala (Nathonnatha, Paksha, Tribhaga, Abda/Masa/Vara/Hora, Ayana), Cheshta, Naisargika and Drik. Ratio = total obtained &divide; classically required strength. Rahu/Ketu are judged through dispositor, dignity and house logic elsewhere.</p></section>';
   }
 
   function shadbalaRows(chart) {
@@ -10923,66 +10923,258 @@
       var row = shadbalaForPlanet(chart, p);
       row.planet = name;
       row.total = Math.round(row.sthana + row.dig + row.kala + row.cheshta + row.naisargika + row.drik);
-      row.judgement = row.total >= 300 ? "Strong" : row.total >= 240 ? "Medium strong" : row.total >= 180 ? "Average" : row.total >= 135 ? "Weak" : "Very weak";
+      var req = requiredShadbala(name);
+      row.required = req;
+      row.rupas = row.total / 60;
+      row.ratio = row.total / req;
+      row.judgement = row.ratio >= 1.2 ? "Strong" : row.ratio >= 1.0 ? "Adequate" : row.ratio >= 0.85 ? "Average" : row.ratio >= 0.6 ? "Weak" : "Very weak";
       return row;
     });
   }
 
+  // ===================================================================
+  // Classical Shadbala (BPHS / Parashari), in Shashtiamsas (virupas).
+  // 60 virupas = 1 Rupa. This replaces the earlier approximation so the
+  // output aligns with reference software (Parashara's Light etc.).
+  // ===================================================================
+  var VN_SB_DEEP_EXALT = { Sun: 10, Moon: 33, Mars: 298, Mercury: 165, Jupiter: 95, Venus: 357, Saturn: 200 };
+  var VN_SB_MT_SIGN = { Sun: 4, Moon: 1, Mars: 0, Mercury: 5, Jupiter: 8, Venus: 6, Saturn: 10 };
+  var VN_SB_NATURAL = {
+    Sun: { friend: ["Moon", "Mars", "Jupiter"], enemy: ["Venus", "Saturn"] },
+    Moon: { friend: ["Sun", "Mercury"], enemy: [] },
+    Mars: { friend: ["Sun", "Moon", "Jupiter"], enemy: ["Mercury"] },
+    Mercury: { friend: ["Sun", "Venus"], enemy: ["Moon"] },
+    Jupiter: { friend: ["Sun", "Moon", "Mars"], enemy: ["Mercury", "Venus"] },
+    Venus: { friend: ["Mercury", "Saturn"], enemy: ["Sun", "Moon"] },
+    Saturn: { friend: ["Mercury", "Venus"], enemy: ["Sun", "Moon", "Mars"] }
+  };
+  var VN_SB_NAISARGIKA = { Sun: 60, Moon: 51.43, Venus: 42.85, Jupiter: 34.28, Mercury: 25.70, Mars: 17.14, Saturn: 8.57 };
+
+  function vnArc180(a, b) { var d = Math.abs(normalize(a) - normalize(b)); return d > 180 ? 360 - d : d; }
+  function vnNaturalRel(p, other) {
+    var t = VN_SB_NATURAL[p];
+    if (!t) return "neutral";
+    if (t.friend.indexOf(other) >= 0) return "friend";
+    if (t.enemy.indexOf(other) >= 0) return "enemy";
+    return "neutral";
+  }
+  function vnTemporalRel(chart, p, other) {
+    // Signs 2,3,4,10,11,12 from the planet = temporal friend; 1,5,6,7,8,9 = enemy
+    var ps = chart.planetsByName[p].sign, os = chart.planetsByName[other].sign;
+    var dist = ((os - ps + 12) % 12) + 1;
+    return [2, 3, 4, 10, 11, 12].indexOf(dist) >= 0 ? "friend" : "enemy";
+  }
+  function vnCompoundValue(chart, p, lord) {
+    if (p === lord) return 30; // own sign
+    var nat = vnNaturalRel(p, lord), tmp = vnTemporalRel(chart, p, lord);
+    if (nat === "friend") return tmp === "friend" ? 22.5 : 7.5;   // adhimitra / sama
+    if (nat === "enemy") return tmp === "friend" ? 7.5 : 1.875;   // sama / adhisatru
+    return tmp === "friend" ? 15 : 3.75;                          // mitra / satru
+  }
+
+  function vnSaptavargajaBala(chart, planet) {
+    var divisions = [1, 2, 3, 7, 9, 12, 30];
+    var total = 0;
+    divisions.forEach(function (dv) {
+      var vsign = vargaSign(planet.lon, dv);
+      var lord = SIGNS[vsign].lord;
+      if (lord === planet.name) {
+        total += (vsign === VN_SB_MT_SIGN[planet.name]) ? 45 : 30;
+      } else {
+        total += vnCompoundValue(chart, planet.name, lord);
+      }
+    });
+    return total;
+  }
+
+  function vnSthanaBala(chart, planet) {
+    // Uccha (exaltation) bala
+    var debil = normalize(VN_SB_DEEP_EXALT[planet.name] + 180);
+    var uccha = vnArc180(planet.lon, debil) / 3;                       // 0..60
+    // Saptavargaja bala
+    var sapta = vnSaptavargajaBala(chart, planet);
+    // Ojayugmarasyamsa bala (odd/even sign & navamsa)
+    var male = ["Sun", "Mars", "Jupiter", "Mercury", "Saturn"].indexOf(planet.name) >= 0;
+    var oja = 0;
+    var rasiOdd = (planet.sign % 2) === 0;      // sign index 0 => 1st sign (odd)
+    var navOdd = (planet.navamsaSign % 2) === 0;
+    if (male) { if (rasiOdd) oja += 15; if (navOdd) oja += 15; }
+    else { if (!rasiOdd) oja += 15; if (!navOdd) oja += 15; }
+    // Kendradi bala
+    var kendradi = [1, 4, 7, 10].indexOf(planet.house) >= 0 ? 60 : [2, 5, 8, 11].indexOf(planet.house) >= 0 ? 30 : 15;
+    // Drekkana bala
+    var drek = Math.floor(planet.deg / 10);
+    var drekBala = 0;
+    if (["Sun", "Mars", "Jupiter"].indexOf(planet.name) >= 0 && drek === 0) drekBala = 15;
+    else if (["Mercury", "Saturn"].indexOf(planet.name) >= 0 && drek === 1) drekBala = 15;
+    else if (["Moon", "Venus"].indexOf(planet.name) >= 0 && drek === 2) drekBala = 15;
+    return uccha + sapta + oja + kendradi + drekBala;
+  }
+
+  function vnDigBala(chart, planet) {
+    // powerless (0-strength) house cusp per planet, equal-house cusps from Lagna
+    var weakHouse = { Mercury: 7, Jupiter: 7, Sun: 4, Mars: 4, Saturn: 1, Moon: 10, Venus: 10 }[planet.name] || 1;
+    var weakLon = normalize(chart.ascendant.lon + (weakHouse - 1) * 30);
+    return vnArc180(planet.lon, weakLon) / 3;   // 0..60 (60 when planet at its strong cusp)
+  }
+
+  function vnDeclination(tropicalLon) {
+    return Math.asin(sinDeg(23.4393) * sinDeg(tropicalLon)) * RAD;
+  }
+  function vnAyanaBala(planet) {
+    var decl = vnDeclination(planet.tropical);
+    var northStrong = ["Sun", "Mars", "Jupiter", "Venus"].indexOf(planet.name) >= 0;
+    var val;
+    if (planet.name === "Mercury") val = (24 + Math.abs(decl)) / 48 * 60;
+    else val = (24 + (northStrong ? decl : -decl)) / 48 * 60;
+    if (planet.name === "Sun") val *= 2;      // Sun's ayana bala is doubled
+    return clamp(val, 0, 60);
+  }
+
+  function vnKalaContext(chart) {
+    if (chart._sbKala) return chart._sbKala;
+    var localMs = chart.date.getTime() + chart.timezone * 3600000;
+    var ld = new Date(localMs);
+    var localMin = ld.getUTCHours() * 60 + ld.getUTCMinutes() + ld.getUTCSeconds() / 60;
+    var dateStr = ld.getUTCFullYear() + "-" + pad(ld.getUTCMonth() + 1) + "-" + pad(ld.getUTCDate());
+    var sun = null;
+    try { sun = sunTimesForDate(dateStr, chart.latitude, chart.longitude, chart.timezone); } catch (e) {}
+    var prevSun = null, nextSun = null;
+    if (sun) {
+      try { prevSun = sunTimesForDate(shiftDateInput(dateStr, -1), chart.latitude, chart.longitude, chart.timezone); } catch (e) {}
+      try { nextSun = sunTimesForDate(shiftDateInput(dateStr, 1), chart.latitude, chart.longitude, chart.timezone); } catch (e) {}
+    }
+    var isDay = sun ? (localMin >= sun.sunrise && localMin < sun.sunset) : (localMin >= 360 && localMin < 1080);
+    // vara (weekday) lord effective at the preceding sunrise
+    var varaDateStr = (sun && localMin < sun.sunrise) ? shiftDateInput(dateStr, -1) : dateStr;
+    var varaLord = weekdayLordForDate(varaDateStr);
+    // hora lord
+    var sr = sun ? sun.sunrise : 360;
+    var horaIdx = Math.floor(((localMin - sr + 1440) % 1440) / 60);
+    var hLord = horaLord(varaLord, horaIdx);
+    // solar month / year lords via sidereal Sun ingress weekday
+    var masaLord = vnSolarIngressWeekday(chart, false);
+    var abdaLord = vnSolarIngressWeekday(chart, true);
+    chart._sbKala = {
+      localMin: localMin, isDay: isDay, sun: sun, prevSun: prevSun, nextSun: nextSun,
+      varaLord: varaLord, horaLord: hLord, masaLord: masaLord, abdaLord: abdaLord
+    };
+    return chart._sbKala;
+  }
+
+  function vnSolarIngressWeekday(chart, yearStart) {
+    // weekday lord of the day the Sun (sidereal) entered its current sign
+    // (masa lord), or last entered Aries 0 (abda / solar-year lord). Found by
+    // scanning backward for the sidereal-sign boundary crossing.
+    try {
+      var key = chart.ayanamshaKey || "raman";
+      function sunSign(jd) { return signIndex(normalize(planetTropicalLongitude("Sun", jd) - ayanamshaValue(jd, key))); }
+      var targetSign = yearStart ? 0 : sunSign(chart.jd);
+      var maxDays = yearStart ? 384 : 34;
+      var ingressJd = chart.jd;
+      var curSign = sunSign(chart.jd);
+      for (var i = 1; i <= maxDays; i += 1) {
+        var prevSign = sunSign(chart.jd - i);
+        if (curSign === targetSign && prevSign !== targetSign) { ingressJd = chart.jd - i + 1; break; }
+        curSign = prevSign;
+      }
+      var localMs = (ingressJd - 2440587.5) * DAY_MS + chart.timezone * 3600000;
+      return WEEKDAY_LORDS[new Date(localMs).getUTCDay()];
+    } catch (e) { return "Sun"; }
+  }
+
+  function vnNathonnathaBala(chart, planet) {
+    var ctx = vnKalaContext(chart);
+    // nata = strength at midnight, unnata = strength at noon (triangular, from local clock)
+    var hours = ctx.localMin / 60;
+    var nata = Math.abs(hours - 12) / 12 * 60;   // 60 at midnight, 0 at noon
+    var unnata = 60 - nata;
+    if (planet.name === "Mercury") return 60;
+    if (["Sun", "Jupiter", "Venus"].indexOf(planet.name) >= 0) return unnata;
+    return nata; // Moon, Mars, Saturn
+  }
+
+  function vnPakshaBala(chart, planet) {
+    var elong = vnArc180(chart.planetsByName.Moon.lon, chart.planetsByName.Sun.lon); // 0..180
+    var beneficStrength = elong / 3; // 0..60, grows toward full moon
+    var benefics = ["Moon", "Mercury", "Jupiter", "Venus"];
+    var val = benefics.indexOf(planet.name) >= 0 ? beneficStrength : (60 - beneficStrength);
+    if (planet.name === "Moon") val *= 2; // Moon's paksha bala is doubled
+    return val;
+  }
+
+  function vnTribhagaBala(chart, planet) {
+    var ctx = vnKalaContext(chart);
+    var lord = null;
+    if (ctx.sun) {
+      if (ctx.isDay) {
+        var dseg = Math.max(1, (ctx.sun.sunset - ctx.sun.sunrise) / 3);
+        var di = clamp(Math.floor((ctx.localMin - ctx.sun.sunrise) / dseg), 0, 2);
+        lord = ["Mercury", "Sun", "Saturn"][di];
+      } else {
+        var nStart = ctx.localMin >= ctx.sun.sunset ? ctx.sun.sunset : (ctx.prevSun ? ctx.prevSun.sunset - 1440 : ctx.sun.sunset - 720);
+        var nEnd = (ctx.nextSun ? ctx.nextSun.sunrise + 1440 : ctx.sun.sunset + 720);
+        if (ctx.localMin < ctx.sun.sunrise && ctx.prevSun) { nStart = ctx.prevSun.sunset - 1440; nEnd = ctx.sun.sunrise; }
+        var nseg = Math.max(1, (nEnd - nStart) / 3);
+        var ni = clamp(Math.floor((ctx.localMin - nStart) / nseg), 0, 2);
+        lord = ["Moon", "Venus", "Mars"][ni];
+      }
+    }
+    var val = 0;
+    if (planet.name === "Jupiter") val += 60;      // Jupiter always gets Tribhaga bala
+    if (lord && planet.name === lord) val += 60;
+    return val;
+  }
+
+  function vnAbdaMasaVaraHoraBala(chart, planet) {
+    var ctx = vnKalaContext(chart);
+    var val = 0;
+    if (planet.name === ctx.abdaLord) val += 15;
+    if (planet.name === ctx.masaLord) val += 30;
+    if (planet.name === ctx.varaLord) val += 45;
+    if (planet.name === ctx.horaLord) val += 60;
+    return val;
+  }
+
+  function vnKalaBala(chart, planet) {
+    return vnNathonnathaBala(chart, planet) + vnPakshaBala(chart, planet) +
+      vnTribhagaBala(chart, planet) + vnAbdaMasaVaraHoraBala(chart, planet) +
+      vnAyanaBala(planet);
+  }
+
+  function vnCheshtaBala(chart, planet) {
+    if (planet.name === "Sun") return vnAyanaBala(planet);
+    if (planet.name === "Moon") return vnPakshaBala(chart, planet);
+    var seeghrocca;
+    if (["Mars", "Jupiter", "Saturn"].indexOf(planet.name) >= 0) {
+      seeghrocca = chart.planetsByName.Sun.tropical;
+    } else {
+      var el = orbitalElements(planet.name, chart.jd - 2451543.5);
+      seeghrocca = normalize(el.N + el.w + el.M);
+    }
+    var kendra = normalize(seeghrocca - planet.tropical);
+    var folded = kendra > 180 ? 360 - kendra : kendra;
+    return folded / 3; // 0..60, peaks near opposition (retrograde)
+  }
+
+  function vnDrikBala(chart, planet) {
+    var score = 0;
+    planetsAspectingPlanet(chart, planet).forEach(function (p) {
+      var v = (p.naturalNature === "Benefic") ? 15 : -15; // full-aspect drishti /4
+      score += v;
+    });
+    return score;
+  }
+
   function shadbalaForPlanet(chart, planet) {
     return {
-      sthana: Math.round(sthanaBala(chart, planet)),
-      dig: Math.round(digBala(planet)),
-      kala: Math.round(kalaBala(chart, planet)),
-      cheshta: Math.round(cheshtaBala(planet)),
-      naisargika: Math.round(naisargikaBala(planet.name)),
-      drik: Math.round(drikBala(chart, planet))
+      sthana: Math.round(vnSthanaBala(chart, planet)),
+      dig: Math.round(vnDigBala(chart, planet)),
+      kala: Math.round(vnKalaBala(chart, planet)),
+      cheshta: Math.round(vnCheshtaBala(chart, planet)),
+      naisargika: Math.round(VN_SB_NAISARGIKA[planet.name] || 30),
+      drik: Math.round(vnDrikBala(chart, planet))
     };
-  }
-
-  function sthanaBala(chart, planet) {
-    var dignityScore = { Exalted: 60, Moolatrikona: 55, "Own sign": 50, "Friendly sign": 42, "Neutral sign": 34, "Enemy sign": 24, Debilitated: 12 }[planet.dignity] || 30;
-    if ([1, 4, 5, 7, 9, 10].indexOf(planet.house) >= 0) dignityScore += 6;
-    if ([6, 8, 12].indexOf(planet.house) >= 0) dignityScore -= 8;
-    if (planet.navamsaSign === planet.sign) dignityScore += 6;
-    return clamp(dignityScore, 0, 60);
-  }
-
-  function digBala(planet) {
-    var ideal = { Sun: 10, Mars: 10, Moon: 4, Venus: 4, Jupiter: 1, Mercury: 1, Saturn: 7 }[planet.name] || 1;
-    var diff = Math.abs(((planet.house - ideal + 18) % 12) - 6);
-    return clamp((1 - diff / 6) * 60, 0, 60);
-  }
-
-  function kalaBala(chart, planet) {
-    var shifted = new Date(chart.date.getTime() + chart.timezone * 3600000);
-    var hour = shifted.getUTCHours() + shifted.getUTCMinutes() / 60;
-    var dayChart = hour >= 6 && hour < 18;
-    var dayPlanets = ["Sun", "Jupiter", "Venus"];
-    var nightPlanets = ["Moon", "Mars", "Saturn"];
-    var score = planet.name === "Mercury" ? 42 : dayPlanets.indexOf(planet.name) >= 0 ? (dayChart ? 55 : 32) : nightPlanets.indexOf(planet.name) >= 0 ? (dayChart ? 32 : 55) : 36;
-    if (planet.name === "Moon" && chart.moonStrength === "Bright") score += 5;
-    if (planet.name === "Sun" && dayChart) score += 3;
-    return clamp(score, 0, 60);
-  }
-
-  function cheshtaBala(planet) {
-    var score = planet.retrograde ? 60 : (planet.name === "Sun" || planet.name === "Moon" ? 35 : 32);
-    if (planet.combust) score -= 15;
-    return clamp(score, 0, 60);
-  }
-
-  function naisargikaBala(name) {
-    return { Sun: 60, Moon: 51, Venus: 43, Jupiter: 34, Mercury: 26, Mars: 17, Saturn: 9 }[name] || 30;
-  }
-
-  function drikBala(chart, planet) {
-    var aspects = planetsAspectingPlanet(chart, planet);
-    var conjunctions = chart.planets.filter(function (p) { return p.name !== planet.name && p.sign === planet.sign; });
-    var score = 30;
-    aspects.concat(conjunctions).forEach(function (p) {
-      score += p.naturalNature === "Benefic" ? 8 : -9;
-    });
-    return clamp(score, 0, 60);
   }
 
   function jaiminiSection(chart) {
