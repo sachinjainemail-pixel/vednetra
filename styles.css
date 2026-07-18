@@ -8962,6 +8962,21 @@ input.vn-wide, select.vn-wide, textarea.vn-wide,
 .vn-dash-mount .chart-title-strip { font-size: 12px; padding: 3px 8px; margin: -5px -5px 5px; }
 .vn-dash-mount .table-wrap { overflow: auto; }
 
+/* Consolidated View: larger, more legible chart labels (SVG viewBox units) */
+#viewA-consolidated .north-sign { font-size: 22px; }
+#viewA-consolidated .north-planets { font-size: 16px; }
+
+/* Consolidated View: full 5-level Vimshottari tree scrolls inside its cell */
+#viewA-consolidated .vn-dash-mount > .panel-box.dasha-panel {
+  display: block !important;
+  overflow-y: auto !important;
+  padding: 6px 8px !important;
+}
+/* keep the dasha panel compact — drop the explorer's verbose helper text */
+#viewA-consolidated .vn-dash-mount .dasha-panel > .fine-print,
+#viewA-consolidated .vn-dash-mount .dasha-panel .commentary-box { display: none !important; }
+#viewA-consolidated .vn-dash-mount .dasha-titlebar { position: sticky; top: 0; background: #fefbef; padding: 2px 0 4px; z-index: 1; }
+
 /* ---- Desktop/tablet: pack all six panels into the visible screen ---- */
 @media (min-width: 820px) {
   /* let the section fill the viewport under the toolbar and drop the extra chrome */
