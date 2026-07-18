@@ -18866,6 +18866,7 @@
     var opts = vargaDivisions().map(function (dv) { return { v: String(dv), label: "D-" + dv + " " + vargaName(dv) }; });
     opts.push({ v: "transit", label: "Gochara (Transit)" });
     opts.push({ v: "table", label: "Planet data table" });
+    opts.push({ v: "varshfal", label: "Varshfal (Annual chart)" });
     opts.push({ v: "dasha", label: "Vimshottari dasha" });
     return opts;
   }
@@ -18877,6 +18878,20 @@
       return '<tr><td><strong>' + escapeHtml(n) + '</strong></td><td>' + escapeHtml(p.signName) + '</td><td>' + escapeHtml(decimalToDms(p.deg)) + '</td><td>' + p.house + '</td><td>' + escapeHtml(NAKSHATRAS[nk.index]) + '</td><td>' + nk.pada + '</td><td>' + escapeHtml(p.dignity) + '</td></tr>';
     }).join("");
     return '<div class="panel-box"><div class="chart-title-strip">Planet data (D-1)</div><div class="table-wrap compact-table"><table><thead><tr><th>Graha</th><th>Rasi</th><th>Degree</th><th>H</th><th>Nakshatra</th><th>Pada</th><th>Dignity</th></tr></thead><tbody>' + rows + '</tbody></table></div></div>';
+  }
+  function vnDashVarshfal(chart, input) {
+    // Tajika annual (Varshphal) D-1 chart for the current running year, with
+    // the Muntha placed. Same single-chart panel style as the varga panels.
+    try {
+      var runningYear = 1;
+      try { runningYear = completedYears(input.birthInstant, input.asOfInstant, input.timezone) + 1; } catch (e) {}
+      var result = computeVarshfal(chart, input, runningYear);
+      return chartBox("Varshfal D-1 · Year " + result.runningYear + " (Muntha H" + result.munthaHouse + ")",
+        result.varshfal.ascendant.sign, result.planetsWithMuntha,
+        { division: 1, rootChart: result.varshfal, showAscDegree: true, ascDegree: result.varshfal.ascendant.deg });
+    } catch (e) {
+      return '<div class="panel-box"><div class="chart-title-strip">Varshfal</div><p class="fine-print">Could not build the annual chart.</p></div>';
+    }
   }
   function vnDashDasha(chart, input) {
     // Reuse the full Vimshottari Dasha Explorer tree (MD -> AD -> PD -> SD ->
@@ -18899,6 +18914,7 @@
         return chartBox("D-1 Gochara (Transit)", ascSign, pls, { division: 1 });
       }
       if (value === "table") return vnDashTable(chart);
+      if (value === "varshfal") return vnDashVarshfal(chart, input);
       if (value === "dasha") return vnDashDasha(chart, input);
       var dv = parseInt(value, 10) || 1;
       var tv = tableVarga(chart, dv);
@@ -18906,7 +18922,7 @@
     } catch (e) { return '<div class="panel-box"><p class="fine-print">Could not render: ' + escapeHtml(e.message || "") + '</p></div>'; }
   }
   function consolidatedSection(chart, input) {
-    var defaults = ["1", "9", "transit", "table", "10", "dasha"];
+    var defaults = ["1", "9", "transit", "table", "varshfal", "dasha"];
     var opts = vnDashViewOptions();
     var cells = "";
     for (var i = 0; i < 6; i++) {
