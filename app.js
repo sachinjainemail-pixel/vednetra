@@ -18878,19 +18878,17 @@
     }).join("");
     return '<div class="panel-box"><div class="chart-title-strip">Planet data (D-1)</div><div class="table-wrap compact-table"><table><thead><tr><th>Graha</th><th>Rasi</th><th>Degree</th><th>H</th><th>Nakshatra</th><th>Pada</th><th>Dignity</th></tr></thead><tbody>' + rows + '</tbody></table></div></div>';
   }
-  function vnDashDasha(chart) {
-    var stack = [], adRows = "", now = Date.now();
-    try { stack = findDashaStack(chart.vimshottari.timeline, new Date()); } catch (e) {}
-    if (stack[0]) {
-      try {
-        adRows = subPeriods(stack[0], "AD").map(function (a) {
-          var run = a.start.getTime() <= now && now < a.end.getTime();
-          return '<tr' + (run ? ' class="current-row"' : '') + '><td>' + escapeHtml(stack[0].lord) + '-' + escapeHtml(a.lord) + '</td><td>' + vnFmtFullDate(a.start.getTime()) + '</td><td>' + vnFmtFullDate(a.end.getTime()) + '</td></tr>';
-        }).join("");
-      } catch (e) {}
+  function vnDashDasha(chart, input) {
+    // Reuse the full Vimshottari Dasha Explorer tree (MD -> AD -> PD -> SD ->
+    // Prana). Native <details>/<summary> handles expansion; Prana rows are
+    // rendered lazily by wireDashaGroupControls when a Sookshma row opens.
+    try {
+      var rangeStart = input && input.birthInstant ? input.birthInstant : null;
+      var rangeEnd = input ? dashaDisplayRangeEnd(chart, input) : null;
+      return dashaExplorerPanelHtml(chart, input, rangeStart, rangeEnd);
+    } catch (e) {
+      return '<div class="panel-box"><div class="chart-title-strip">Vimshottari</div><p class="fine-print">Could not build the dasha tree.</p></div>';
     }
-    var running = stack.length ? stack.map(function (p, i) { return ["MD", "AD", "PD", "SD", "PR"][i] + " " + p.lord; }).join(" > ") : "-";
-    return '<div class="panel-box"><div class="chart-title-strip">Vimshottari</div><p class="fine-print" style="margin:6px 4px">Running: ' + escapeHtml(running) + '</p><div class="table-wrap compact-table" style="max-height:340px"><table><thead><tr><th>MD-AD</th><th>Start</th><th>End</th></tr></thead><tbody>' + (adRows || '<tr><td colspan="3">-</td></tr>') + '</tbody></table></div></div>';
   }
   function vnDashRender(chart, input, value) {
     try {
@@ -18901,7 +18899,7 @@
         return chartBox("D-1 Gochara (Transit)", ascSign, pls, { division: 1 });
       }
       if (value === "table") return vnDashTable(chart);
-      if (value === "dasha") return vnDashDasha(chart);
+      if (value === "dasha") return vnDashDasha(chart, input);
       var dv = parseInt(value, 10) || 1;
       var tv = tableVarga(chart, dv);
       return chartBox("D-" + dv + " " + vargaName(dv), tv.ascendant.sign, tv.planets, { division: dv, showAscDegree: dv === 1, ascDegree: tv.ascendant.deg });
@@ -18948,9 +18946,16 @@
     Array.prototype.slice.call(root.querySelectorAll(".vn-dash-pick")).forEach(function (sel) {
       sel.addEventListener("change", function () {
         var mount = root.querySelector('.vn-dash-mount[data-mount="' + sel.getAttribute("data-cell") + '"]');
-        if (mount) mount.innerHTML = vnDashRender(chart, input, sel.value);
+        if (mount) {
+          mount.innerHTML = vnDashRender(chart, input, sel.value);
+          // Newly-mounted Vimshottari tree needs its expand/Prana wiring.
+          if (sel.value === "dasha") { try { wireDashaGroupControls(); } catch (e) {} }
+          vnDashFit();
+        }
       });
     });
+    // Any dasha panels present at first render need their controls wired too.
+    try { wireDashaGroupControls(); } catch (e) {}
     // Size the grid to fill the remaining viewport now and after layout settles.
     vnDashFit();
     setTimeout(vnDashFit, 60);
