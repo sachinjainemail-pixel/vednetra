@@ -13,7 +13,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.svg">
-  <link rel="stylesheet" href="styles.css?v=72">
+  <link rel="stylesheet" href="styles.css?v=73">
 </head>
 <body>
   <div id="vnSplash" class="vn-splash" role="dialog" aria-label="Welcome to VedNetra">
@@ -53,7 +53,7 @@
           <div>
             <h1 class="brand-title">VedNetra</h1>
           </div>
-          <span class="status-pill">v1.72</span>
+          <span class="status-pill">v1.73</span>
         </div>
 
         <form id="birthForm" autocomplete="off">
@@ -258,6 +258,7 @@
           <div class="nav-category">
             <button type="button" class="nav-category-title" data-nav-category-toggle aria-expanded="false">Workspace</button>
             <div class="nav-category-actions">
+              <button type="button" data-view-a-target="viewA-consolidated">Consolidated View</button>
               <button type="button" data-view-a-target="viewA-output-library">Library</button>
               <button type="button" data-view-a-target="viewA-worksheets">Worksheets</button>
               <button type="button" data-view-a-target="viewA-summary">Summary</button>
@@ -352,6 +353,7 @@
                 <option value="__chartSetupDownload">Download Report</option>
               </optgroup>
               <optgroup label="Workspace">
+                <option value="viewA-consolidated">Consolidated View</option>
                 <option value="viewA-output-library">Library</option>
                 <option value="viewA-worksheets">Worksheets</option>
                 <option value="viewA-summary">Summary</option>
@@ -445,7 +447,7 @@
           </div>
           <p class="empty-state-tagline">A complete Vedic workbench: divisional charts (D-1 to D-60), Vimshottari dasha, Shadbala, Ashtakavarga, KP, Jaimini and Varshfal â plus a daily dashboard, muhurta windows, numerology, card readings and more. Pick anything below to jump straight in.</p>
           <div id="vnHomeShowcase" class="vn-home-showcase"></div>
-          <p class="empty-state-version" id="appVersionLabel">Version 1.72</p>
+          <p class="empty-state-version" id="appVersionLabel">Version 1.73</p>
         </div>
         <article id="report" class="report hidden"></article>
       </section>
@@ -555,6 +557,6 @@
       </div>
     </div>
   </main>
-  <script src="app.js?v=72"></script>
+  <script src="app.js?v=73"></script>
 </body>
 </html>
