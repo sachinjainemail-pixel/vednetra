@@ -8954,8 +8954,8 @@ input.vn-wide, select.vn-wide, textarea.vn-wide,
   background: rgba(255, 251, 240, 0.6);
   overflow: hidden;
 }
-.vn-dash-head { padding: 4px; border-bottom: 1px solid rgba(200, 168, 78, 0.3); flex: 0 0 auto; }
-.vn-dash-pick { width: 100% !important; max-width: none !important; min-height: 28px; font-size: 12px; font-weight: 700; }
+.vn-dash-head { padding: 2px; border-bottom: 1px solid rgba(200, 168, 78, 0.3); flex: 0 0 auto; }
+.vn-dash-pick { width: 100% !important; max-width: none !important; min-height: 24px; font-size: 12px; font-weight: 700; }
 .vn-dash-mount { padding: 5px; min-width: 0; }
 .vn-dash-mount > .panel-box { min-height: 0 !important; margin: 0 !important; box-shadow: none !important; border: 0 !important; }
 .vn-dash-mount .north-chart { width: 100% !important; max-width: 100% !important; height: auto !important; }
@@ -8966,19 +8966,30 @@ input.vn-wide, select.vn-wide, textarea.vn-wide,
 @media (min-width: 820px) {
   /* let the section fill the viewport under the toolbar and drop the extra chrome */
   body.report-active.report-view-chartData #chartDataReportView:has(#viewA-consolidated:not(.hidden)) > .report-head,
-  #viewA-consolidated .section-head { display: none !important; }
-  #viewA-consolidated { margin: 0 !important; }
+  #viewA-consolidated .section-head,
+  #viewA-consolidated > .fine-print { display: none !important; }
+  #viewA-consolidated { margin: 0 !important; padding: 4px !important; }
+  /* JS sets an exact pixel height on the grid; this calc is only a pre-JS
+     fallback so the layout is never taller than the viewport. */
   #chartDataReportView .vn-dash-grid {
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(2, 1fr);
     height: calc(100dvh - 150px);
     min-height: 440px;
-    gap: 8px;
+    gap: 6px;
     align-items: stretch;
   }
   /* min-height:0 lets grid items shrink to their 1fr track instead of
      forcing their content min-height and overflowing the viewport */
   #viewA-consolidated .vn-dash-cell { overflow: hidden; min-height: 0; }
+  /* thin panel switcher so the chart gets the height, not the chrome */
+  #viewA-consolidated .vn-dash-head { padding: 1px; }
+  #viewA-consolidated .vn-dash-pick { min-height: 20px; height: 22px; font-size: 11px; padding: 0 4px; }
+  #viewA-consolidated .vn-dash-mount { padding: 2px; }
+  /* the dropdown already names the panel — drop the duplicated inner title bar
+     and the meta pill so the chart square can grow to fill the cell */
+  #viewA-consolidated .vn-dash-mount .chart-title-strip,
+  #viewA-consolidated .vn-dash-mount .chart-meta { display: none !important; }
   #viewA-consolidated .vn-dash-mount {
     flex: 1 1 auto;
     min-height: 0;
@@ -9009,4 +9020,4 @@ input.vn-wide, select.vn-wide, textarea.vn-wide,
     overflow: auto;
   }
 }
-@media (max-width: 819px) { #chartDataReportView .vn-dash-grid { grid-template-columns: 1fr; } }
+@media (max-width: 819px) { #chartDataReportView .vn-dash-grid { grid-template-columns: 1fr; height: auto !important; } }

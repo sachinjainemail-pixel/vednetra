@@ -2095,6 +2095,10 @@
     setChartDataNavActive(null, targetId);
     if (!opts.keepCategoryOpen) closeChartDataNavCategories();
     refreshRailFocusTargets(false);
+    if (targetId === "viewA-consolidated" && typeof vnDashFitSoon === "function") {
+      vnDashFitSoon();
+      setTimeout(function () { if (typeof vnDashFit === "function") vnDashFit(); }, 120);
+    }
   }
 
   function syncSingleChartDataSectionVisibility() {
@@ -18911,6 +18915,28 @@
       '<p class="fine-print">All key charts on one screen. Each panel is independently switchable - pick any divisional chart (D-1 to D-60), the live transit (Gochara), the planet data table, or the Vimshottari dasha from its dropdown.</p>' +
       '<div class="vn-dash-grid">' + cells + '</div></section>';
   }
+  function vnDashFit() {
+    var root = document.getElementById("viewA-consolidated");
+    if (!root || root.classList.contains("hidden")) return;
+    var grid = root.querySelector(".vn-dash-grid");
+    if (!grid) return;
+    // Only lock height on wide screens where we pack all six panels onto one
+    // screen; on narrow screens the grid stacks and scrolls naturally.
+    if (window.innerWidth < 820) { grid.style.height = ""; return; }
+    var top = grid.getBoundingClientRect().top;
+    var h = Math.max(360, Math.round(window.innerHeight - top - 6));
+    grid.style.height = h + "px";
+  }
+  var vnDashFitPending = null;
+  function vnDashFitSoon() {
+    if (vnDashFitPending) cancelAnimationFrame(vnDashFitPending);
+    vnDashFitPending = requestAnimationFrame(function () { vnDashFitPending = null; vnDashFit(); });
+  }
+  if (!window.vnDashResizeWired) {
+    window.vnDashResizeWired = true;
+    window.addEventListener("resize", vnDashFitSoon);
+    window.addEventListener("orientationchange", vnDashFitSoon);
+  }
   function wireConsolidatedControls(chart, input) {
     var root = document.getElementById("viewA-consolidated");
     if (!root) return;
@@ -18920,6 +18946,10 @@
         if (mount) mount.innerHTML = vnDashRender(chart, input, sel.value);
       });
     });
+    // Size the grid to fill the remaining viewport now and after layout settles.
+    vnDashFit();
+    setTimeout(vnDashFit, 60);
+    setTimeout(vnDashFit, 250);
   }
 
   function nativeReportSection(chart, input) {
