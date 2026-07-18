@@ -2795,7 +2795,7 @@
   }
   function vnWireForceRefresh() {
     if (typeof document === "undefined") return;
-    ["appVersionLabel"].forEach(function (id) {
+    ["appVersionLabel", "appVersionPill"].forEach(function (id) {
       var el = document.getElementById(id);
       if (!el || el._vnRefreshWired) return;
       el._vnRefreshWired = true;
