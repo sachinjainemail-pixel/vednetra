@@ -8938,11 +8938,11 @@ input.vn-wide, select.vn-wide, textarea.vn-wide,
   -webkit-overflow-scrolling: touch;
 }
 
-/* v73 — Consolidated View: multi-panel switchable dashboard */
+/* v73 — Consolidated View: compact, fits one screen, no page scroll */
 #chartDataReportView .vn-dash-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: 8px;
   align-items: start;
 }
 .vn-dash-cell {
@@ -8954,18 +8954,59 @@ input.vn-wide, select.vn-wide, textarea.vn-wide,
   background: rgba(255, 251, 240, 0.6);
   overflow: hidden;
 }
-.vn-dash-head { padding: 6px; border-bottom: 1px solid rgba(200, 168, 78, 0.35); }
-.vn-dash-pick {
-  width: 100% !important;
-  max-width: none !important;
-  min-height: 32px;
-  font-size: 12.5px;
-  font-weight: 700;
-}
-.vn-dash-mount { padding: 8px; min-width: 0; }
-.vn-dash-mount .panel-box,
-.vn-dash-mount .chart-panel { min-height: 0 !important; margin: 0 !important; box-shadow: none !important; border: 0 !important; }
+.vn-dash-head { padding: 4px; border-bottom: 1px solid rgba(200, 168, 78, 0.3); flex: 0 0 auto; }
+.vn-dash-pick { width: 100% !important; max-width: none !important; min-height: 28px; font-size: 12px; font-weight: 700; }
+.vn-dash-mount { padding: 5px; min-width: 0; }
+.vn-dash-mount > .panel-box { min-height: 0 !important; margin: 0 !important; box-shadow: none !important; border: 0 !important; }
 .vn-dash-mount .north-chart { width: 100% !important; max-width: 100% !important; height: auto !important; }
-.vn-dash-mount .table-wrap { max-height: 360px; overflow: auto; }
-@media (max-width: 1100px) { #chartDataReportView .vn-dash-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 680px)  { #chartDataReportView .vn-dash-grid { grid-template-columns: 1fr; } }
+.vn-dash-mount .chart-title-strip { font-size: 12px; padding: 3px 8px; margin: -5px -5px 5px; }
+.vn-dash-mount .table-wrap { overflow: auto; }
+
+/* ---- Desktop/tablet: pack all six panels into the visible screen ---- */
+@media (min-width: 820px) {
+  /* let the section fill the viewport under the toolbar and drop the extra chrome */
+  body.report-active.report-view-chartData #chartDataReportView:has(#viewA-consolidated:not(.hidden)) > .report-head,
+  #viewA-consolidated .section-head { display: none !important; }
+  #viewA-consolidated { margin: 0 !important; }
+  #chartDataReportView .vn-dash-grid {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    height: calc(100dvh - 150px);
+    min-height: 440px;
+    gap: 8px;
+    align-items: stretch;
+  }
+  /* min-height:0 lets grid items shrink to their 1fr track instead of
+     forcing their content min-height and overflowing the viewport */
+  #viewA-consolidated .vn-dash-cell { overflow: hidden; min-height: 0; }
+  #viewA-consolidated .vn-dash-mount {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+  }
+  #viewA-consolidated .vn-dash-mount > .panel-box {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+  #viewA-consolidated .vn-dash-mount .north-chart {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+  }
+  #viewA-consolidated .vn-dash-mount .table-wrap {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: 100%;
+    overflow: auto;
+  }
+}
+@media (max-width: 819px) { #chartDataReportView .vn-dash-grid { grid-template-columns: 1fr; } }
