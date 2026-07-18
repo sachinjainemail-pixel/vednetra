@@ -1932,6 +1932,7 @@
     if (layoutBar) layoutBar.classList.add("hidden");
     document.body.classList.remove("report-active");
     document.body.classList.remove("report-view-chartData");
+    document.body.classList.remove("vn-dash-active");
     if (typeof window !== "undefined" && window.scrollTo) window.scrollTo(0, 0);
   }
 
@@ -2095,7 +2096,9 @@
     setChartDataNavActive(null, targetId);
     if (!opts.keepCategoryOpen) closeChartDataNavCategories();
     refreshRailFocusTargets(false);
-    if (targetId === "viewA-consolidated" && typeof vnDashFitSoon === "function") {
+    var isDash = targetId === "viewA-consolidated";
+    if (typeof document !== "undefined" && document.body) document.body.classList.toggle("vn-dash-active", isDash);
+    if (isDash && typeof vnDashFitSoon === "function") {
       vnDashFitSoon();
       setTimeout(function () { if (typeof vnDashFit === "function") vnDashFit(); }, 120);
     }
@@ -2498,7 +2501,9 @@
   function showVargaSectionAfterChartChange() {
     window.setTimeout(function () {
       if (vnPendingHomeTarget) { var t = vnPendingHomeTarget; vnPendingHomeTarget = null; showSingleChartDataSection(t, { skipScroll: false }); return; }
-      showSingleChartDataSection("viewA-vargas", { skipScroll: false });
+      // Land on the Consolidated View (all key charts on one screen) by default
+      // whenever a chart is generated or selected.
+      showSingleChartDataSection("viewA-consolidated", { skipScroll: false });
     }, 0);
   }
 
@@ -5816,7 +5821,7 @@
     // -------------------------------------------------------------------------
     pendingSectionRenders.clear();
     navAliasToPendingId.clear();
-    if (!opts.preserveActiveSection) activeChartDataSectionId = "viewA-output-library";
+    if (!opts.preserveActiveSection) activeChartDataSectionId = "viewA-consolidated";
 
     var sections = [
       // ---- immediate (above the fold) ----

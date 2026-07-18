@@ -8967,16 +8967,40 @@ input.vn-wide, select.vn-wide, textarea.vn-wide,
   /* let the section fill the viewport under the toolbar and drop the extra chrome */
   body.report-active.report-view-chartData #chartDataReportView:has(#viewA-consolidated:not(.hidden)) > .report-head,
   #viewA-consolidated .section-head,
-  #viewA-consolidated > .fine-print { display: none !important; }
-  #viewA-consolidated { margin: 0 !important; padding: 4px !important; }
+  #viewA-consolidated > .fine-print,
+  #viewA-consolidated > .vn-tip { display: none !important; }
+  #viewA-consolidated { margin: 0 !important; padding: 2px !important; }
+
+  /* Trim the sticky top toolbar to a slim strip in this view so the panels
+     get the reclaimed height. Scoped to body.vn-dash-active so every other
+     report view keeps its normal toolbar. */
+  body.vn-dash-active #chartInputLayoutBar {
+    margin: 0 0 2px !important;
+    padding: 2px 6px !important;
+    gap: 5px !important;
+    box-shadow: 0 2px 8px rgba(24, 15, 4, 0.1) !important;
+  }
+  body.vn-dash-active #chartInputLayoutBar .input-toggle-btn,
+  body.vn-dash-active #chartInputLayoutBar .part-a-download-btn,
+  body.vn-dash-active #chartInputLayoutBar .part-a-fullscreen-btn {
+    min-height: 26px !important;
+    padding: 2px 9px !important;
+    font-size: 11.5px !important;
+  }
+  body.vn-dash-active #chartInputLayoutBar .vn-lang-toggle select { min-height: 26px !important; padding: 1px 6px !important; font-size: 11.5px !important; }
+  body.vn-dash-active #partAIdentityStrip { padding: 1px 8px !important; gap: 8px !important; }
+  body.vn-dash-active #partAIdentityStrip .part-a-brand-mini img { width: 26px !important; height: 26px !important; }
+  body.vn-dash-active #partAIdentityStrip .part-a-brand-mini strong { font-size: 16px !important; }
+  body.vn-dash-active #partAIdentityStrip .part-a-native-summary { font-size: 11.5px !important; line-height: 1.25 !important; }
+
   /* JS sets an exact pixel height on the grid; this calc is only a pre-JS
      fallback so the layout is never taller than the viewport. */
   #chartDataReportView .vn-dash-grid {
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    height: calc(100dvh - 150px);
+    height: calc(100dvh - 120px);
     min-height: 440px;
-    gap: 6px;
+    gap: 4px;
     align-items: stretch;
   }
   /* min-height:0 lets grid items shrink to their 1fr track instead of
