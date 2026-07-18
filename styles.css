@@ -9030,12 +9030,22 @@ input.vn-wide, select.vn-wide, textarea.vn-wide,
     align-items: stretch;
     width: 100%;
   }
+  /* chart panels: center the square chart so its own border stays square
+     (align-items:center stops the stretch that would fight aspect-ratio) */
+  #viewA-consolidated .vn-dash-mount > .panel-box:has(.north-chart) { align-items: center; }
+  /* The chart element must stay square: size it by height and let
+     aspect-ratio drive the width, never force both width AND height (that
+     cancels aspect-ratio and stretches the element's border into a
+     rectangle around a centred graphic). */
   #viewA-consolidated .vn-dash-mount .north-chart {
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     min-height: 0;
-    width: 100% !important;
     height: 100% !important;
+    width: auto !important;
+    max-width: 100% !important;
     max-height: 100% !important;
+    margin: 0 auto !important;
+    aspect-ratio: 1 / 1;
   }
   #viewA-consolidated .vn-dash-mount .table-wrap {
     flex: 1 1 auto;
