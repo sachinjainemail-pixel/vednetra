@@ -18367,6 +18367,13 @@
 
   // ---- NATIVE INPUT REPORT v3 — full template export (§0–§16 + v3 adds) --
   function vnNativeMarkdown(chart, input) {
+    // The Native Input Report is ALWAYS cast with Lahiri ayanamsha, regardless
+    // of the ayanamsha chosen for the on-screen chart. Recast on Lahiri here.
+    if (input && input.birthInstant && chart.ayanamshaKey !== "lahiri") {
+      try {
+        chart = buildChart(input.birthInstant, Number(input.latitude), Number(input.longitude), Number(input.timezone), { ascendantOverride: input.ascendantOverride, ayanamshaKey: "lahiri" });
+      } catch (e) {}
+    }
     var d = vnCcData(chart, input), asc = chart.ascendant, L = [];
     var order = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
     var classical = CLASSICAL_PLANETS;
