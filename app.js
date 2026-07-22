@@ -19122,16 +19122,22 @@
           else if (!o1 && o2) { if (b1 <= b2) bySign[s1] = 0; }
         });
         var afterEka = bySign.slice();
-        var rasiP = 0, grahaP = 0;
-        for (var s3 = 0; s3 < 12; s3++) rasiP += afterEka[s3] * VAPM_RASI_PINDA[s3];
-        classical.forEach(function (g) { for (var s4 = 0; s4 < 12; s4++) if (SIGNS[s4].lord === g) grahaP += afterEka[s4] * VAPM_GRAHA_PINDA[g]; });
-        L.push("**" + n + "** - Rasi Pinda " + rasiP + " · Graha Pinda " + grahaP + " · **Shodhya Pinda " + (rasiP + grahaP) + "**");
+        function pinda(arr) {
+          var rp = 0, gp = 0;
+          for (var s3 = 0; s3 < 12; s3++) rp += arr[s3] * VAPM_RASI_PINDA[s3];
+          classical.forEach(function (g) { for (var s4 = 0; s4 < 12; s4++) if (SIGNS[s4].lord === g) gp += arr[s4] * VAPM_GRAHA_PINDA[g]; });
+          return { rp: rp, gp: gp, total: rp + gp };
+        }
+        var pTri = pinda(afterTri), pEka = pinda(afterEka);
+        // Headline Shodhya Pinda = Trikona-reduced (deterministic & reproducible);
+        // the occupancy-dependent Ekadhipatya value is shown as an optional refinement.
+        L.push("**" + n + "** - Rasi Pinda " + pTri.rp + " · Graha Pinda " + pTri.gp + " · **Shodhya Pinda " + pTri.total + "** (post-Trikona)" + (pEka.total !== pTri.total ? " · with Ekadhipatya = " + pEka.total : ""));
         L.push(row(["Step"].concat(sgnAbbr))); L.push(sep(13));
         L.push(row(["BAV"].concat(original)));
         L.push(row(["after Trikona"].concat(afterTri)));
-        L.push(row(["after Ekadhipatya"].concat(afterEka)));
+        L.push(row(["after Ekadhipatya (opt.)"].concat(afterEka)));
       });
-      L.push("_Rasi multipliers Ar7 Ta10 Ge8 Cn4 Le10 Vi5 Li7 Sc8 Sg9 Cp5 Aq11 Pi12; Graha multipliers Su5 Mo5 Ma8 Me5 Ju10 Ve7 Sa5. Ekadhipatya pairs: Ma(Ar/Sc) Ve(Ta/Li) Me(Ge/Vi) Ju(Sg/Pi) Sa(Cp/Aq); the equal-value ambiguous case is left unchanged._");
+      L.push("_Headline Shodhya Pinda is the **post-Trikona** value (deterministic and reproducible). The Ekadhipatya (two-sign-lordship) step is occupancy-dependent and its equal-value case is disputed across sources, so its result is shown only as an optional refinement - do not treat the Ekadhipatya figure as final for the Mars sibling-timing formulas without independent confirmation. Rasi mult. Ar7 Ta10 Ge8 Cn4 Le10 Vi5 Li7 Sc8 Sg9 Cp5 Aq11 Pi12; Graha mult. Su5 Mo5 Ma8 Me5 Ju10 Ve7 Sa5._");
       L.push("");
       // Kakshya - each planet's natal placement
       L.push("### §7d Kakshya - each planet's natal kakshya (sign in 8 parts of 3°45'; lords Sa Ju Ma Su Ve Me Mo La)");
@@ -19351,27 +19357,37 @@
         if (SIGNS[pA.sign].lord === pB.name && SIGNS[pB.sign].lord === pA.name) exch.push(pA.name + "<->" + pB.name);
       }
       chk.push(["Parivartana (exchange)", exch.length ? "**YES** - " + exch.join(", ") : "no"]);
-      // Nabhasa (present throughout life) — note category
-      chk.push(["Nabhasa (Aakriti/Sankhya/etc.)", "checked via placement; see modality/element census in §2 - operates lifelong irrespective of dasha"]);
+      // Nabhasa yogas (operate lifelong) — compute the deterministic groups:
+      // Sankhya (by distinct signs occupied), Aashraya (all in one modality), Dala.
+      var occSigns = {}; classical.forEach(function (n) { occSigns[chart.planetsByName[n].sign] = true; });
+      var distinct = Object.keys(occSigns).length;
+      var sankhyaNames = { 1: "Gola", 2: "Yuga", 3: "Soola", 4: "Kedaara", 5: "Paasa", 6: "Daama", 7: "Veena" };
+      chk.push(["Nabhasa - Sankhya (" + distinct + " signs occupied)", "**" + (sankhyaNames[distinct] || "-") + "**"]);
+      var mods = classical.map(function (n) { return SIGNS[chart.planetsByName[n].sign].modality; });
+      var allMov = mods.every(function (m) { return m === "Movable"; }), allFix = mods.every(function (m) { return m === "Fixed"; }), allDual = mods.every(function (m) { return m === "Common"; });
+      chk.push(["Nabhasa - Aashraya", allMov ? "**Rajju** (all in movable)" : allFix ? "**Musala** (all in fixed)" : allDual ? "**Nala** (all in dual)" : "none (planets span modalities)"]);
+      var benKendra = ["Jupiter", "Venus", "Mercury", "Moon"].every(function (n) { return [1, 4, 7, 10].indexOf(chart.planetsByName[n].house) >= 0; });
+      var malKendra = ["Sun", "Mars", "Saturn"].every(function (n) { return [1, 4, 7, 10].indexOf(chart.planetsByName[n].house) >= 0; });
+      chk.push(["Nabhasa - Dala", benKendra ? "**Maala** (all benefics in kendras)" : malKendra ? "**Sarpa** (all malefics in kendras)" : "none"]);
+      chk.push(["Nabhasa - Aakriti (20 shape yogas)", "shape-based on the occupied-house pattern - not individually enumerated here; the Sankhya/Aashraya/Dala results above are the deterministic Nabhasa set"]);
       L.push("**Category checklist (present / checked-and-absent):**");
       L.push(row(["Yoga", "Status"])); L.push(sep(2));
       chk.forEach(function (c) { L.push(row(c)); });
       L.push("");
-      // Neecha Bhanga with the clause named
+      // Neecha Bhanga - verdict taken from the SAME engine test used by the
+      // scan above (so the two can never disagree), with the clause named.
       var nbry = [];
       classical.forEach(function (n) {
         var p = chart.planetsByName[n];
         if (p.dignity !== "Debilitated") return;
+        var debLord = chart.planetsByName[SIGNS[p.sign].lord];                       // dispositor
+        var exaltLordP = chart.planetsByName[SIGNS[EXALTATION[p.name]].lord];         // lord of its exaltation sign
         var clauses = [];
-        var debLord = chart.planetsByName[SIGNS[p.sign].lord];
-        var exaltPlanet = null; for (var k in EXALTATION) { if (EXALTATION[k] === p.sign) exaltPlanet = k; }
-        var exaltLordP = exaltPlanet ? chart.planetsByName[exaltPlanet] : null;
-        if (debLord && [1, 4, 7, 10].indexOf(houseFromSign(asc.sign, debLord.sign)) >= 0) clauses.push("dispositor (" + debLord.name + ") in a kendra from Lagna");
-        if (debLord && [1, 4, 7, 10].indexOf(houseFromSign(moonSign, debLord.sign)) >= 0) clauses.push("dispositor in a kendra from Moon");
-        if (exaltLordP && [1, 4, 7, 10].indexOf(houseFromSign(asc.sign, exaltLordP.sign)) >= 0) clauses.push("the sign's exalted-lord (" + exaltPlanet + ") in a kendra from Lagna");
-        if (exaltLordP && exaltLordP.sign === p.sign) clauses.push("exalted-lord conjunct the debilitated planet");
-        if (planetsAspectingPlanet(chart, p).some(function (x) { return x.name === (debLord && debLord.name); })) clauses.push("dispositor aspects the debilitated planet");
-        nbry.push([n + " (debilitated in " + p.signName + ")", clauses.length ? "**Neecha Bhanga** - " + clauses.join("; ") : "no cancellation clause satisfied"]);
+        if (debLord && isKendraTrine(debLord.house)) clauses.push("dispositor " + debLord.name + " in a kendra/trikona (H" + debLord.house + ")");
+        if (exaltLordP && isKendraTrine(exaltLordP.house)) clauses.push("lord of its exaltation sign (" + exaltLordP.name + ") in a kendra/trikona (H" + exaltLordP.house + ")");
+        if (hasBeneficAspectOnHouse(chart, p.house)) clauses.push("benefic aspect on its house (H" + p.house + ")");
+        var cancelled = neechabhanga(chart, p);
+        nbry.push([n + " (debilitated in " + p.signName + ")", cancelled ? "**Neecha Bhanga** - " + (clauses.join("; ") || "cancellation factors present") : "no cancellation clause satisfied"]);
       });
       if (nbry.length) {
         L.push("**Neecha Bhanga Raja Yoga - clause check for each debilitated planet:**");
@@ -19458,13 +19474,23 @@
       var k = chart.planetsByName[karakaName]; if (!k) return null;
       var sgn = normalizeSign(k.sign + nth - 1);
       var lord = SIGNS[sgn].lord, lp = chart.planetsByName[lord];
-      return { sign: sgn, occ: signOccupants(sgn), lord: lord, cond: lp ? (lp.dignity + " in H" + lp.house) : "-" };
+      var cond = "-";
+      if (lp) {
+        var chH = lp.equalHouse || houseFromSign(asc.sign, lp.sign);
+        cond = vnVapmFiveFold(chart, lp) + ", H" + lp.house + (chH !== lp.house ? " (Chalit H" + chH + ")" : "") + (lp.combust ? ", combust" : "");
+      }
+      return { sign: sgn, occ: signOccupants(sgn), lord: lord, cond: cond };
+    }
+    function aspectingSign(sgn) {
+      var hn = houseFromSign(asc.sign, sgn), res = [];
+      d.aspects.forEach(function (a) { if ((a.targets || []).some(function (t) { return parseInt(t, 10) === hn; })) res.push(a.from); });
+      return res;
     }
     [["Mother", "Moon", 4], ["Father" + (dayBirth ? "" : " (night→Saturn)"), dayBirth ? "Sun" : "Saturn", 9], ["Father longevity", dayBirth ? "Sun" : "Saturn", 8], ["Children", "Jupiter", 5], ["Brothers", "Mars", 3], ["Spouse", "Venus", 7]].forEach(function (r) {
       var res = fromKaraka(r[1], r[2]);
-      if (res) L.push(row([r[0], r[1], r[2] + "th from " + r[1] + " (" + SIGNS[res.sign].name + ")", (res.occ.join(", ") || "-"), "-", res.lord + " - " + res.cond]));
+      if (res) L.push(row([r[0], r[1], r[2] + "th from " + r[1] + " (" + SIGNS[res.sign].name + ")", (res.occ.join(", ") || "-"), (aspectingSign(res.sign).join(", ") || "none"), res.lord + " - " + res.cond]));
     });
-    L.push("_Aspecting-planets column left for the reader; occupants and lord condition are computed._");
+    L.push("_Dignity wording matches §2 (5-fold compound relationship); lord condition also shows the Chalit house where it differs from whole-sign, and combustion. Occupants are whole-sign; where §2b flags a Chalit shift (e.g. Mercury), that planet's bhava membership changes under Chalit - judge the affected karaka house under both systems._");
     L.push("");
     // B2 four-fold convergence scaffold
     L.push("## B2 - Four-fold convergence scaffold (one row per life area)");
