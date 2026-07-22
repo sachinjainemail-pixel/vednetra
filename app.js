@@ -47,6 +47,14 @@
     "Mula", "Purva Ashadha", "Uttara Ashadha", "Shravana", "Dhanishta", "Shatabhisha", "Purva Bhadrapada", "Uttara Bhadrapada", "Revati"
   ];
   var NAK_LORDS = NAKSHATRAS.map(function (_, i) { return DASHA_SEQUENCE[i % DASHA_SEQUENCE.length]; });
+  // Nakshatra-layer reference tables (27 nakshatras, Ashwini=0)
+  var VN_NAK_GANA = ["Deva", "Manushya", "Rakshasa", "Manushya", "Deva", "Manushya", "Deva", "Deva", "Rakshasa", "Rakshasa", "Manushya", "Manushya", "Deva", "Rakshasa", "Deva", "Rakshasa", "Deva", "Rakshasa", "Rakshasa", "Manushya", "Manushya", "Deva", "Rakshasa", "Rakshasa", "Manushya", "Manushya", "Deva"];
+  var VN_NAK_YONI = [["Horse", "M"], ["Elephant", "M"], ["Sheep", "F"], ["Serpent", "M"], ["Serpent", "F"], ["Dog", "F"], ["Cat", "F"], ["Sheep", "M"], ["Cat", "M"], ["Rat", "M"], ["Rat", "F"], ["Cow", "F"], ["Buffalo", "F"], ["Tiger", "F"], ["Buffalo", "M"], ["Tiger", "M"], ["Deer", "F"], ["Deer", "M"], ["Dog", "M"], ["Monkey", "M"], ["Mongoose", "F"], ["Monkey", "F"], ["Lion", "F"], ["Horse", "F"], ["Lion", "M"], ["Cow", "M"], ["Elephant", "F"]];
+  // Nadi cycle (period 6): Aadi(Vata) Madhya(Pitta) Antya(Kapha) Antya Madhya Aadi
+  var VN_NADI_CYCLE = ["Aadi", "Madhya", "Antya", "Antya", "Madhya", "Aadi"];
+  var VN_NADI_DOSHA = { Aadi: "Vata", Madhya: "Pitta", Antya: "Kapha" };
+  // Pushkara Bhaga degree within each sign (Aries=0 .. Pisces=11)
+  var VN_PUSHKARA_BHAGA = [21, 14, 18, 8, 19, 9, 24, 11, 23, 14, 19, 9];
   var TITHIS = [
     "Pratipada", "Dwitiya", "Tritiya", "Chaturthi", "Panchami", "Shashthi", "Saptami", "Ashtami", "Navami", "Dashami",
     "Ekadashi", "Dwadashi", "Trayodashi", "Chaturdashi", "Purnima",
@@ -5861,6 +5869,7 @@
       { id: "viewA-ccreport",       label: "Natal report", render: function () { return ccReportSection(chart, input); }, wire: function () { wireCcReportControls(chart, input); } },
       { id: "viewA-nativereport",   label: "Native report", render: function () { return nativeReportSection(chart, input); }, wire: function () { wireNativeReportControls(chart, input); } },
       { id: "viewA-vapmreport",     label: "VAPM export", render: function () { return vapmReportSection(chart, input); }, wire: function () { wireVapmReportControls(chart, input); } },
+      { id: "viewA-vapmnakreport",  label: "VAPM + Nakshatra", render: function () { return vapmNakReportSection(chart, input); }, wire: function () { wireVapmNakReportControls(chart, input); } },
       { id: "viewA-num-compat",     immediate: true, render: function () { return numCompatSection(chart, input); }, wire: function () { wireNumCompatControls(chart, input); } },
       { id: "viewA-cards",          immediate: true, render: function () { return cardsSection(chart, input); }, wire: function () { wireCardsControls(chart, input); } },
       { id: "viewA-sadesati",       label: "Sade Sati", render: function () { return sadeSatiSection(chart, input); } },
@@ -13004,6 +13013,7 @@
     var curType = typeEl ? typeEl.value : "cc";
     var curFmt = fmtEl ? fmtEl.value : "pdf";
     var types = [
+      ["vapmnak", "VAPM + Nakshatra Report (Lahiri · §1–§15 + Part B) — default"],
       ["native", "Native Input Report v3 (full §0–§16 + v3 adds)"],
       ["vapm", "VAPM Export (Lahiri · §1–§14 + Part B)"],
       ["cc", "Natal Report (Chamatkar Chintamani)"],
@@ -13072,6 +13082,10 @@
     }
     if (reportType === "vapm") {
       downloadVapmReport(format);
+      return;
+    }
+    if (reportType === "vapmnak") {
+      downloadVapmNakReport(format);
       return;
     }
     if (!lastPlainReport) {
@@ -13197,6 +13211,28 @@
     } catch (error) {
       console.error(error);
       alertUser("Natal Report (Chamatkar Chintamani) could not be built: " + (error && error.message ? error.message : error));
+    }
+  }
+
+  function downloadVapmNakReport(format) {
+    try {
+      var input = lastReportInput || readInput();
+      var chart = lastReportChart || buildChart(input.birthInstant, input.latitude, input.longitude, input.timezone, {
+        ascendantOverride: input.ascendantOverride,
+        ayanamshaKey: input.ayanamshaKey || "lahiri"
+      });
+      var text = vnVapmNakshatraMarkdown(chart, input);
+      lastPlainReport = text;
+      lastPlainReports.chartData = text;
+      var filenameBase = reportDownloadFilenameBase() + "_VAPM_Nakshatra_Report";
+      if (format === "pdf") { downloadBlob(filenameBase + ".pdf", "application/pdf", makeSimplePdf(text)); showToast("✓ VAPM + Nakshatra Report — PDF download started"); return; }
+      if (format === "csv") { downloadBlob(filenameBase + ".csv", "text/csv;charset=utf-8", vedNetraReportTextToCsv(text)); showToast("✓ VAPM + Nakshatra Report — CSV download started"); return; }
+      if (format === "xls") { downloadBlob(filenameBase + ".xls", "application/vnd.ms-excel;charset=utf-8", vedNetraReportTextToExcel(text)); showToast("✓ VAPM + Nakshatra Report — Excel download started"); return; }
+      downloadBlob(filenameBase + ".md", "text/markdown;charset=utf-8", text);
+      showToast("✓ VAPM + Nakshatra Report — Markdown download started");
+    } catch (error) {
+      console.error(error);
+      alertUser("VAPM + Nakshatra Report could not be built: " + (error && error.message ? error.message : error));
     }
   }
 
@@ -17184,6 +17220,7 @@
       { id: "viewA-ccreport", label: "Natal Report (CC)", desc: "Full Chamatkār Chintāmaṇi data export — PDF & Markdown." },
       { id: "viewA-nativereport", label: "Native Input Report", desc: "Full v3 native export (§0–§16): fragility flags, guna, sphutas, sahams, rupa Ṣaḍbala, prastarāṣṭakavarga, D16, Parivritti-D10, full-life dashas, ingress + natal-return transits." },
       { id: "viewA-vapmreport", label: "VAPM Export", desc: "VAPM export spec (Lahiri, §1–§14 + Part B): master table, aspect/Kartari table, functional nature, Chandra/Surya Lagna, all vargas + Dashavarga count, Ashtakavarga incl. Shodhya Pinda, Vimshottari/Yogini/Jaimini, Indu Lagna, Tara Chakra, transits, four-fold scaffolds." },
+      { id: "viewA-vapmnakreport", label: "VAPM + Nakshatra Report", desc: "Default full export (Lahiri): the whole VAPM export plus the §15 Nakshatra Layer — within-nakshatra degrees, Gandanta (48′/3°20′), Abhijit, Navatara points, pada-level navamsa dignity, Nadi/dosha and Yoni/Gana matching factors." },
       { id: "viewA-lifereport", label: "Life Report", desc: "One consolidated report — save it as a PDF." },
       { id: "viewA-rashifal", label: "Rashifal", desc: "Daily/weekly/monthly/yearly Moon-sign horoscope." },
       { id: "viewA-doshas", label: "Dosha Analysis", desc: "Manglik, Kaal Sarp and Pitra dosha with remedies." },
@@ -18933,7 +18970,7 @@
     var avd = null; try { avd = samudayaAshtakavargaData(chart); } catch (e) {}
     function bavInSign(name, sgn) { if (!avd) return "-"; var idx = ((sgn - asc.sign + 12) % 12); return avd.rows[name] ? avd.rows[name][idx] : "-"; }
     L.push("## §2 - Rasi chart D-1 - master table [C]");
-    L.push(row(["Planet", "Sign", "Longitude D°M'S'", "House", "Dignity", "Nakshatra+pada+lord", "Navamsa", "R", "Combust (Sun-sep°)", "Dispositor", "Vargottama", "Mrityu Bhaga", "First/Last 5°", "BAV bindu (own sign)", "Avastha"])); L.push(sep(15));
+    L.push(row(["Planet", "Sign", "Longitude D°M'S'", "House", "Dignity", "Nakshatra+pada+lord", "Deg-in-nak", "Navamsa", "R", "Combust (Sun-sep°)", "Dispositor", "Vargottama", "Mrityu Bhaga", "First/Last 5°", "BAV bindu (own sign)", "Avastha"])); L.push(sep(16));
     d.planets.forEach(function (p) {
       var pl = chart.planetsByName[p.name];
       var nk = nakshatraInfo(pl.lon);
@@ -18941,9 +18978,9 @@
       var mrityu = (odd && p.deg >= 24) || (!odd && p.deg < 6);
       var edge5 = p.deg < 5 || p.deg > 25;
       var combust = p.combust ? ("Y (" + vnElong(pl.lon, sun.lon).toFixed(2) + "°)") : "N";
-      L.push(row([p.name, p.signName, vnCcDms(p.deg), p.house, vnVapmFiveFold(chart, pl), NAKSHATRAS[nk.index] + " p" + nk.pada + " / " + nk.lord, SIGNS[vargaSign(pl.lon, 9)].name, (p.retro ? "R" : "-"), combust, pl.dispositor, (p.vargottama ? "Y" : "-"), (mrityu ? "**yes**" : "-"), (edge5 ? "yes" : "-"), bavInSign(p.name, pl.sign), vnBaladi(pl)]));
+      L.push(row([p.name, p.signName, vnCcDms(p.deg), p.house, vnVapmFiveFold(chart, pl), NAKSHATRAS[nk.index] + " p" + nk.pada + " / " + nk.lord, vnCcDms(nk.within), SIGNS[vargaSign(pl.lon, 9)].name, (p.retro ? "R" : "-"), combust, pl.dispositor, (p.vargottama ? "Y" : "-"), (mrityu ? "**yes**" : "-"), (edge5 ? "yes" : "-"), bavInSign(p.name, pl.sign), vnBaladi(pl)]));
     });
-    L.push(row(["Lagna", asc.signName, vnCcDms(asc.deg), 1, "-", NAKSHATRAS[lnk.index] + " p" + lnk.pada + " / " + NAK_LORDS[lnk.index], SIGNS[vargaSign(asc.lon, 9)].name, "-", "-", SIGNS[asc.sign].lord, (vargaSign(asc.lon, 9) === asc.sign ? "Y" : "-"), "-", (asc.deg < 5 || asc.deg > 25 ? "yes" : "-"), "-", "-"]));
+    L.push(row(["Lagna", asc.signName, vnCcDms(asc.deg), 1, "-", NAKSHATRAS[lnk.index] + " p" + lnk.pada + " / " + NAK_LORDS[lnk.index], vnCcDms(lnk.within), SIGNS[vargaSign(asc.lon, 9)].name, "-", "-", SIGNS[asc.sign].lord, (vargaSign(asc.lon, 9) === asc.sign ? "Y" : "-"), "-", (asc.deg < 5 || asc.deg > 25 ? "yes" : "-"), "-", "-"]));
     L.push("");
     var lagLord = chart.planetsByName[SIGNS[asc.sign].lord];
     L.push("**Lagna details:** " + asc.signName + " " + vnCcDms(asc.deg) + " - nakshatra " + NAKSHATRAS[lnk.index] + " pada " + lnk.pada + " - Lagna lord " + SIGNS[asc.sign].lord + " sits in house " + (lagLord ? lagLord.house : "-") + " (" + (lagLord ? lagLord.signName : "-") + ").");
@@ -19079,6 +19116,10 @@
       });
       L.push(row([n, good, (repNames[good] || (good < 2 ? "-" : "")), (strong > 3 ? "**yes** (" + strong + ")" : "-")]));
     });
+    L.push("");
+    // Vargottama flag for every planet and the Lagna (navamsa sign == rasi sign)
+    var vgList = order.filter(function (n) { var p = chart.planetsByName[n]; return p && vargaSign(p.lon, 9) === p.sign; });
+    L.push("**Vargottama (D-1 sign = D-9 sign):** " + (vgList.join(", ") || "none") + (vargaSign(asc.lon, 9) === asc.sign ? ", Lagna" : "") + ".");
     L.push("");
 
     // ---------- §7 Ashtakavarga ----------
@@ -19457,7 +19498,7 @@
     L.push(row(["Birth-time source", btSource]));
     L.push(row(["Birth-time confidence", btConf]));
     L.push(row(["Rectified?", (btSource === "Rectified" ? "Yes" : "-")]));
-    if (btConf === "±15 min") L.push(row(["Techniques disabled", "D-60 unusable; degree-closeness and natal-degree triggers unreliable"]));
+    if (btConf === "±15 min") L.push(row(["Techniques disabled", "D-60 unusable; degree-closeness and natal-degree triggers unreliable; the 48' gandanta test (§15B) becomes unsafe"]));
     else if (btConf === "±1 hr") L.push(row(["Techniques disabled", "Lagna itself may shift; house-based judgements unsafe - read from Moon"]));
     else if (btConf === "unknown") L.push(row(["Techniques disabled", "No houses, no vargas, no dasha balance - Moon-sign only, no event timing"]));
     L.push("");
@@ -19547,6 +19588,122 @@
 
     L.push("_Generated by VedNetra - VAPM Export (Lahiri) - " + vnFmtFullDate(nowMs) + "_");
     return L.join("\n");
+  }
+
+  // dignity of a planet if it were placed in `sgn` (used for pada/varga dignity)
+  function vnDignityInSign(name, sgn) {
+    if (EXALTATION[name] === sgn) return "Exalted";
+    if (normalizeSign(EXALTATION[name] + 6) === sgn) return "Debilitated";
+    if (VN_SB_MT_SIGN[name] === sgn) return "Moolatrikona";
+    if (SIGNS[sgn].lord === name) return "Own";
+    var rel = vnNaturalRel(name, SIGNS[sgn].lord);
+    return rel === "friend" ? "Friend" : rel === "enemy" ? "Enemy" : "Neutral";
+  }
+
+  // §15 - NAKSHATRA LAYER (A-G). Returns markdown lines joined.
+  function vnNakshatraLayer(chart, input) {
+    var L = [], asc = chart.ascendant, order = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+    function row(c) { return "| " + c.join(" | ") + " |"; }
+    function sep(n) { return "|" + new Array(n + 1).join("---|"); }
+    // Gandanta junctions are the water-fire boundaries: end Cancer/start Leo (120°),
+    // end Scorpio/start Sagittarius (240°), end Pisces/start Aries (0°/360°).
+    function gandantaDist(lon) {
+      var pts = [0, 120, 240], best = Infinity;
+      pts.forEach(function (g) { var raw = Math.abs(normalize(lon) - g); raw = Math.min(raw, 360 - raw); best = Math.min(best, raw); });
+      return best;
+    }
+    // §15A per-body nakshatra detail
+    L.push("# §15 - NAKSHATRA LAYER [C for nakshatra work]");
+    L.push("");
+    L.push("### §15A - Per-planet, Lagna & Moon: nakshatra, number, pada, lord, exact degree within");
+    L.push(row(["Body", "Nakshatra", "Nak #", "Pada", "Nak lord", "Deg within nak (D°M'S')"])); L.push(sep(6));
+    function nakRow(label, lon) { var nk = nakshatraInfo(lon); L.push(row([label, nk.name, nk.index + 1, nk.pada, nk.lord, vnCcDms(nk.within)])); }
+    nakRow("Lagna", asc.lon);
+    order.forEach(function (n) { var p = chart.planetsByName[n]; if (p) nakRow(n, p.lon); });
+    L.push("");
+    // §15B Gandanta
+    L.push("### §15B - Gandanta (junctions Cancer/Leo, Scorpio/Sagittarius, Pisces/Aries)");
+    L.push(row(["Body", "Dist to nearest junction", "≤ 48' (Sutton knot)", "≤ 3°20' (Mehta zone)"])); L.push(sep(4));
+    ["Lagna"].concat(order).forEach(function (n) {
+      var lon = n === "Lagna" ? asc.lon : (chart.planetsByName[n] ? chart.planetsByName[n].lon : null);
+      if (lon === null) return;
+      var gd = gandantaDist(lon);
+      L.push(row([n, vnCcDms(gd), (gd <= 0.8 ? "**FLAG**" : "-"), (gd <= 3.3333 ? "**flag**" : "-")]));
+    });
+    L.push("_The two layers disagree on width; both are shown. 48' = Sutton's knot, 3°20' = Mehta's conventional zone._");
+    L.push("");
+    // §15C Abhijit
+    L.push("### §15C - Abhijit flag (any body in 6°40' to 11°13'20\" Capricorn = sidereal 276°40'-281°13'20\")");
+    var abh = [];
+    ["Lagna"].concat(order).forEach(function (n) {
+      var lon = n === "Lagna" ? asc.lon : (chart.planetsByName[n] ? chart.planetsByName[n].lon : null);
+      if (lon === null) return;
+      if (lon >= 276.6667 && lon <= 281.2222) abh.push(n);
+    });
+    L.push("- In Abhijit: " + (abh.join(", ") || "none") + ".");
+    L.push("");
+    // §15D Navatara reference points
+    var mdLord = "-"; try { var st = findDashaStack(chart.vimshottari.timeline, new Date()); if (st[0]) mdLord = st[0].lord; } catch (e) {}
+    L.push("### §15D - Navatara reference points (nakshatra NUMBERS only)");
+    L.push(row(["Reference", "Nakshatra #", "Nakshatra"])); L.push(sep(3));
+    L.push(row(["Moon", nakshatraInfo(chart.planetsByName.Moon.lon).index + 1, nakshatraInfo(chart.planetsByName.Moon.lon).name]));
+    L.push(row(["Lagna", nakshatraInfo(asc.lon).index + 1, nakshatraInfo(asc.lon).name]));
+    L.push(row(["Sun", nakshatraInfo(chart.planetsByName.Sun.lon).index + 1, nakshatraInfo(chart.planetsByName.Sun.lon).name]));
+    L.push(row(["Running MD lord (" + mdLord + ")", (mdLord !== "-" && chart.planetsByName[mdLord]) ? nakshatraInfo(chart.planetsByName[mdLord].lon).index + 1 : "-", (mdLord !== "-" && chart.planetsByName[mdLord]) ? nakshatraInfo(chart.planetsByName[mdLord].lon).name : "-"]));
+    L.push("_Navatara (Janma/Sampat/Vipat...) is derived by counting from these four - not recomputed here._");
+    L.push("");
+    // §15E Pada-level dignity
+    L.push("### §15E - Pada-level dignity (navamsa rashi of the pada; can contradict sign dignity)");
+    L.push(row(["Planet", "Sign dignity", "Navamsa (pada) sign", "Dignity IN navamsa", "Vargottama", "Pushkara Bhaga", "Ashtamamsha"])); L.push(sep(7));
+    CLASSICAL_PLANETS.concat(["Rahu", "Ketu"]).forEach(function (n) {
+      var p = chart.planetsByName[n]; if (!p) return;
+      var navSign = vargaSign(p.lon, 9);
+      var vgtm = navSign === p.sign;
+      var pb = VN_PUSHKARA_BHAGA[p.sign];
+      var pushkara = Math.abs(p.deg - pb) <= 1;
+      var ashtam = navSign === normalizeSign(p.sign + 7); // navamsa = 8th sign from rasi
+      L.push(row([n, (p.dignity || "-"), SIGNS[navSign].name, vnDignityInSign(n, navSign), (vgtm ? "**yes**" : "-"), (pushkara ? "yes (bhaga " + pb + "°)" : "-"), (ashtam ? "yes" : "-")]));
+    });
+    L.push("_Pada dignity uses the planet's dignity in its navamsa sign (natural relationships). A strong sign placement with a weak navamsa pada is a real weakness (e.g. Mars in Ashwini pada 4 = own sign Aries but Cancer navamsa = debilitated)._");
+    L.push("");
+    // §15F Nadi / dosha for Moon nakshatra
+    var mi = nakshatraInfo(chart.planetsByName.Moon.lon).index;
+    var mNadi = VN_NADI_CYCLE[mi % 6];
+    L.push("### §15F - Nadi / Ayurvedic dosha (Moon nakshatra)");
+    L.push("- Moon nakshatra: **" + NAKSHATRAS[mi] + "** - Nadi **" + mNadi + "** = dosha **" + VN_NADI_DOSHA[mNadi] + "** (Aadi=Vata, Madhya=Pitta, Antya=Kapha).");
+    L.push("");
+    // §15G Matching factors (native; spouse if partner present)
+    L.push("### §15G - Matching factors (Moon nakshatra)");
+    L.push(row(["Chart", "Moon nakshatra + pada", "Yoni (animal/sex)", "Gana", "Nadi / dosha"])); L.push(sep(5));
+    function matchRow(label, ch) {
+      var idx = nakshatraInfo(ch.planetsByName.Moon.lon).index, pd = nakshatraInfo(ch.planetsByName.Moon.lon).pada;
+      var nd = VN_NADI_CYCLE[idx % 6];
+      L.push(row([label, NAKSHATRAS[idx] + " p" + pd, VN_NAK_YONI[idx][0] + " / " + VN_NAK_YONI[idx][1], VN_NAK_GANA[idx], nd + " / " + VN_NADI_DOSHA[nd]]));
+    }
+    matchRow("Native", chart);
+    try {
+      var pt = input && input.partner;
+      if (pt && pt.birthInstant) {
+        var sc = buildChart(pt.birthInstant, Number(pt.latitude), Number(pt.longitude), Number(pt.timezone !== undefined ? pt.timezone : input.timezone), { ayanamshaKey: "lahiri" });
+        matchRow("Spouse", sc);
+      }
+    } catch (e) {}
+    L.push("_Bharani's gana is taken as Manushya here; some sources classify it differently - cross-check for a matching verdict._");
+    L.push("");
+    return L.join("\n");
+  }
+
+  // Full "Report 07": VAPM export (§1-§14 + Part B) PLUS the §15 Nakshatra Layer.
+  function vnVapmNakshatraMarkdown(chart, input) {
+    if (input && input.birthInstant && chart.ayanamshaKey !== "lahiri") {
+      try { chart = buildChart(input.birthInstant, Number(input.latitude), Number(input.longitude), Number(input.timezone), { ascendantOverride: input.ascendantOverride, ayanamshaKey: "lahiri" }); } catch (e) {}
+    }
+    var base = vnVapmMarkdown(chart, input);
+    // splice §15 in before the final generated-by line, and retitle
+    base = base.replace("# VEDNETRA VAPM EXPORT", "# VEDNETRA REPORT - VAPM + NAKSHATRA LAYER");
+    base = base.replace(/\n_Generated by VedNetra - VAPM Export \(Lahiri\)[^\n]*_\s*$/, "\n");
+    var nak = vnNakshatraLayer(chart, input);
+    return base + "\n" + nak + "\n_Generated by VedNetra - VAPM + Nakshatra Report (Lahiri) - " + vnFmtFullDate(Date.now()) + "_\n";
   }
 
   // ---- NATIVE INPUT REPORT v1 — retained for reference --------------------
@@ -19946,6 +20103,31 @@
     var copy = document.getElementById("vnVapmCopy");
     if (copy) copy.addEventListener("click", function () {
       var md = vnVapmMarkdown(chart, input), status = document.getElementById("vnVapmCopyStatus");
+      function done() { if (status) { status.textContent = "Copied!"; setTimeout(function () { status.textContent = ""; }, 2500); } }
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(md).then(done, function () { vnCcFallbackCopy(md, done); });
+        else vnCcFallbackCopy(md, done);
+      } catch (e) { vnCcFallbackCopy(md, done); }
+    });
+  }
+  function vapmNakReportSection(chart, input) {
+    var md;
+    try { md = vnVapmNakshatraMarkdown(chart, input); }
+    catch (e) { md = "Could not build the report: " + (e && e.message ? e.message : e); }
+    return '<section id="viewA-vapmnakreport" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Master Export · Default</p><h3>VAPM + Nakshatra Report</h3></div><span class="small-pill">Lahiri · §1–§15 + Part B</span></div>' +
+      '<p class="fine-print">The default full export, always cast on <strong>Lahiri (Chitrapaksha)</strong>: the entire VAPM export (§1–§14 + Part B) <em>plus</em> the complete <strong>§15 Nakshatra Layer</strong> — per-body nakshatra number/pada/lord with the exact degree within the star, Gandanta flags at 48′ and 3°20′, the Abhijit flag, Navatara reference points, pada-level navamsa dignity (with vargottama/pushkara/ashtamamsha), Nadi/dosha, and the Yoni/Gana/Nadi matching factors (native and spouse). Download or copy one file per native.</p>' +
+      '<div class="vn-tool-actions" style="margin-bottom:10px"><button type="button" id="vnVapmNakPdf" class="primary-action vn-generate-btn">Save as PDF</button> <button type="button" id="vnVapmNakMd" class="input-toggle-btn">Download Markdown</button> <button type="button" id="vnVapmNakCopy" class="input-toggle-btn">Copy (Markdown)</button> <span id="vnVapmNakCopyStatus" class="fine-print"></span></div>' +
+      '<div class="panel-box"><pre class="vn-native-pre">' + escapeHtml(md) + '</pre></div>' +
+      '</section>';
+  }
+  function wireVapmNakReportControls(chart, input) {
+    var pdf = document.getElementById("vnVapmNakPdf");
+    if (pdf) pdf.addEventListener("click", function () { try { downloadVapmNakReport("pdf"); } catch (e) {} });
+    var mdBtn = document.getElementById("vnVapmNakMd");
+    if (mdBtn) mdBtn.addEventListener("click", function () { try { downloadVapmNakReport("md"); } catch (e) {} });
+    var copy = document.getElementById("vnVapmNakCopy");
+    if (copy) copy.addEventListener("click", function () {
+      var md = vnVapmNakshatraMarkdown(chart, input), status = document.getElementById("vnVapmNakCopyStatus");
       function done() { if (status) { status.textContent = "Copied!"; setTimeout(function () { status.textContent = ""; }, 2500); } }
       try {
         if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(md).then(done, function () { vnCcFallbackCopy(md, done); });
