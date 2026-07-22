@@ -3822,6 +3822,9 @@
       name: document.getElementById("nativeName").value.trim() || "Native",
       chartNumber: document.getElementById("chartNumber").value.trim(),
       gender: document.getElementById("gender").value,
+      birthTimeSource: fieldValue("birthTimeSource"),
+      birthTimeConfidence: fieldValue("birthTimeConfidence"),
+      lifeEvents: fieldValue("lifeEvents"),
       ayanamshaKey: normalizeAyanamshaKey(fieldValue("ayanamsha") || "lahiri"),
       birthDate: birthDate,
       birthTime: normalizeTimeInput(birthTime),
@@ -18914,8 +18917,10 @@
     L.push(row(["Sex", gender + (isFemale ? " (Kshetra Sphuta shown; Trimsamsa female rules)" : " (Beeja Sphuta shown; Trimsamsa male rules)")]));
     L.push(row(["Date of birth", String((input && input.birthDate) || "-")]));
     L.push(row(["Time of birth", String((input && input.birthTime) || "-")]));
-    L.push(row(["Birth-time SOURCE", "- (native-supplied: certificate / hospital / family / rectified)"]));
-    L.push(row(["Birth-time CONFIDENCE", "- (native-supplied: exact / ±15 min / ±1 hr / unknown)"]));
+    var btSource = (input && input.birthTimeSource) ? input.birthTimeSource : "-";
+    var btConf = (input && input.birthTimeConfidence) ? input.birthTimeConfidence : "-";
+    L.push(row(["Birth-time SOURCE", btSource + (btSource === "-" ? " (native-supplied: certificate / hospital / family / rectified)" : "")]));
+    L.push(row(["Birth-time CONFIDENCE", btConf + (btConf === "-" ? " (native-supplied: exact / ±15 min / ±1 hr / unknown)" : "")]));
     L.push(row(["Place", String((input && input.birthPlace) || "-")]));
     L.push(row(["Lat / Lon / TZ", String((input && input.latitude) || "-") + " / " + String((input && input.longitude) || "-") + " / UTC" + (Number(input && input.timezone) >= 0 ? "+" : "") + ((input && input.timezone) !== undefined ? input.timezone : "-")]));
     L.push(row(["**Ayanamsa**", "**LAHIRI (Chitrapaksha)** - " + chart.ayanamsa.toFixed(4) + "°"]));
@@ -18955,6 +18960,16 @@
       if (pa2.sign === pb2.sign && Math.abs(pa2.deg - pb2.deg) < 1) war2.push(pa2.name + "-" + pb2.name + " (winner " + (pa2.lon < pb2.lon ? pa2.name : pb2.name) + ")");
     }
     L.push("**Planetary war (graha yuddha):** " + (war2.join("; ") || "none"));
+    L.push("");
+    // §2b Bhava Chalit (equal-house cusps) — flags planets in a different bhava than sign
+    L.push("### §2b - Bhava Chalit (equal-house cusps vs whole-sign) [I]");
+    L.push(row(["Planet", "Whole-sign house", "Chalit (equal) house", "Differs?"])); L.push(sep(4));
+    order.forEach(function (n) {
+      var p = chart.planetsByName[n]; if (!p) return;
+      var ch = p.equalHouse || houseFromSign(asc.sign, p.sign);
+      L.push(row([n, p.house, ch, (ch !== p.house ? "**yes**" : "-")]));
+    });
+    L.push("_Cusps taken as the Lagna degree carried through each sign (equal-house Chalit). A 'yes' means the planet's bhava differs from its rasi - judge that house from the Chalit position._");
     L.push("");
 
     // ---------- §3 Aspect table ----------
@@ -19079,30 +19094,55 @@
       classical.forEach(function (n) { L.push(row([n].concat(SIGNS.map(function (_, sg) { var c = vnPrastarContributors(chart, n, sg); return c.length ? c.join(" ") : "."; })))); });
       L.push("_Contributors: Su Mo Ma Me Ju Ve Sa La._");
       L.push("");
-      // Shodhya Pinda (Trikona-reduced) + Rasi/Graha Pinda
-      L.push("### §7c Shodhya Pinda (Trikona reduction applied; Ekadhipatya noted)");
-      L.push(row(["Planet", "Rasi Pinda", "Graha Pinda", "Shodhya Pinda"])); L.push(sep(4));
+      // Shodhya Pinda with the reduction steps shown
+      var sgnAbbr = SIGNS.map(function (s) { return s.name.slice(0, 2); });
+      var EKA_PAIRS = [[0, 7], [1, 6], [2, 5], [8, 11], [9, 10]]; // Ma, Ve, Me, Ju, Sa (two-sign lords)
+      L.push("### §7c Shodhya Pinda - with reduction steps (BAV -> Trikona -> Ekadhipatya)");
       classical.forEach(function (n) {
-        var bav = avd.rows[n].slice(); // indexed house-from-asc; map to sign index
         var bySign = new Array(12).fill(0);
         for (var i = 0; i < 12; i++) bySign[normalizeSign(asc.sign + i)] = avd.rows[n][i];
-        // trikona reduction
+        var original = bySign.slice();
+        // Trikona (trine) reduction: subtract the least of each trine from all three
         [[0, 4, 8], [1, 5, 9], [2, 6, 10], [3, 7, 11]].forEach(function (tri) {
           var mn = Math.min(bySign[tri[0]], bySign[tri[1]], bySign[tri[2]]);
           tri.forEach(function (s) { bySign[s] = bySign[s] - mn; });
         });
+        var afterTri = bySign.slice();
+        // Ekadhipatya (two-sign lordship) reduction - unambiguous cases applied:
+        //  both signs empty  -> both take the lower value
+        //  both occupied     -> unchanged
+        //  one empty/one not -> the empty sign is dropped to 0 when it is the weaker
+        EKA_PAIRS.forEach(function (pr) {
+          var s1 = pr[0], s2 = pr[1], b1 = bySign[s1], b2 = bySign[s2];
+          if (b1 === 0 || b2 === 0) return;
+          var o1 = chart.planets.some(function (p) { return p.sign === s1; });
+          var o2 = chart.planets.some(function (p) { return p.sign === s2; });
+          if (!o1 && !o2) { var mn2 = Math.min(b1, b2); bySign[s1] = mn2; bySign[s2] = mn2; }
+          else if (o1 && !o2) { if (b2 <= b1) bySign[s2] = 0; }
+          else if (!o1 && o2) { if (b1 <= b2) bySign[s1] = 0; }
+        });
+        var afterEka = bySign.slice();
         var rasiP = 0, grahaP = 0;
-        for (var s2 = 0; s2 < 12; s2++) { rasiP += bySign[s2] * VAPM_RASI_PINDA[s2]; }
-        // graha pinda: sum of reduced bindus in each planet's owned signs × that planet's multiplier
-        classical.forEach(function (g) { for (var s3 = 0; s3 < 12; s3++) if (SIGNS[s3].lord === g) grahaP += bySign[s3] * VAPM_GRAHA_PINDA[g]; });
-        L.push(row([n, rasiP, grahaP, rasiP + grahaP]));
+        for (var s3 = 0; s3 < 12; s3++) rasiP += afterEka[s3] * VAPM_RASI_PINDA[s3];
+        classical.forEach(function (g) { for (var s4 = 0; s4 < 12; s4++) if (SIGNS[s4].lord === g) grahaP += afterEka[s4] * VAPM_GRAHA_PINDA[g]; });
+        L.push("**" + n + "** - Rasi Pinda " + rasiP + " · Graha Pinda " + grahaP + " · **Shodhya Pinda " + (rasiP + grahaP) + "**");
+        L.push(row(["Step"].concat(sgnAbbr))); L.push(sep(13));
+        L.push(row(["BAV"].concat(original)));
+        L.push(row(["after Trikona"].concat(afterTri)));
+        L.push(row(["after Ekadhipatya"].concat(afterEka)));
       });
-      L.push("_Trikona (trine) reduction applied; Ekadhipatya (two-sign-lordship) reduction is chart-conditional - verify Mars for the sibling-timing formulas._");
+      L.push("_Rasi multipliers Ar7 Ta10 Ge8 Cn4 Le10 Vi5 Li7 Sc8 Sg9 Cp5 Aq11 Pi12; Graha multipliers Su5 Mo5 Ma8 Me5 Ju10 Ve7 Sa5. Ekadhipatya pairs: Ma(Ar/Sc) Ve(Ta/Li) Me(Ge/Vi) Ju(Sg/Pi) Sa(Cp/Aq); the equal-value ambiguous case is left unchanged._");
       L.push("");
-      // Kakshya table
-      L.push("### §7d Kakshya (each sign in 8 parts of 3°45'; lords Sa Ju Ma Su Ve Me Mo Lagna)");
+      // Kakshya - each planet's natal placement
+      L.push("### §7d Kakshya - each planet's natal kakshya (sign in 8 parts of 3°45'; lords Sa Ju Ma Su Ve Me Mo La)");
       var kakLords = ["Saturn", "Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon", "Lagna"];
-      L.push("- Kakshya lords in order (0°→30°): " + kakLords.join(" · ") + ". Transit rule: a planet gives results of the kakshya lord it currently occupies; 0 bindus in that kakshya = severe.");
+      L.push(row(["Planet", "Deg in sign", "Kakshya part (of 8)", "Kakshya lord"])); L.push(sep(4));
+      classical.forEach(function (n) {
+        var p = chart.planetsByName[n]; if (!p) return;
+        var part = Math.min(7, Math.floor(p.deg / 3.75));
+        L.push(row([n, vnCcDms(p.deg), (part + 1), kakLords[part]]));
+      });
+      L.push("_Lord order 0°→30°: " + kakLords.join(" · ") + ". In transit a planet gives the results of the kakshya lord it occupies; 0 bindus in that kakshya sign = severe._");
       L.push("");
     }
 
@@ -19142,8 +19182,19 @@
       var yCur = yog.periods.filter(function (p) { return p.start.getTime() <= nowMs && nowMs < p.end.getTime(); })[0];
       L.push("## §9 - Yogini Dasha [I]");
       L.push("**Birth Yogini:** " + yog.birthYogini.name + " (" + yog.birthYogini.lord + ") · **Running:** " + (yCur ? yCur.name + " (" + yCur.lord + ")" : "-"));
-      L.push(row(["Yogini MD (lord)", "Start", "End"])); L.push(sep(3));
-      yog.periods.slice(0, 20).forEach(function (p) { L.push(row([p.name + " (" + p.lord + ")", vnFmtFullDate(p.start.getTime()), vnFmtFullDate(p.end.getTime())])); });
+      var yTot = VN_YOGINI.reduce(function (s, y) { return s + y.years; }, 0);
+      var yNames = VN_YOGINI.map(function (y) { return y.name; });
+      L.push("**Yogini MD -> AD tree (full life):**");
+      L.push(row(["Yogini MD (lord)", "AD (lord)", "Start", "End"])); L.push(sep(4));
+      yog.periods.slice(0, 20).forEach(function (p) {
+        var startI = yNames.indexOf(p.name), span = p.end.getTime() - p.start.getTime(), cur = p.start.getTime();
+        for (var yi = 0; yi < 8; yi++) {
+          var yy = VN_YOGINI[(startI + yi) % 8], en = cur + span * (yy.years / yTot);
+          L.push(row([p.name + " (" + p.lord + ")", yy.name + " (" + yy.lord + ")", vnFmtFullDate(cur), vnFmtFullDate(en)]));
+          cur = en;
+        }
+      });
+      L.push("_ADs shown as the proportional (years/36) split of each Yogini MD - the Chidra cross-check timer for Vimshottari._");
       L.push("");
     } catch (e) {}
 
@@ -19217,7 +19268,19 @@
     var kshetraLon = normalize(moon.lon + chart.planetsByName.Mars.lon + chart.planetsByName.Jupiter.lon);
     L.push("**Beeja Sphuta (male = Sun+Venus+Jupiter):** " + SIGNS[signIndex(beejaLon)].name + " " + vnCcDms(beejaLon % 30) + " (raw " + vnCcDms(beejaLon) + ")");
     L.push("**Kshetra Sphuta (female = Moon+Mars+Jupiter):** " + SIGNS[signIndex(kshetraLon)].name + " " + vnCcDms(kshetraLon % 30) + " (raw " + vnCcDms(kshetraLon) + ")");
-    L.push("_This is a two-chart method - supply the SPOUSE's Beeja/Kshetra Sphuta for any children question._");
+    // Spouse's fertility sphuta (two-chart method) — computed if partner data present
+    try {
+      var pt = input && input.partner;
+      if (pt && pt.birthInstant) {
+        var sc = buildChart(pt.birthInstant, Number(pt.latitude), Number(pt.longitude), Number(pt.timezone !== undefined ? pt.timezone : input.timezone), { ayanamshaKey: "lahiri" });
+        var sBeeja = normalize(sc.planetsByName.Sun.lon + sc.planetsByName.Venus.lon + sc.planetsByName.Jupiter.lon);
+        var sKshetra = normalize(sc.planetsByName.Moon.lon + sc.planetsByName.Mars.lon + sc.planetsByName.Jupiter.lon);
+        L.push("**SPOUSE Beeja Sphuta:** " + SIGNS[signIndex(sBeeja)].name + " " + vnCcDms(sBeeja % 30) + " · **SPOUSE Kshetra Sphuta:** " + SIGNS[signIndex(sKshetra)].name + " " + vnCcDms(sKshetra % 30) + " (from partner birth data, Lahiri).");
+        L.push("_Children leg: pair the native's " + (isFemale ? "Kshetra" : "Beeja") + " Sphuta with the spouse's " + (isFemale ? "Beeja" : "Kshetra") + " Sphuta._");
+      } else {
+        L.push("_This is a two-chart method - enter the SPOUSE's birth data (partner fields) and it will compute their Beeja/Kshetra Sphuta here; the children leg is disabled until then._");
+      }
+    } catch (e) { L.push("_Spouse Sphuta unavailable._"); }
     L.push("");
     // Janma nakshatra + Tara chakra
     var jNak = mnk.index;
@@ -19231,10 +19294,92 @@
 
     // ---------- §12 Yogas ----------
     try {
-      var yogas = scanYogas(chart);
       L.push("## §12 - Yogas present [I]");
+      var yogas = scanYogas(chart);
+      L.push("**Engine-scanned yogas:**");
       if (yogas.length) yogas.forEach(function (y) { L.push("- **" + y.name + "** (" + y.category + ")" + (y.planets && y.planets.length ? " - " + y.planets.join(", ") : "") + (y.effect ? " - " + y.effect : "")); });
-      else L.push("- No named yogas auto-detected.");
+      else L.push("- (none flagged by the engine scan)");
+      L.push("");
+      // Explicit category checklist so silence is never ambiguous
+      var fromMoon = function (n) { return houseFromSign(moonSign, chart.planetsByName[n].sign); };
+      var fromSun = function (n) { return houseFromSign(sunSign, chart.planetsByName[n].sign); };
+      var occ = function (sgn) { return chart.planets.filter(function (p) { return ["Rahu", "Ketu"].indexOf(p.name) < 0 && p.sign === sgn; }).map(function (p) { return p.name; }); };
+      var chk = [];
+      // Panch Mahapurusha
+      var pmp = { Ruchaka: "Mars", Bhadra: "Mercury", Hamsa: "Jupiter", Malavya: "Venus", Sasa: "Saturn" };
+      Object.keys(pmp).forEach(function (yn) {
+        var p = chart.planetsByName[pmp[yn]];
+        var strong = ["Exalted", "Moolatrikona", "Own sign"].indexOf(p.dignity) >= 0;
+        var kendra = [1, 4, 7, 10].indexOf(p.house) >= 0;
+        chk.push([yn + " (Mahapurusha, " + pmp[yn] + ")", (strong && kendra) ? "**YES** - " + p.dignity + " in kendra H" + p.house : "no"]);
+      });
+      // Gaja Kesari
+      var jkFromMoon = fromMoon("Jupiter");
+      chk.push(["Gaja Kesari", ([1, 4, 7, 10].indexOf(jkFromMoon) >= 0) ? "**YES** - Jupiter in kendra (" + jkFromMoon + ") from Moon" : "no"]);
+      // Sunapha / Anapha / Durudhara / Kemadruma (planets excl Sun/nodes in 2nd/12th from Moon)
+      var second = occ(normalizeSign(moonSign + 1)).filter(function (n) { return n !== "Sun"; });
+      var twelfth = occ(normalizeSign(moonSign - 1)).filter(function (n) { return n !== "Sun"; });
+      chk.push(["Sunapha", second.length ? "**YES** - " + second.join(",") + " in 2nd from Moon" : "no"]);
+      chk.push(["Anapha", twelfth.length ? "**YES** - " + twelfth.join(",") + " in 12th from Moon" : "no"]);
+      chk.push(["Durudhara", (second.length && twelfth.length) ? "**YES**" : "no"]);
+      var withMoon = occ(moonSign).filter(function (n) { return n !== "Moon"; });
+      chk.push(["Kemadruma", (!second.length && !twelfth.length && !withMoon.length) ? "**YES** - Moon isolated" : "no"]);
+      // Adhi Yoga: benefics in 6/7/8 from Moon
+      var adhi = ["Mercury", "Jupiter", "Venus"].filter(function (n) { return [6, 7, 8].indexOf(fromMoon(n)) >= 0; });
+      chk.push(["Adhi Yoga", (adhi.length >= 2) ? "**YES** - " + adhi.join(",") + " in 6/7/8 from Moon" : "no"]);
+      // Chandra-Mangala
+      chk.push(["Chandra-Mangala", (chart.planetsByName.Moon.sign === chart.planetsByName.Mars.sign) ? "**YES** - Moon+Mars conjunct" : "no"]);
+      // Solar: Vesi/Vasi/Ubhayachari, Budha-Aditya
+      var sunSecond = occ(normalizeSign(sunSign + 1)).filter(function (n) { return n !== "Moon"; });
+      var sunTwelfth = occ(normalizeSign(sunSign - 1)).filter(function (n) { return n !== "Moon"; });
+      chk.push(["Vesi (Sun)", sunSecond.length ? "**YES** - " + sunSecond.join(",") + " in 2nd from Sun" : "no"]);
+      chk.push(["Vasi (Sun)", sunTwelfth.length ? "**YES** - " + sunTwelfth.join(",") + " in 12th from Sun" : "no"]);
+      chk.push(["Ubhayachari", (sunSecond.length && sunTwelfth.length) ? "**YES**" : "no"]);
+      chk.push(["Budha-Aditya", (chart.planetsByName.Sun.sign === chart.planetsByName.Mercury.sign) ? "**YES** - Sun+Mercury conjunct" : "no"]);
+      // Sakata: Moon 6/8/12 from Jupiter
+      var moonFromJup = houseFromSign(chart.planetsByName.Jupiter.sign, moonSign);
+      chk.push(["Sakata", [6, 8, 12].indexOf(moonFromJup) >= 0 ? "**YES** - Moon " + moonFromJup + " from Jupiter" : "no"]);
+      // Kaal Sarpa: all 7 between Rahu->Ketu
+      var rahuLon = chart.planetsByName.Rahu.lon, ketuLon = chart.planetsByName.Ketu.lon;
+      var arc = normalize(ketuLon - rahuLon);
+      var allOneSide = classical.every(function (n) { var rel = normalize(chart.planetsByName[n].lon - rahuLon); return rel <= arc; }) || classical.every(function (n) { var rel = normalize(chart.planetsByName[n].lon - rahuLon); return rel >= arc; });
+      chk.push(["Kaal Sarpa", allOneSide ? "**YES** - all 7 on one side of the nodal axis" : "no"]);
+      // Parivartana (exchange)
+      var exch = [];
+      for (var e1 = 0; e1 < classical.length; e1++) for (var e2 = e1 + 1; e2 < classical.length; e2++) {
+        var pA = chart.planetsByName[classical[e1]], pB = chart.planetsByName[classical[e2]];
+        if (SIGNS[pA.sign].lord === pB.name && SIGNS[pB.sign].lord === pA.name) exch.push(pA.name + "<->" + pB.name);
+      }
+      chk.push(["Parivartana (exchange)", exch.length ? "**YES** - " + exch.join(", ") : "no"]);
+      // Nabhasa (present throughout life) — note category
+      chk.push(["Nabhasa (Aakriti/Sankhya/etc.)", "checked via placement; see modality/element census in §2 - operates lifelong irrespective of dasha"]);
+      L.push("**Category checklist (present / checked-and-absent):**");
+      L.push(row(["Yoga", "Status"])); L.push(sep(2));
+      chk.forEach(function (c) { L.push(row(c)); });
+      L.push("");
+      // Neecha Bhanga with the clause named
+      var nbry = [];
+      classical.forEach(function (n) {
+        var p = chart.planetsByName[n];
+        if (p.dignity !== "Debilitated") return;
+        var clauses = [];
+        var debLord = chart.planetsByName[SIGNS[p.sign].lord];
+        var exaltPlanet = null; for (var k in EXALTATION) { if (EXALTATION[k] === p.sign) exaltPlanet = k; }
+        var exaltLordP = exaltPlanet ? chart.planetsByName[exaltPlanet] : null;
+        if (debLord && [1, 4, 7, 10].indexOf(houseFromSign(asc.sign, debLord.sign)) >= 0) clauses.push("dispositor (" + debLord.name + ") in a kendra from Lagna");
+        if (debLord && [1, 4, 7, 10].indexOf(houseFromSign(moonSign, debLord.sign)) >= 0) clauses.push("dispositor in a kendra from Moon");
+        if (exaltLordP && [1, 4, 7, 10].indexOf(houseFromSign(asc.sign, exaltLordP.sign)) >= 0) clauses.push("the sign's exalted-lord (" + exaltPlanet + ") in a kendra from Lagna");
+        if (exaltLordP && exaltLordP.sign === p.sign) clauses.push("exalted-lord conjunct the debilitated planet");
+        if (planetsAspectingPlanet(chart, p).some(function (x) { return x.name === (debLord && debLord.name); })) clauses.push("dispositor aspects the debilitated planet");
+        nbry.push([n + " (debilitated in " + p.signName + ")", clauses.length ? "**Neecha Bhanga** - " + clauses.join("; ") : "no cancellation clause satisfied"]);
+      });
+      if (nbry.length) {
+        L.push("**Neecha Bhanga Raja Yoga - clause check for each debilitated planet:**");
+        L.push(row(["Debilitated planet", "Cancellation"])); L.push(sep(2));
+        nbry.forEach(function (r) { L.push(row(r)); });
+      } else {
+        L.push("**Neecha Bhanga:** no planet is debilitated in D-1.");
+      }
       L.push("");
     } catch (e) {}
 
@@ -19261,15 +19406,44 @@
       L.push(row(["Planet", "Event", "Date", "Sign", "Deg"])); L.push(sep(5));
       vnIngressEvents(chart, nowMs, 3).forEach(function (ev) { L.push(row([ev.planet, ev.event, vnFmtFullDate(ev.ms), ev.signName, ev.deg ? vnCcDms(ev.deg) : "-"])); });
       L.push("");
-      L.push("_Eclipse dates in the study period: supply from an ephemeris (not auto-computed by this engine)._");
+      // Eclipse finder: scan lunations over the next ~2.5 years; flag those near a node.
+      L.push("**Eclipses in the study period (next ~30 months):**");
+      L.push(row(["Type", "Date", "Sun/Moon sign", "Moon-node dist"])); L.push(sep(4));
+      try {
+        var startJd = julianDay(new Date()), eclRows = 0;
+        var prevElong = null, prevOpp = null;
+        for (var dj = 0; dj <= 920 && eclRows < 24; dj += 1) {
+          var jd = startJd + dj;
+          var sunT = planetTropicalLongitude("Sun", jd), moonT = moonTropicalLongitude(jd);
+          var elong = normalize(moonT - sunT);
+          var conj = ((elong + 180) % 360) - 180;         // 0 at new moon
+          var opp = (((elong - 180) + 540) % 360) - 180;  // 0 at full moon
+          function nodeDist(m, jj) { var nd = meanNodeTropical(jj); return Math.min(vnArc180(m, nd), vnArc180(m, normalize(nd + 180))); }
+          if (prevElong !== null && prevElong < 0 && conj >= 0) {
+            var ndS = nodeDist(moonT, jd);
+            if (ndS < 16) { L.push(row(["Solar eclipse (New Moon)", vnFmtFullDate((jd - 2440587.5) * DAY_MS + chart.timezone * 3600000), SIGNS[signIndex(normalize(sunT - chart.ayanamsa))].name, ndS.toFixed(1) + "°"])); eclRows++; }
+          }
+          if (prevOpp !== null && prevOpp < 0 && opp >= 0) {
+            var ndL = nodeDist(moonT, jd);
+            if (ndL < 11) { L.push(row(["Lunar eclipse (Full Moon)", vnFmtFullDate((jd - 2440587.5) * DAY_MS + chart.timezone * 3600000), SIGNS[signIndex(normalize(moonT - chart.ayanamsa))].name, ndL.toFixed(1) + "°"])); eclRows++; }
+          }
+          prevElong = conj; prevOpp = opp;
+        }
+        if (!eclRows) L.push(row(["(none within the ecliptic limit in this window)", "-", "-", "-"]));
+      } catch (e) { L.push(row(["(eclipse scan unavailable)", "-", "-", "-"])); }
+      L.push("_Computed from lunations within the ecliptic limit (~16° solar / ~11° lunar of the mean node); visibility/locality not resolved - confirm against a full ephemeris for a hard timing verdict._");
       L.push("");
     } catch (e) {}
 
     // ---------- §14 Data quality declaration ----------
     L.push("## §14 - Data quality declaration [C]");
     L.push(row(["Field", "Value"])); L.push(sep(2));
-    L.push(row(["Birth-time confidence", "- (native-supplied: exact / ±15 min / ±1 hr / unknown)"]));
-    L.push(row(["Rectified?", "- (if yes, on what basis)"]));
+    L.push(row(["Birth-time source", btSource]));
+    L.push(row(["Birth-time confidence", btConf]));
+    L.push(row(["Rectified?", (btSource === "Rectified" ? "Yes" : "-")]));
+    if (btConf === "±15 min") L.push(row(["Techniques disabled", "D-60 unusable; degree-closeness and natal-degree triggers unreliable"]));
+    else if (btConf === "±1 hr") L.push(row(["Techniques disabled", "Lagna itself may shift; house-based judgements unsafe - read from Moon"]));
+    else if (btConf === "unknown") L.push(row(["Techniques disabled", "No houses, no vargas, no dasha balance - Moon-sign only, no event timing"]));
     L.push("");
     L.push("_Confidence gates: ±15 min → D-60 unusable, degree/natal-degree triggers unreliable · ±1 hr → Lagna may shift, read from Moon · unknown → Moon-sign only, no dasha balance / vargas / houses._");
     L.push("");
@@ -19319,10 +19493,30 @@
         L.push("");
       });
     } catch (e) {}
-    // B4 known life events scaffold
-    L.push("## B4 - Known life events (fill from the native's history, for back-testing)");
+    // B4 known life events — parsed from native-supplied input, with the dasha at each date stamped
+    L.push("## B4 - Known life events (for back-testing)");
     L.push(row(["Event", "Date", "MD / AD / PD then", "Retrodicted?"])); L.push(sep(4));
-    ["Education milestones", "First job / career changes", "Marriage", "Births of children", "Property acquired", "Major illness / surgery", "Deaths in family", "Foreign travel / relocation", "Major financial gain or loss"].forEach(function (e) { L.push(row([e, "-", "-", "-"])); });
+    var evLines = String((input && input.lifeEvents) || "").split(/\n+/).map(function (s) { return s.trim(); }).filter(Boolean);
+    if (evLines.length) {
+      evLines.forEach(function (line) {
+        var m = line.match(/^(.*?)[:\-]\s*(\d{4}(?:-\d{1,2}(?:-\d{1,2})?)?)\s*$/);
+        var label = m ? m[1].trim() : line, dstr = m ? m[2] : "";
+        var dashaStr = "-";
+        if (dstr) {
+          try {
+            var parts = dstr.split("-").map(Number);
+            var evDate = new Date(Date.UTC(parts[0], (parts[1] || 6) - 1, parts[2] || 15));
+            var st = findDashaStack(chart.vimshottari.timeline, evDate);
+            dashaStr = st.length ? st.slice(0, 3).map(function (x, i) { return ["MD", "AD", "PD"][i] + " " + x.lord; }).join(" / ") : "-";
+          } catch (e) {}
+        }
+        L.push(row([label, dstr || "-", dashaStr, "-"]));
+      });
+    } else {
+      ["Education milestones", "First job / career changes", "Marriage", "Births of children", "Property acquired", "Major illness / surgery", "Deaths in family", "Foreign travel / relocation", "Major financial gain or loss"].forEach(function (e) { L.push(row([e, "-", "-", "-"])); });
+      L.push("");
+      L.push("_No events entered - fill the 'Known life events' box in the chart form (one per line, e.g. `Marriage: 2011-05-14`) and this table will auto-stamp the running MD/AD/PD at each date._");
+    }
     L.push("");
 
     L.push("_Generated by VedNetra - VAPM Export (Lahiri) - " + vnFmtFullDate(nowMs) + "_");
