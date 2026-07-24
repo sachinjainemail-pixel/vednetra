@@ -1609,6 +1609,18 @@
         showReportDownloadChooser();
       });
     }
+    // Modify Chart / Select Chart shortcuts in the top layout bar.
+    [["partAModifyBtn", "modify"], ["partASelectBtn", "select"]].forEach(function (pair) {
+      var btn = document.getElementById(pair[0]);
+      if (btn && btn.dataset.setupWired !== "1") {
+        btn.dataset.setupWired = "1";
+        btn.addEventListener("click", function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          runChartSetupRibbonAction(pair[1]);
+        });
+      }
+    });
   }
 
   function syncPartAFullScreenButton() {
@@ -19957,20 +19969,29 @@
     var rows = order.map(function (n) {
       var p = chart.planetsByName[n]; if (!p) return "";
       var nk = nakshatraInfo(p.lon);
-      return '<tr><td><strong>' + escapeHtml(n) + '</strong></td><td>' + escapeHtml(p.signName) + '</td><td>' + escapeHtml(decimalToDms(p.deg)) + '</td><td>' + p.house + '</td><td>' + escapeHtml(NAKSHATRAS[nk.index]) + '</td><td>' + nk.pada + '</td><td>' + escapeHtml(p.dignity) + '</td></tr>';
+      return '<tr><td><strong>' + escapeHtml(n) + '</strong></td><td>' + escapeHtml(p.signName) + '</td><td>' + escapeHtml(decimalToDms(p.deg)) + '</td><td>' + p.house + '</td><td>' + escapeHtml(NAKSHATRAS[nk.index]) + '</td><td>' + nk.pada + '</td><td>' + escapeHtml(nk.lord) + '</td><td>' + escapeHtml(p.dignity) + '</td></tr>';
     }).join("");
-    return '<div class="panel-box"><div class="chart-title-strip">Planet data (D-1)</div><div class="table-wrap compact-table"><table><thead><tr><th>Graha</th><th>Rasi</th><th>Degree</th><th>H</th><th>Nakshatra</th><th>Pada</th><th>Dignity</th></tr></thead><tbody>' + rows + '</tbody></table></div></div>';
+    return '<div class="panel-box"><div class="chart-title-strip">Planet data (D-1)</div><div class="table-wrap compact-table"><table><thead><tr><th>Graha</th><th>Rasi</th><th>Degree</th><th>H</th><th>Nakshatra</th><th>Pada</th><th>Nak Lord</th><th>Dignity</th></tr></thead><tbody>' + rows + '</tbody></table></div></div>';
   }
-  function vnDashVarshfal(chart, input) {
-    // Tajika annual (Varshphal) D-1 chart for the current running year, with
-    // the Muntha placed. Same single-chart panel style as the varga panels.
+  function vnDashVarshfal(chart, input, yearOverride) {
+    // Tajika annual (Varshphal) D-1 chart with the Muntha placed. A year
+    // stepper lets the user move to any running year without leaving the panel.
     try {
       var runningYear = 1;
       try { runningYear = completedYears(input.birthInstant, input.asOfInstant, input.timezone) + 1; } catch (e) {}
-      var result = computeVarshfal(chart, input, runningYear);
-      return chartBox("Varshfal D-1 · Year " + result.runningYear + " (Muntha H" + result.munthaHouse + ")",
+      var year = yearOverride ? Math.max(1, Math.min(121, parseInt(yearOverride, 10) || runningYear)) : runningYear;
+      var result = computeVarshfal(chart, input, year);
+      var box = chartBox("Varshfal D-1 · Year " + result.runningYear + " (Muntha H" + result.munthaHouse + ")",
         result.varshfal.ascendant.sign, result.planetsWithMuntha,
         { division: 1, rootChart: result.varshfal, showAscDegree: true, ascDegree: result.varshfal.ascendant.deg });
+      // Bar and chart are returned as siblings (no wrapper) so the dashboard's
+      // ".vn-dash-mount > .panel-box" sizing rules keep applying to the chart.
+      var bar = '<div class="vn-vf-yearbar" data-vf-year="' + year + '">' +
+        '<button type="button" class="vn-vf-year-btn" data-vf-step="-1" aria-label="Previous Varshfal year">&#9664;</button>' +
+        '<span class="vn-vf-year-label">Varshfal year ' + year + '</span>' +
+        '<button type="button" class="vn-vf-year-btn" data-vf-step="1" aria-label="Next Varshfal year">&#9654;</button>' +
+        '</div>';
+      return bar + box;
     } catch (e) {
       return '<div class="panel-box"><div class="chart-title-strip">Varshfal</div><p class="fine-print">Could not build the annual chart.</p></div>';
     }
@@ -20000,7 +20021,7 @@
       if (value === "dasha") return vnDashDasha(chart, input);
       var dv = parseInt(value, 10) || 1;
       var tv = tableVarga(chart, dv);
-      return chartBox("D-" + dv + " " + vargaName(dv), tv.ascendant.sign, tv.planets, { division: dv, showAscDegree: dv === 1, ascDegree: tv.ascendant.deg });
+      return chartBox("D-" + dv + " " + vargaName(dv), tv.ascendant.sign, tv.planets, { division: dv, showAscDegree: true, ascDegree: tv.ascendant.deg });
     } catch (e) { return '<div class="panel-box"><p class="fine-print">Could not render: ' + escapeHtml(e.message || "") + '</p></div>'; }
   }
   function consolidatedSection(chart, input) {
@@ -20052,6 +20073,20 @@
         }
       });
     });
+    // Varshfal year stepper (delegated) — re-render the panel for the chosen year.
+    if (!root.dataset.vfWired) {
+      root.dataset.vfWired = "1";
+      root.addEventListener("click", function (e) {
+        var btn = e.target && e.target.closest ? e.target.closest(".vn-vf-year-btn") : null;
+        if (!btn || !root.contains(btn)) return;
+        var mount = btn.closest(".vn-dash-mount"), bar = btn.closest(".vn-vf-yearbar");
+        if (!mount || !bar) return;
+        var cur = parseInt(bar.getAttribute("data-vf-year"), 10) || 1;
+        var next = cur + (parseInt(btn.getAttribute("data-vf-step"), 10) || 0);
+        mount.innerHTML = vnDashVarshfal(chart, input, next);
+        vnDashFit();
+      });
+    }
     // Any dasha panels present at first render need their controls wired too.
     try { wireDashaGroupControls(); } catch (e) {}
     // Size the grid to fill the remaining viewport now and after layout settles.
