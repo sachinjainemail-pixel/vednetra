@@ -5882,6 +5882,7 @@
       { id: "viewA-nativereport",   label: "Native report", render: function () { return nativeReportSection(chart, input); }, wire: function () { wireNativeReportControls(chart, input); } },
       { id: "viewA-vapmreport",     label: "VAPM export", render: function () { return vapmReportSection(chart, input); }, wire: function () { wireVapmReportControls(chart, input); } },
       { id: "viewA-vapmnakreport",  label: "VAPM + Nakshatra", render: function () { return vapmNakReportSection(chart, input); }, wire: function () { wireVapmNakReportControls(chart, input); } },
+      { id: "viewA-trivenireport",  label: "Triveni Intake", render: function () { return triveniReportSection(chart, input); }, wire: function () { wireTriveniReportControls(chart, input); } },
       { id: "viewA-num-compat",     immediate: true, render: function () { return numCompatSection(chart, input); }, wire: function () { wireNumCompatControls(chart, input); } },
       { id: "viewA-cards",          immediate: true, render: function () { return cardsSection(chart, input); }, wire: function () { wireCardsControls(chart, input); } },
       { id: "viewA-sadesati",       label: "Sade Sati", render: function () { return sadeSatiSection(chart, input); } },
@@ -13025,7 +13026,8 @@
     var curType = typeEl ? typeEl.value : "cc";
     var curFmt = fmtEl ? fmtEl.value : "pdf";
     var types = [
-      ["vapmnak", "VAPM + Nakshatra Report (Lahiri · §1–§15 + Part B) — default"],
+      ["triveni", "Triveni Chart Intake (Lahiri · §0–§10) — default"],
+      ["vapmnak", "VAPM + Nakshatra Report (Lahiri · §1–§15 + Part B)"],
       ["native", "Native Input Report v3 (full §0–§16 + v3 adds)"],
       ["vapm", "VAPM Export (Lahiri · §1–§14 + Part B)"],
       ["cc", "Natal Report (Chamatkar Chintamani)"],
@@ -13098,6 +13100,10 @@
     }
     if (reportType === "vapmnak") {
       downloadVapmNakReport(format);
+      return;
+    }
+    if (reportType === "triveni") {
+      downloadTriveniReport(format);
       return;
     }
     if (!lastPlainReport) {
@@ -13223,6 +13229,28 @@
     } catch (error) {
       console.error(error);
       alertUser("Natal Report (Chamatkar Chintamani) could not be built: " + (error && error.message ? error.message : error));
+    }
+  }
+
+  function downloadTriveniReport(format) {
+    try {
+      var input = lastReportInput || readInput();
+      var chart = lastReportChart || buildChart(input.birthInstant, input.latitude, input.longitude, input.timezone, {
+        ascendantOverride: input.ascendantOverride,
+        ayanamshaKey: input.ayanamshaKey || "lahiri"
+      });
+      var text = vnTriveniMarkdown(chart, input);
+      lastPlainReport = text;
+      lastPlainReports.chartData = text;
+      var filenameBase = reportDownloadFilenameBase() + "_Triveni_Intake";
+      if (format === "pdf") { downloadBlob(filenameBase + ".pdf", "application/pdf", makeSimplePdf(text)); showToast("✓ Triveni Intake — PDF download started"); return; }
+      if (format === "csv") { downloadBlob(filenameBase + ".csv", "text/csv;charset=utf-8", vedNetraReportTextToCsv(text)); showToast("✓ Triveni Intake — CSV download started"); return; }
+      if (format === "xls") { downloadBlob(filenameBase + ".xls", "application/vnd.ms-excel;charset=utf-8", vedNetraReportTextToExcel(text)); showToast("✓ Triveni Intake — Excel download started"); return; }
+      downloadBlob(filenameBase + ".md", "text/markdown;charset=utf-8", text);
+      showToast("✓ Triveni Intake — Markdown download started");
+    } catch (error) {
+      console.error(error);
+      alertUser("Triveni Intake could not be built: " + (error && error.message ? error.message : error));
     }
   }
 
@@ -17232,7 +17260,8 @@
       { id: "viewA-ccreport", label: "Natal Report (CC)", desc: "Full Chamatkār Chintāmaṇi data export — PDF & Markdown." },
       { id: "viewA-nativereport", label: "Native Input Report", desc: "Full v3 native export (§0–§16): fragility flags, guna, sphutas, sahams, rupa Ṣaḍbala, prastarāṣṭakavarga, D16, Parivritti-D10, full-life dashas, ingress + natal-return transits." },
       { id: "viewA-vapmreport", label: "VAPM Export", desc: "VAPM export spec (Lahiri, §1–§14 + Part B): master table, aspect/Kartari table, functional nature, Chandra/Surya Lagna, all vargas + Dashavarga count, Ashtakavarga incl. Shodhya Pinda, Vimshottari/Yogini/Jaimini, Indu Lagna, Tara Chakra, transits, four-fold scaffolds." },
-      { id: "viewA-vapmnakreport", label: "VAPM + Nakshatra Report", desc: "Default full export (Lahiri): the whole VAPM export plus the §15 Nakshatra Layer — within-nakshatra degrees, Gandanta (48′/3°20′), Abhijit, Navatara points, pada-level navamsa dignity, Nadi/dosha and Yoni/Gana matching factors." },
+      { id: "viewA-vapmnakreport", label: "VAPM + Nakshatra Report", desc: "Full export (Lahiri): the whole VAPM export plus the §15 Nakshatra Layer — within-nakshatra degrees, Gandanta (48′/3°20′), Abhijit, Navatara points, pada-level navamsa dignity, Nadi/dosha and Yoni/Gana matching factors." },
+      { id: "viewA-trivenireport", label: "Triveni Chart Intake", desc: "Default intake sheet (Lahiri, §0–§10): D1 sign-deg-min, unequal Sripati bhava cusps, Dasavarga, Shadbala pass/fail + Vimsopaka + Ishta/Kashta + bhava-sandhi, Ashtakavarga + Shodhya Pinda, Vimshottari, Jaimini 8-karaka, longevity + conditional dashas." },
       { id: "viewA-lifereport", label: "Life Report", desc: "One consolidated report — save it as a PDF." },
       { id: "viewA-rashifal", label: "Rashifal", desc: "Daily/weekly/monthly/yearly Moon-sign horoscope." },
       { id: "viewA-doshas", label: "Dosha Analysis", desc: "Manglik, Kaal Sarp and Pitra dosha with remedies." },
@@ -19718,6 +19747,242 @@
     return base + "\n" + nak + "\n_Generated by VedNetra - VAPM + Nakshatra Report (Lahiri) - " + vnFmtFullDate(Date.now()) + "_\n";
   }
 
+  var VN_SHADVARGA_W = [{ d: 1, w: 6 }, { d: 2, w: 2 }, { d: 3, w: 4 }, { d: 9, w: 5 }, { d: 12, w: 2 }, { d: 30, w: 1 }];
+  function vnVimsopaka(planetName, lon) {
+    if (["Rahu", "Ketu"].indexOf(planetName) >= 0) return null;
+    var total = 0;
+    VN_SHADVARGA_W.forEach(function (v) { total += v.w * vargaDignity(planetName, vargaSign(lon, v.d)).frac; });
+    return total; // out of 20
+  }
+  function vnJagradadi(planetName, sign) {
+    var dg = vnDignityInSign(planetName, sign);
+    if (["Exalted", "Own", "Moolatrikona"].indexOf(dg) >= 0) return "Jagrat (awake)";
+    if (["Friend", "Neutral"].indexOf(dg) >= 0) return "Swapna (dreaming)";
+    return "Sushupta (sleeping)";
+  }
+
+  // "Report 08": VEDNETRA -> TRIVENI chart-intake sheet (§0-§10). Always Lahiri.
+  function vnTriveniMarkdown(chart, input) {
+    if (input && input.birthInstant && chart.ayanamshaKey !== "lahiri") {
+      try { chart = buildChart(input.birthInstant, Number(input.latitude), Number(input.longitude), Number(input.timezone), { ascendantOverride: input.ascendantOverride, ayanamshaKey: "lahiri" }); } catch (e) {}
+    }
+    var d = vnCcData(chart, input), asc = chart.ascendant, L = [];
+    var order = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+    var classical = CLASSICAL_PLANETS;
+    var lvl = ["MD", "AD", "PD", "SD", "PR"];
+    var nm = (input && (input.nativeName || input.name)) || "Chart";
+    var gender = (input && input.gender) || "-";
+    var nowMs = Date.now();
+    function row(c) { return "| " + c.join(" | ") + " |"; }
+    function sep(n) { return "|" + new Array(n + 1).join("---|"); }
+    var moon = chart.planetsByName.Moon, sun = chart.planetsByName.Sun;
+
+    // day/night + age
+    var dayBirth = null, sunTimes = null;
+    try {
+      var localMs = chart.date.getTime() + chart.timezone * 3600000, ld = new Date(localMs);
+      var dstr = ld.getUTCFullYear() + "-" + pad(ld.getUTCMonth() + 1) + "-" + pad(ld.getUTCDate());
+      var lmin = ld.getUTCHours() * 60 + ld.getUTCMinutes() + ld.getUTCSeconds() / 60;
+      sunTimes = sunTimesForDate(dstr, chart.latitude, chart.longitude, chart.timezone);
+      dayBirth = lmin >= sunTimes.sunrise && lmin < sunTimes.sunset;
+    } catch (e) { dayBirth = [7, 8, 9, 10, 11, 12].indexOf(sun.house) >= 0; }
+    var age = "-"; try { age = completedYears(input.birthInstant, input.asOfInstant || new Date(), input.timezone); } catch (e) {}
+
+    L.push("# VEDNETRA → TRIVENI — CHART INTAKE — " + nm);
+    L.push("");
+    L.push("_Sidereal (Lahiri/Chitrapaksha) · whole-sign lordship, Sripati bhava occupancy · generated by VedNetra on " + vnFmtFullDate(nowMs) + "._");
+    L.push("");
+
+    // §0 Header & gate
+    L.push("## 0 · Header & gate [E]");
+    L.push(row(["Field", "Value"])); L.push(sep(2));
+    L.push(row(["Native name / ID", nm]));
+    L.push(row(["Sex", gender]));
+    L.push(row(["Birth date", String((input && input.birthDate) || "-")]));
+    L.push(row(["Birth time", String((input && input.birthTime) || "-")]));
+    L.push(row(["Day / Night", (dayBirth ? "Day" : "Night")]));
+    L.push(row(["Birth place", String((input && input.birthPlace) || "-")]));
+    L.push(row(["Latitude / Longitude", String((input && input.latitude) || "-") + " / " + String((input && input.longitude) || "-")]));
+    L.push(row(["Timezone (UTC±)", (Number(input && input.timezone) >= 0 ? "+" : "") + ((input && input.timezone) !== undefined ? input.timezone : "-")]));
+    L.push(row(["Ayanamsa = LAHIRI", "[x] confirmed — " + chart.ayanamsa.toFixed(4) + "°"]));
+    L.push(row(["Birth-time source", (input && input.birthTimeSource) || "-"]));
+    L.push(row(["Birth-time confidence", (input && input.birthTimeConfidence) || "-"]));
+    L.push(row(["Current age", (age === "-" ? "-" : age + " yrs")]));
+    L.push("");
+
+    // §1 D1 Rasi
+    L.push("## 1 · D1 Rasi — planetary positions [E]");
+    L.push(row(["Body", "Sign", "Deg°Min'", "Nakshatra–Pada", "Naksh. lord", "R / C", "Dignity", "Bhava"])); L.push(sep(8));
+    var lnk = nakshatraInfo(asc.lon);
+    L.push(row(["**Lagna (Asc)**", asc.signName, vnCcDms(asc.deg), NAKSHATRAS[lnk.index] + "-" + lnk.pada, NAK_LORDS[lnk.index], "—", "—", 1]));
+    d.planets.forEach(function (p) {
+      var pl = chart.planetsByName[p.name];
+      var nk = nakshatraInfo(pl.lon);
+      var rc = (p.retro ? "R" : "") + (p.combust ? "C" : "");
+      L.push(row([p.name, p.signName, vnCcDms(p.deg), NAKSHATRAS[nk.index] + "-" + nk.pada, nk.lord, (rc || "—"), (["Rahu", "Ketu"].indexOf(p.name) >= 0 ? "—" : vnVapmFiveFold(chart, pl)), p.house]));
+    });
+    try {
+      var gul = standingGulika(chart, input), mandi = standingGulika(chart, input, { atEnd: true, name: "Mandi" });
+      if (gul) L.push(row(["Gulika", gul.signName, vnCcDms(gul.deg), (function () { var g = nakshatraInfo(gul.lon !== undefined ? gul.lon : gul.sign * 30 + gul.deg); return NAKSHATRAS[g.index] + "-" + g.pada; })(), "—", "—", "—", gul.house]));
+      if (mandi) L.push(row(["Mandi", mandi.signName, vnCcDms(mandi.deg), "—", "—", "—", "—", mandi.house]));
+    } catch (e) {}
+    L.push("");
+
+    // §2 Bhava / Chalit (unequal, quadrant/Sripati-style cusps from Asc + MC)
+    L.push("## 2 · Bhava / Chalit chart (unequal cusps) [E]");
+    L.push(row(["Bhava", "Cusp sign", "Cusp Deg°Min'", "Bodies in this bhava"])); L.push(sep(4));
+    var cuspLon = {};
+    try {
+      var trop = quadrantCuspLongitudes(chart);
+      for (var h = 1; h <= 12; h++) cuspLon[h] = normalize(trop[h] - chart.ayanamsa);
+    } catch (e) { for (var h2 = 1; h2 <= 12; h2++) cuspLon[h2] = normalize(asc.lon - 15 + (h2 - 1) * 30); }
+    function bhavaOf(lon) {
+      for (var b = 1; b <= 12; b++) {
+        var start = cuspLon[b], end = cuspLon[b === 12 ? 1 : b + 1];
+        if (normalize(lon - start) < normalize(end - start)) return b;
+      }
+      return 1;
+    }
+    var occ = {}; for (var b0 = 1; b0 <= 12; b0++) occ[b0] = [];
+    order.forEach(function (n) { var p = chart.planetsByName[n]; if (p) occ[bhavaOf(p.lon)].push(n); });
+    for (var bb = 1; bb <= 12; bb++) {
+      var cs = signIndex(cuspLon[bb]);
+      L.push(row([bb, SIGNS[cs].name, vnCcDms(cuspLon[bb] - cs * 30), (occ[bb].join(", ") || "—")]));
+    }
+    L.push("_Cusps are the quadrant (Sripati/Porphyry-style) unequal bhava cusps from the Ascendant and Midheaven; occupancy is judged here, lordship in D1._");
+    L.push("");
+
+    // §3 Dasavarga
+    var vg = [["D9", 9], ["D2", 2], ["D3", 3], ["D4", 4], ["D7", 7], ["D10", 10], ["D12", 12], ["D16", 16], ["D20", 20], ["D24", 24], ["D27", 27], ["D30", 30], ["D60", 60]];
+    var vcharts = vg.map(function (v) { return makeVargaChart(chart, v[1]); });
+    L.push("## 3 · Divisional charts (Dasavarga) [E for D9; R for rest]");
+    L.push(row(["Body"].concat(vg.map(function (v) { return v[0]; })))); L.push(sep(vg.length + 1));
+    L.push(row(["Lagna"].concat(vcharts.map(function (vc) { return vc.ascendant.signName; }))));
+    order.forEach(function (n) { L.push(row([n].concat(vcharts.map(function (vc) { var vp = vc.planetsByName[n]; return vp ? vp.signName : "—"; })))); });
+    var vgtm = order.filter(function (n) { var p = chart.planetsByName[n]; return p && vargaSign(p.lon, 9) === p.sign; });
+    L.push("");
+    L.push("**Vargottama (D1 sign = D9 sign):** " + (vgtm.join(", ") || "none") + (vargaSign(asc.lon, 9) === asc.sign ? ", Lagna" : "") + ".");
+    L.push("");
+
+    // §4 Strengths
+    L.push("## 4 · Strengths [R]");
+    var reqRupa = { Sun: 6.5, Moon: 6, Mars: 5, Mercury: 7, Jupiter: 6.5, Venus: 5.5, Saturn: 5 };
+    L.push(row(["Planet", "Shadbala (rupa)", "Required", "Pass?", "Vimsopaka /20", "Varga grade", "Ishta", "Kashta", "Baladi", "Jagradadi", "Deeptadi"])); L.push(sep(11));
+    var repN = { 2: "Parijata", 3: "Uttama", 4: "Gopura", 5: "Simhasana", 6: "Parvata", 7: "Devaloka", 8: "Brahmaloka", 9: "Airavata", 10: "Sreedhama" };
+    var sbRows = {}; try { shadbalaRows(chart).forEach(function (r) { sbRows[r.planet] = r; }); } catch (e) {}
+    classical.forEach(function (n) {
+      var p = chart.planetsByName[n], r = sbRows[n];
+      var rupa = r ? r.total / 60 : 0, req = reqRupa[n];
+      var vim = vnVimsopaka(n, p.lon);
+      var dashaGood = 0; [1, 2, 3, 7, 9, 10, 12, 16, 30, 60].forEach(function (dv) { var vs = vargaSign(p.lon, dv), lord = SIGNS[vs].lord; if (EXALTATION[n] === vs || VN_SB_MT_SIGN[n] === vs || lord === n || vnNaturalRel(n, lord) === "friend") dashaGood++; });
+      L.push(row([n, rupa.toFixed(2), req.toFixed(1), (rupa >= req ? "PASS" : "fail"), (vim !== null ? vim.toFixed(1) : "—"), (repN[dashaGood] || "-"), (r ? ishtaPhala(r) : "—"), (r ? kashtaPhala(r) : "—"), vnBaladi(p), vnJagradadi(n, p.sign), vnDeeptadi(p.dignity)]));
+    });
+    L.push("");
+    // flags
+    var combustList = classical.filter(function (n) { return chart.planetsByName[n].combust; });
+    var retroList = classical.filter(function (n) { return chart.planetsByName[n].retrograde; });
+    // bhava-sandhi: planet within ~1° of any bhava cusp
+    var sandhi = [];
+    order.forEach(function (n) { var p = chart.planetsByName[n]; if (!p) return; var best = 999; for (var c = 1; c <= 12; c++) { var dd = Math.abs(normalize(p.lon) - cuspLon[c]); dd = Math.min(dd, 360 - dd); best = Math.min(best, dd); } if (best <= 1) sandhi.push(n + " (" + best.toFixed(2) + "°)"); });
+    L.push("**Flags** — combust: " + (combustList.join(", ") || "none") + " · retrograde: " + (retroList.join(", ") || "none") + " · vargottama: " + (vgtm.join(", ") || "none"));
+    L.push("**BHAVA-SANDHI (within ~1° of a bhava cusp — decisive veto):** " + (sandhi.join(", ") || "none") + ".");
+    L.push("_Avasthas: Baladi (infant→old), Jagradadi (awake/dreaming/sleeping by dignity), Deeptadi (dignity mood). Lajjitadi & Shayanadi are conjunction/aspect-driven and can be added on request._");
+    L.push("");
+
+    // §5 Ashtakavarga
+    try {
+      var avd = samudayaAshtakavargaData(chart);
+      L.push("## 5 · Ashtakavarga [R]");
+      L.push(row(["Sign →"].concat(avd.houseNumbers.map(function (h) { return "H" + h; })).concat(["Total"]))); L.push(sep(avd.houseNumbers.length + 2));
+      classical.forEach(function (n) { L.push(row(["BAV " + n].concat(avd.rows[n]).concat([avd.rowTotals[n]]))); });
+      L.push(row(["**SAV**"].concat(avd.columnTotals).concat(["**" + avd.grandTotal + "**"])));
+      L.push("");
+      L.push("**Shodhya Pinda (post-Trikona):**");
+      var pinL = [];
+      classical.forEach(function (n) {
+        var bySign = new Array(12).fill(0);
+        for (var i = 0; i < 12; i++) bySign[normalizeSign(asc.sign + i)] = avd.rows[n][i];
+        [[0, 4, 8], [1, 5, 9], [2, 6, 10], [3, 7, 11]].forEach(function (tri) { var mn = Math.min(bySign[tri[0]], bySign[tri[1]], bySign[tri[2]]); tri.forEach(function (s) { bySign[s] -= mn; }); });
+        var rp = 0, gp = 0;
+        for (var s2 = 0; s2 < 12; s2++) rp += bySign[s2] * VAPM_RASI_PINDA[s2];
+        classical.forEach(function (g) { for (var s3 = 0; s3 < 12; s3++) if (SIGNS[s3].lord === g) gp += bySign[s3] * VAPM_GRAHA_PINDA[g]; });
+        pinL.push(n + " " + (rp + gp));
+      });
+      L.push("- " + pinL.join(" · ") + " _(Trikona reduction applied; Ekadhipatya is occupancy-dependent — see the VAPM report for the step grid)._");
+      L.push("");
+    } catch (e) {}
+
+    // §6 Sub-planets & special points
+    L.push("## 6 · Sub-planets & special points [R/O]");
+    L.push(row(["Point", "Sign", "Degree", "House", "Note"])); L.push(sep(5));
+    try { var g2 = standingGulika(chart, input); if (g2) L.push(row(["Gulika", g2.signName, vnCcDms(g2.deg), g2.house, "general malefic"])); } catch (e) {}
+    try { var m2 = standingGulika(chart, input, { atEnd: true, name: "Mandi" }); if (m2) L.push(row(["Mandi", m2.signName, vnCcDms(m2.deg), m2.house, "end of Saturn's part"])); } catch (e) {}
+    try { standingUpagrahas(chart).forEach(function (u) { L.push(row([u.name, u.signName, vnCcDms(u.deg), u.house, "Sun-based upagraha"])); }); } catch (e) {}
+    try { var d22 = twentySecondDrekkana(chart); L.push(row(["22nd Drekkana (from Lagna)", d22.sign, "—", "—", "longevity/death — lord " + d22.lord])); } catch (e) {}
+    try { var n64 = vnSixtyFourthNavamsa(chart); L.push(row(["64th Navamsha (from Moon)", n64.signName, "—", "—", "longevity/affliction — lord " + n64.lord])); } catch (e) {}
+    var beejaLon = normalize(sun.lon + chart.planetsByName.Venus.lon + chart.planetsByName.Jupiter.lon);
+    var kshetraLon = normalize(moon.lon + chart.planetsByName.Mars.lon + chart.planetsByName.Jupiter.lon);
+    L.push(row(["Beeja Sphuta (male progeny)", SIGNS[signIndex(beejaLon)].name, vnCcDms(beejaLon % 30), houseFromSign(asc.sign, signIndex(beejaLon)), "should be odd sign"]));
+    L.push(row(["Kshetra Sphuta (female progeny)", SIGNS[signIndex(kshetraLon)].name, vnCcDms(kshetraLon % 30), houseFromSign(asc.sign, signIndex(kshetraLon)), "should be even sign"]));
+    L.push("");
+
+    // §7 Vimshottari
+    L.push("## 7 · Vimshottari dasha [E]");
+    L.push(row(["Field", "Value"])); L.push(sep(2));
+    L.push(row(["Dasha balance at birth", d.balance]));
+    L.push(row(["Current MD / AD / PD", d.stack.length ? d.stack.slice(0, 3).map(function (p, i) { return lvl[i] + " " + p.lord; }).join(" / ") : "-"]));
+    try {
+      if (d.stack[1]) {
+        var ads = subPeriods(d.stack[0], "AD");
+        var curAd = ads.filter(function (a) { return a.start.getTime() <= nowMs && nowMs < a.end.getTime(); })[0];
+        if (curAd) L.push(row(["Current AD ends", vnFmtFullDate(curAd.end.getTime())]));
+        var upcoming = ads.filter(function (a) { return a.start.getTime() > nowMs; }).slice(0, 3).map(function (a) { return d.stack[0].lord + "-" + a.lord + " from " + vnFmtFullDate(a.start.getTime()); });
+        L.push(row(["Next 2–3 AD changes", upcoming.join(" · ") || "-"]));
+      }
+    } catch (e) {}
+    L.push("");
+
+    // §8 Jaimini (8-karaka)
+    try {
+      var k8 = jaiminiKarakas(chart, true).slice().sort(function (a, b) { return b.degree - a.degree; });
+      var d9 = makeVargaChart(chart, 9);
+      var akName = (jaiminiKarakas(chart, true).filter(function (k) { return k.role === "AK"; })[0] || {}).planet;
+      var karakamsa = akName ? d9.planetsByName[akName] : null;
+      var ulSign = vnCcArudha(chart, 12);
+      L.push("## 8 · Jaimini layer (8-karaka scheme) [R]");
+      L.push(row(["Karaka", "Planet", "Degree", "Sign"])); L.push(sep(4));
+      k8.forEach(function (k) { L.push(row([k.role, k.planet, vnCcDms(k.degree), k.signName])); });
+      L.push("");
+      L.push("- **Karakamsa** (AK's Navamsa sign): " + (karakamsa ? karakamsa.signName : "-") + " · **Arudha Lagna (AL):** " + SIGNS[vnCcArudha(chart, 1)].name);
+      L.push("- **Upapada (UL):** " + SIGNS[ulSign].name + " · **2nd-from-UL:** " + SIGNS[normalizeSign(ulSign + 1)].name);
+      L.push("");
+    } catch (e) {}
+
+    // §9 Second-opinion & conditional dashas
+    L.push("## 9 · Second-opinion & conditional dashas [O]");
+    try {
+      var lv = longevityVerdict(longevityRules(chart));
+      L.push("- **Ayurdaya (longevity class):** " + lv + " _(method: VedNetra's multi-rule longevity scan — Maraka/8th-lord/Saturn/lagna-lord factors; not a numeric Pindayu/Amsayu figure)._");
+    } catch (e) {}
+    var paksha = d.panchang.paksha;
+    var ashtottari = (dayBirth && /Krishna/i.test(paksha)) || (!dayBirth && /Shukla/i.test(paksha));
+    var condLines = ["Yogini (applicable to all — see §9 of the full report)", "Chara / Jaimini (applicable to all)"];
+    condLines.push("Ashtottari: " + (ashtottari ? "**qualifies** (day+Krishna or night+Shukla paksha rule)" : "does not meet the day/paksha applicability rule"));
+    condLines.push("Kaala-Chakra / Shoola: computable on request (nakshatra-based; not auto-run here)");
+    L.push("- **Conditional dashas the chart qualifies for:** " + condLines.join(" · ") + ".");
+    L.push("");
+
+    // §10 The question
+    L.push("## 10 · The question");
+    L.push("- " + ((input && input.question) ? input.question : "_(none supplied — enter the native's question in the chart form's Question field.)_"));
+    L.push("");
+
+    L.push("**Coverage:** §0–§8 computed from the chart; §9 longevity is qualitative; enter birth-time source/confidence and the question in the chart form to complete §0 and §10.");
+    L.push("");
+    L.push("_Generated by VedNetra - Triveni Chart Intake (Lahiri) - " + vnFmtFullDate(nowMs) + "_");
+    return L.join("\n");
+  }
+
   // ---- NATIVE INPUT REPORT v1 — retained for reference --------------------
   function vnNativeMarkdownV1(chart, input) {
     var d = vnCcData(chart, input), asc = chart.ascendant, L = [];
@@ -20163,6 +20428,31 @@
     var copy = document.getElementById("vnVapmNakCopy");
     if (copy) copy.addEventListener("click", function () {
       var md = vnVapmNakshatraMarkdown(chart, input), status = document.getElementById("vnVapmNakCopyStatus");
+      function done() { if (status) { status.textContent = "Copied!"; setTimeout(function () { status.textContent = ""; }, 2500); } }
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(md).then(done, function () { vnCcFallbackCopy(md, done); });
+        else vnCcFallbackCopy(md, done);
+      } catch (e) { vnCcFallbackCopy(md, done); }
+    });
+  }
+  function triveniReportSection(chart, input) {
+    var md;
+    try { md = vnTriveniMarkdown(chart, input); }
+    catch (e) { md = "Could not build the report: " + (e && e.message ? e.message : e); }
+    return '<section id="viewA-trivenireport" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Master Export · Default</p><h3>Triveni Chart Intake</h3></div><span class="small-pill">Lahiri · §0–§10</span></div>' +
+      '<p class="fine-print">The default intake sheet, always cast on <strong>Lahiri (Chitrapaksha)</strong>, mapping 1:1 to the Triveni pipeline: §0 header &amp; gate, §1 D1 with sign-degree-minute + nakshatra-pada-lord + R/C + dignity + bhava (incl. Gulika/Mandi), §2 unequal (Sripati/quadrant) bhava cusps + occupancy, §3 Dasavarga (D9 + 12 more), §4 strengths (Shadbala pass/fail, Vimsopaka, Ishta/Kashta, avasthas, combust/retro/vargottama + <em>bhava-sandhi veto</em>), §5 Ashtakavarga (BAV/SAV + Shodhya Pinda), §6 sub-planets &amp; sphutas, §7 Vimshottari, §8 Jaimini 8-karaka, §9 longevity + conditional-dasha qualification, §10 the question.</p>' +
+      '<div class="vn-tool-actions" style="margin-bottom:10px"><button type="button" id="vnTriveniPdf" class="primary-action vn-generate-btn">Save as PDF</button> <button type="button" id="vnTriveniMd" class="input-toggle-btn">Download Markdown</button> <button type="button" id="vnTriveniCopy" class="input-toggle-btn">Copy (Markdown)</button> <span id="vnTriveniCopyStatus" class="fine-print"></span></div>' +
+      '<div class="panel-box"><pre class="vn-native-pre">' + escapeHtml(md) + '</pre></div>' +
+      '</section>';
+  }
+  function wireTriveniReportControls(chart, input) {
+    var pdf = document.getElementById("vnTriveniPdf");
+    if (pdf) pdf.addEventListener("click", function () { try { downloadTriveniReport("pdf"); } catch (e) {} });
+    var mdBtn = document.getElementById("vnTriveniMd");
+    if (mdBtn) mdBtn.addEventListener("click", function () { try { downloadTriveniReport("md"); } catch (e) {} });
+    var copy = document.getElementById("vnTriveniCopy");
+    if (copy) copy.addEventListener("click", function () {
+      var md = vnTriveniMarkdown(chart, input), status = document.getElementById("vnTriveniCopyStatus");
       function done() { if (status) { status.textContent = "Copied!"; setTimeout(function () { status.textContent = ""; }, 2500); } }
       try {
         if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(md).then(done, function () { vnCcFallbackCopy(md, done); });
