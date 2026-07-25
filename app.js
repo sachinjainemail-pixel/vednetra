@@ -5895,6 +5895,7 @@
       { id: "viewA-ephemeris",      label: "Ephemeris",         render: function () { return ephemerisSection(chart, input); }, wire: function () { wireEphemerisControls(chart, input); } },
       { id: "viewA-references",     label: "Reference tables",  render: function () { return referenceTablesSection(chart); } },
       { id: "viewA-shadbala",       label: "Shadbala",          render: function () { return shadbalaSection(chart); } },
+      { id: "viewA-sahams",         label: "Sahams",            render: function () { return sahamsSection(chart, input); } },
       { id: "viewA-jaimini",        label: "Jaimini",           render: function () { return jaiminiSection(chart); } },
       { id: "viewA-compatibility",  label: "Compatibility",     render: function () { return marriageCompatibilityReportSection(chart, input); }, wire: wireCompatibilityInlineControls },
       { id: "viewA-horary",         label: "Horary",            render: function () { return horarySection(chart, input); }, wire: function () { wireHoraryControls(chart, input); } },
@@ -17242,6 +17243,7 @@
     ] },
     { title: "Strengths & Systems", items: [
       { id: "viewA-shadbala", label: "Shadbala", desc: "Six-fold planetary strength." },
+      { id: "viewA-sahams", label: "Sahams", desc: "Full set of Tajika Sahams (sensitive points) — Punya, Vidya, Vivaha, Putra, Karma, Roga, Ayu and 20 more, with sign/degree/house and formula." },
       { id: "viewA-sav", label: "Ashtakavarga (SAV)", desc: "Sarvashtakavarga bindu totals." },
       { id: "viewA-bav", label: "Bhinnashtakavarga", desc: "Per-planet ashtakavarga." },
       { id: "viewA-kp", label: "KP System", desc: "Star and sub-lords with cuspal analysis." },
@@ -18425,15 +18427,67 @@
       return standingBody(chart, name, sid);
     } catch (e) { return null; }
   }
-  function vnSaham(chart, def) {
+  // Full standard Tajika Saham set (day-birth formula A − B + Lagna; reversed
+  // for a night birth unless rev:false). Terms may be a planet, "Lagna",
+  // "Gulika", "Mandi", "Punya" (the Punya saham) or "lordN" (lord of the Nth
+  // house from Lagna). Sources vary on a few formulas — each formula is printed
+  // for audit.
+  var VN_SAHAMS = [
+    { name: "Punya", a: "Moon", b: "Sun", rev: true, use: "fortune, merit, overall prosperity" },
+    { name: "Vidya", a: "Sun", b: "Moon", rev: true, use: "education, intelligence" },
+    { name: "Yasas", a: "Jupiter", b: "Gulika", rev: true, use: "fame, reputation" },
+    { name: "Gaurava", a: "Jupiter", b: "Moon", rev: true, use: "honour, respect, dignity" },
+    { name: "Mitra", a: "Mercury", b: "Punya", rev: true, use: "friends, alliances" },
+    { name: "Mahatmya", a: "Mars", b: "Punya", rev: true, use: "greatness, eminence" },
+    { name: "Asha", a: "Saturn", b: "Mars", rev: true, use: "hopes, desires" },
+    { name: "Samartha", a: "Mars", b: "Mercury", rev: true, use: "capability, competence" },
+    { name: "Bhratru", a: "Jupiter", b: "Mars", rev: true, use: "siblings" },
+    { name: "Pitru", a: "Sun", b: "Saturn", rev: true, use: "father" },
+    { name: "Matru", a: "Moon", b: "Venus", rev: true, use: "mother" },
+    { name: "Putra", a: "Jupiter", b: "Moon", rev: true, use: "children / progeny" },
+    { name: "Jeeva", a: "Saturn", b: "Jupiter", rev: true, use: "vitality, livelihood" },
+    { name: "Karma", a: "Mercury", b: "Mars", rev: true, use: "career, action" },
+    { name: "Roga", a: "Saturn", b: "Mars", rev: false, use: "disease (no night reversal)" },
+    { name: "Kali", a: "Jupiter", b: "Mars", rev: true, use: "valour, strife" },
+    { name: "Sastra", a: "Saturn", b: "Mars", rev: true, use: "scriptures, deep learning" },
+    { name: "Bandhu", a: "Mercury", b: "Moon", rev: true, use: "relatives, kinsfolk" },
+    { name: "Mrityu", a: "lord8", b: "Moon", rev: true, use: "death, mortal danger" },
+    { name: "Paradesa", a: "Saturn", b: "Moon", rev: true, use: "foreign travel / residence" },
+    { name: "Artha", a: "lord2", b: "Sun", rev: true, use: "wealth" },
+    { name: "Vanik", a: "Mercury", b: "Sun", rev: true, use: "trade, commerce" },
+    { name: "Vyapara", a: "Saturn", b: "Mercury", rev: true, use: "business enterprise" },
+    { name: "Karyasiddhi", a: "Saturn", b: "Sun", rev: true, use: "success of undertakings" },
+    { name: "Satru", a: "Mars", b: "Saturn", rev: true, use: "enemies, opposition" },
+    { name: "Vivaha", a: "Venus", b: "Saturn", rev: true, use: "marriage" },
+    { name: "Ayu", a: "Moon", b: "Saturn", rev: true, use: "longevity" }
+  ];
+  function vnSahamPointLon(chart, input, term, isDay) {
+    if (!term) return chart.ascendant.lon;
+    if (term === "Lagna" || term === "La") return chart.ascendant.lon;
+    if (term === "Gulika" || term === "Mandi") {
+      try { var g = standingGulika(chart, input, term === "Mandi" ? { atEnd: true, name: "Mandi" } : undefined); if (g) return (g.lon !== undefined ? g.lon : g.sign * 30 + g.deg); } catch (e) {}
+      return chart.ascendant.lon;
+    }
+    if (term === "Punya") { return vnSahamRawValue(chart, input, { a: "Moon", b: "Sun", rev: true }, isDay); }
+    var m = /^lord(\d+)$/.exec(term);
+    if (m) { var lord = SIGNS[normalizeSign(chart.ascendant.sign + (parseInt(m[1], 10) - 1))].lord; var lp = chart.planetsByName[lord]; return lp ? lp.lon : chart.ascendant.lon; }
+    var p = chart.planetsByName[term]; return p ? p.lon : chart.ascendant.lon;
+  }
+  function vnSahamRawValue(chart, input, def, isDay) {
+    var A = vnSahamPointLon(chart, input, def.a, isDay), B = vnSahamPointLon(chart, input, def.b, isDay), asc = chart.ascendant.lon;
+    return (def.rev && !isDay) ? normalize(B - A + asc) : normalize(A - B + asc);
+  }
+  function vnSaham(chart, def, input) {
     try {
       var sunHouse = chart.planetsByName.Sun.house;
       var isDay = sunHouse >= 7 && sunHouse <= 12;
-      var A = chart.planetsByName[def.a].lon, B = chart.planetsByName[def.b].lon, asc = chart.ascendant.lon;
-      var val = (def.rev && !isDay) ? normalize(B - A + asc) : normalize(A - B + asc);
+      var val = vnSahamRawValue(chart, input, def, isDay);
       var sign = signIndex(val);
-      return { name: def.name, signName: SIGNS[sign].name, deg: val - sign * 30, house: houseFromSign(chart.ascendant.sign, sign), formula: (def.rev && !isDay ? def.b + " - " + def.a : def.a + " - " + def.b) + " + Asc" };
+      return { name: def.name, signName: SIGNS[sign].name, deg: val - sign * 30, lon: val, house: houseFromSign(chart.ascendant.sign, sign), formula: ((def.rev && !isDay) ? def.b + " - " + def.a : def.a + " - " + def.b) + " + Asc" };
     } catch (e) { return null; }
+  }
+  function vnSahamRows(chart, input) {
+    return VN_SAHAMS.map(function (def) { return vnSaham(chart, def, input); }).filter(Boolean);
   }
   function vnPrastarContributors(chart, target, sign) {
     var rules = ashtakavargaRules()[target];
@@ -18717,16 +18771,9 @@
     try { var n64 = vnSixtyFourthNavamsa(chart); L.push(row(["64th Navamsha (from Moon)", n64.signName, "-", "-", "longevity / affliction - lord " + n64.lord])); } catch (e) {}
     try { var spd = vnSarpaDrekkana(chart); L.push(row(["Sarpa Drekkana? (Lagna)", (spd.hit ? "Yes - " + spd.label : "No"), "-", "-", "disease / death"])); } catch (e) {}
     L.push("");
-    L.push("### 5d. Sahams (Tajika; day-birth formula shown, reversed at night)");
+    L.push("### 5d. Sahams (Tajika; full set — day-birth formula shown, reversed at night)");
     L.push(row(["Saham", "Sign", "Degree", "House", "Formula", "Used by"])); L.push(sep(6));
-    [
-      { name: "Punya", a: "Sun", b: "Moon", rev: true, use: "merit / fortune" },
-      { name: "Putra (= Santaan)", a: "Moon", b: "Jupiter", rev: true, use: "progeny (Jupiter-transit trigger)" },
-      { name: "Vivaha", a: "Saturn", b: "Venus", rev: true, use: "marriage" },
-      { name: "Karma", a: "Mercury", b: "Mars", rev: true, use: "career" },
-      { name: "Roga", a: "Saturn", b: "Mars", rev: false, use: "disease" },
-      { name: "Ayu", a: "Moon", b: "Saturn", rev: true, use: "longevity" }
-    ].forEach(function (def) { var sh = vnSaham(chart, def); if (sh) L.push(row([def.name, sh.signName, vnCcDms(sh.deg), sh.house, sh.formula, def.use])); });
+    VN_SAHAMS.forEach(function (def) { var sh = vnSaham(chart, def, input); if (sh) L.push(row([def.name, sh.signName, vnCcDms(sh.deg), sh.house, sh.formula, def.use])); });
     L.push("");
 
     // §6 Shadbala
@@ -20434,6 +20481,18 @@
         else vnCcFallbackCopy(md, done);
       } catch (e) { vnCcFallbackCopy(md, done); }
     });
+  }
+  function sahamsSection(chart, input) {
+    var body = "";
+    VN_SAHAMS.forEach(function (def) {
+      var sh = vnSaham(chart, def, input); if (!sh) return;
+      body += '<tr><td><strong>' + escapeHtml(def.name) + '</strong></td><td>' + escapeHtml(sh.signName) + '</td><td>' + escapeHtml(vnCcDms(sh.deg)) + '</td><td>' + sh.house + '</td><td>' + escapeHtml(sh.formula) + '</td><td>' + escapeHtml(def.use) + '</td></tr>';
+    });
+    var sunHouse = chart.planetsByName.Sun.house, isDay = sunHouse >= 7 && sunHouse <= 12;
+    return '<section id="viewA-sahams" class="section"><div class="section-head"><div><p class="eyebrow">Tajika</p><h3>Sahams (Sensitive Points)</h3></div><span class="small-pill">' + VN_SAHAMS.length + ' sahams</span></div>' +
+      '<p class="fine-print">The full set of Tajika Sahams for this chart (' + (isDay ? "day" : "night") + ' birth). Each Saham = A − B + Lagna for a day birth; for a night birth the two terms are reversed unless the formula is fixed (e.g. Roga). A term may be a planet, the Lagna, Gulika, the Punya Saham, or a house lord. Classical sources differ on a few formulas, so the exact formula used is printed per row for audit.</p>' +
+      '<div class="table-wrap"><table><thead><tr><th>Saham</th><th>Sign</th><th>Degree</th><th>House</th><th>Formula (day)</th><th>Signifies</th></tr></thead><tbody>' + body + '</tbody></table></div>' +
+      '<p class="fine-print">A Saham activates when a transiting planet (especially its karaka or the year lord) crosses its degree; it is read from the Lagna and the Moon. Sahams are a Varshaphal (annual-chart) technique and are also used in the natal chart.</p></section>';
   }
   function triveniReportSection(chart, input) {
     var md;
