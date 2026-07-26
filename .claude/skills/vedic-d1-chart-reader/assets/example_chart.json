@@ -1,0 +1,42 @@
+{
+  "_comment": "Worked example. This is a correct Part-A extraction and a valid Part-B input. Running `python scripts/derive_birth.py assets/example_chart.json` derives 1950-2025 -> 4 March 2004, ~evening IST, FULL CHART MATCH True. The `houses` and `derived` blocks are documentation; derive_birth.py ignores unknown fields.",
+  "chartType": "D1_Rashi",
+  "style": "north_indian",
+  "ayanamsha": "Lahiri",
+  "ascendant": { "sign": "Leo", "degree": 28 },
+  "planets": {
+    "Sun":     { "sign": "Aquarius",  "degree": 20 },
+    "Moon":    { "sign": "Cancer",    "degree": 21 },
+    "Mars":    { "sign": "Aries",     "degree": 25 },
+    "Mercury": { "sign": "Aquarius",  "degree": 20, "conditions": ["combust"] },
+    "Jupiter": { "sign": "Leo",       "degree": 20, "conditions": ["retrograde"] },
+    "Venus":   { "sign": "Aries",     "degree": 4 },
+    "Saturn":  { "sign": "Gemini",    "degree": 12, "conditions": ["retrograde"] },
+    "Rahu":    { "sign": "Aries",     "degree": 20, "conditions": ["retrograde"] },
+    "Ketu":    { "sign": "Libra",     "degree": 20, "conditions": ["retrograde"] },
+    "Uranus":  { "sign": "Aquarius",  "degree": 9 },
+    "Neptune": { "sign": "Capricorn", "degree": 20 },
+    "Pluto":   { "sign": "Scorpio",   "degree": 28 }
+  },
+  "houses": {
+    "1":  { "sign": "Leo",         "planets": ["Jupiter", "Lagna 28"] },
+    "2":  { "sign": "Virgo",       "planets": [] },
+    "3":  { "sign": "Libra",       "planets": ["Ketu"] },
+    "4":  { "sign": "Scorpio",     "planets": ["Pluto"] },
+    "5":  { "sign": "Sagittarius", "planets": [] },
+    "6":  { "sign": "Capricorn",   "planets": ["Neptune"] },
+    "7":  { "sign": "Aquarius",    "planets": ["Sun", "Mercury", "Uranus"] },
+    "8":  { "sign": "Pisces",      "planets": [] },
+    "9":  { "sign": "Aries",       "planets": ["Mars", "Rahu", "Venus"] },
+    "10": { "sign": "Taurus",      "planets": [] },
+    "11": { "sign": "Gemini",      "planets": ["Saturn"] },
+    "12": { "sign": "Cancer",      "planets": ["Moon"] }
+  },
+  "search_from_year": 1950,
+  "search_to_year": 2025,
+  "derived": {
+    "date_of_birth": "2004-03-04",
+    "tentative_time_ist": "~18:11-19:15 (evening); best fit near 73E longitude ~19:15",
+    "note": "Date is certain; time is a range pending exact birthplace."
+  }
+}
