@@ -16122,10 +16122,132 @@
     return null;
   }
 
+  // ============================================================
+  // Extended Muhurta engines (Hora, sub-Hora, Lagna, Gowri, Do-Ghati,
+  // Panchaka Rahita, Chandrabalam, Tarabalam, Panjika Yoga).
+  // ============================================================
+  var VN_HORA_INFO = {
+    Sun: { nat: "Malefic", cls: "vn-neutral", good: "authority, government / official work, health, courage" },
+    Moon: { nat: "Benefic", cls: "vn-good", good: "travel, water matters, romance, new clothes, mental work" },
+    Mars: { nat: "Malefic", cls: "vn-bad", good: "sports, litigation, surgery, land, bold / aggressive action" },
+    Mercury: { nat: "Benefic", cls: "vn-good", good: "study, trade, accounts, writing, communication" },
+    Jupiter: { nat: "Benefic", cls: "vn-good", good: "education, religious acts, marriage, finance (most auspicious)" },
+    Venus: { nat: "Benefic", cls: "vn-good", good: "arts, marriage, luxury, vehicles, romance, beauty" },
+    Saturn: { nat: "Malefic", cls: "vn-bad", good: "labour, iron, property, long-term & routine work" }
+  };
+  // Kaala Hora: day (sunrise→sunset) and night (sunset→next sunrise) each split
+  // into 12 proportional horas; the first day hora is the weekday lord and the
+  // rulership advances through the Chaldean hora sequence continuously.
+  function vnHoraList(ctx) {
+    var s = vnSunWindow(ctx);
+    var dayLord = WEEKDAY_LORDS[vnWeekdayIndex(ctx.date)];
+    var dayLen = s.sunset - s.sunrise, nightLen = s.nextSunrise - s.sunset, out = [];
+    for (var i = 0; i < 12; i++) out.push({ n: i + 1, lord: horaLord(dayLord, i), part: "Day", start: s.sunrise + i * dayLen / 12, end: s.sunrise + (i + 1) * dayLen / 12 });
+    for (var j = 0; j < 12; j++) out.push({ n: j + 13, lord: horaLord(dayLord, 12 + j), part: "Night", start: s.sunset + j * nightLen / 12, end: s.sunset + (j + 1) * nightLen / 12 });
+    return out;
+  }
+  function vnSubHoraList(ctx) {
+    var horas = vnHoraList(ctx), out = [];
+    horas.forEach(function (h) {
+      var part = (h.end - h.start) / 7;
+      for (var k = 0; k < 7; k++) out.push({ horaN: h.n, horaLord: h.lord, horaPart: h.part, lord: horaLord(h.lord, k), start: h.start + k * part, end: h.start + (k + 1) * part });
+    });
+    return out;
+  }
+  // Panchang values at sunrise (governs the "day") and at sunset (the "night").
+  function vnDayPanchang(ctx) {
+    var s = vnSunWindow(ctx);
+    var midnight = localDateTimeToUtc(ctx.date, "00:00:00", ctx.timezone).getTime();
+    function info(minFromMidnight) {
+      var c = buildChart(new Date(midnight + minFromMidnight * 60000), ctx.latitude, ctx.longitude, ctx.timezone, { ayanamshaKey: ctx.ayanamshaKey });
+      var moon = c.planetsByName.Moon, sun = c.planetsByName.Sun, nak = nakshatraInfo(moon.lon);
+      var tithiIdx = Math.floor(normalize(moon.lon - sun.lon) / 12);
+      var yogaIdx = Math.floor(normalize(moon.lon + sun.lon) / NAK_SIZE);
+      return { moonSign: moon.sign, moonSignName: moon.signName, nakIdx: nak.index, nakName: NAKSHATRAS[nak.index], nakLord: nak.lord, tithiIdx: tithiIdx, tithiName: TITHIS[tithiIdx], yoga: YOGAS[yogaIdx] };
+    }
+    return { sun: s, weekday: vnWeekdayIndex(ctx.date), sunrise: info(s.sunrise), sunset: info(s.sunset) };
+  }
+  // Gowri Panchangam — day and night each split into 8 Gowri periods.
+  var VN_GOWRI_SEQ = ["Udyoga", "Amrutha", "Roga", "Labha", "Dhana", "Sugam", "Soka", "Visha"];
+  var VN_GOWRI_NAT = { Amrutha: "Good", Labha: "Good", Dhana: "Good", Sugam: "Good", Udyoga: "Neutral", Roga: "Bad", Soka: "Bad", Visha: "Bad" };
+  function vnGowriList(ctx, atNight) {
+    var s = vnSunWindow(ctx), wd = vnWeekdayIndex(ctx.date);
+    var from = atNight ? s.sunset : s.sunrise, span = (atNight ? s.nextSunrise - s.sunset : s.sunset - s.sunrise) / 8;
+    var startIdx = (atNight ? (wd + 5) : wd) % 8;
+    var out = [];
+    for (var i = 0; i < 8; i++) { var name = VN_GOWRI_SEQ[(startIdx + i) % 8]; out.push({ name: name, nat: VN_GOWRI_NAT[name], start: from + i * span, end: from + (i + 1) * span }); }
+    return out;
+  }
+  // 30 Muhurtas (2 ghati each) across the ahoratri (sunrise → next sunrise).
+  var VN_MUHURTA30 = [
+    ["Rudra", "bad"], ["Ahi", "bad"], ["Mitra", "good"], ["Pitri", "bad"], ["Vasu", "good"],
+    ["Vara", "good"], ["Vishvedeva", "good"], ["Abhijit", "good"], ["Vidhi", "good"], ["Sutamukhi", "neutral"],
+    ["Puruhuta", "bad"], ["Vahini", "neutral"], ["Naktanakara", "bad"], ["Varuna", "good"], ["Aryaman", "good"],
+    ["Girisha", "good"], ["Ajapada", "bad"], ["Ahirbudhnya", "good"], ["Pushya", "good"], ["Ashwini", "good"],
+    ["Yama", "bad"], ["Agni", "bad"], ["Vidhatri", "good"], ["Kanda", "bad"], ["Aditi", "good"],
+    ["Amrita", "good"], ["Vishnu", "good"], ["Dyumadgadyuti", "neutral"], ["Brahma", "good"], ["Samudra", "good"]
+  ];
+  function vnDoGhatiList(ctx) {
+    var s = vnSunWindow(ctx), total = s.nextSunrise - s.sunrise, mu = total / 30, out = [];
+    for (var i = 0; i < 30; i++) out.push({ n: i + 1, name: VN_MUHURTA30[i][0], nat: VN_MUHURTA30[i][1], ghati: (2 * i + 1) + "–" + (2 * i + 2), part: (i < 15 ? "Day-ish" : "Night-ish"), start: s.sunrise + i * mu, end: s.sunrise + (i + 1) * mu });
+    return out;
+  }
+  // Panchaka Rahita — per rising-sign (lagna) window, using the day's tithi,
+  // weekday and nakshatra. (nak + tithi + vaara + lagna) mod 9 selects the panchaka.
+  var VN_PANCHAKA = { 1: "Mrityu", 2: "Agni", 4: "Raja", 6: "Chora", 8: "Roga" };
+  function vnPanchakaList(ctx, dp) {
+    var segs = vnLagnaSegments(ctx);
+    var tithiN = dp.sunrise.tithiIdx + 1, nakN = dp.sunrise.nakIdx + 1, vaaraN = dp.weekday + 1;
+    return segs.map(function (sg) {
+      var rem = (nakN + tithiN + vaaraN + (sg.sign + 1)) % 9;
+      var p = VN_PANCHAKA[rem];
+      return { sign: sg.sign, start: sg.start, end: sg.end, panchaka: p || "Rahita", rahita: !p };
+    });
+  }
+  // Chandrabalam — Moon's transit house from each of the 12 rashis (sunrise Moon).
+  function vnChandrabalamList(dp) {
+    var out = [];
+    for (var r = 0; r < 12; r++) {
+      var h = houseFromSign(r, dp.sunrise.moonSign);
+      var good = [1, 3, 6, 7, 10, 11].indexOf(h) >= 0, bad = [4, 8, 12].indexOf(h) >= 0;
+      out.push({ rashi: r, house: h, cls: good ? "vn-good" : bad ? "vn-bad" : "vn-neutral", label: good ? "Favourable" : bad ? "Weak" : "Neutral" });
+    }
+    return out;
+  }
+  // Tarabalam — the 9-fold star quality of the day's Moon nakshatra counted from
+  // each of the 27 janma nakshatras (VN_TARA_NAMES defined earlier).
+  var VN_TARA_GOOD = { 1: 1, 3: 1, 5: 1, 7: 1, 8: 1 };  // Sampat, Kshema, Sadhaka, Mitra, Ati-Mitra
+  function vnTarabalamList(dp) {
+    var out = [];
+    for (var b = 0; b < 27; b++) {
+      var count = ((dp.sunrise.nakIdx - b + 27) % 27) + 1;
+      var taraIdx = (count - 1) % 9;
+      var good = !!VN_TARA_GOOD[taraIdx];
+      out.push({ nakIdx: b, tara: VN_TARA_NAMES[taraIdx], cls: good ? "vn-good" : "vn-neutral", good: good });
+    }
+    return out;
+  }
+  // Panjika Yoga — weekday + nakshatra special yogas for day (sunrise nak) and
+  // night (sunset nak), alongside the running Nitya yoga.
+  var VN_AMRITA_SIDDHI = { 0: "Hasta", 1: "Mrigashira", 2: "Ashwini", 3: "Anuradha", 4: "Pushya", 5: "Revati", 6: "Rohini" };
+  var VN_MRITYU_YOGA = { 0: "Anuradha", 1: "Uttara Ashadha", 2: "Shatabhisha", 3: "Ashwini", 4: "Magha", 5: "Rohini", 6: "Hasta" };
+  function vnPanjikaFor(weekday, nakName, yoga) {
+    var out = [];
+    if (VN_AMRITA_SIDDHI[weekday] === nakName) out.push({ name: "Amrita Siddhi Yoga", cls: "vn-good" });
+    if (VN_MRITYU_YOGA[weekday] === nakName) out.push({ name: "Mrityu Yoga", cls: "vn-bad" });
+    out.push({ name: "Nitya yoga: " + yoga, cls: "vn-neutral" });
+    return out;
+  }
+
+  function vnMuhTable(title, headers, rows, note) {
+    var head = headers.map(function (h) { return "<th>" + escapeHtml(h) + "</th>"; }).join("");
+    return '<div class="panel-box"><h3>' + escapeHtml(title) + '</h3><div class="table-wrap compact-table"><table><thead><tr>' + head + '</tr></thead><tbody>' + rows + '</tbody></table></div>' + (note ? '<p class="fine-print">' + note + '</p>' : '') + '</div>';
+  }
+
   function muhurtaSection(chart, input) {
     var ctx = vnDefaultCtx(input);
     return '<section id="viewA-muhurta" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Daily Timing</p><h3>Muhurta &amp; Choghadiya</h3></div><span class="small-pill">Inputs</span></div>' +
-      '<p class="fine-print">Auspicious and inauspicious windows from sunrise/sunset for the selected day and place. Set the inputs below, then press Generate.</p>' +
+      '<p class="fine-print">Auspicious and inauspicious windows from sunrise/sunset for the selected day and place — Rahu Kaal, Gulika, Yamaganda, Abhijit, Brahma Muhurta, day/night Choghadiya, every <strong>Hora</strong> and <strong>sub-Hora</strong>, the <strong>Lagna (Udaya) Muhurta</strong>, <strong>Gowri Panchangam</strong>, <strong>Do-Ghati (30 Muhurta / 60 Ghati)</strong>, <strong>Panchaka Rahita</strong>, <strong>Chandrabalam</strong> (12 rashi), <strong>Tarabalam</strong> (27 nakshatra) and day/night <strong>Panjika Yoga</strong>. Set the inputs below, then press Generate.</p>' +
       vnControlsHtml("vnMuh", ctx, { generateLabel: "Generate" }) + '</section>';
   }
   function muhurtaPanelHtml(ctx) {
@@ -16150,9 +16272,81 @@
           return '<tr class="' + cls + '"><td><strong>' + escapeHtml(c.name) + '</strong></td><td>' + escapeHtml(c.lord) + '</td><td>' + escapeHtml(c.nature) + '</td><td>' + escapeHtml(vnFmtRange(c.start, c.end)) + '</td></tr>';
         }).join("") + '</tbody></table></div></div>';
     }
+    // ---- Extended tables -------------------------------------------------
+    var extra = "";
+    try {
+      var dp = vnDayPanchang(ctx);
+      var natCls = { good: "vn-good", bad: "vn-bad", neutral: "vn-neutral" };
+
+      // 1) Hora — full day
+      var horaRows = vnHoraList(ctx).map(function (h) {
+        var info = VN_HORA_INFO[h.lord] || { nat: "-", cls: "vn-neutral", good: "-" };
+        return '<tr class="' + info.cls + '"><td>' + h.n + '</td><td>' + escapeHtml(h.part) + '</td><td><strong>' + escapeHtml(h.lord) + '</strong></td><td>' + escapeHtml(info.nat) + '</td><td>' + escapeHtml(vnFmtRange(h.start, h.end)) + '</td><td>' + escapeHtml(info.good) + '</td></tr>';
+      }).join("");
+      var horaTbl = vnMuhTable("Hora (planetary hours) — full day & night", ["#", "Part", "Lord", "Nature", "Window", "Good for"], horaRows, "Kaala Hora: day and night each split into 12 proportional horas from sunrise/sunset. The first day hora is ruled by the weekday lord (" + escapeHtml(WEEKDAY_LORDS[dp.weekday]) + "); rulership advances Sun→Venus→Mercury→Moon→Saturn→Jupiter→Mars.");
+
+      // 2) Sub-Hora — full day
+      var subRows = vnSubHoraList(ctx).map(function (sh) {
+        var info = VN_HORA_INFO[sh.lord] || { cls: "vn-neutral", nat: "-" };
+        return '<tr class="' + info.cls + '"><td>' + sh.horaN + ' (' + escapeHtml(sh.horaLord) + ')</td><td><strong>' + escapeHtml(sh.lord) + '</strong></td><td>' + escapeHtml(info.nat) + '</td><td>' + escapeHtml(vnFmtRange(sh.start, sh.end)) + '</td></tr>';
+      }).join("");
+      var subTbl = '<div class="panel-box"><h3>Sub-Hora (each hora into 7 sub-lords) — full day &amp; night</h3><div class="table-wrap compact-table" style="max-height:340px;overflow:auto"><table><thead><tr><th>Parent hora</th><th>Sub-lord</th><th>Nature</th><th>Window</th></tr></thead><tbody>' + subRows + '</tbody></table></div><p class="fine-print">Each hora is sub-divided into 7 equal sub-horas whose lords continue the hora sequence from that hora’s lord.</p></div>';
+
+      // 3) Lagna Muhurta (Udaya Lagna table for the ahoratri)
+      var lagRows = vnLagnaSegments(ctx).map(function (sg) {
+        return '<tr><td><strong>' + escapeHtml(SIGNS[sg.sign].name) + '</strong></td><td>' + escapeHtml(vnFmtRange(sg.start, sg.end)) + '</td><td>' + escapeHtml(SIGNS[sg.sign].lord) + '</td></tr>';
+      }).join("");
+      var lagTbl = vnMuhTable("Lagna Muhurta — Udaya (rising) Lagna for the Ahoratri", ["Rising sign", "Window", "Sign lord"], lagRows, "The ascendant (Udaya Lagna) moving through the twelve signs across the civil day, refined to ~2-second precision.");
+
+      // 4) Gowri Panchangam (day + night)
+      function gowriRows(list) { return list.map(function (g) { return '<tr class="' + natCls[g.nat.toLowerCase()] + '"><td><strong>' + escapeHtml(g.name) + '</strong></td><td>' + escapeHtml(g.nat) + '</td><td>' + escapeHtml(vnFmtRange(g.start, g.end)) + '</td></tr>'; }).join(""); }
+      var gowriDay = vnMuhTable("Gowri Panchangam — Day", ["Gowri", "Nature", "Window"], gowriRows(vnGowriList(ctx, false)));
+      var gowriNight = vnMuhTable("Gowri Panchangam — Night", ["Gowri", "Nature", "Window"], gowriRows(vnGowriList(ctx, true)));
+
+      // 5) Do Ghati Muhurta (30 muhurta / 60 ghati)
+      var dgRows = vnDoGhatiList(ctx).map(function (m) {
+        return '<tr class="' + natCls[m.nat] + '"><td>' + m.n + '</td><td><strong>' + escapeHtml(m.name) + '</strong></td><td>' + escapeHtml(m.ghati) + '</td><td>' + (m.nat === "good" ? "Auspicious" : m.nat === "bad" ? "Inauspicious" : "Neutral") + '</td><td>' + escapeHtml(vnFmtRange(m.start, m.end)) + '</td></tr>';
+      }).join("");
+      var dgTbl = vnMuhTable("Do Ghati Muhurta — 30 Muhurtas & 60 Ghatis", ["#", "Muhurta", "Ghati", "Nature", "Window"], dgRows, "The ahoratri (sunrise to next sunrise) is divided into 30 Muhurtas of 2 Ghatis each (60 Ghatis / ~24 min a Ghati). The 8th, Abhijit, is especially auspicious.");
+
+      // 6) Panchaka Rahita (day / night by lagna window)
+      var pkRows = vnPanchakaList(ctx, dp).map(function (p) {
+        return '<tr class="' + (p.rahita ? "vn-good" : "vn-bad") + '"><td><strong>' + escapeHtml(SIGNS[p.sign].name) + '</strong> lagna</td><td>' + escapeHtml(vnFmtRange(p.start, p.end)) + '</td><td>' + (p.rahita ? "Rahita (free / auspicious)" : escapeHtml(p.panchaka) + " Panchaka") + '</td></tr>';
+      }).join("");
+      var pkTbl = vnMuhTable("Panchaka Rahita Muhurta — day & night", ["Lagna window", "Window", "Panchaka status"], pkRows, "Per rising-sign window, (nakshatra + tithi + weekday + lagna) mod 9 selects the Panchaka; remainders 1/2/4/6/8 = Mrityu/Agni/Raja/Chora/Roga Panchaka, the rest are Panchaka-Rahita (auspicious). Uses the day’s sunrise nakshatra &amp; tithi.");
+
+      // 7) Chandrabalam (12 rashi)
+      var cbRows = vnChandrabalamList(dp).map(function (c) {
+        return '<tr class="' + c.cls + '"><td><strong>' + escapeHtml(SIGNS[c.rashi].name) + '</strong></td><td>' + c.house + '</td><td>' + escapeHtml(c.label) + '</td></tr>';
+      }).join("");
+      var cbTbl = vnMuhTable("Chandrabalam — all 12 Rashi", ["Janma Rashi", "Moon transits house", "Bala"], cbRows, "The day’s Moon is in " + escapeHtml(dp.sunrise.moonSignName) + " (at sunrise). Chandrabala is favourable when the Moon transits the 1/3/6/7/10/11 from the birth Moon-sign, weak in the 4/8/12.");
+
+      // 8) Tarabalam (27 nakshatra)
+      var tbRows = vnTarabalamList(dp).map(function (t) {
+        return '<tr class="' + t.cls + '"><td><strong>' + escapeHtml(NAKSHATRAS[t.nakIdx]) + '</strong></td><td>' + escapeHtml(t.tara) + '</td><td>' + (t.good ? "Favourable" : "Avoid") + '</td></tr>';
+      }).join("");
+      var tbTbl = vnMuhTable("Tarabalam — all 27 Nakshatra", ["Janma Nakshatra", "Tara", "Bala"], tbRows, "The day’s Moon nakshatra is " + escapeHtml(dp.sunrise.nakName) + " (at sunrise). Tara is counted from each birth-star to the day-star; Sampat, Kshema, Sadhaka, Mitra &amp; Ati-Mitra are favourable.");
+
+      // 9) Panjika Yoga (day + night)
+      function panjikaCell(list) { return list.map(function (y) { return '<span class="' + y.cls + '" style="display:inline-block;padding:1px 6px;border-radius:6px;margin:1px 2px">' + escapeHtml(y.name) + '</span>'; }).join(" "); }
+      var pyRows = '<tr><td><strong>Day</strong> (from sunrise)</td><td>' + escapeHtml(dp.sunrise.nakName) + '</td><td>' + panjikaCell(vnPanjikaFor(dp.weekday, dp.sunrise.nakName, dp.sunrise.yoga)) + '</td></tr>' +
+        '<tr><td><strong>Night</strong> (from sunset)</td><td>' + escapeHtml(dp.sunset.nakName) + '</td><td>' + panjikaCell(vnPanjikaFor(dp.weekday, dp.sunset.nakName, dp.sunset.yoga)) + '</td></tr>';
+      var pyTbl = vnMuhTable("Panjika Yoga — day & night", ["Segment", "Nakshatra", "Yogas"], pyRows, "Weekday + nakshatra special yogas (Amrita Siddhi is auspicious, Mrityu is to be avoided) shown with the running Nitya yoga for the day (sunrise star) and night (sunset star).");
+
+      extra =
+        '<h3 class="vn-muh-subhead">Hora &amp; Sub-Hora</h3>' + horaTbl + subTbl +
+        '<h3 class="vn-muh-subhead">Lagna, Gowri &amp; Do-Ghati</h3>' + lagTbl +
+        '<div class="report-grid two">' + gowriDay + gowriNight + '</div>' + dgTbl +
+        '<h3 class="vn-muh-subhead">Panchaka Rahita, Chandrabalam, Tarabalam &amp; Panjika Yoga</h3>' + pkTbl +
+        '<div class="report-grid two">' + cbTbl + tbTbl + '</div>' + pyTbl;
+    } catch (e) {
+      extra = '<div class="panel-box"><p class="fine-print">Could not compute the extended Muhurta tables: ' + escapeHtml(e && e.message ? e.message : String(e)) + '</p></div>';
+    }
+
     return '<div class="report-grid two">' + auspicious + inauspicious + '</div>' +
       '<div class="report-grid two">' + chogTable("Day Choghadiya", chog.day) + chogTable("Night Choghadiya", chog.night) + '</div>' +
-      '<p class="fine-print">Varjyam and Dur Muhurtam depend on per-nakshatra segment timing and are intentionally omitted rather than approximated.</p>';
+      extra +
+      '<p class="fine-print">Varjyam and Dur Muhurtam depend on per-nakshatra segment timing and are intentionally omitted rather than approximated. Gowri and Panchaka conventions vary by regional almanac; the method used is noted under each table.</p>';
   }
   function wireMuhurtaControls(chart, input) {
     vnWireToolControls("vnMuh", input, function (ctx) {
@@ -17422,7 +17616,7 @@
     ] },
     { title: "Today & Daily Tools", items: [
       { id: "viewA-today", label: "Today Dashboard", desc: "Live panchang, timing windows and the running dasha at a glance." },
-      { id: "viewA-muhurta", label: "Muhurta & Choghadiya", desc: "Rahu Kaal, Gulika, Yamaganda, Abhijit, Brahma Muhurta and day/night Choghadiya." },
+      { id: "viewA-muhurta", label: "Muhurta & Choghadiya", desc: "Rahu Kaal, Gulika, Yamaganda, Abhijit, Brahma, Choghadiya, Hora & sub-Hora, Lagna/Gowri/Do-Ghati Muhurta, Panchaka Rahita, Chandrabalam, Tarabalam and Panjika Yoga." },
       { id: "viewA-lagna-timeline", label: "Lagna Timeline", desc: "Rising sign across the day with favourable and caution windows." },
       { id: "viewA-numerology", label: "Numerology", desc: "Mulank, Bhagyank, name number and your personal day cycles." },
       { id: "viewA-num-compat", label: "Numerology Match", desc: "Compatibility of two people from their numbers." },

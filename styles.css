@@ -3876,6 +3876,14 @@ body.focus-mode .output-panel {
   display: none;
 }
 
+.vn-muh-subhead {
+  margin: 18px 0 6px;
+  padding-bottom: 4px;
+  border-bottom: 2px solid rgba(200, 168, 78, 0.5);
+  color: #9a3b16;
+  font-size: 16px;
+}
+
 /* ---- Universal search bar (left of Full Screen) ---- */
 .vn-universal-search {
   position: relative;
