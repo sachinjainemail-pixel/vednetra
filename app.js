@@ -558,6 +558,7 @@
       wireHouseContextMenuControls();
       wireFocusModeControls();
       wirePartAFullScreenControl();
+      try { wireUniversalSearch(); } catch (e) {}
       updatePartAIdentityStrip();
       wireButtonInteractionPolish();
       wireMobileAccessInfo();
@@ -1571,6 +1572,208 @@
     });
     document.addEventListener("keydown", function (event) {
       if (event.key === "Escape" && document.body.classList.contains("focus-mode")) exitFocusMode();
+    });
+  }
+
+  // =====================================================================
+  // Universal search — jump to any saved chart, any section, or any tool.
+  // =====================================================================
+  function vnLoadSavedChartById(id) {
+    var list = (typeof savedCharts !== "undefined" && savedCharts && savedCharts.length) ? savedCharts : readLocalSavedCharts();
+    var rec = (list || []).find(function (item) { return item && item.id === id; });
+    if (!rec || !rec.input) return false;
+    setChartStartMode("existing");
+    applySavedInputToForm(rec.input);
+    generate();
+    showReportView("chartData");
+    try { refreshRailFocusTargets(false); } catch (e) {}
+    closeChartSetupDialog();
+    showVargaSectionAfterChartChange();
+    return true;
+  }
+
+  // Global tool actions, mapped to existing ribbon controls so behaviour stays
+  // identical to clicking the buttons directly.
+  function vnSearchActionItems() {
+    return [
+      { type: "action", label: "Home", sub: "Return to the start screen", keywords: "home start begin", run: function () { returnToHome(); } },
+      { type: "action", label: "Time Tool", sub: "Open the time tool", keywords: "time tool clock muhurta transit prashna", run: function () { var b = document.querySelector("[data-time-tool-open]"); if (b) b.click(); } },
+      { type: "action", label: "Modify Chart", sub: "Edit the current chart's birth details", keywords: "modify edit change birth details rectify", run: function () { runChartSetupRibbonAction("modify"); } },
+      { type: "action", label: "Select Chart", sub: "Open the saved-chart library", keywords: "select open load saved library switch chart native", run: function () { runChartSetupRibbonAction("select"); } },
+      { type: "action", label: "New Chart", sub: "Create a brand-new chart", keywords: "new create add fresh chart native", run: function () { runChartSetupRibbonAction("new"); } },
+      { type: "action", label: "Download Report", sub: "Download the current report", keywords: "download export save pdf report", run: function () { runChartSetupRibbonAction("download"); } },
+      { type: "action", label: "Full Screen", sub: "Toggle the full-screen view", keywords: "full screen focus expand", run: function () { var b = document.getElementById("partAFullScreenBtn"); if (b) b.click(); } }
+    ];
+  }
+
+  function vnBuildSearchIndex() {
+    var items = [];
+    // 1) Saved charts (any native).
+    var list = (typeof savedCharts !== "undefined" && savedCharts && savedCharts.length) ? savedCharts : readLocalSavedCharts();
+    (list || []).forEach(function (rec) {
+      if (!rec || !rec.input) return;
+      var inp = rec.input;
+      var title = rec.title || (typeof savedChartTitle === "function" ? savedChartTitle(inp) : (inp.name || "Chart"));
+      var subParts = [];
+      if (inp.birthDate) subParts.push(inp.birthDate);
+      if (inp.birthTime) subParts.push(inp.birthTime);
+      if (inp.birthPlace) subParts.push(inp.birthPlace);
+      items.push({
+        type: "chart", label: title, sub: subParts.join(" · ") || "Saved chart",
+        keywords: [title, inp.name, inp.birthPlace, inp.birthDate, inp.gender, rec.chartNumber, inp.chartNumber].filter(Boolean).join(" "),
+        chartId: rec.id
+      });
+    });
+    // 2) Sections (every navigable view, read from the section ribbon).
+    var seen = {};
+    Array.prototype.slice.call(document.querySelectorAll("#chartDataNavRibbon [data-view-a-target]")).forEach(function (btn) {
+      var id = btn.getAttribute("data-view-a-target");
+      var label = (btn.textContent || "").trim();
+      if (!id || seen[id] || !label) return;
+      seen[id] = true;
+      // Category label (parent group) adds helpful search context.
+      var cat = ""; var group = btn.closest(".nav-category"); if (group) { var t = group.querySelector("[data-nav-category-toggle], .nav-category-label, summary"); if (t) cat = (t.textContent || "").trim(); }
+      items.push({ type: "section", label: label, sub: cat ? ("Section · " + cat) : "Section", keywords: label + " " + cat + " " + id, sectionId: id });
+    });
+    // 3) Global actions/tools.
+    vnSearchActionItems().forEach(function (a) { items.push(a); });
+    return items;
+  }
+
+  function vnSearchScore(item, tokens, qFull) {
+    var hay = ((item.label || "") + " " + (item.sub || "") + " " + (item.keywords || "")).toLowerCase();
+    var label = (item.label || "").toLowerCase();
+    for (var i = 0; i < tokens.length; i++) { if (hay.indexOf(tokens[i]) < 0) return -1; }
+    var score = 0;
+    if (label === qFull) score += 100;
+    else if (label.indexOf(qFull) === 0) score += 60;
+    else if (label.indexOf(qFull) >= 0) score += 30;
+    // earlier match in the label ranks higher
+    var pos = label.indexOf(tokens[0]);
+    if (pos >= 0) score += Math.max(0, 20 - pos);
+    // type priority: charts, then sections, then actions
+    score += item.type === "chart" ? 6 : item.type === "section" ? 4 : 2;
+    return score;
+  }
+
+  function vnRunSearch(query) {
+    var q = (query || "").trim().toLowerCase();
+    if (!q) return [];
+    var tokens = q.split(/\s+/).filter(Boolean);
+    var idx = vnBuildSearchIndex();
+    var scored = [];
+    idx.forEach(function (item) { var s = vnSearchScore(item, tokens, q); if (s >= 0) scored.push({ item: item, score: s }); });
+    scored.sort(function (a, b) { return b.score - a.score || a.item.label.localeCompare(b.item.label); });
+    return scored.slice(0, 12).map(function (s) { return s.item; });
+  }
+
+  var vnSearchState = { items: [], active: -1 };
+  function vnBadgeFor(type) { return type === "chart" ? "◈" : type === "section" ? "▤" : "⚙"; }
+  function vnRenderSearchResults(items) {
+    var box = document.getElementById("vnSearchResults");
+    var input = document.getElementById("vnSearchInput");
+    if (!box) return;
+    vnSearchState.items = items;
+    vnSearchState.active = -1;
+    if (!items.length) {
+      box.innerHTML = '<div class="vn-search-empty">No matches. Try a native name, a section (e.g. "Shadbala", "Dasha"), or a tool.</div>';
+      box.classList.remove("hidden");
+      if (input) input.setAttribute("aria-expanded", "true");
+      return;
+    }
+    var groups = { chart: [], section: [], action: [] };
+    items.forEach(function (it, i) { it._i = i; groups[it.type].push(it); });
+    var labels = { chart: "Charts", section: "Sections", action: "Tools & actions" };
+    var html = "";
+    ["chart", "section", "action"].forEach(function (type) {
+      if (!groups[type].length) return;
+      html += '<div class="vn-search-group-head">' + labels[type] + '</div>';
+      groups[type].forEach(function (it) {
+        html += '<div class="vn-search-item" role="option" data-i="' + it._i + '">' +
+          '<span class="vn-search-item-badge">' + vnBadgeFor(it.type) + '</span>' +
+          '<span class="vn-search-item-text"><span class="vn-search-item-label">' + escapeHtml(it.label) + '</span><span class="vn-search-item-sub">' + escapeHtml(it.sub || "") + '</span></span>' +
+          '</div>';
+      });
+    });
+    box.innerHTML = html;
+    box.classList.remove("hidden");
+    if (input) input.setAttribute("aria-expanded", "true");
+  }
+
+  function vnCloseSearchResults() {
+    var box = document.getElementById("vnSearchResults");
+    var input = document.getElementById("vnSearchInput");
+    if (box) box.classList.add("hidden");
+    if (input) input.setAttribute("aria-expanded", "false");
+    vnSearchState.active = -1;
+  }
+
+  function vnSetSearchActive(nextIndex) {
+    var box = document.getElementById("vnSearchResults");
+    if (!box) return;
+    var nodes = Array.prototype.slice.call(box.querySelectorAll(".vn-search-item"));
+    if (!nodes.length) return;
+    var n = nodes.length;
+    var i = ((nextIndex % n) + n) % n;
+    vnSearchState.active = i;
+    nodes.forEach(function (node) { node.classList.remove("active"); });
+    var target = box.querySelector('.vn-search-item[data-i="' + i + '"]') || nodes[i];
+    if (target) { target.classList.add("active"); if (target.scrollIntoView) target.scrollIntoView({ block: "nearest" }); }
+  }
+
+  function vnActivateSearchItem(item) {
+    if (!item) return;
+    vnCloseSearchResults();
+    var input = document.getElementById("vnSearchInput");
+    var clear = document.getElementById("vnSearchClear");
+    if (input) input.value = "";
+    if (clear) clear.classList.add("hidden");
+    if (input && input.blur) input.blur();
+    if (item.type === "chart") { vnLoadSavedChartById(item.chartId); return; }
+    if (item.type === "section") { showReportView("chartData"); showSingleChartDataSection(item.sectionId); return; }
+    if (item.type === "action" && typeof item.run === "function") { item.run(); return; }
+  }
+
+  function wireUniversalSearch() {
+    var input = document.getElementById("vnSearchInput");
+    var box = document.getElementById("vnSearchResults");
+    var clear = document.getElementById("vnSearchClear");
+    if (!input || input.dataset.searchWired === "1") return;
+    input.dataset.searchWired = "1";
+    function refresh() {
+      var v = input.value;
+      if (clear) clear.classList.toggle("hidden", !v);
+      if (!v.trim()) { vnCloseSearchResults(); return; }
+      vnRenderSearchResults(vnRunSearch(v));
+    }
+    input.addEventListener("input", refresh);
+    input.addEventListener("focus", function () { if (input.value.trim()) refresh(); });
+    input.addEventListener("keydown", function (event) {
+      if (event.key === "ArrowDown") { event.preventDefault(); if (box.classList.contains("hidden")) refresh(); vnSetSearchActive(vnSearchState.active + 1); }
+      else if (event.key === "ArrowUp") { event.preventDefault(); vnSetSearchActive(vnSearchState.active - 1); }
+      else if (event.key === "Enter") {
+        var i = vnSearchState.active >= 0 ? vnSearchState.active : 0;
+        if (vnSearchState.items[i]) { event.preventDefault(); vnActivateSearchItem(vnSearchState.items[i]); }
+      } else if (event.key === "Escape") { vnCloseSearchResults(); }
+    });
+    if (box) box.addEventListener("mousedown", function (event) {
+      var el = event.target && event.target.closest ? event.target.closest(".vn-search-item") : null;
+      if (!el) return;
+      event.preventDefault();
+      var i = parseInt(el.getAttribute("data-i"), 10);
+      vnActivateSearchItem(vnSearchState.items[i]);
+    });
+    if (clear) clear.addEventListener("click", function () { input.value = ""; clear.classList.add("hidden"); vnCloseSearchResults(); input.focus(); });
+    document.addEventListener("click", function (event) {
+      var wrap = document.getElementById("vnUniversalSearch");
+      if (wrap && !wrap.contains(event.target)) vnCloseSearchResults();
+    });
+    // Keyboard shortcut: "/" focuses the search when not already typing.
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "/" && document.activeElement && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName) && !document.activeElement.isContentEditable) {
+        var bar = document.getElementById("chartInputLayoutBar");
+        if (bar && !bar.classList.contains("hidden")) { event.preventDefault(); input.focus(); }
+      }
     });
   }
 
