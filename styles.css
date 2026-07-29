@@ -3884,6 +3884,69 @@ body.focus-mode .output-panel {
   font-size: 16px;
 }
 
+/* ---- Current Muhurta (live) panel ---- */
+.vn-current-muhurta {
+  border: 2px solid rgba(154, 59, 22, 0.5);
+  background: linear-gradient(180deg, rgba(255, 251, 240, 0.98), rgba(250, 242, 222, 0.96));
+}
+.vn-cur-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.vn-cur-head h3 { margin: 0; color: #9a3b16; }
+.vn-cur-live {
+  font-size: 12px;
+  font-weight: 800;
+  color: #1c7d3b;
+  animation: vnCurPulse 1.6s ease-in-out infinite;
+}
+@keyframes vnCurPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+.vn-cur-clock { font-size: 14px; }
+.vn-cur-clock strong { font-variant-numeric: tabular-nums; }
+.vn-cur-warn { margin: 8px 0 4px; min-height: 20px; }
+.vn-cur-flag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 13px;
+  margin-right: 6px;
+}
+.vn-cur-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+}
+.vn-cur-card {
+  border: 1px solid rgba(200, 168, 78, 0.45);
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: #fffdf7;
+}
+.vn-cur-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #9a7b2c;
+}
+.vn-cur-body { margin-top: 3px; }
+.vn-cur-name { font-size: 15px; font-weight: 800; color: #173f38; }
+.vn-cur-nat { font-size: 12px; color: #5f7a5c; }
+.vn-cur-win { display: block; font-size: 11px; color: #6d6152; margin-top: 2px; font-variant-numeric: tabular-nums; }
+
+/* Bold-highlight the row active right now in every time-based table */
+tr.vn-muh-row.vn-now-row > td {
+  font-weight: 800 !important;
+  background: rgba(200, 168, 78, 0.28);
+}
+tr.vn-muh-row.vn-now-row > td:first-child { box-shadow: inset 3px 0 0 #9a3b16; }
+tr.vn-muh-row.vn-now-row > td:first-child::before { content: "\25B6 "; color: #9a3b16; }
+
 /* ---- Universal search bar (left of Full Screen) ---- */
 .vn-universal-search {
   position: relative;

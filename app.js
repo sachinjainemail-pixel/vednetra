@@ -16243,6 +16243,66 @@
     var head = headers.map(function (h) { return "<th>" + escapeHtml(h) + "</th>"; }).join("");
     return '<div class="panel-box"><h3>' + escapeHtml(title) + '</h3><div class="table-wrap compact-table"><table><thead><tr>' + head + '</tr></thead><tbody>' + rows + '</tbody></table></div>' + (note ? '<p class="fine-print">' + note + '</p>' : '') + '</div>';
   }
+  // Merge the "vn-muh-row" marker + time-window data onto a table row so the
+  // live ticker can bold the row that is active right now.
+  function vnMuhRowAttrs(existingCls, group, start, end, name, nature) {
+    return 'class="' + (existingCls ? existingCls + " " : "") + 'vn-muh-row" data-g="' + group + '" data-s="' + start.toFixed(2) + '" data-e="' + end.toFixed(2) + '" data-nm="' + escapeHtml(String(name)) + '" data-nat="' + escapeHtml(String(nature || "-")) + '"';
+  }
+  // Real-time ticker: bolds the active row in every time-based Muhurta table and
+  // fills the "Current Muhurta" panel, refreshing every second while the output
+  // is open. Live tracking applies only when the chosen date is "today".
+  function vnStartMuhurtaTicker(el, ctx) {
+    if (!el || typeof setInterval !== "function") return;
+    var tz = Number(ctx.timezone) || 0;
+    function nowMin() { var d = new Date(); var utc = d.getUTCHours() * 60 + d.getUTCMinutes() + d.getUTCSeconds() / 60; return (((utc + tz * 60) % 1440) + 1440) % 1440; }
+    function todayStr() { var ld = new Date(Date.now() + tz * 3600000); return ld.getUTCFullYear() + "-" + pad(ld.getUTCMonth() + 1) + "-" + pad(ld.getUTCDate()); }
+    var isToday = String(ctx.date) === todayStr();
+    function on(n, s, e) { return (n >= s && n < e) || (n + 1440 >= s && n + 1440 < e); }
+    var panel = el.querySelector("#vnCurrentMuhurta");
+    function tick() {
+      if (!document.body.contains(el)) { clearInterval(timer); return; }
+      var n = nowMin(), active = {};
+      var rows = el.querySelectorAll(".vn-muh-row");
+      Array.prototype.forEach.call(rows, function (r) {
+        var s = parseFloat(r.getAttribute("data-s")), e = parseFloat(r.getAttribute("data-e"));
+        var hit = isToday && on(n, s, e);
+        r.classList.toggle("vn-now-row", hit);
+        if (hit && !active[r.getAttribute("data-g")]) active[r.getAttribute("data-g")] = { nm: r.getAttribute("data-nm"), nat: r.getAttribute("data-nat"), s: s, e: e };
+      });
+      var clk = el.querySelector("#vnCurClock");
+      if (clk) {
+        if (isToday) { var ts = Math.floor(n * 60); clk.textContent = pad(Math.floor(ts / 3600)) + ":" + pad(Math.floor((ts % 3600) / 60)) + ":" + pad(ts % 60) + " (" + (tz >= 0 ? "UTC+" : "UTC") + tz + ")"; }
+        else clk.textContent = "selected date is not today";
+      }
+      ["chog", "hora", "subhora", "lagna", "gowri", "doghati", "panchaka", "panjika"].forEach(function (g) {
+        var box = el.querySelector("#vnCur-" + g); if (!box) return;
+        if (!isToday) { box.innerHTML = '<span class="vn-cur-name">selected date is not today</span>'; return; }
+        var a = active[g];
+        if (!a) { box.innerHTML = '<span class="vn-cur-name">&mdash;</span>'; return; }
+        var eDisp = a.e > 1440 ? a.e - 1440 : a.e;
+        var rem = Math.max(0, Math.round(a.e - (n < a.s ? n + 1440 : n)));
+        box.innerHTML = '<span class="vn-cur-name">' + escapeHtml(a.nm) + '</span>' + (a.nat && a.nat !== "-" ? ' <span class="vn-cur-nat">' + escapeHtml(a.nat) + '</span>' : '') + '<span class="vn-cur-win">' + vnClock(a.s) + '&ndash;' + vnClock(eDisp) + ' &middot; ends in ' + rem + 'm</span>';
+      });
+      if (panel) {
+        var warn = el.querySelector("#vnCurWarn");
+        if (warn) {
+          var bad = [], good = [];
+          [["rahu", "Rahu Kaal"], ["yama", "Yamaganda"], ["gulika", "Gulika Kaal"]].forEach(function (w) {
+            var s = parseFloat(panel.getAttribute("data-" + w[0] + "s")), e = parseFloat(panel.getAttribute("data-" + w[0] + "e"));
+            if (isToday && !isNaN(s) && on(n, s, e)) bad.push(w[1]);
+          });
+          var as = parseFloat(panel.getAttribute("data-abhs")), ae = parseFloat(panel.getAttribute("data-abhe"));
+          if (isToday && !isNaN(as) && on(n, as, ae)) good.push("Abhijit Muhurta");
+          warn.innerHTML = (bad.length ? '<span class="vn-bad vn-cur-flag">&#9888; ' + bad.join(", ") + ' running now</span>' : '') +
+            (good.length ? ' <span class="vn-good vn-cur-flag">&#9733; ' + good.join(", ") + ' running now</span>' : '') +
+            (isToday && !bad.length && !good.length ? '<span class="fine-print">No Rahu Kaal / Yamaganda / Gulika running now.</span>' : '') +
+            (!isToday ? '<span class="fine-print">Live tracking is active only when the selected date is today. Showing the full tables for ' + escapeHtml(String(ctx.date)) + '.</span>' : '');
+        }
+      }
+    }
+    var timer = setInterval(tick, 1000);
+    tick();
+  }
 
   function muhurtaSection(chart, input) {
     var ctx = vnDefaultCtx(input);
@@ -16269,7 +16329,7 @@
       return '<div class="panel-box"><h3>' + escapeHtml(title) + '</h3><div class="table-wrap compact-table"><table><thead><tr><th>Choghadiya</th><th>Lord</th><th>Nature</th><th>Window</th></tr></thead><tbody>' +
         list.map(function (c) {
           var cls = c.nature === "Good" ? "vn-good" : (c.nature === "Bad" ? "vn-bad" : "vn-neutral");
-          return '<tr class="' + cls + '"><td><strong>' + escapeHtml(c.name) + '</strong></td><td>' + escapeHtml(c.lord) + '</td><td>' + escapeHtml(c.nature) + '</td><td>' + escapeHtml(vnFmtRange(c.start, c.end)) + '</td></tr>';
+          return '<tr ' + vnMuhRowAttrs(cls, "chog", c.start, c.end, c.name + " (" + c.lord + ")", c.nature) + '><td><strong>' + escapeHtml(c.name) + '</strong></td><td>' + escapeHtml(c.lord) + '</td><td>' + escapeHtml(c.nature) + '</td><td>' + escapeHtml(vnFmtRange(c.start, c.end)) + '</td></tr>';
         }).join("") + '</tbody></table></div></div>';
     }
     // ---- Extended tables -------------------------------------------------
@@ -16281,37 +16341,39 @@
       // 1) Hora — full day
       var horaRows = vnHoraList(ctx).map(function (h) {
         var info = VN_HORA_INFO[h.lord] || { nat: "-", cls: "vn-neutral", good: "-" };
-        return '<tr class="' + info.cls + '"><td>' + h.n + '</td><td>' + escapeHtml(h.part) + '</td><td><strong>' + escapeHtml(h.lord) + '</strong></td><td>' + escapeHtml(info.nat) + '</td><td>' + escapeHtml(vnFmtRange(h.start, h.end)) + '</td><td>' + escapeHtml(info.good) + '</td></tr>';
+        return '<tr ' + vnMuhRowAttrs(info.cls, "hora", h.start, h.end, h.lord + " hora (" + h.part + " #" + h.n + ")", info.nat) + '><td>' + h.n + '</td><td>' + escapeHtml(h.part) + '</td><td><strong>' + escapeHtml(h.lord) + '</strong></td><td>' + escapeHtml(info.nat) + '</td><td>' + escapeHtml(vnFmtRange(h.start, h.end)) + '</td><td>' + escapeHtml(info.good) + '</td></tr>';
       }).join("");
       var horaTbl = vnMuhTable("Hora (planetary hours) — full day & night", ["#", "Part", "Lord", "Nature", "Window", "Good for"], horaRows, "Kaala Hora: day and night each split into 12 proportional horas from sunrise/sunset. The first day hora is ruled by the weekday lord (" + escapeHtml(WEEKDAY_LORDS[dp.weekday]) + "); rulership advances Sun→Venus→Mercury→Moon→Saturn→Jupiter→Mars.");
 
       // 2) Sub-Hora — full day
       var subRows = vnSubHoraList(ctx).map(function (sh) {
         var info = VN_HORA_INFO[sh.lord] || { cls: "vn-neutral", nat: "-" };
-        return '<tr class="' + info.cls + '"><td>' + sh.horaN + ' (' + escapeHtml(sh.horaLord) + ')</td><td><strong>' + escapeHtml(sh.lord) + '</strong></td><td>' + escapeHtml(info.nat) + '</td><td>' + escapeHtml(vnFmtRange(sh.start, sh.end)) + '</td></tr>';
+        return '<tr ' + vnMuhRowAttrs(info.cls, "subhora", sh.start, sh.end, sh.lord + " sub (in " + sh.horaLord + " hora #" + sh.horaN + ")", info.nat) + '><td>' + sh.horaN + ' (' + escapeHtml(sh.horaLord) + ')</td><td><strong>' + escapeHtml(sh.lord) + '</strong></td><td>' + escapeHtml(info.nat) + '</td><td>' + escapeHtml(vnFmtRange(sh.start, sh.end)) + '</td></tr>';
       }).join("");
       var subTbl = '<div class="panel-box"><h3>Sub-Hora (each hora into 7 sub-lords) — full day &amp; night</h3><div class="table-wrap compact-table" style="max-height:340px;overflow:auto"><table><thead><tr><th>Parent hora</th><th>Sub-lord</th><th>Nature</th><th>Window</th></tr></thead><tbody>' + subRows + '</tbody></table></div><p class="fine-print">Each hora is sub-divided into 7 equal sub-horas whose lords continue the hora sequence from that hora’s lord.</p></div>';
 
       // 3) Lagna Muhurta (Udaya Lagna table for the ahoratri)
       var lagRows = vnLagnaSegments(ctx).map(function (sg) {
-        return '<tr><td><strong>' + escapeHtml(SIGNS[sg.sign].name) + '</strong></td><td>' + escapeHtml(vnFmtRange(sg.start, sg.end)) + '</td><td>' + escapeHtml(SIGNS[sg.sign].lord) + '</td></tr>';
+        return '<tr ' + vnMuhRowAttrs("", "lagna", sg.start, sg.end, SIGNS[sg.sign].name + " lagna", SIGNS[sg.sign].lord) + '><td><strong>' + escapeHtml(SIGNS[sg.sign].name) + '</strong></td><td>' + escapeHtml(vnFmtRange(sg.start, sg.end)) + '</td><td>' + escapeHtml(SIGNS[sg.sign].lord) + '</td></tr>';
       }).join("");
       var lagTbl = vnMuhTable("Lagna Muhurta — Udaya (rising) Lagna for the Ahoratri", ["Rising sign", "Window", "Sign lord"], lagRows, "The ascendant (Udaya Lagna) moving through the twelve signs across the civil day, refined to ~2-second precision.");
 
       // 4) Gowri Panchangam (day + night)
-      function gowriRows(list) { return list.map(function (g) { return '<tr class="' + natCls[g.nat.toLowerCase()] + '"><td><strong>' + escapeHtml(g.name) + '</strong></td><td>' + escapeHtml(g.nat) + '</td><td>' + escapeHtml(vnFmtRange(g.start, g.end)) + '</td></tr>'; }).join(""); }
+      function gowriRows(list) { return list.map(function (g) { return '<tr ' + vnMuhRowAttrs(natCls[g.nat.toLowerCase()], "gowri", g.start, g.end, g.name, g.nat) + '><td><strong>' + escapeHtml(g.name) + '</strong></td><td>' + escapeHtml(g.nat) + '</td><td>' + escapeHtml(vnFmtRange(g.start, g.end)) + '</td></tr>'; }).join(""); }
       var gowriDay = vnMuhTable("Gowri Panchangam — Day", ["Gowri", "Nature", "Window"], gowriRows(vnGowriList(ctx, false)));
       var gowriNight = vnMuhTable("Gowri Panchangam — Night", ["Gowri", "Nature", "Window"], gowriRows(vnGowriList(ctx, true)));
 
       // 5) Do Ghati Muhurta (30 muhurta / 60 ghati)
       var dgRows = vnDoGhatiList(ctx).map(function (m) {
-        return '<tr class="' + natCls[m.nat] + '"><td>' + m.n + '</td><td><strong>' + escapeHtml(m.name) + '</strong></td><td>' + escapeHtml(m.ghati) + '</td><td>' + (m.nat === "good" ? "Auspicious" : m.nat === "bad" ? "Inauspicious" : "Neutral") + '</td><td>' + escapeHtml(vnFmtRange(m.start, m.end)) + '</td></tr>';
+        var natLbl = m.nat === "good" ? "Auspicious" : m.nat === "bad" ? "Inauspicious" : "Neutral";
+        return '<tr ' + vnMuhRowAttrs(natCls[m.nat], "doghati", m.start, m.end, m.name + " (Muhurta " + m.n + ")", natLbl) + '><td>' + m.n + '</td><td><strong>' + escapeHtml(m.name) + '</strong></td><td>' + escapeHtml(m.ghati) + '</td><td>' + natLbl + '</td><td>' + escapeHtml(vnFmtRange(m.start, m.end)) + '</td></tr>';
       }).join("");
       var dgTbl = vnMuhTable("Do Ghati Muhurta — 30 Muhurtas & 60 Ghatis", ["#", "Muhurta", "Ghati", "Nature", "Window"], dgRows, "The ahoratri (sunrise to next sunrise) is divided into 30 Muhurtas of 2 Ghatis each (60 Ghatis / ~24 min a Ghati). The 8th, Abhijit, is especially auspicious.");
 
       // 6) Panchaka Rahita (day / night by lagna window)
       var pkRows = vnPanchakaList(ctx, dp).map(function (p) {
-        return '<tr class="' + (p.rahita ? "vn-good" : "vn-bad") + '"><td><strong>' + escapeHtml(SIGNS[p.sign].name) + '</strong> lagna</td><td>' + escapeHtml(vnFmtRange(p.start, p.end)) + '</td><td>' + (p.rahita ? "Rahita (free / auspicious)" : escapeHtml(p.panchaka) + " Panchaka") + '</td></tr>';
+        var status = p.rahita ? "Rahita (free / auspicious)" : p.panchaka + " Panchaka";
+        return '<tr ' + vnMuhRowAttrs(p.rahita ? "vn-good" : "vn-bad", "panchaka", p.start, p.end, status, SIGNS[p.sign].name + " lagna") + '><td><strong>' + escapeHtml(SIGNS[p.sign].name) + '</strong> lagna</td><td>' + escapeHtml(vnFmtRange(p.start, p.end)) + '</td><td>' + (p.rahita ? "Rahita (free / auspicious)" : escapeHtml(p.panchaka) + " Panchaka") + '</td></tr>';
       }).join("");
       var pkTbl = vnMuhTable("Panchaka Rahita Muhurta — day & night", ["Lagna window", "Window", "Panchaka status"], pkRows, "Per rising-sign window, (nakshatra + tithi + weekday + lagna) mod 9 selects the Panchaka; remainders 1/2/4/6/8 = Mrityu/Agni/Raja/Chora/Roga Panchaka, the rest are Panchaka-Rahita (auspicious). Uses the day’s sunrise nakshatra &amp; tithi.");
 
@@ -16329,8 +16391,8 @@
 
       // 9) Panjika Yoga (day + night)
       function panjikaCell(list) { return list.map(function (y) { return '<span class="' + y.cls + '" style="display:inline-block;padding:1px 6px;border-radius:6px;margin:1px 2px">' + escapeHtml(y.name) + '</span>'; }).join(" "); }
-      var pyRows = '<tr><td><strong>Day</strong> (from sunrise)</td><td>' + escapeHtml(dp.sunrise.nakName) + '</td><td>' + panjikaCell(vnPanjikaFor(dp.weekday, dp.sunrise.nakName, dp.sunrise.yoga)) + '</td></tr>' +
-        '<tr><td><strong>Night</strong> (from sunset)</td><td>' + escapeHtml(dp.sunset.nakName) + '</td><td>' + panjikaCell(vnPanjikaFor(dp.weekday, dp.sunset.nakName, dp.sunset.yoga)) + '</td></tr>';
+      var pyRows = '<tr ' + vnMuhRowAttrs("", "panjika", w.sun.sunrise, w.sun.sunset, "Day · " + dp.sunrise.nakName, "day") + '><td><strong>Day</strong> (from sunrise)</td><td>' + escapeHtml(dp.sunrise.nakName) + '</td><td>' + panjikaCell(vnPanjikaFor(dp.weekday, dp.sunrise.nakName, dp.sunrise.yoga)) + '</td></tr>' +
+        '<tr ' + vnMuhRowAttrs("", "panjika", w.sun.sunset, w.sun.nextSunrise, "Night · " + dp.sunset.nakName, "night") + '><td><strong>Night</strong> (from sunset)</td><td>' + escapeHtml(dp.sunset.nakName) + '</td><td>' + panjikaCell(vnPanjikaFor(dp.weekday, dp.sunset.nakName, dp.sunset.yoga)) + '</td></tr>';
       var pyTbl = vnMuhTable("Panjika Yoga — day & night", ["Segment", "Nakshatra", "Yogas"], pyRows, "Weekday + nakshatra special yogas (Amrita Siddhi is auspicious, Mrityu is to be avoided) shown with the running Nitya yoga for the day (sunrise star) and night (sunset star).");
 
       extra =
@@ -16343,14 +16405,31 @@
       extra = '<div class="panel-box"><p class="fine-print">Could not compute the extended Muhurta tables: ' + escapeHtml(e && e.message ? e.message : String(e)) + '</p></div>';
     }
 
-    return '<div class="report-grid two">' + auspicious + inauspicious + '</div>' +
+    // ---- Current Muhurta (live) panel — the first section -----------------
+    function curCard(label, g) { return '<div class="vn-cur-card"><div class="vn-cur-label">' + escapeHtml(label) + '</div><div class="vn-cur-body" id="vnCur-' + g + '"><span class="vn-cur-name">&mdash;</span></div></div>'; }
+    var currentPanel = '<div class="panel-box vn-current-muhurta" id="vnCurrentMuhurta"' +
+      ' data-rahus="' + w.rahu.start.toFixed(2) + '" data-rahue="' + w.rahu.end.toFixed(2) + '"' +
+      ' data-yamas="' + w.yama.start.toFixed(2) + '" data-yamae="' + w.yama.end.toFixed(2) + '"' +
+      ' data-gulikas="' + w.gulika.start.toFixed(2) + '" data-gulikae="' + w.gulika.end.toFixed(2) + '"' +
+      ' data-abhs="' + w.abhijit.start.toFixed(2) + '" data-abhe="' + w.abhijit.end.toFixed(2) + '">' +
+      '<div class="vn-cur-head"><h3>Current Muhurta <span class="vn-cur-live">&#9679; live</span></h3><div class="vn-cur-clock">Now: <strong id="vnCurClock">&mdash;</strong></div></div>' +
+      '<div id="vnCurWarn" class="vn-cur-warn"></div>' +
+      '<div class="vn-cur-grid">' +
+      curCard("Choghadiya", "chog") + curCard("Hora", "hora") + curCard("Sub-Hora", "subhora") + curCard("Lagna", "lagna") +
+      curCard("Gowri", "gowri") + curCard("Do-Ghati Muhurta", "doghati") + curCard("Panchaka", "panchaka") + curCard("Panjika", "panjika") +
+      '</div>' +
+      '<p class="fine-print">This panel updates every second and tracks the muhurta running <strong>right now</strong>; each table below bolds its currently-active row. Live tracking applies when the selected date is today.</p>' +
+      '</div>';
+
+    return currentPanel +
+      '<div class="report-grid two">' + auspicious + inauspicious + '</div>' +
       '<div class="report-grid two">' + chogTable("Day Choghadiya", chog.day) + chogTable("Night Choghadiya", chog.night) + '</div>' +
       extra +
       '<p class="fine-print">Varjyam and Dur Muhurtam depend on per-nakshatra segment timing and are intentionally omitted rather than approximated. Gowri and Panchaka conventions vary by regional almanac; the method used is noted under each table.</p>';
   }
   function wireMuhurtaControls(chart, input) {
     vnWireToolControls("vnMuh", input, function (ctx) {
-      vnShowToolOutput("Muhurta & Choghadiya", muhurtaPanelHtml(ctx), { usage: "muhurta" });
+      vnShowToolOutput("Muhurta & Choghadiya", muhurtaPanelHtml(ctx), { usage: "muhurta", onWire: function (el) { try { vnStartMuhurtaTicker(el, ctx); } catch (e) {} } });
     });
   }
 
