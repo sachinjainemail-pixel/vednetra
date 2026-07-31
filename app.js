@@ -16252,36 +16252,44 @@
   // fills the "Current Muhurta" panel, refreshing every second while the output
   // is open. Live tracking applies only when the chosen date is "today".
   function vnStartMuhurtaTicker(el, ctx) {
-    if (!el || typeof setInterval !== "function") return;
+    if (!el) return;
     var tz = Number(ctx.timezone) || 0;
     function nowMin() { var d = new Date(); var utc = d.getUTCHours() * 60 + d.getUTCMinutes() + d.getUTCSeconds() / 60; return (((utc + tz * 60) % 1440) + 1440) % 1440; }
     function todayStr() { var ld = new Date(Date.now() + tz * 3600000); return ld.getUTCFullYear() + "-" + pad(ld.getUTCMonth() + 1) + "-" + pad(ld.getUTCDate()); }
+    function parseMin(t) { var p = String(t || "").split(":").map(Number); return (p[0] || 0) * 60 + (p[1] || 0) + (p[2] || 0) / 60; }
     var isToday = String(ctx.date) === todayStr();
+    var selectedMin = ctx.time ? (((parseMin(ctx.time) % 1440) + 1440) % 1440) : nowMin();
+    // "Live" = the selection IS the present moment (today, and the chosen time is
+    // within a few minutes of the real clock). Otherwise show a static snapshot
+    // at the selected date & time.
+    var live = isToday && Math.abs(nowMin() - selectedMin) <= 3;
     function on(n, s, e) { return (n >= s && n < e) || (n + 1440 >= s && n + 1440 < e); }
     var panel = el.querySelector("#vnCurrentMuhurta");
+    var liveBadge = el.querySelector("#vnCurLive");
+    if (liveBadge) { liveBadge.classList.toggle("vn-static", !live); liveBadge.innerHTML = live ? "&#9679; live" : "&#9673; selected"; }
     function tick() {
-      if (!document.body.contains(el)) { clearInterval(timer); return; }
-      var n = nowMin(), active = {};
+      if (!document.body.contains(el)) { if (timer) clearInterval(timer); return; }
+      var n = live ? nowMin() : selectedMin, active = {};
       var rows = el.querySelectorAll(".vn-muh-row");
       Array.prototype.forEach.call(rows, function (r) {
         var s = parseFloat(r.getAttribute("data-s")), e = parseFloat(r.getAttribute("data-e"));
-        var hit = isToday && on(n, s, e);
+        var hit = on(n, s, e);
         r.classList.toggle("vn-now-row", hit);
         if (hit && !active[r.getAttribute("data-g")]) active[r.getAttribute("data-g")] = { nm: r.getAttribute("data-nm"), nat: r.getAttribute("data-nat"), s: s, e: e };
       });
       var clk = el.querySelector("#vnCurClock");
       if (clk) {
-        if (isToday) { var ts = Math.floor(n * 60); clk.textContent = pad(Math.floor(ts / 3600)) + ":" + pad(Math.floor((ts % 3600) / 60)) + ":" + pad(ts % 60) + " (" + (tz >= 0 ? "UTC+" : "UTC") + tz + ")"; }
-        else clk.textContent = "selected date is not today";
+        var suffix = " (" + (tz >= 0 ? "UTC+" : "UTC") + tz + ")";
+        if (live) { var ts = Math.floor(n * 60); clk.textContent = pad(Math.floor(ts / 3600)) + ":" + pad(Math.floor((ts % 3600) / 60)) + ":" + pad(ts % 60) + suffix + " · now"; }
+        else clk.textContent = ctx.date + " " + vnClock(n) + suffix + " · selected";
       }
       ["chog", "hora", "subhora", "lagna", "gowri", "doghati", "panchaka", "panjika", "pakshi"].forEach(function (g) {
         var box = el.querySelector("#vnCur-" + g); if (!box) return;
-        if (!isToday) { box.innerHTML = '<span class="vn-cur-name">selected date is not today</span>'; return; }
         var a = active[g];
         if (!a) { box.innerHTML = '<span class="vn-cur-name">&mdash;</span>'; return; }
         var eDisp = a.e > 1440 ? a.e - 1440 : a.e;
         var rem = Math.max(0, Math.round(a.e - (n < a.s ? n + 1440 : n)));
-        box.innerHTML = '<span class="vn-cur-name">' + escapeHtml(a.nm) + '</span>' + (a.nat && a.nat !== "-" ? ' <span class="vn-cur-nat">' + escapeHtml(a.nat) + '</span>' : '') + '<span class="vn-cur-win">' + vnClock(a.s) + '&ndash;' + vnClock(eDisp) + ' &middot; ends in ' + rem + 'm</span>';
+        box.innerHTML = '<span class="vn-cur-name">' + escapeHtml(a.nm) + '</span>' + (a.nat && a.nat !== "-" ? ' <span class="vn-cur-nat">' + escapeHtml(a.nat) + '</span>' : '') + '<span class="vn-cur-win">' + vnClock(a.s) + '&ndash;' + vnClock(eDisp) + ' &middot; ' + (live ? 'ends in ' + rem + 'm' : 'window') + '</span>';
       });
       if (panel) {
         var warn = el.querySelector("#vnCurWarn");
@@ -16289,18 +16297,19 @@
           var bad = [], good = [];
           [["rahu", "Rahu Kaal"], ["yama", "Yamaganda"], ["gulika", "Gulika Kaal"]].forEach(function (w) {
             var s = parseFloat(panel.getAttribute("data-" + w[0] + "s")), e = parseFloat(panel.getAttribute("data-" + w[0] + "e"));
-            if (isToday && !isNaN(s) && on(n, s, e)) bad.push(w[1]);
+            if (!isNaN(s) && on(n, s, e)) bad.push(w[1]);
           });
           var as = parseFloat(panel.getAttribute("data-abhs")), ae = parseFloat(panel.getAttribute("data-abhe"));
-          if (isToday && !isNaN(as) && on(n, as, ae)) good.push("Abhijit Muhurta");
-          warn.innerHTML = (bad.length ? '<span class="vn-bad vn-cur-flag">&#9888; ' + bad.join(", ") + ' running now</span>' : '') +
-            (good.length ? ' <span class="vn-good vn-cur-flag">&#9733; ' + good.join(", ") + ' running now</span>' : '') +
-            (isToday && !bad.length && !good.length ? '<span class="fine-print">No Rahu Kaal / Yamaganda / Gulika running now.</span>' : '') +
-            (!isToday ? '<span class="fine-print">Live tracking is active only when the selected date is today. Showing the full tables for ' + escapeHtml(String(ctx.date)) + '.</span>' : '');
+          if (!isNaN(as) && on(n, as, ae)) good.push("Abhijit Muhurta");
+          var whenTxt = live ? "now" : "at the selected time";
+          warn.innerHTML = (bad.length ? '<span class="vn-bad vn-cur-flag">&#9888; ' + bad.join(", ") + ' running ' + whenTxt + '</span>' : '') +
+            (good.length ? ' <span class="vn-good vn-cur-flag">&#9733; ' + good.join(", ") + ' running ' + whenTxt + '</span>' : '') +
+            (!bad.length && !good.length ? '<span class="fine-print">No Rahu Kaal / Yamaganda / Gulika running ' + whenTxt + '.</span>' : '');
         }
       }
     }
-    var timer = setInterval(tick, 1000);
+    var timer = null;
+    if (live && typeof setInterval === "function") timer = setInterval(tick, 1000);
     tick();
   }
 
@@ -16507,13 +16516,13 @@
       ' data-yamas="' + w.yama.start.toFixed(2) + '" data-yamae="' + w.yama.end.toFixed(2) + '"' +
       ' data-gulikas="' + w.gulika.start.toFixed(2) + '" data-gulikae="' + w.gulika.end.toFixed(2) + '"' +
       ' data-abhs="' + w.abhijit.start.toFixed(2) + '" data-abhe="' + w.abhijit.end.toFixed(2) + '">' +
-      '<div class="vn-cur-head"><h3>Current Muhurta <span class="vn-cur-live">&#9679; live</span></h3><div class="vn-cur-clock">Now: <strong id="vnCurClock">&mdash;</strong></div></div>' +
+      '<div class="vn-cur-head"><h3>Current Muhurta <span class="vn-cur-live" id="vnCurLive">&#9679; live</span></h3><div class="vn-cur-clock">Showing: <strong id="vnCurClock">&mdash;</strong></div></div>' +
       '<div id="vnCurWarn" class="vn-cur-warn"></div>' +
       '<div class="vn-cur-grid">' +
       curCard("Choghadiya", "chog") + curCard("Hora", "hora") + curCard("Sub-Hora", "subhora") + curCard("Lagna", "lagna") +
       curCard("Gowri", "gowri") + curCard("Do-Ghati Muhurta", "doghati") + curCard("Panchaka", "panchaka") + curCard("Panjika", "panjika") + curCard("Pancha Pakshi", "pakshi") +
       '</div>' +
-      '<p class="fine-print">This panel updates every second and tracks the muhurta running <strong>right now</strong>; each table below bolds its currently-active row. Live tracking applies when the selected date is today.</p>' +
+      '<p class="fine-print">Shows the muhurta for the selected date &amp; time — <strong>live</strong> (updating every second) when that is the present moment, otherwise a snapshot <strong>at the selected time</strong>. Each table below bolds the matching row.</p>' +
       '</div>';
 
     return currentPanel +
