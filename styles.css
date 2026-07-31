@@ -3893,6 +3893,16 @@ body.focus-mode .output-panel {
 }
 .vn-date-stepper .fine-print { margin: 0; flex: 1 1 180px; }
 
+.vn-time-preview {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1c7d3b;
+  margin-top: 3px;
+  min-height: 15px;
+  font-variant-numeric: tabular-nums;
+}
+.vn-time-preview.vn-time-bad { color: #b3402a; font-weight: 600; }
+
 /* ---- Current Muhurta (live) panel ---- */
 .vn-current-muhurta {
   border: 2px solid rgba(154, 59, 22, 0.5);
