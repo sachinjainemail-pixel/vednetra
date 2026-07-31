@@ -16274,7 +16274,7 @@
         if (isToday) { var ts = Math.floor(n * 60); clk.textContent = pad(Math.floor(ts / 3600)) + ":" + pad(Math.floor((ts % 3600) / 60)) + ":" + pad(ts % 60) + " (" + (tz >= 0 ? "UTC+" : "UTC") + tz + ")"; }
         else clk.textContent = "selected date is not today";
       }
-      ["chog", "hora", "subhora", "lagna", "gowri", "doghati", "panchaka", "panjika"].forEach(function (g) {
+      ["chog", "hora", "subhora", "lagna", "gowri", "doghati", "panchaka", "panjika", "pakshi"].forEach(function (g) {
         var box = el.querySelector("#vnCur-" + g); if (!box) return;
         if (!isToday) { box.innerHTML = '<span class="vn-cur-name">selected date is not today</span>'; return; }
         var a = active[g];
@@ -16304,10 +16304,81 @@
     tick();
   }
 
+  // ---- Jain Pachchakkhan (pratyakhyan) earliest-times, from sunrise --------
+  function vnJainPachList(ctx) {
+    var s = vnSunWindow(ctx), D = s.sunset - s.sunrise;
+    return [
+      { name: "Navkarsi", meaning: "earliest morning break; 48 min after sunrise", t: s.sunrise + 48 },
+      { name: "Porisi", meaning: "1 prahar (¼ of daytime) after sunrise", t: s.sunrise + D / 4 },
+      { name: "Sadh Porisi", meaning: "1½ prahar (⅜ of daytime) after sunrise", t: s.sunrise + 3 * D / 8 },
+      { name: "Purimuddha", meaning: "2 prahar / midday (½ of daytime)", t: s.sunrise + D / 2 },
+      { name: "Avaddha (Avddha)", meaning: "3 prahar (¾ of daytime) after sunrise", t: s.sunrise + 3 * D / 4 },
+      { name: "Chauvihar (sunset)", meaning: "no food or water after sunset", t: s.sunset }
+    ];
+  }
+
+  // ---- Pancha Pakshi (five-bird) daily activities --------------------------
+  var VN_PP_BIRDS = ["Vulture", "Owl", "Crow", "Cock", "Peacock"];
+  var VN_PP_ACTS = [{ n: "Rule", q: "good" }, { n: "Eat", q: "good" }, { n: "Walk", q: "neutral" }, { n: "Sleep", q: "bad" }, { n: "Die", q: "bad" }];
+  function vnPanchaPakshiList(ctx, atNight, paksha, weekday) {
+    var s = vnSunWindow(ctx);
+    var from = atNight ? s.sunset : s.sunrise, span = (atNight ? s.nextSunrise - s.sunset : s.sunset - s.sunrise) / 5;
+    var shukla = paksha === "Shukla";
+    var startBird = (((weekday % 5) + (atNight ? 2 : 0)) % 5 + 5) % 5;
+    var out = [];
+    for (var p = 0; p < 5; p++) {
+      var bird = VN_PP_BIRDS[(startBird + p) % 5];
+      var ai = shukla ? (atNight ? (4 - p) : p) : (atNight ? p : (4 - p));
+      var act = VN_PP_ACTS[ai];
+      out.push({ bird: bird, act: act.n, q: act.q, start: from + p * span, end: from + (p + 1) * span });
+    }
+    return out;
+  }
+
+  // ---- Event muhurta (auspicious-date finder) ------------------------------
+  // Tithi numbers are within the paksha (1..15). Vaara: 0=Sun .. 6=Sat.
+  var VN_MUH_EVENTS = [
+    { key: "vivah", label: "Vivah (Marriage)", tithis: [2, 3, 5, 7, 10, 11, 13], varas: [1, 3, 4, 5], naks: ["Rohini", "Mrigashira", "Magha", "Uttara Phalguni", "Hasta", "Swati", "Anuradha", "Mula", "Uttara Ashadha", "Uttara Bhadrapada", "Revati"] },
+    { key: "griha", label: "Griha Pravesh (House-warming)", tithis: [2, 3, 5, 7, 10, 11, 13], varas: [1, 3, 4, 5], naks: ["Rohini", "Mrigashira", "Anuradha", "Chitra", "Uttara Phalguni", "Uttara Ashadha", "Uttara Bhadrapada", "Revati", "Shatabhisha", "Pushya"] },
+    { key: "vehicle", label: "Vehicle Purchase", tithis: [1, 2, 3, 5, 7, 10, 11, 13], varas: [0, 1, 3, 4, 5], naks: ["Ashwini", "Rohini", "Mrigashira", "Punarvasu", "Pushya", "Hasta", "Chitra", "Swati", "Anuradha", "Shravana", "Dhanishta", "Revati"] },
+    { key: "property", label: "Property Purchase", tithis: [2, 3, 5, 7, 10, 11, 13], varas: [1, 3, 4, 5], naks: ["Rohini", "Mrigashira", "Uttara Phalguni", "Uttara Ashadha", "Uttara Bhadrapada", "Chitra", "Anuradha", "Revati", "Pushya", "Dhanishta", "Shatabhisha"] }
+  ];
+  function vnDayPanchangFor(dateStr, ctx) {
+    try {
+      var st = sunTimesForDate(dateStr, ctx.latitude, ctx.longitude, ctx.timezone);
+      var srMin = (st && isFinite(st.sunrise)) ? st.sunrise : 360;
+      var inst = localDateTimeToUtc(dateStr, vnClock(srMin) + ":00", ctx.timezone);
+      var c = buildChart(inst, ctx.latitude, ctx.longitude, ctx.timezone, { ayanamshaKey: ctx.ayanamshaKey });
+      var moon = c.planetsByName.Moon, sun = c.planetsByName.Sun, nak = nakshatraInfo(moon.lon);
+      var tithiIdx = Math.floor(normalize(moon.lon - sun.lon) / 12);
+      return { date: dateStr, weekday: vnWeekdayIndex(dateStr), nakName: NAKSHATRAS[nak.index], nakIdx: nak.index, tithiIdx: tithiIdx, pakshaTithi: (tithiIdx % 15) + 1, paksha: tithiIdx < 15 ? "Shukla" : "Krishna", tithiName: TITHIS[tithiIdx] };
+    } catch (e) { return null; }
+  }
+  function vnScanDays(ctx, startDateStr, numDays) {
+    var days = [], ds = startDateStr;
+    for (var i = 0; i < numDays; i++) { var p = vnDayPanchangFor(ds, ctx); if (p) days.push(p); ds = vnNextDateStr(ds); }
+    return days;
+  }
+  function vnEventDates(days, ev, limit) {
+    var out = [];
+    for (var i = 0; i < days.length && out.length < (limit || 20); i++) {
+      var p = days[i];
+      var rikta = [4, 9, 14].indexOf(p.pakshaTithi) >= 0;
+      if (!rikta && ev.tithis.indexOf(p.pakshaTithi) >= 0 && ev.varas.indexOf(p.weekday) >= 0 && ev.naks.indexOf(p.nakName) >= 0) out.push(p);
+    }
+    return out;
+  }
+
   function muhurtaSection(chart, input) {
     var ctx = vnDefaultCtx(input);
     return '<section id="viewA-muhurta" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Daily Timing</p><h3>Muhurta &amp; Choghadiya</h3></div><span class="small-pill">Inputs</span></div>' +
-      '<p class="fine-print">Auspicious and inauspicious windows from sunrise/sunset for the selected day and place — Rahu Kaal, Gulika, Yamaganda, Abhijit, Brahma Muhurta, day/night Choghadiya, every <strong>Hora</strong> and <strong>sub-Hora</strong>, the <strong>Lagna (Udaya) Muhurta</strong>, <strong>Gowri Panchangam</strong>, <strong>Do-Ghati (30 Muhurta / 60 Ghati)</strong>, <strong>Panchaka Rahita</strong>, <strong>Chandrabalam</strong> (12 rashi), <strong>Tarabalam</strong> (27 nakshatra) and day/night <strong>Panjika Yoga</strong>. Set the inputs below, then press Generate.</p>' +
+      '<p class="fine-print">Auspicious and inauspicious windows from sunrise/sunset for <strong>any past, present or future date</strong> and place — Rahu Kaal, Gulika, Yamaganda, Abhijit, Brahma Muhurta, day/night Choghadiya, every <strong>Hora</strong> and <strong>sub-Hora</strong>, the <strong>Lagna (Udaya) Muhurta</strong>, <strong>Gowri Panchangam</strong>, <strong>Do-Ghati (30 Muhurta / 60 Ghati)</strong>, <strong>Panchaka Rahita</strong>, <strong>Jain Pachchakkhan</strong>, <strong>Pancha Pakshi</strong>, <strong>Chandrabalam</strong>, <strong>Tarabalam</strong>, <strong>Panjika Yoga</strong>, and auspicious-date finders for <strong>Vivah, Griha Pravesh, Vehicle &amp; Property</strong>. Pick a date (or use the steppers), then press Generate.</p>' +
+      '<div class="vn-date-stepper"><button type="button" id="vnMuhPrevDay" class="input-toggle-btn">&#9664; Prev day</button>' +
+      '<button type="button" id="vnMuhToday" class="input-toggle-btn">Today</button>' +
+      '<button type="button" id="vnMuhNextDay" class="input-toggle-btn">Next day &#9654;</button>' +
+      '<button type="button" id="vnMuhPrevWeek" class="input-toggle-btn">&#9664;&#9664; -1 week</button>' +
+      '<button type="button" id="vnMuhNextWeek" class="input-toggle-btn">+1 week &#9654;&#9654;</button>' +
+      '<span class="fine-print">Any date works — check muhurtas in the past, today, or the future.</span></div>' +
       vnControlsHtml("vnMuh", ctx, { generateLabel: "Generate" }) + '</section>';
   }
   function muhurtaPanelHtml(ctx) {
@@ -16395,12 +16466,36 @@
         '<tr ' + vnMuhRowAttrs("", "panjika", w.sun.sunset, w.sun.nextSunrise, "Night · " + dp.sunset.nakName, "night") + '><td><strong>Night</strong> (from sunset)</td><td>' + escapeHtml(dp.sunset.nakName) + '</td><td>' + panjikaCell(vnPanjikaFor(dp.weekday, dp.sunset.nakName, dp.sunset.yoga)) + '</td></tr>';
       var pyTbl = vnMuhTable("Panjika Yoga — day & night", ["Segment", "Nakshatra", "Yogas"], pyRows, "Weekday + nakshatra special yogas (Amrita Siddhi is auspicious, Mrityu is to be avoided) shown with the running Nitya yoga for the day (sunrise star) and night (sunset star).");
 
+      // 10) Jain Pachchakkhan
+      var jainRows = vnJainPachList(ctx).map(function (j) { return '<tr><td><strong>' + escapeHtml(j.name) + '</strong></td><td>' + escapeHtml(vnClock(j.t)) + '</td><td>' + escapeHtml(j.meaning) + '</td></tr>'; }).join("");
+      var jainTbl = vnMuhTable("Jain Pachchakkhan (pratyakhyan times)", ["Pachchakkhan", "Earliest time", "Meaning"], jainRows, "Jain fasting-vow break times from sunrise (a prahar = ¼ of the daytime): Navkarsi is earliest, then Porisi, Sadh Porisi, Purimuddha and Avaddha; Chauvihar/Tivihar is observed from sunset.");
+
+      // 11) Pancha Pakshi
+      var paksha = dp.sunrise.tithiIdx < 15 ? "Shukla" : "Krishna";
+      function ppRows(list) { return list.map(function (a) { return '<tr ' + vnMuhRowAttrs(natCls[a.q], "pakshi", a.start, a.end, a.bird + " — " + a.act, a.act) + '><td><strong>' + escapeHtml(a.bird) + '</strong></td><td>' + escapeHtml(a.act) + '</td><td>' + (a.q === "good" ? "Favourable" : a.q === "bad" ? "Weak" : "Neutral") + '</td><td>' + escapeHtml(vnFmtRange(a.start, a.end)) + '</td></tr>'; }).join(""); }
+      var ppDay = vnMuhTable("Pancha Pakshi — Day", ["Bird", "Activity", "Strength", "Window"], ppRows(vnPanchaPakshiList(ctx, false, paksha, dp.weekday)));
+      var ppNight = vnMuhTable("Pancha Pakshi — Night", ["Bird", "Activity", "Strength", "Window"], ppRows(vnPanchaPakshiList(ctx, true, paksha, dp.weekday)));
+
+      // 12) Event auspicious-date finders (from the selected date)
+      var scanDays = vnScanDays(ctx, ctx.date, 90);
+      var eventTbls = VN_MUH_EVENTS.map(function (ev) {
+        var hits = vnEventDates(scanDays, ev, 16);
+        var rows = hits.length ? hits.map(function (p) { return '<tr class="vn-good"><td><strong>' + escapeHtml(p.date) + '</strong></td><td>' + escapeHtml(VARAS[p.weekday]) + '</td><td>' + escapeHtml(p.paksha + " " + p.tithiName) + '</td><td>' + escapeHtml(p.nakName) + '</td></tr>'; }).join("") : '<tr><td colspan="4">No fully-auspicious date in the next 90 days by the built-in tithi/vaara/nakshatra rules.</td></tr>';
+        return vnMuhTable(ev.label + " — auspicious dates", ["Date", "Weekday", "Tithi", "Nakshatra"], rows);
+      });
+
       extra =
         '<h3 class="vn-muh-subhead">Hora &amp; Sub-Hora</h3>' + horaTbl + subTbl +
         '<h3 class="vn-muh-subhead">Lagna, Gowri &amp; Do-Ghati</h3>' + lagTbl +
         '<div class="report-grid two">' + gowriDay + gowriNight + '</div>' + dgTbl +
         '<h3 class="vn-muh-subhead">Panchaka Rahita, Chandrabalam, Tarabalam &amp; Panjika Yoga</h3>' + pkTbl +
-        '<div class="report-grid two">' + cbTbl + tbTbl + '</div>' + pyTbl;
+        '<div class="report-grid two">' + cbTbl + tbTbl + '</div>' + pyTbl +
+        '<h3 class="vn-muh-subhead">Jain Pachchakkhan &amp; Pancha Pakshi</h3>' + jainTbl +
+        '<div class="report-grid two">' + ppDay + ppNight + '</div>' +
+        '<p class="fine-print">Pancha Pakshi here is the simplified daily version — day and night each split into five parts (Rule/Eat are favourable, Walk neutral, Sleep/Die weak). A precise reading uses the native’s Janma-Pakshi (birth-star bird) and the classical main/sub activity tables; conventions vary.</p>' +
+        '<h3 class="vn-muh-subhead">Shubha Muhurta — auspicious dates (scanning 90 days from ' + escapeHtml(ctx.date) + ')</h3>' +
+        '<div class="report-grid two">' + eventTbls.join("") + '</div>' +
+        '<p class="fine-print">Event dates are days whose weekday, tithi (non-Rikta) and Moon-nakshatra all suit the activity by classical rules — a first-pass shortlist. Confirm the final muhurta with the intraday Choghadiya/Hora/Lagna windows above and a fuller panchang (planetary combustion, Chaturmas, local custom).</p>';
     } catch (e) {
       extra = '<div class="panel-box"><p class="fine-print">Could not compute the extended Muhurta tables: ' + escapeHtml(e && e.message ? e.message : String(e)) + '</p></div>';
     }
@@ -16416,7 +16511,7 @@
       '<div id="vnCurWarn" class="vn-cur-warn"></div>' +
       '<div class="vn-cur-grid">' +
       curCard("Choghadiya", "chog") + curCard("Hora", "hora") + curCard("Sub-Hora", "subhora") + curCard("Lagna", "lagna") +
-      curCard("Gowri", "gowri") + curCard("Do-Ghati Muhurta", "doghati") + curCard("Panchaka", "panchaka") + curCard("Panjika", "panjika") +
+      curCard("Gowri", "gowri") + curCard("Do-Ghati Muhurta", "doghati") + curCard("Panchaka", "panchaka") + curCard("Panjika", "panjika") + curCard("Pancha Pakshi", "pakshi") +
       '</div>' +
       '<p class="fine-print">This panel updates every second and tracks the muhurta running <strong>right now</strong>; each table below bolds its currently-active row. Live tracking applies when the selected date is today.</p>' +
       '</div>';
@@ -16430,6 +16525,27 @@
   function wireMuhurtaControls(chart, input) {
     vnWireToolControls("vnMuh", input, function (ctx) {
       vnShowToolOutput("Muhurta & Choghadiya", muhurtaPanelHtml(ctx), { usage: "muhurta", onWire: function (el) { try { vnStartMuhurtaTicker(el, ctx); } catch (e) {} } });
+    });
+    // Past / present / future date steppers.
+    function shiftMuhDate(days) {
+      var el = document.getElementById("vnMuhDate"); if (!el) return;
+      var out;
+      if (days === "today") {
+        var tz = Number((document.getElementById("vnMuhTimezone") || {}).value); if (!isFinite(tz)) tz = 5.5;
+        var ld = new Date(Date.now() + tz * 3600000);
+        out = ld.getUTCFullYear() + "-" + pad(ld.getUTCMonth() + 1) + "-" + pad(ld.getUTCDate());
+      } else {
+        var p = (el.value || "").split("-").map(Number);
+        var d = new Date(Date.UTC(p[0] || 2000, (p[1] || 1) - 1, p[2] || 1));
+        d.setUTCDate(d.getUTCDate() + days);
+        out = d.getUTCFullYear() + "-" + pad(d.getUTCMonth() + 1) + "-" + pad(d.getUTCDate());
+      }
+      el.value = out;
+      var gen = document.getElementById("vnMuhGenerateBtn"); if (gen) gen.click();
+    }
+    [["vnMuhPrevDay", -1], ["vnMuhNextDay", 1], ["vnMuhPrevWeek", -7], ["vnMuhNextWeek", 7], ["vnMuhToday", "today"]].forEach(function (pair) {
+      var b = document.getElementById(pair[0]);
+      if (b && !b._muhStepWired) { b._muhStepWired = true; b.addEventListener("click", function () { shiftMuhDate(pair[1]); }); }
     });
   }
 
