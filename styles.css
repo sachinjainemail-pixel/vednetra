@@ -3913,6 +3913,7 @@ body.focus-mode .output-panel {
   animation: vnCurPulse 1.6s ease-in-out infinite;
 }
 @keyframes vnCurPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+.vn-cur-live.vn-static { animation: none; color: #9a7b2c; }
 .vn-cur-clock { font-size: 14px; }
 .vn-cur-clock strong { font-variant-numeric: tabular-nums; }
 .vn-cur-warn { margin: 8px 0 4px; min-height: 20px; }
