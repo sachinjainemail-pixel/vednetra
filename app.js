@@ -3310,12 +3310,10 @@
   }
 
   function wireBirthTimeControls() {
-    var time = document.getElementById("birthTime");
-    if (time) {
-      time.addEventListener("change", function () {
-        time.value = normalizeTimeInput(time.value || "00:00:00");
-      });
-    }
+    ["birthTime", "partnerBirthTime", "asOfTime"].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) vnAttachSmartTime(el);
+    });
   }
 
   function wireQuickBirthInputControls() {
@@ -4452,9 +4450,86 @@
     return normalizeTimeInput(fieldValue("birthTime") || "00:00:00");
   }
 
+  // Flexible time parser — accepts almost any way a person writes a clock time:
+  //   "9:30", "930", "0930", "1430", "9.30", "9 30 15", "9:30 pm", "9pm",
+  //   "12", "9:30:15", "2.05 am" … Returns "HH:MM:SS" (24h) or null if unusable.
+  function vnParseTimeFlexible(raw) {
+    var s = String(raw == null ? "" : raw).trim().toLowerCase();
+    if (!s) return null;
+    var ampm = null;
+    if (/p/.test(s)) ampm = "pm"; else if (/a/.test(s)) ampm = "am";
+    var hh, mm = 0, ss = 0;
+    if (/[:.\s]/.test(s)) {
+      var parts = s.replace(/[^0-9]+/g, " ").trim().split(/\s+/);
+      hh = parseInt(parts[0], 10);
+      if (parts.length > 1) mm = parseInt(parts[1], 10);
+      if (parts.length > 2) ss = parseInt(parts[2], 10);
+    } else {
+      var d = s.replace(/[^0-9]/g, "");
+      if (!d) return null;
+      if (d.length <= 2) { hh = parseInt(d, 10); }
+      else if (d.length === 3) { hh = parseInt(d.slice(0, 1), 10); mm = parseInt(d.slice(1), 10); }
+      else if (d.length === 4) { hh = parseInt(d.slice(0, 2), 10); mm = parseInt(d.slice(2), 10); }
+      else { hh = parseInt(d.slice(0, 2), 10); mm = parseInt(d.slice(2, 4), 10); ss = parseInt(d.slice(4, 6), 10); }
+    }
+    if (isNaN(hh)) return null;
+    if (isNaN(mm)) mm = 0;
+    if (isNaN(ss)) ss = 0;
+    if (ampm === "pm" && hh < 12) hh += 12;
+    if (ampm === "am" && hh === 12) hh = 0;
+    if (hh === 24) hh = 0;
+    if (hh < 0 || hh > 23 || mm < 0 || mm > 59 || ss < 0 || ss > 59) return null;
+    return pad(hh) + ":" + pad(mm) + ":" + pad(ss);
+  }
+
+  function vnFormatTimePretty(hhmmss) {
+    var p = String(hhmmss || "").split(":").map(Number);
+    var h = p[0] || 0, m = p[1] || 0, s = p[2] || 0;
+    var ap = h < 12 ? "AM" : "PM", h12 = h % 12; if (h12 === 0) h12 = 12;
+    return h12 + ":" + pad(m) + (s ? ":" + pad(s) : "") + " " + ap;
+  }
+
   function normalizeTimeInput(value) {
+    var parsed = vnParseTimeFlexible(value);
+    if (parsed) return parsed;
     var parts = String(value || "00:00:00").split(":");
     return pad(parts[0] || 0) + ":" + pad(parts[1] || 0) + ":" + pad(parts[2] || 0);
+  }
+
+  // Turn any time text field into an easy, forgiving input: flexible parsing,
+  // a live "→ 09:30:00 · 9:30 AM" preview, no strict pattern to fight, and
+  // auto-normalisation on blur. Used for every birth/chart time field.
+  function vnAttachSmartTime(el) {
+    if (!el || el._smartTime) return;
+    el._smartTime = true;
+    try { el.removeAttribute("pattern"); } catch (e) {}
+    el.setAttribute("inputmode", "text");
+    el.setAttribute("autocomplete", "off");
+    el.setAttribute("autocapitalize", "off");
+    el.setAttribute("spellcheck", "false");
+    if (!el.placeholder || /HH:MM:SS/i.test(el.placeholder)) el.placeholder = "e.g. 9:30 am · 930 · 14:30";
+    el.title = "Type the time any way — 9:30 am, 930, 0930, 14:30, or 9.30. Seconds optional.";
+    var prev = document.createElement("div");
+    prev.className = "vn-time-preview";
+    if (el.parentNode) el.parentNode.appendChild(prev);
+    function refresh(commit) {
+      var parsed = vnParseTimeFlexible(el.value);
+      if (parsed) {
+        prev.textContent = "→ " + parsed + " · " + vnFormatTimePretty(parsed);
+        prev.classList.remove("vn-time-bad");
+        if (commit && el.value !== parsed) el.value = parsed;
+      } else if (el.value.trim()) {
+        prev.textContent = "Type a time like 9:30 am or 930";
+        prev.classList.add("vn-time-bad");
+      } else {
+        prev.textContent = "";
+        prev.classList.remove("vn-time-bad");
+      }
+    }
+    el.addEventListener("input", function () { refresh(false); });
+    el.addEventListener("change", function () { refresh(true); });
+    el.addEventListener("blur", function () { refresh(true); });
+    refresh(false);
   }
 
   function formatInTimezone(date, tzHours) {
@@ -15768,6 +15843,8 @@
   function vnWireToolControls(prefix, input, generateFn) {
     var fallback = vnDefaultCtx(input);
     vnWireGeo(prefix);
+    var timeEl = document.getElementById(prefix + "Time");
+    if (timeEl) vnAttachSmartTime(timeEl);
     var refresh = document.getElementById(prefix + "UpdateBtn");
     if (refresh) refresh.addEventListener("click", function () {
       var d = vnDefaultCtx(input);
