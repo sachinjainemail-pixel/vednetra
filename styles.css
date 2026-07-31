@@ -3884,6 +3884,15 @@ body.focus-mode .output-panel {
   font-size: 16px;
 }
 
+.vn-date-stepper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 10px;
+}
+.vn-date-stepper .fine-print { margin: 0; flex: 1 1 180px; }
+
 /* ---- Current Muhurta (live) panel ---- */
 .vn-current-muhurta {
   border: 2px solid rgba(154, 59, 22, 0.5);
