@@ -13,7 +13,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.svg">
-  <link rel="stylesheet" href="styles.css?v=99">
+  <link rel="stylesheet" href="styles.css?v=100">
 </head>
 <body>
   <div id="vnSplash" class="vn-splash" role="dialog" aria-label="Welcome to VedNetra">
@@ -53,7 +53,7 @@
           <div>
             <h1 class="brand-title">VedNetra</h1>
           </div>
-          <span class="status-pill" id="appVersionPill">v1.99</span>
+          <span class="status-pill" id="appVersionPill">v1.100</span>
         </div>
 
         <form id="birthForm" autocomplete="off">
@@ -161,6 +161,11 @@
               <input id="birthPlace" name="birthPlace" list="cityOptions" placeholder="Example: Chandigarh, India">
               <datalist id="cityOptions"></datalist>
             </label>
+            <label>
+              KP Horary number (1–249, optional)
+              <input id="kpHoraryNumber" name="kpHoraryNumber" type="number" min="1" max="249" step="1" placeholder="leave blank for a natal chart">
+            </label>
+            <p class="fine-print">For a <strong>KP Horary (Prashna)</strong> report, enter a number 1–249 here and put the <strong>moment &amp; place of judgment</strong> in the date/time/place fields above; the KP System Report then casts the horary chart (no birth data needed). Leave blank for a natal KP report.</p>
             <label class="button-label location-search-action">Internet location search
               <button type="button" id="lookupBirthPlaceBtn">Search and populate lat/long</button>
             </label>
@@ -501,7 +506,7 @@
           </div>
           <p class="empty-state-tagline">A complete Vedic workbench: divisional charts (D-1 to D-60), Vimshottari dasha, Shadbala, Ashtakavarga, KP, Jaimini and Varshfal â plus a daily dashboard, muhurta windows, numerology, card readings and more. Pick anything below to jump straight in.</p>
           <div id="vnHomeShowcase" class="vn-home-showcase"></div>
-          <p class="empty-state-version" id="appVersionLabel">Version 1.99</p>
+          <p class="empty-state-version" id="appVersionLabel">Version 1.100</p>
         </div>
         <article id="report" class="report hidden"></article>
       </section>
@@ -615,6 +620,6 @@
       </div>
     </div>
   </main>
-  <script src="app.js?v=99"></script>
+  <script src="app.js?v=100"></script>
 </body>
 </html>
