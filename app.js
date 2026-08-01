@@ -6163,6 +6163,7 @@
       { id: "viewA-consolidatedmaster", label: "Consolidated Master Run", render: function () { return consolidatedReportSection(chart, input); }, wire: function () { wireConsolidatedReportControls(chart, input); } },
       { id: "viewA-trivenireport",  label: "Triveni Intake", render: function () { return triveniReportSection(chart, input); }, wire: function () { wireTriveniReportControls(chart, input); } },
       { id: "viewA-trinetrareport", label: "Trinetra Master Run", render: function () { return trinetraReportSection(chart, input); }, wire: function () { wireTrinetraReportControls(chart, input); } },
+      { id: "viewA-kpreport",       label: "KP System Report", render: function () { return kpReportSection(chart, input); }, wire: function () { wireKpReportControls(chart, input); } },
       { id: "viewA-num-compat",     immediate: true, render: function () { return numCompatSection(chart, input); }, wire: function () { wireNumCompatControls(chart, input); } },
       { id: "viewA-cards",          immediate: true, render: function () { return cardsSection(chart, input); }, wire: function () { wireCardsControls(chart, input); } },
       { id: "viewA-sadesati",       label: "Sade Sati", render: function () { return sadeSatiSection(chart, input); } },
@@ -13310,6 +13311,7 @@
     var curFmt = fmtEl ? fmtEl.value : "pdf";
     var types = [
       ["consolidatedmaster", "Consolidated Master Run (Lahiri · all 4 projects) — default"],
+      ["kp", "KP System Report (Krishnamurti · Placidus · sub-lords)"],
       ["triveni", "Triveni Chart Intake (Lahiri · §0–§10)"],
       ["trinetra", "Trinetra Master Run (Lahiri · §0–§8 · Promise/Star/Time)"],
       ["vapmnak", "VAPM + Nakshatra Report (Lahiri · §1–§15 + Part B)"],
@@ -13389,6 +13391,10 @@
     }
     if (reportType === "consolidatedmaster") {
       downloadConsolidatedReport(format);
+      return;
+    }
+    if (reportType === "kp") {
+      downloadKpReport(format);
       return;
     }
     if (reportType === "triveni") {
@@ -13544,6 +13550,28 @@
     } catch (error) {
       console.error(error);
       alertUser("Triveni Intake could not be built: " + (error && error.message ? error.message : error));
+    }
+  }
+
+  function downloadKpReport(format) {
+    try {
+      var input = lastReportInput || readInput();
+      var chart = lastReportChart || buildChart(input.birthInstant, input.latitude, input.longitude, input.timezone, {
+        ascendantOverride: input.ascendantOverride,
+        ayanamshaKey: input.ayanamshaKey || "lahiri"
+      });
+      var text = vnKpMarkdown(chart, input);
+      lastPlainReport = text;
+      lastPlainReports.chartData = text;
+      var filenameBase = reportDownloadFilenameBase() + "_KP_System_Report";
+      if (format === "pdf") { downloadBlob(filenameBase + ".pdf", "application/pdf", makeSimplePdf(text)); showToast("✓ KP System Report — PDF download started"); return; }
+      if (format === "csv") { downloadBlob(filenameBase + ".csv", "text/csv;charset=utf-8", vedNetraReportTextToCsv(text)); showToast("✓ KP System Report — CSV download started"); return; }
+      if (format === "xls") { downloadBlob(filenameBase + ".xls", "application/vnd.ms-excel;charset=utf-8", vedNetraReportTextToExcel(text)); showToast("✓ KP System Report — Excel download started"); return; }
+      downloadBlob(filenameBase + ".md", "text/markdown;charset=utf-8", text);
+      showToast("✓ KP System Report — Markdown download started");
+    } catch (error) {
+      console.error(error);
+      alertUser("KP System Report could not be built: " + (error && error.message ? error.message : error));
     }
   }
 
@@ -18004,6 +18032,7 @@
       { id: "viewA-vapmreport", label: "VAPM Export", desc: "VAPM export spec (Lahiri, §1–§14 + Part B): master table, aspect/Kartari table, functional nature, Chandra/Surya Lagna, all vargas + Dashavarga count, Ashtakavarga incl. Shodhya Pinda, Vimshottari/Yogini/Jaimini, Indu Lagna, Tara Chakra, transits, four-fold scaffolds." },
       { id: "viewA-vapmnakreport", label: "VAPM + Nakshatra Report", desc: "Full export (Lahiri): the whole VAPM export plus the §15 Nakshatra Layer — within-nakshatra degrees, Gandanta (48′/3°20′), Abhijit, Navatara points, pada-level navamsa dignity, Nadi/dosha and Yoni/Gana matching factors." },
       { id: "viewA-consolidatedmaster", label: "Consolidated Master Run", desc: "DEFAULT one-sheet master run covering all four projects (Lahiri): Mehta+Sutton (VAPM), Trinetra (Promise/Star/Time), Umesh Puri (LP+Gochar) and Triveni (BPHS·BJ·PD). Part I is the universal computed data core; Part II re-frames it through each project's method lens." },
+      { id: "viewA-kpreport", label: "KP System Report", desc: "Dedicated Krishnamurti Paddhati export (Krishnamurti ayanamsa − Lahiri−0.1°, Placidus, mean nodes, sub-lords to the second): A0 header + birth-time-sensitivity, A1 twelve cusps with the Cuspal Sub-Lord (CSL), A2 nine planets star/sub/sub-sub + Placidus house + retro, A3 four-level Vimshottari with dates, B1–B4 significators/ruling-planets/CSL promise board, C1 transit snapshot." },
       { id: "viewA-trivenireport", label: "Triveni Chart Intake", desc: "Intake sheet (Lahiri, §0–§17): D1 sign-deg-min, unequal Sripati bhava cusps, Dasavarga, Shadbala pass/fail + Vimsopaka + Ishta/Kashta + bhava-sandhi, Ashtakavarga + Shodhya Pinda, Vimshottari, Jaimini 8-karaka, longevity + conditional dashas, full MD-AD-PD, gochara, Sahams, Varshaphal, Panchang, planetary strength." },
       { id: "viewA-trinetrareport", label: "Trinetra Master Run", desc: "Three-eye worksheet (Lahiri, §0–§8): intake/ayanamsa gate, Eye 1 Promise (eight-factor engine, yogas+bhanga, longevity ordinal), Eye 2 Star (nakshatra-pada, Navatara from Moon & Lagna, the one-way override), Eye 3 Time (functional nature, maraka danger, per-bhavesha firing test + gochara), grade/resolve, guardrails." },
       { id: "viewA-lifereport", label: "Life Report", desc: "One consolidated report — save it as a PDF." },
@@ -22248,6 +22277,230 @@
     var copy = document.getElementById("vnConsCopy");
     if (copy) copy.addEventListener("click", function () {
       var md = vnConsolidatedMarkdown(chart, input), status = document.getElementById("vnConsCopyStatus");
+      function done() { if (status) { status.textContent = "Copied!"; setTimeout(function () { status.textContent = ""; }, 2500); } }
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(md).then(done, function () { vnCcFallbackCopy(md, done); });
+        else vnCcFallbackCopy(md, done);
+      } catch (e) { vnCcFallbackCopy(md, done); }
+    });
+  }
+  // ================================================================
+  // KP SYSTEM REPORT — dedicated Krishnamurti-Paddhati export.
+  // Krishnamurti ayanamsa (Lahiri − 0.1°), Placidus cusps, mean nodes,
+  // sub-lords to the second. Emits the KP-VEDNETRA-EXPORT format (Part A
+  // must, Part B accelerators, Part C on-demand transit). Reuses the built-in
+  // KP engine (buildKpChart) — separate from the whole-sign default report.
+  // ================================================================
+  var VN_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  function vnKpDMY(ms, tz) {
+    try { var d = new Date(ms + (Number(tz) || 0) * 3600000); return pad(d.getUTCDate()) + "-" + VN_MONTHS[d.getUTCMonth()] + "-" + d.getUTCFullYear(); } catch (e) { return "-"; }
+  }
+  function vnKpSubEdgeArcmin(lon) {
+    // distance (arcmin) to the nearer edge of the KP sub-division the point sits in
+    var nak = nakshatraInfo(lon), sub = kpSubSegment(nak.within, nak.lord, NAK_SIZE);
+    return Math.min(sub.within, sub.size - sub.within) * 60;
+  }
+  function vnKpMarkdown(chart, input) {
+    // KP is cast on Krishnamurti ayanamsa (= Lahiri − 0.1°, same as VedNetra's
+    // KP engine) with Placidus cusps, regardless of the on-screen ayanamsha.
+    if (input && input.birthInstant && chart.ayanamshaKey !== "krishnamurti") {
+      try { chart = buildChart(input.birthInstant, Number(input.latitude), Number(input.longitude), Number(input.timezone), { ascendantOverride: input.ascendantOverride, ayanamshaKey: "krishnamurti" }); } catch (e) {}
+    }
+    var kp = buildKpChart(chart);
+    var L = [], nm = (input && (input.nativeName || input.name)) || "Chart", tz = Number(input && input.timezone) || 0;
+    var order = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+    var asOf = (input && input.asOfInstant) || new Date(), asOfMs = asOf.getTime ? asOf.getTime() : Date.now();
+    function row(c) { return "| " + c.join(" | ") + " |"; }
+    function sep(n) { return "|" + new Array(n + 1).join("---|"); }
+    function lonTxt(lon) { var s = signIndex(lon); return SIGNS[s].name + " " + decimalToDms(normalize(lon) - s * 30); }
+    function uniq(a) { var s = {}, o = []; a.forEach(function (x) { if (x && !s[x]) { s[x] = 1; o.push(x); } }); return o; }
+    // KP significator houses for a planet: star-lord own+occ (dominant) + self own+occ (+ node dispositor)
+    function signified(name) {
+      var p = kp.planetsByName[name]; if (!p) return [];
+      var set = {};
+      function add(h) { if (h) set[h] = 1; }
+      var S = p.kp.starLord;
+      kpOwnedHouses(kp, S).forEach(add); if (kp.planetsByName[S]) add(kp.planetsByName[S].house);
+      kpOwnedHouses(kp, name).forEach(add); add(p.house);
+      if (name === "Rahu" || name === "Ketu") { var disp = SIGNS[p.sign].lord; kpOwnedHouses(kp, disp).forEach(add); if (kp.planetsByName[disp]) add(kp.planetsByName[disp].house); }
+      return Object.keys(set).map(Number).sort(function (a, b) { return a - b; });
+    }
+    function occupantsOf(h) { return kp.planets.filter(function (p) { return p.house === h; }).map(function (p) { return p.name; }); }
+    function starOf(x) { return kp.planets.filter(function (p) { return p.kp.starLord === x; }).map(function (p) { return p.name; }); }
+    function ownerOf(h) { return kp.cusps[h - 1].signLord; }
+
+    // running dasa stack at the reading moment
+    var stack = []; try { stack = findDashaStack(chart.vimshottari.timeline, asOf); } catch (e) {}
+    var lvl = ["MD", "AD", "PD", "SD"];
+
+    L.push("# KP SYSTEM REPORT — " + nm);
+    L.push("");
+    L.push("_Krishnamurti Paddhati · Placidus · mean nodes · sub-lords to the second. Generated by VedNetra on " + vnKpDMY(Date.now(), tz) + "._");
+    L.push("");
+
+    // ===== A0 casting header =====
+    L.push("## A0 · Casting header");
+    L.push("```");
+    L.push("Ayanamsa       : Krishnamurti (KP)   value " + decimalToDms(kp.ayanamsa) + "  (KP = Lahiri − 0°06′ ≈ Lahiri − 0.1°)");
+    L.push("House system   : Placidus");
+    L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
+    L.push("Software / ver : VedNetra 1.98");
+    L.push("Native         : " + nm + "            Sex: " + ((input && input.gender) || "-"));
+    L.push("DoB / ToB      : " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
+    L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
+    L.push("Reading as-of  : " + vnKpDMY(asOfMs, tz) + " " + (function () { var d = new Date(asOfMs + tz * 3600000); return pad(d.getUTCHours()) + ":" + pad(d.getUTCMinutes()) + ":" + pad(d.getUTCSeconds()); })());
+    L.push("Lagna (KP)     : " + lonTxt(kp.ascendant.lon) + "  Star " + kp.ascendant.kp.starLord + "  Sub " + kp.ascendant.kp.subLord + "  Sub-sub " + kp.ascendant.kp.subSubLord);
+    L.push("Running dasa   : " + (stack.length ? stack.slice(0, 4).map(function (p, i) { return lvl[i] + " " + p.lord; }).join(" / ") : "-"));
+    L.push("```");
+    // birth-time sensitivity flag
+    var sens = [];
+    if (vnKpSubEdgeArcmin(kp.ascendant.lon) <= 20) sens.push("Lagna (" + vnKpSubEdgeArcmin(kp.ascendant.lon).toFixed(1) + "′ to a sub-edge)");
+    if (kp.planetsByName.Moon && vnKpSubEdgeArcmin(kp.planetsByName.Moon.lon) <= 20) sens.push("Moon (" + vnKpSubEdgeArcmin(kp.planetsByName.Moon.lon).toFixed(1) + "′)");
+    kp.cusps.forEach(function (c) { if (vnKpSubEdgeArcmin(c.lon) <= 20) sens.push("Cusp " + c.house + " (" + vnKpSubEdgeArcmin(c.lon).toFixed(1) + "′)"); });
+    L.push("");
+    L.push("**Birth-time sensitivity:** " + (sens.length ? "⚠ within 20′ of a sub boundary — a small time error flips the sub: " + sens.join(", ") + "." : "none within 20′ of a sub boundary."));
+    L.push("");
+
+    // ===== A1 twelve cusps =====
+    L.push("## A1 · Twelve cusps (KP core — the Sub Lord column IS the Cuspal Sub-Lord / CSL)");
+    L.push(row(["Cusp", "Longitude (Sign d:m:s)", "Sign Lord", "Star Lord", "Sub Lord (CSL)", "Sub-Sub Lord"])); L.push(sep(6));
+    kp.cusps.forEach(function (c) { L.push(row([c.house, lonTxt(c.lon), c.signLord, c.kp.starLord, "**" + c.kp.subLord + "**", c.kp.subSubLord])); });
+    L.push("");
+
+    // ===== A2 nine planets =====
+    L.push("## A2 · Nine planets (Placidus house = the cusp span the planet falls in)");
+    L.push(row(["Planet", "Longitude (Sign d:m:s)", "Placidus House", "Retro", "Star Lord", "Sub Lord", "Sub-Sub Lord"])); L.push(sep(7));
+    order.forEach(function (n) { var p = kp.planetsByName[n]; if (!p) return; L.push(row([n, lonTxt(p.lon), p.house, (p.retrograde ? "R" : "–"), p.kp.starLord, p.kp.subLord, p.kp.subSubLord])); });
+    L.push("");
+
+    // ===== A3 Vimshottari 4-level =====
+    L.push("## A3 · Vimshottari dasha (4 levels, Soura year, dates DD-MMM-YYYY)");
+    try {
+      var bal = chart.vimshottari;
+      L.push("**Balance at birth (from Moon):** " + bal.balanceLord + " " + vnCcDurationYMD(bal.balanceDays) + ".");
+      L.push("");
+      L.push("**Mahadasha sequence (life):**");
+      L.push(row(["MD", "Start", "End"])); L.push(sep(3));
+      chart.vimshottari.timeline.forEach(function (md) { L.push(row([md.lord, vnKpDMY(md.start.getTime(), tz), vnKpDMY(md.end.getTime(), tz)])); });
+      L.push("");
+      if (stack[0]) {
+        L.push("**Running MD " + stack[0].lord + " → Antardasha:**");
+        L.push(row(["AD", "Start", "End"])); L.push(sep(3));
+        subPeriods(stack[0], "AD").forEach(function (ad) { L.push(row([stack[0].lord + "-" + ad.lord, vnKpDMY(ad.start.getTime(), tz), vnKpDMY(ad.end.getTime(), tz)])); });
+        L.push("");
+      }
+      if (stack[1]) {
+        L.push("**Running AD " + stack[1].lord + " → Pratyantar:**");
+        L.push(row(["PD", "Start", "End"])); L.push(sep(3));
+        subPeriods(stack[1], "PD").forEach(function (pd) { L.push(row([stack[0].lord + "-" + stack[1].lord + "-" + pd.lord, vnKpDMY(pd.start.getTime(), tz), vnKpDMY(pd.end.getTime(), tz)])); });
+        L.push("");
+      }
+      if (stack[2]) {
+        L.push("**Running PD " + stack[2].lord + " → Sookshma:**");
+        L.push(row(["SD", "Start", "End"])); L.push(sep(3));
+        subPeriods(stack[2], "SD").forEach(function (sd) { L.push(row([stack[2].lord + "-" + sd.lord, vnKpDMY(sd.start.getTime(), tz), vnKpDMY(sd.end.getTime(), tz)])); });
+        L.push("");
+      }
+    } catch (e) { L.push("_Dasha unavailable: " + (e && e.message ? e.message : e) + "_"); L.push(""); }
+
+    // ===== B (accelerators) =====
+    L.push("## B1 · Planet significator worksheet (star-lord own+occ dominant; self own+occ)");
+    // ruling planets set (for the 'is RP?' column) — computed in B3, precompute here
+    var rp = {};
+    try {
+      var trKp = buildKpChart(buildChart(asOf, Number(input.latitude), Number(input.longitude), Number(input.timezone), { ayanamshaKey: "krishnamurti" }));
+      var dayLord = WEEKDAY_LORDS[new Date(asOfMs + tz * 3600000).getUTCDay()];
+      var mo = trKp.planetsByName.Moon, ascS = trKp.ascendant;
+      [dayLord, SIGNS[mo.sign].lord, mo.kp.starLord, SIGNS[ascS.sign].lord, ascS.kp.starLord, ascS.kp.subLord, mo.kp.subLord].forEach(function (x) { if (x) rp[x] = 1; });
+      var _trKp = trKp, _dayLord = dayLord, _mo = mo, _ascS = ascS;
+    } catch (e) {}
+    L.push(row(["Planet", "Star Lord", "Houses signified", "Ruling Planet?"])); L.push(sep(4));
+    order.forEach(function (n) { var p = kp.planetsByName[n]; if (!p) return; L.push(row([n, p.kp.starLord, (signified(n).join(", ") || "-"), (rp[n] ? "yes" : "–")])); });
+    L.push("");
+
+    L.push("## B2 · Four-step significators per house (A > B > C > D)");
+    L.push(row(["House", "A: planets in star of occupants", "B: occupants", "C: planets in star of owner", "D: owner", "Ranked"])); L.push(sep(6));
+    for (var h = 1; h <= 12; h++) {
+      var occ = occupantsOf(h), A = uniq([].concat.apply([], occ.map(function (o) { return starOf(o); }))), B = occ, C = starOf(ownerOf(h)), D = [ownerOf(h)];
+      var ranked = occ.length ? uniq(A.concat(B).concat(C).concat(D)) : uniq(C.concat(D));
+      L.push(row([h, (A.join(", ") || "—"), (B.join(", ") || "—"), (C.join(", ") || "—"), (D.join(", ") || "—"), (ranked.join(", ") || "—")]));
+    }
+    L.push("_Vacant house → A & B blank, use C then D. A node in the owner's sign or a significator's star ranks strongest. The final per-query ranking also sub-screens each significator by its sub-lord._");
+    L.push("");
+
+    L.push("## B3 · Ruling planets (for the reading-as-of moment — recompute per query)");
+    try {
+      L.push(row(["Role", "Planet", "Star Lord", "Sub Lord"])); L.push(sep(4));
+      var tK = _trKp, moR = tK.planetsByName.Moon, asR = tK.ascendant;
+      L.push(row(["Day-lord (Vara)", _dayLord, "—", "—"]));
+      L.push(row(["Moon sign-lord", SIGNS[moR.sign].lord, "—", "—"]));
+      L.push(row(["Moon star-lord", moR.kp.starLord, "—", "—"]));
+      L.push(row(["Moon sub-lord", moR.kp.subLord, "—", "—"]));
+      L.push(row(["Lagna sign-lord", SIGNS[asR.sign].lord, "—", "—"]));
+      L.push(row(["Lagna star-lord", asR.kp.starLord, "—", "—"]));
+      L.push(row(["Lagna sub-lord", asR.kp.subLord, "—", "—"]));
+      L.push("_Apply node substitution: a node conjoining/aspecting an RP represents it. RPs above are for " + vnKpDMY(asOfMs, tz) + "; recompute at the query moment._");
+    } catch (e) { L.push("_Ruling planets unavailable (transit chart)._"); }
+    L.push("");
+
+    L.push("## B4 · CSL promise board (cuspal sub-lord verdict)");
+    L.push(row(["Matter", "Support / negate houses", "Primary cusp", "CSL", "CSL signifies", "Verdict"])); L.push(sep(6));
+    var matters = [
+      ["Marriage", [2, 7, 11], [1, 6, 10], 7],
+      ["Children", [2, 5, 11], [1, 4, 10], 5],
+      ["Profession", [2, 6, 10, 11], [], 10],
+      ["Wealth", [2, 11], [8, 12], 2],
+      ["Disease", [6, 8, 12], [], 6],
+      ["Overseas", [3, 9, 12], [], 12]
+    ];
+    matters.forEach(function (m) {
+      var cusp = kp.cusps[m[3] - 1], csl = cusp.kp.subLord, sig = signified(csl);
+      var supports = m[1].filter(function (x) { return sig.indexOf(x) >= 0; });
+      var negates = m[2].filter(function (x) { return sig.indexOf(x) >= 0; });
+      var cslP = kp.planetsByName[csl];
+      var retroVeto = (cslP && cslP.retrograde) || (cslP && kp.planetsByName[cslP.kp.starLord] && kp.planetsByName[cslP.kp.starLord].retrograde);
+      var verdict = retroVeto ? "DENIED (retro veto)" : supports.length ? "PROMISED" : "not promised";
+      L.push(row([m[0], m[1].join(",") + " / *" + (m[2].join(",") || "—") + "*", m[3], csl, (sig.join(",") || "—"), verdict]));
+    });
+    L.push("_Verdict = does the primary cusp's CSL signify the support group. Retrograde CSL, or CSL in a retrograde planet's star, vetoes to DENY. Confirm the sub-screen and node substitution per query._");
+    L.push("");
+
+    // ===== C on-demand transit =====
+    L.push("## C1 · Transit snapshot (reading-as-of " + vnKpDMY(asOfMs, tz) + ")");
+    try {
+      var tK2 = _trKp;
+      L.push(row(["Body", "Sign · Star · Sub"])); L.push(sep(2));
+      var dasaLords = uniq((stack.slice(0, 3).map(function (p) { return p.lord; })));
+      uniq(["Sun", "Moon"].concat(dasaLords)).forEach(function (n) {
+        var tp = tK2.planetsByName[n]; if (!tp) return;
+        L.push(row([n + (dasaLords.indexOf(n) >= 0 ? " (dasa lord)" : ""), tp.signName + " · " + tp.kp.starLord + " · " + tp.kp.subLord]));
+      });
+      L.push("_A promised event fires when a significator/luminary transits the star + sub of the group's significators (Sun → month, Moon → day). Horary (1–249) mode: supply a horary number to seed the Ascendant and cast A1–A2 + B3 for the judgment moment._");
+    } catch (e) { L.push("_Transit snapshot unavailable._"); }
+    L.push("");
+    L.push("**Golden rule:** KP verdicts turn on the sub-lord, which turns on the exact longitude + KP ayanamsa + Placidus cusp. Every longitude here is Krishnamurti-ayanamsa, Placidus, to the second.");
+    L.push("");
+    L.push("_Generated by VedNetra — KP System Report (Krishnamurti · Placidus) — " + vnKpDMY(Date.now(), tz) + "_");
+    return L.join("\n");
+  }
+  function kpReportSection(chart, input) {
+    var md;
+    try { md = vnKpMarkdown(chart, input); }
+    catch (e) { md = "Could not build the report: " + (e && e.message ? e.message : e); }
+    return '<section id="viewA-kpreport" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Master Export · KP</p><h3>KP System Report</h3></div><span class="small-pill">Krishnamurti · Placidus</span></div>' +
+      '<p class="fine-print">A dedicated <strong>Krishnamurti Paddhati</strong> export — cast on <strong>Krishnamurti ayanamsa (Lahiri − 0.1°)</strong> with <strong>Placidus</strong> cusps and mean nodes, sub-lords to the second, separate from the whole-sign default report. Emits the KP-VEDNETRA export format: A0 header (with birth-time-sensitivity flag), A1 twelve cusps with the <strong>Cuspal Sub-Lord (CSL)</strong>, A2 nine planets with star/sub/sub-sub + Placidus house + retro, A3 four-level Vimshottari with dates, B1 planet significators, B2 four-step significators per house, B3 ruling planets, B4 CSL promise board, and C1 a transit snapshot. Paste it into the KP project and it runs with no missing inputs.</p>' +
+      '<div class="vn-tool-actions" style="margin-bottom:10px"><button type="button" id="vnKpPdf" class="primary-action vn-generate-btn">Save as PDF</button> <button type="button" id="vnKpMd" class="input-toggle-btn">Download Markdown</button> <button type="button" id="vnKpCopy" class="input-toggle-btn">Copy (Markdown)</button> <span id="vnKpReportCopyStatus" class="fine-print"></span></div>' +
+      '<div class="panel-box"><pre class="vn-native-pre">' + escapeHtml(md) + '</pre></div>' +
+      '</section>';
+  }
+  function wireKpReportControls(chart, input) {
+    var pdf = document.getElementById("vnKpPdf");
+    if (pdf) pdf.addEventListener("click", function () { try { downloadKpReport("pdf"); } catch (e) {} });
+    var mdBtn = document.getElementById("vnKpMd");
+    if (mdBtn) mdBtn.addEventListener("click", function () { try { downloadKpReport("md"); } catch (e) {} });
+    var copy = document.getElementById("vnKpCopy");
+    if (copy) copy.addEventListener("click", function () {
+      var md = vnKpMarkdown(chart, input), status = document.getElementById("vnKpReportCopyStatus");
       function done() { if (status) { status.textContent = "Copied!"; setTimeout(function () { status.textContent = ""; }, 2500); } }
       try {
         if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(md).then(done, function () { vnCcFallbackCopy(md, done); });
