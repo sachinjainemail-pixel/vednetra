@@ -13311,8 +13311,8 @@
     var curType = typeEl ? typeEl.value : "cc";
     var curFmt = fmtEl ? fmtEl.value : "pdf";
     var types = [
-      ["consolidatedmaster", "Consolidated Master Run (Lahiri · all 4 projects) — default"],
-      ["kp", "KP System Report (Krishnamurti · Placidus · sub-lords)"],
+      ["kp", "KP System Report (Krishnamurti · Placidus · sub-lords) — default"],
+      ["consolidatedmaster", "Consolidated Master Run (Lahiri · all 4 projects)"],
       ["triveni", "Triveni Chart Intake (Lahiri · §0–§10)"],
       ["trinetra", "Trinetra Master Run (Lahiri · §0–§8 · Promise/Star/Time)"],
       ["vapmnak", "VAPM + Nakshatra Report (Lahiri · §1–§15 + Part B)"],
@@ -18032,8 +18032,8 @@
       { id: "viewA-nativereport", label: "Native Input Report", desc: "Full v3 native export (§0–§16): fragility flags, guna, sphutas, sahams, rupa Ṣaḍbala, prastarāṣṭakavarga, D16, Parivritti-D10, full-life dashas, ingress + natal-return transits." },
       { id: "viewA-vapmreport", label: "VAPM Export", desc: "VAPM export spec (Lahiri, §1–§14 + Part B): master table, aspect/Kartari table, functional nature, Chandra/Surya Lagna, all vargas + Dashavarga count, Ashtakavarga incl. Shodhya Pinda, Vimshottari/Yogini/Jaimini, Indu Lagna, Tara Chakra, transits, four-fold scaffolds." },
       { id: "viewA-vapmnakreport", label: "VAPM + Nakshatra Report", desc: "Full export (Lahiri): the whole VAPM export plus the §15 Nakshatra Layer — within-nakshatra degrees, Gandanta (48′/3°20′), Abhijit, Navatara points, pada-level navamsa dignity, Nadi/dosha and Yoni/Gana matching factors." },
-      { id: "viewA-consolidatedmaster", label: "Consolidated Master Run", desc: "DEFAULT one-sheet master run covering all four projects (Lahiri): Mehta+Sutton (VAPM), Trinetra (Promise/Star/Time), Umesh Puri (LP+Gochar) and Triveni (BPHS·BJ·PD). Part I is the universal computed data core; Part II re-frames it through each project's method lens." },
-      { id: "viewA-kpreport", label: "KP System Report", desc: "Dedicated Krishnamurti Paddhati export (Krishnamurti ayanamsa − Lahiri−0.1°, Placidus, mean nodes, sub-lords to the second): A0 header + birth-time-sensitivity, A1 twelve cusps with the Cuspal Sub-Lord (CSL), A2 nine planets star/sub/sub-sub + Placidus house + retro, A3 four-level Vimshottari with dates, B1–B4 significators/ruling-planets/CSL promise board, C1 transit snapshot." },
+      { id: "viewA-consolidatedmaster", label: "Consolidated Master Run", desc: "One-sheet master run covering all four projects (Lahiri): Mehta+Sutton (VAPM), Trinetra (Promise/Star/Time), Umesh Puri (LP+Gochar) and Triveni (BPHS·BJ·PD). Part I is the universal computed data core; Part II re-frames it through each project's method lens." },
+      { id: "viewA-kpreport", label: "KP System Report", desc: "DEFAULT — dedicated Krishnamurti Paddhati export (Krishnamurti ayanamsa − Lahiri−0.1°, Placidus, mean nodes, sub-lords to the second). Natal AND horary (Prashna 1–249): A0 header + birth-time-sensitivity, A1 twelve cusps with the CSL and its OWN sub-lord (final verdict layer), A2 nine planets star/sub/sub-sub + house + retro, A4 karaka/body-part master, A5 relative-rotation map, A3 four-level Vimshottari, B1–B4 significators/ruling-planets/CSL promise board (with CSL-sub), B5 event-group scan, B6 money-direction flag, B7 badhaka/maraka, C1 natal-house transit + Moon star-lord + rising lagna, C2 Prana ladder, and an anti-anchoring self-check." },
       { id: "viewA-trivenireport", label: "Triveni Chart Intake", desc: "Intake sheet (Lahiri, §0–§17): D1 sign-deg-min, unequal Sripati bhava cusps, Dasavarga, Shadbala pass/fail + Vimsopaka + Ishta/Kashta + bhava-sandhi, Ashtakavarga + Shodhya Pinda, Vimshottari, Jaimini 8-karaka, longevity + conditional dashas, full MD-AD-PD, gochara, Sahams, Varshaphal, Panchang, planetary strength." },
       { id: "viewA-trinetrareport", label: "Trinetra Master Run", desc: "Three-eye worksheet (Lahiri, §0–§8): intake/ayanamsa gate, Eye 1 Promise (eight-factor engine, yogas+bhanga, longevity ordinal), Eye 2 Star (nakshatra-pada, Navatara from Moon & Lagna, the one-way override), Eye 3 Time (functional nature, maraka danger, per-bhavesha firing test + gochara), grade/resolve, guardrails." },
       { id: "viewA-lifereport", label: "Life Report", desc: "One consolidated report — save it as a PDF." },
@@ -22264,7 +22264,7 @@
     var md;
     try { md = vnConsolidatedMarkdown(chart, input); }
     catch (e) { md = "Could not build the report: " + (e && e.message ? e.message : e); }
-    return '<section id="viewA-consolidatedmaster" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Master Export · Default</p><h3>Consolidated Master Run</h3></div><span class="small-pill">Lahiri · 4 projects</span></div>' +
+    return '<section id="viewA-consolidatedmaster" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Master Export</p><h3>Consolidated Master Run</h3></div><span class="small-pill">Lahiri · 4 projects</span></div>' +
       '<p class="fine-print">The <strong>default</strong> one-sheet master run that covers all four projects at once — <strong>Mehta + Sutton (VAPM)</strong>, <strong>Trinetra (Promise/Star/Time)</strong>, <strong>Umesh Puri (Laghu Parashari + Gochar)</strong> and <strong>Triveni (BPHS·BJ·PD three-witness)</strong>. Always Lahiri (Chitrapaksha). <strong>Part I</strong> is the universal computed data core (full VedNetra export §I-0→§I-17 plus reference lagnas, planet-ledger union with pada dignity + Navatara from Moon &amp; Lagna + gandanta + BAV, LP p.68 scores + functional nature, sambandhas/raja-yoga, Yogini/Chara/Sade-Sati, nakshatra sweep, routing map); <strong>Part II</strong> re-frames the same data through each project&rsquo;s method lens. External book corpora are scaffolded, never gap-filled; guardrails are the union of all four (no lifespan/death timing).</p>' +
       '<div class="vn-tool-actions" style="margin-bottom:10px"><button type="button" id="vnConsPdf" class="primary-action vn-generate-btn">Save as PDF</button> <button type="button" id="vnConsMd" class="input-toggle-btn">Download Markdown</button> <button type="button" id="vnConsCopy" class="input-toggle-btn">Copy (Markdown)</button> <span id="vnConsCopyStatus" class="fine-print"></span></div>' +
       '<div class="panel-box"><pre class="vn-native-pre">' + escapeHtml(md) + '</pre></div>' +
@@ -22293,6 +22293,116 @@
   // KP engine (buildKpChart) — separate from the whole-sign default report.
   // ================================================================
   var VN_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  // ---- KP addendum v2: karaka/body-part, rotation, event-groups, money, badhaka ----
+  var VN_KP_KARAKA = [
+    ["Sun", "father, authority, self, govt, soul", "heart, upper spine, right eye, bones-vitality", "father, status, authority, heart/spine"],
+    ["Moon", "mother, mind, public, fluids", "chest, stomach, breasts, blood-fluid, mind", "mother, emotions, public, fluids, mind"],
+    ["Mars", "courage, younger sibling, land, blood", "muscle, marrow, blood, genitals, head-injury", "accident, cut, surgery, fever, land, violence"],
+    ["Mercury", "speech, intellect, trade, nerves", "skin, nerves, lungs, hands, speech", "education, trade, nerves, communication, skin"],
+    ["Jupiter", "children, guru, wealth, husband (f)", "liver, fat, thighs, blood-sugar", "children, wisdom, marriage, finance, liver"],
+    ["Venus", "spouse, vehicle, comfort, semen", "kidney, ovary/repro, urinary, face, throat", "marriage, vehicle, luxury, repro/urinary, kidney"],
+    ["Saturn", "longevity, sorrow, labour, old age", "**bones, joints, SPINE, DISCS, teeth, knees, chronic nerves**", "**chronic/structural disease, spine/back/disc, delay, death, labour**"],
+    ["Rahu", "sudden/foreign, unconventional, smoke", "poisoning, gas, skin, undiagnosed", "sudden/foreign gain OR loss, windfall, poison"],
+    ["Ketu", "separation, moksha, wound, occult", "scars, infection, undiagnosed, feet", "separation, sudden loss, wound, occult, detachment"]
+  ];
+  var VN_KP_BODYPART_SIGN = ["head/brain", "face/throat/neck", "arms/shoulders/lungs", "chest/stomach", "heart/upper-back/spine", "abdomen/intestines", "kidney/lower-abdomen/lumbar/urinary/repro", "genitals/rectum/pelvis", "hips/thighs", "knees/joints/skin", "calves/ankles/circulation", "feet/lymph"];
+  var VN_KP_EVENTGROUPS = [
+    ["Marriage", [2, 7, 11], [1, 6, 10], "Venus, Jupiter(f)"],
+    ["Progeny / birth", [2, 5, 11], [1, 4, 10], "Jupiter"],
+    ["Profession / job", [2, 6, 10, 11], [5, 8, 9], "Sun, Saturn, Mercury"],
+    ["Job change", [5, 9, 6, 10], [], "Rahu (on 10)"],
+    ["Wealth / gain (earned)", [2, 6, 10, 11], [8, 12], "Jupiter, Venus"],
+    ["Windfall (sudden)", [8, 11, 2], [], "Rahu (on 11/9)"],
+    ["Property / home", [4, 11, 12], [3, 8], "Mars, Saturn, Venus"],
+    ["Vehicle", [4, 11], [], "Venus"],
+    ["Speculation gain", [5, 6, 11], [8, 12], "Mercury"],
+    ["Speculation loss", [5, 8, 12], [6, 11], "Mercury, Rahu"],
+    ["Foreign travel", [3, 9, 12], [], "—"],
+    ["Short journey", [3], [], "—"],
+    ["Litigation", [6, 8, 11], [12], "Mars, Saturn"],
+    ["Health / disease", [1, 6, 8, 12], [], "disease-karaka + body sign"],
+    ["Danger to life", [1, 8, 2, 7], [], "Mars (injury trigger)"]
+  ];
+  var VN_KP_RELATIVES = [["Spouse / wife", 7], ["Elder child (1st)", 5], ["Younger child (2nd)", 7], ["Mother", 4], ["Father", 9], ["Elder sibling", 11], ["Younger sibling", 3]];
+  function vnKpRow(c) { return "| " + c.join(" | ") + " |"; }
+  function vnKpSep(n) { return "|" + new Array(n + 1).join("---|"); }
+  function vnKpSig(kp, name) {
+    var p = kp.planetsByName[name]; if (!p) return [];
+    var set = {}; function add(h) { if (h) set[h] = 1; }
+    var S = p.kp.starLord;
+    kpOwnedHouses(kp, S).forEach(add); if (kp.planetsByName[S]) add(kp.planetsByName[S].house);
+    kpOwnedHouses(kp, name).forEach(add); add(p.house);
+    if (name === "Rahu" || name === "Ketu") { var disp = SIGNS[p.sign].lord; kpOwnedHouses(kp, disp).forEach(add); if (kp.planetsByName[disp]) add(kp.planetsByName[disp].house); }
+    return Object.keys(set).map(Number).sort(function (a, b) { return a - b; });
+  }
+  function vnKpA4Lines() {
+    var L = [];
+    L.push("## A4 · Planetary karaka + body-part master (static reference — weigh karaka & body part every time)");
+    L.push(vnKpRow(["Planet", "Chief karakas", "Body parts / systems", "Event flavour when dominant/afflicted"])); L.push(vnKpSep(4));
+    VN_KP_KARAKA.forEach(function (r) { L.push(vnKpRow(r)); });
+    L.push("");
+    L.push("**Body part by sign:** " + SIGNS.map(function (s, i) { return s.name + "=" + VN_KP_BODYPART_SIGN[i]; }).join(" · ") + ". _Watery signs (Cancer/Scorpio/Pisces) → fluid/drowning in danger reads._");
+    L.push("");
+    return L;
+  }
+  function vnKpA5Lines(kp) {
+    var L = [];
+    L.push("## A5 · Relative rotation map (health axis 1·6·8·12 and marriage axis 2·7·11, pre-rotated)");
+    L.push(vnKpRow(["Relative", "Their 1st = cusp", "Health 1·6·8·12 (sign)", "Marriage 2·7·11 (sign)"])); L.push(vnKpSep(4));
+    VN_KP_RELATIVES.forEach(function (r) {
+      var f = r[1]; function cs(n) { var cn = ((f - 1 + n - 1) % 12) + 1; return kp.cusps[cn - 1].signName; }
+      L.push(vnKpRow([r[0], f, [1, 6, 8, 12].map(function (h) { return h + "=" + cs(h); }).join(" "), [2, 7, 11].map(function (h) { return h + "=" + cs(h); }).join(" ")]));
+    });
+    L.push("_Read a relative's health from their 1/6/8/12 and marriage from their 2/7/11, counted from the cusp shown (spouse=7, elder child=5, mother=4, father=9, elder sib=11, younger sib=3)._");
+    L.push("");
+    return L;
+  }
+  function vnKpB5Lines(kp, dasaLords) {
+    var L = [], dh = {}; (dasaLords || []).forEach(function (l) { vnKpSig(kp, l).forEach(function (h) { dh[h] = 1; }); });
+    L.push("## B5 · Event-group scan (run ALL groups before ranking — never anchor on one transit)");
+    L.push("_Houses lit by the running lords (" + ((dasaLords && dasaLords.length) ? dasaLords.join("/") : "—") + "): " + (Object.keys(dh).map(Number).sort(function (a, b) { return a - b; }).join(",") || "—") + "._");
+    L.push(vnKpRow(["Event group", "Support houses", "Negate / drain", "Karaka", "Lit by running lords?"])); L.push(vnKpSep(5));
+    VN_KP_EVENTGROUPS.forEach(function (g) {
+      var hits = g[1].filter(function (h) { return dh[h]; });
+      L.push(vnKpRow([g[0], g[1].join(","), (g[2].join(",") || "—"), g[3], (hits.length ? "**lit** (" + hits.join(",") + ")" : "—")]));
+    });
+    L.push("_Tabulate every lit group, state the money-direction (B6) if a wealth group fires, THEN rank; list considered-and-rejected groups with the reason._");
+    L.push("");
+    return L;
+  }
+  function vnKpB6Lines(kp) {
+    var benefics = ["Jupiter", "Venus", "Mercury", "Moon"], malefics = ["Sun", "Mars", "Saturn", "Rahu", "Ketu"];
+    function occ(h) { return kp.planets.filter(function (p) { return p.house === h; }).map(function (p) { return p.name; }); }
+    var gain = occ(8).concat(occ(2)).concat(occ(11)), drain = occ(2).concat(occ(8)).concat(occ(12)), twelve = occ(12);
+    var benGain = gain.some(function (n) { return benefics.indexOf(n) >= 0; });
+    var malDrain = drain.some(function (n) { return malefics.indexOf(n) >= 0; });
+    var twelveAff = twelve.some(function (n) { return malefics.indexOf(n) >= 0; });
+    var loss = occ(5).length && occ(8).length && occ(12).length;
+    var dir = (loss || (malDrain && twelveAff)) ? "OUTFLOW / loss" : (benGain && !twelveAff) ? "INFLOW / gain" : "mixed (12th involvement is the switch)";
+    return ["## B6 · Money-direction flag (mandatory on any wealth/speculation query)",
+      "- **Direction: " + dir + "** — 8th [" + (occ(8).join(",") || "—") + "], 2nd [" + (occ(2).join(",") || "—") + "], 11th [" + (occ(11).join(",") || "—") + "], 12th [" + (twelve.join(",") || "—") + "]. INFLOW when benefics sit on 8/2/11 and the 12th is clean; OUTFLOW when 5+8+12 cluster or malefics load 2/8/12 with the 12th prominent. The same 8th = windfall (benefic) or loss (malefic + 12th) — the 12th is the switch.", ""];
+  }
+  function vnKpB7Lines(kp) {
+    var mod = SIGNS[kp.ascendant.sign].modality, bh = mod === "Movable" ? 11 : mod === "Fixed" ? 9 : 7, bhLord = kp.cusps[bh - 1].signLord;
+    var L = [];
+    L.push("## B7 · Badhaka / Maraka (danger & longevity — pre-computed)");
+    L.push(vnKpRow(["Lagna type", "Badhaka", "Maraka", "Danger"])); L.push(vnKpSep(4));
+    L.push(vnKpRow(["Movable (Ar,Cn,Li,Cp)", "11th", "2,7", "8"]));
+    L.push(vnKpRow(["Fixed (Ta,Le,Sc,Aq)", "9th", "2,7", "8"]));
+    L.push(vnKpRow(["Common (Ge,Vi,Sg,Pi)", "7th", "2,7", "8"]));
+    L.push("- **This chart:** " + SIGNS[kp.ascendant.sign].name + " lagna (" + mod + ") → **badhaka " + bh + " (lord " + bhLord + ")**, maraka 2 & 7, danger 8. Danger fires when malefics (esp. Mars) load 2/7/8 together AND the running lords touch them.");
+    L.push("");
+    return L;
+  }
+  function vnKpSelfCheckLines() {
+    return ["## Self-check (anti-anchoring — before finalising any rank)",
+      "- [ ] Scanned **all** B5 event-groups, not just the loudest transit?",
+      "- [ ] **Money-direction** (B6) stated for any wealth/speculation call?",
+      "- [ ] If a malefic sits on the 1st or the 6/8/12 axis is lit — tested **health FIRST** (A4 karaka + body-part) rather than reframing as a benefic 'initiative'?",
+      "- [ ] Checked the **karaka of the doubled period-lord** (A4)?",
+      "- [ ] For a promise, read **CSL → its sub-lord** (A1+), not the CSL house-list alone?",
+      ""];
+  }
   function vnKpDMY(ms, tz) {
     try { var d = new Date(ms + (Number(tz) || 0) * 3600000); return pad(d.getUTCDate()) + "-" + VN_MONTHS[d.getUTCMonth()] + "-" + d.getUTCFullYear(); } catch (e) { return "-"; }
   }
@@ -22355,7 +22465,7 @@
     L.push("Ayanamsa       : Krishnamurti (KP-Old)   value " + decimalToDms(kp.ayanamsa) + "   (= Lahiri Chitrapaksha − 6′00″; e.g. 2001 = 23°46′32″)");
     L.push("House system   : Placidus");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.101");
+    L.push("Software / ver : VedNetra 1.102");
     L.push("Native         : " + nm + "            Sex: " + ((input && input.gender) || "-"));
     L.push("DoB / ToB      : " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
@@ -22372,10 +22482,15 @@
     L.push("**Birth-time sensitivity:** " + (sens.length ? "⚠ within 20′ of a sub boundary — a small time error flips the sub: " + sens.join(", ") + "." : "none within 20′ of a sub boundary."));
     L.push("");
 
-    // ===== A1 twelve cusps =====
-    L.push("## A1 · Twelve cusps (KP core — the Sub Lord column IS the Cuspal Sub-Lord / CSL)");
-    L.push(row(["Cusp", "Longitude (Sign d:m:s)", "Sign Lord", "Star Lord", "Sub Lord (CSL)", "Sub-Sub Lord"])); L.push(sep(6));
-    kp.cusps.forEach(function (c) { L.push(row([c.house, lonTxt(c.lon), c.signLord, c.kp.starLord, "**" + c.kp.subLord + "**", c.kp.subSubLord])); });
+    // ===== A1 twelve cusps (CSL → CSL's own sub-lord is the final verdict layer) =====
+    L.push("## A1 · Twelve cusps (KP core — Sub Lord IS the CSL; the CSL's OWN sub-lord is the final verdict layer)");
+    L.push(row(["Cusp", "Longitude (Sign d:m:s)", "Sign Lord", "Star Lord", "Sub Lord (CSL)", "CSL signifies", "CSL's sub-lord", "CSL-sub signifies"])); L.push(sep(8));
+    kp.cusps.forEach(function (c) {
+      var csl = c.kp.subLord, cslP = kp.planetsByName[csl], cslSub = cslP ? cslP.kp.subLord : "—";
+      var subSig = (cslSub && kp.planetsByName[cslSub]) ? (signified(cslSub).join(",") || "—") : "—";
+      L.push(row([c.house, lonTxt(c.lon), c.signLord, c.kp.starLord, "**" + csl + "**", (signified(csl).join(",") || "—"), "**" + cslSub + "**", subSig]));
+    });
+    L.push("_For every promise cusp read CSL → its sub-lord: if the CSL house-list looks weak, the CSL-sub often carries the true promise. Never deny a matter on the CSL house-list alone._");
     L.push("");
 
     // ===== A2 nine planets =====
@@ -22383,6 +22498,10 @@
     L.push(row(["Planet", "Longitude (Sign d:m:s)", "Placidus House", "Retro", "Star Lord", "Sub Lord", "Sub-Sub Lord"])); L.push(sep(7));
     order.forEach(function (n) { var p = kp.planetsByName[n]; if (!p) return; L.push(row([n, lonTxt(p.lon), p.house, (p.retrograde ? "R" : "–"), p.kp.starLord, p.kp.subLord, p.kp.subSubLord])); });
     L.push("");
+
+    // ===== A4 karaka/body-part + A5 relative-rotation (static/pre-built references) =====
+    vnKpA4Lines().forEach(function (s) { L.push(s); });
+    vnKpA5Lines(kp).forEach(function (s) { L.push(s); });
 
     // ===== A3 Vimshottari 4-level =====
     L.push("## A3 · Vimshottari dasha (4 levels, Soura year, dates DD-MMM-YYYY)");
@@ -22454,8 +22573,8 @@
     } catch (e) { L.push("_Ruling planets unavailable (transit chart)._"); }
     L.push("");
 
-    L.push("## B4 · CSL promise board (cuspal sub-lord verdict)");
-    L.push(row(["Matter", "Support / negate houses", "Primary cusp", "CSL", "CSL signifies", "Verdict"])); L.push(sep(6));
+    L.push("## B4 · CSL promise board (CSL → its OWN sub-lord is the final verdict layer)");
+    L.push(row(["Matter", "Support / negate", "Cusp", "CSL", "CSL signifies", "CSL sub-lord", "CSL-sub signifies", "Verdict"])); L.push(sep(8));
     var matters = [
       ["Marriage", [2, 7, 11], [1, 6, 10], 7],
       ["Children", [2, 5, 11], [1, 4, 10], 5],
@@ -22466,29 +22585,63 @@
     ];
     matters.forEach(function (m) {
       var cusp = kp.cusps[m[3] - 1], csl = cusp.kp.subLord, sig = signified(csl);
-      var supports = m[1].filter(function (x) { return sig.indexOf(x) >= 0; });
-      var negates = m[2].filter(function (x) { return sig.indexOf(x) >= 0; });
-      var cslP = kp.planetsByName[csl];
+      var cslP = kp.planetsByName[csl], cslSub = cslP ? cslP.kp.subLord : "—";
+      var subSig = (cslSub && kp.planetsByName[cslSub]) ? signified(cslSub) : [];
+      var supports = m[1].filter(function (x) { return sig.indexOf(x) >= 0 || subSig.indexOf(x) >= 0; });
       var retroVeto = (cslP && cslP.retrograde) || (cslP && kp.planetsByName[cslP.kp.starLord] && kp.planetsByName[cslP.kp.starLord].retrograde);
       var verdict = retroVeto ? "DENIED (retro veto)" : supports.length ? "PROMISED" : "not promised";
-      L.push(row([m[0], m[1].join(",") + " / *" + (m[2].join(",") || "—") + "*", m[3], csl, (sig.join(",") || "—"), verdict]));
+      L.push(row([m[0], m[1].join(",") + " / *" + (m[2].join(",") || "—") + "*", m[3], csl, (sig.join(",") || "—"), cslSub, (subSig.join(",") || "—"), verdict]));
     });
-    L.push("_Verdict = does the primary cusp's CSL signify the support group. Retrograde CSL, or CSL in a retrograde planet's star, vetoes to DENY. Confirm the sub-screen and node substitution per query._");
+    L.push("_Verdict now reads the CSL AND its own sub-lord (A1+): promised if the support group shows in either. Retrograde CSL, or CSL in a retrograde planet's star, vetoes to DENY. Confirm the sub-screen and node substitution per query._");
     L.push("");
 
-    // ===== C on-demand transit =====
-    L.push("## C1 · Transit snapshot (reading-as-of " + vnKpDMY(asOfMs, tz) + ")");
+    // ===== B5 event-group scan · B6 money-direction · B7 badhaka/maraka =====
+    vnKpB5Lines(kp, stack.slice(0, 3).map(function (p) { return p.lord; })).forEach(function (s) { L.push(s); });
+    vnKpB6Lines(kp).forEach(function (s) { L.push(s); });
+    vnKpB7Lines(kp).forEach(function (s) { L.push(s); });
+
+    // ===== C1 richer transit (natal-house transit + Moon star-lord + rising lagna) =====
+    L.push("## C1 · Transit snapshot (reading-as-of " + vnKpDMY(asOfMs, tz) + ") — the natal-house transit is the trigger");
     try {
       var tK2 = _trKp;
-      L.push(row(["Body", "Sign · Star · Sub"])); L.push(sep(2));
+      L.push(row(["Body", "Sign · Star · Sub", "Natal house transited"])); L.push(sep(3));
       var dasaLords = uniq((stack.slice(0, 3).map(function (p) { return p.lord; })));
       uniq(["Sun", "Moon"].concat(dasaLords)).forEach(function (n) {
         var tp = tK2.planetsByName[n]; if (!tp) return;
-        L.push(row([n + (dasaLords.indexOf(n) >= 0 ? " (dasa lord)" : ""), tp.signName + " · " + tp.kp.starLord + " · " + tp.kp.subLord]));
+        var nh = "—"; try { nh = kpHouseFromCusps(tp.lon, kp.cusps) || "—"; } catch (e) {}
+        L.push(row([n + (dasaLords.indexOf(n) >= 0 ? " (dasa lord)" : ""), tp.signName + " · " + tp.kp.starLord + " · " + tp.kp.subLord, nh]));
       });
-      L.push("_A promised event fires when a significator/luminary transits the star + sub of the group's significators (Sun → month, Moon → day). Horary (1–249) mode: supply a horary number to seed the Ascendant and cast A1–A2 + B3 for the judgment moment._");
+      var tMoon = tK2.planetsByName.Moon;
+      L.push("");
+      L.push("- **Moon's star-lord today: " + (tMoon ? tMoon.kp.starLord : "—") + "** — the day-trigger (Moon in the star of Mars = injury/accident flavour; in the star of a promise significator = event day).");
+      L.push("- **Rising Lagna now:** " + lonTxt(tK2.ascendant.lon) + " (star " + tK2.ascendant.kp.starLord + ", sub " + tK2.ascendant.kp.subLord + ") — for hour-specific reads (danger/accident).");
+      L.push("_A promised event fires when a significator/luminary transits the natal house AND the star + sub of the group's significators (Sun → month, Moon → day). For health/danger, read the afflicting malefic's SIGN → body part (A4). Horary (1–249) mode: supply a KP number to seed the Ascendant and cast the judgment moment._");
     } catch (e) { L.push("_Transit snapshot unavailable._"); }
     L.push("");
+
+    // ===== C2 event-date Prana ladder (exact IST boundaries across the query day) =====
+    L.push("## C2 · Event-date Prana ladder (running MD–AD–PD–SD–Prana across the reading-as-of day)");
+    try {
+      var sd = stack[3];
+      if (sd) {
+        var dayStartMs = (function () { var d = new Date(asOfMs + tz * 3600000); return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) - tz * 3600000; })();
+        var dayEndMs = dayStartMs + 86400000;
+        function hm(ms) { var d = new Date(ms + tz * 3600000); return pad(d.getUTCHours()) + ":" + pad(d.getUTCMinutes()); }
+        var pranas = subPeriods(sd, "PR").filter(function (p) { return p.end.getTime() > dayStartMs && p.start.getTime() < dayEndMs; });
+        L.push("- **Running to Sookshma:** " + stack.slice(0, 4).map(function (p, i) { return lvl[i] + " " + p.lord; }).join(" / ") + ".");
+        L.push(row(["Prana lord", "Start (local)", "End (local)"])); L.push(sep(3));
+        pranas.forEach(function (p) {
+          var s = Math.max(p.start.getTime(), dayStartMs), e = Math.min(p.end.getTime(), dayEndMs);
+          L.push(row([stack[3].lord + "-" + p.lord, (p.start.getTime() < dayStartMs ? "(prev) " : "") + hm(s), hm(e) + (p.end.getTime() > dayEndMs ? " (next)" : "")]));
+        });
+        L.push("_Prana can flip a same-day timing verdict — read the exact boundary the event moment falls in. The lord shown = Sookshma-Prana; the full DBA chain is above._");
+      } else { L.push("_Prana ladder unavailable (no running Sookshma resolved)._"); }
+    } catch (e) { L.push("_Prana ladder unavailable._"); }
+    L.push("");
+
+    // ===== anti-anchoring self-check =====
+    vnKpSelfCheckLines().forEach(function (s) { L.push(s); });
+
     L.push("**Golden rule:** KP verdicts turn on the sub-lord, which turns on the exact longitude + KP ayanamsa + Placidus cusp. Every longitude here is Krishnamurti-ayanamsa, Placidus, to the second.");
     L.push("");
     L.push("_Generated by VedNetra — KP System Report (Krishnamurti · Placidus) — " + vnKpDMY(Date.now(), tz) + "_");
@@ -22539,7 +22692,7 @@
     L.push("KP number      : " + hnum + " / 249");
     L.push("House system   : " + kp.houseSystem + "  (equal 30° cusps from the number-seed ascendant — VedNetra KP-horary convention)");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.101");
+    L.push("Software / ver : VedNetra 1.102");
     L.push("Question       : " + ((input && input.question) ? String(input.question) : "-"));
     L.push("Judgment moment: " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
@@ -22550,10 +22703,15 @@
     L.push("**Golden rule (horary):** the promise turns on the **ascendant sub-lord** from the number (" + record.kp.subLord + ") and the significators' sub-lords. A retrograde ascendant sub-lord, or one in a retrograde planet's star, denies.");
     L.push("");
 
-    // A1 cusps
-    L.push("## A1 · Twelve cusps (Sub Lord = Cuspal Sub-Lord / CSL)");
-    L.push(row(["Cusp", "Longitude (Sign d:m:s)", "Sign Lord", "Star Lord", "Sub Lord (CSL)", "Sub-Sub Lord"])); L.push(sep(6));
-    kp.cusps.forEach(function (c) { L.push(row([c.house, lonTxt(c.lon), c.signLord, c.kp.starLord, "**" + c.kp.subLord + "**", c.kp.subSubLord])); });
+    // A1 cusps (with CSL → CSL-sub verdict layer)
+    L.push("## A1 · Twelve cusps (Sub Lord = CSL; the CSL's OWN sub-lord is the final verdict layer)");
+    L.push(row(["Cusp", "Longitude (Sign d:m:s)", "Sign Lord", "Star Lord", "Sub Lord (CSL)", "CSL signifies", "CSL's sub-lord", "CSL-sub signifies"])); L.push(sep(8));
+    kp.cusps.forEach(function (c) {
+      var csl = c.kp.subLord, cslP = kp.planetsByName[csl], cslSub = cslP ? cslP.kp.subLord : "—";
+      var subSig = (cslSub && kp.planetsByName[cslSub]) ? (signified(cslSub).join(",") || "—") : "—";
+      L.push(row([c.house, lonTxt(c.lon), c.signLord, c.kp.starLord, "**" + csl + "**", (signified(csl).join(",") || "—"), "**" + cslSub + "**", subSig]));
+    });
+    L.push("_For every promise cusp read CSL → its sub-lord: if the CSL house-list looks weak, the CSL-sub often carries the true promise. Never deny on the CSL house-list alone._");
     L.push("");
 
     // A2 planets
@@ -22561,6 +22719,10 @@
     L.push(row(["Planet", "Longitude (Sign d:m:s)", "House", "Retro", "Star Lord", "Sub Lord", "Sub-Sub Lord"])); L.push(sep(7));
     order.forEach(function (n) { var p = kp.planetsByName[n]; if (!p) return; L.push(row([n, lonTxt(p.lon), p.house, (p.retrograde ? "R" : "–"), p.kp.starLord, p.kp.subLord, p.kp.subSubLord])); });
     L.push("");
+
+    // A4 karaka/body-part + A5 relative-rotation (static/pre-built references)
+    vnKpA4Lines().forEach(function (s) { L.push(s); });
+    vnKpA5Lines(kp).forEach(function (s) { L.push(s); });
 
     // A3 Prashna Moon Vimshottari (timing)
     L.push("## A3 · Prashna Moon Vimshottari (running — for horary timing)");
@@ -22600,18 +22762,29 @@
     L.push("_Apply node substitution (a node conjoining/aspecting an RP represents it). The RP set + the ascendant sub-lord are the horary decision spine._");
     L.push("");
 
-    // B4 CSL promise board
-    L.push("## B4 · CSL promise board (from the horary cusps)");
-    L.push(row(["Matter", "Support / negate houses", "Primary cusp", "CSL", "CSL signifies", "Verdict"])); L.push(sep(6));
+    // B4 CSL promise board (CSL → its own sub-lord verdict layer)
+    L.push("## B4 · CSL promise board (CSL → its OWN sub-lord is the final verdict layer)");
+    L.push(row(["Matter", "Support / negate", "Cusp", "CSL", "CSL signifies", "CSL sub-lord", "CSL-sub signifies", "Verdict"])); L.push(sep(8));
     [["Marriage", [2, 7, 11], [1, 6, 10], 7], ["Children", [2, 5, 11], [1, 4, 10], 5], ["Profession", [2, 6, 10, 11], [], 10], ["Wealth", [2, 11], [8, 12], 2], ["Disease", [6, 8, 12], [], 6], ["Overseas", [3, 9, 12], [], 12], ["Litigation/win", [6, 11], [5, 8, 12], 6], ["Lost item found", [2, 11], [8, 12], 2]].forEach(function (m) {
       var cusp = kp.cusps[m[3] - 1], csl = cusp.kp.subLord, sig = signified(csl), cslP = kp.planetsByName[csl];
+      var cslSub = cslP ? cslP.kp.subLord : "—", subSig = (cslSub && kp.planetsByName[cslSub]) ? signified(cslSub) : [];
       var retroVeto = (cslP && cslP.retrograde) || (cslP && kp.planetsByName[cslP.kp.starLord] && kp.planetsByName[cslP.kp.starLord].retrograde);
-      var supports = m[1].filter(function (x) { return sig.indexOf(x) >= 0; });
+      var supports = m[1].filter(function (x) { return sig.indexOf(x) >= 0 || subSig.indexOf(x) >= 0; });
       var verdict = retroVeto ? "DENIED (retro veto)" : supports.length ? "PROMISED" : "not promised";
-      L.push(row([m[0], m[1].join(",") + " / *" + (m[2].join(",") || "—") + "*", m[3], csl, (sig.join(",") || "—"), verdict]));
+      L.push(row([m[0], m[1].join(",") + " / *" + (m[2].join(",") || "—") + "*", m[3], csl, (sig.join(",") || "—"), cslSub, (subSig.join(",") || "—"), verdict]));
     });
-    L.push("_Verdict = does the matter's primary-cusp CSL signify the support group. Retrograde CSL vetoes. For the actual question, judge the CSL of the specific cusp the query maps to, screened by ruling planets and the running Moon dasa/transit._");
+    L.push("_Verdict now reads the CSL AND its own sub-lord (A1+): promised if the support group shows in either. Retrograde CSL vetoes. For the actual question, judge the CSL of the specific cusp the query maps to, screened by ruling planets and the running Moon dasa/transit._");
     L.push("");
+
+    // B5 event-group scan · B6 money-direction · B7 badhaka/maraka
+    var horDasa = []; try { horDasa = findDashaStack(pchart.vimshottari.timeline, input.birthInstant).slice(0, 3).map(function (p) { return p.lord; }); } catch (e) {}
+    vnKpB5Lines(kp, horDasa).forEach(function (s) { L.push(s); });
+    vnKpB6Lines(kp).forEach(function (s) { L.push(s); });
+    vnKpB7Lines(kp).forEach(function (s) { L.push(s); });
+
+    // anti-anchoring self-check
+    vnKpSelfCheckLines().forEach(function (s) { L.push(s); });
+
     L.push("_Generated by VedNetra — KP Horary Report (Krishnamurti · number " + hnum + ") — " + vnKpDMY(Date.now(), tz) + "_");
     return L.join("\n");
   }
@@ -22619,7 +22792,7 @@
     var md;
     try { md = vnKpMarkdown(chart, input); }
     catch (e) { md = "Could not build the report: " + (e && e.message ? e.message : e); }
-    return '<section id="viewA-kpreport" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Master Export · KP</p><h3>KP System Report</h3></div><span class="small-pill">Krishnamurti · Placidus</span></div>' +
+    return '<section id="viewA-kpreport" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Master Export · Default</p><h3>KP System Report</h3></div><span class="small-pill">Krishnamurti · Placidus</span></div>' +
       '<p class="fine-print">A dedicated <strong>Krishnamurti Paddhati</strong> export — cast on <strong>Krishnamurti ayanamsa (Lahiri − 0.1°)</strong> with <strong>Placidus</strong> cusps and mean nodes, sub-lords to the second, separate from the whole-sign default report. <strong>Natal</strong> (default): A0 header (with birth-time-sensitivity flag), A1 twelve cusps with the <strong>Cuspal Sub-Lord (CSL)</strong>, A2 nine planets with star/sub/sub-sub + Placidus house + retro, A3 four-level Vimshottari with dates, B1–B4 significators / four-step / ruling-planets / CSL promise board, and C1 a transit snapshot. <strong>Horary (Prashna):</strong> enter a <strong>KP number 1–249</strong> in the birth form and put the moment &amp; place of judgment in the date/time/place fields — the report then casts a full KP horary chart (ascendant seeded from the number, cusps, planets, significators, ruling planets, promise board, Prashna-Moon dasa) with no birth data needed. Paste it into the KP project and it runs with no missing inputs.</p>' +
       '<div class="vn-tool-actions" style="margin-bottom:10px"><button type="button" id="vnKpPdf" class="primary-action vn-generate-btn">Save as PDF</button> <button type="button" id="vnKpMd" class="input-toggle-btn">Download Markdown</button> <button type="button" id="vnKpCopy" class="input-toggle-btn">Copy (Markdown)</button> <span id="vnKpReportCopyStatus" class="fine-print"></span></div>' +
       '<div class="panel-box"><pre class="vn-native-pre">' + escapeHtml(md) + '</pre></div>' +
