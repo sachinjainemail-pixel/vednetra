@@ -6161,6 +6161,7 @@
       { id: "viewA-vapmreport",     label: "VAPM export", render: function () { return vapmReportSection(chart, input); }, wire: function () { wireVapmReportControls(chart, input); } },
       { id: "viewA-vapmnakreport",  label: "VAPM + Nakshatra", render: function () { return vapmNakReportSection(chart, input); }, wire: function () { wireVapmNakReportControls(chart, input); } },
       { id: "viewA-trivenireport",  label: "Triveni Intake", render: function () { return triveniReportSection(chart, input); }, wire: function () { wireTriveniReportControls(chart, input); } },
+      { id: "viewA-trinetrareport", label: "Trinetra Master Run", render: function () { return trinetraReportSection(chart, input); }, wire: function () { wireTrinetraReportControls(chart, input); } },
       { id: "viewA-num-compat",     immediate: true, render: function () { return numCompatSection(chart, input); }, wire: function () { wireNumCompatControls(chart, input); } },
       { id: "viewA-cards",          immediate: true, render: function () { return cardsSection(chart, input); }, wire: function () { wireCardsControls(chart, input); } },
       { id: "viewA-sadesati",       label: "Sade Sati", render: function () { return sadeSatiSection(chart, input); } },
@@ -13308,6 +13309,7 @@
     var curFmt = fmtEl ? fmtEl.value : "pdf";
     var types = [
       ["triveni", "Triveni Chart Intake (Lahiri · §0–§10) — default"],
+      ["trinetra", "Trinetra Master Run (Lahiri · §0–§8 · Promise/Star/Time)"],
       ["vapmnak", "VAPM + Nakshatra Report (Lahiri · §1–§15 + Part B)"],
       ["native", "Native Input Report v3 (full §0–§16 + v3 adds)"],
       ["vapm", "VAPM Export (Lahiri · §1–§14 + Part B)"],
@@ -13385,6 +13387,10 @@
     }
     if (reportType === "triveni") {
       downloadTriveniReport(format);
+      return;
+    }
+    if (reportType === "trinetra") {
+      downloadTrinetraReport(format);
       return;
     }
     if (!lastPlainReport) {
@@ -13532,6 +13538,28 @@
     } catch (error) {
       console.error(error);
       alertUser("Triveni Intake could not be built: " + (error && error.message ? error.message : error));
+    }
+  }
+
+  function downloadTrinetraReport(format) {
+    try {
+      var input = lastReportInput || readInput();
+      var chart = lastReportChart || buildChart(input.birthInstant, input.latitude, input.longitude, input.timezone, {
+        ascendantOverride: input.ascendantOverride,
+        ayanamshaKey: input.ayanamshaKey || "lahiri"
+      });
+      var text = vnTrinetraMarkdown(chart, input);
+      lastPlainReport = text;
+      lastPlainReports.chartData = text;
+      var filenameBase = reportDownloadFilenameBase() + "_Trinetra_Master_Run";
+      if (format === "pdf") { downloadBlob(filenameBase + ".pdf", "application/pdf", makeSimplePdf(text)); showToast("✓ Trinetra Master Run — PDF download started"); return; }
+      if (format === "csv") { downloadBlob(filenameBase + ".csv", "text/csv;charset=utf-8", vedNetraReportTextToCsv(text)); showToast("✓ Trinetra Master Run — CSV download started"); return; }
+      if (format === "xls") { downloadBlob(filenameBase + ".xls", "application/vnd.ms-excel;charset=utf-8", vedNetraReportTextToExcel(text)); showToast("✓ Trinetra Master Run — Excel download started"); return; }
+      downloadBlob(filenameBase + ".md", "text/markdown;charset=utf-8", text);
+      showToast("✓ Trinetra Master Run — Markdown download started");
+    } catch (error) {
+      console.error(error);
+      alertUser("Trinetra Master Run could not be built: " + (error && error.message ? error.message : error));
     }
   }
 
@@ -17948,6 +17976,7 @@
       { id: "viewA-vapmreport", label: "VAPM Export", desc: "VAPM export spec (Lahiri, §1–§14 + Part B): master table, aspect/Kartari table, functional nature, Chandra/Surya Lagna, all vargas + Dashavarga count, Ashtakavarga incl. Shodhya Pinda, Vimshottari/Yogini/Jaimini, Indu Lagna, Tara Chakra, transits, four-fold scaffolds." },
       { id: "viewA-vapmnakreport", label: "VAPM + Nakshatra Report", desc: "Full export (Lahiri): the whole VAPM export plus the §15 Nakshatra Layer — within-nakshatra degrees, Gandanta (48′/3°20′), Abhijit, Navatara points, pada-level navamsa dignity, Nadi/dosha and Yoni/Gana matching factors." },
       { id: "viewA-trivenireport", label: "Triveni Chart Intake", desc: "Default intake sheet (Lahiri, §0–§10): D1 sign-deg-min, unequal Sripati bhava cusps, Dasavarga, Shadbala pass/fail + Vimsopaka + Ishta/Kashta + bhava-sandhi, Ashtakavarga + Shodhya Pinda, Vimshottari, Jaimini 8-karaka, longevity + conditional dashas." },
+      { id: "viewA-trinetrareport", label: "Trinetra Master Run", desc: "Three-eye worksheet (Lahiri, §0–§8): intake/ayanamsa gate, Eye 1 Promise (eight-factor engine, yogas+bhanga, longevity ordinal), Eye 2 Star (nakshatra-pada, Navatara from Moon & Lagna, the one-way override), Eye 3 Time (functional nature, maraka danger, per-bhavesha firing test + gochara), grade/resolve, guardrails." },
       { id: "viewA-lifereport", label: "Life Report", desc: "One consolidated report — save it as a PDF." },
       { id: "viewA-rashifal", label: "Rashifal", desc: "Daily/weekly/monthly/yearly Moon-sign horoscope." },
       { id: "viewA-doshas", label: "Dosha Analysis", desc: "Manglik, Kaal Sarp and Pitra dosha with remedies." },
@@ -21589,6 +21618,331 @@
       '<p class="fine-print">The full set of Tajika Sahams for this chart (' + (isDay ? "day" : "night") + ' birth). Each Saham = A − B + Lagna for a day birth; for a night birth the two terms are reversed unless the formula is fixed (e.g. Roga). A term may be a planet, the Lagna, Gulika, the Punya Saham, or a house lord. Classical sources differ on a few formulas, so the exact formula used is printed per row for audit.</p>' +
       '<div class="table-wrap"><table><thead><tr><th>Saham</th><th>Sign</th><th>Degree</th><th>House</th><th>Formula (day)</th><th>Signifies</th></tr></thead><tbody>' + body + '</tbody></table></div>' +
       '<p class="fine-print">A Saham activates when a transiting planet (especially its karaka or the year lord) crosses its degree; it is read from the Lagna and the Moon. Sahams are a Varshaphal (annual-chart) technique and are also used in the natal chart.</p></section>';
+  }
+  // ================================================================
+  // TRINETRA MASTER RUN — three-eye worksheet (Promise / Star / Time).
+  // Always Lahiri (Chitrapaksha). VedNetra computes every chart factor;
+  // the external rule corpora (RBPM / Sutton / UPT LP-GO) are NOT embedded,
+  // so their citation columns are left as a scaffold rather than gap-filled.
+  // ================================================================
+  var VN_TRI_HOUSE_KARAKA = { 1: "Sun", 2: "Jupiter", 3: "Mars", 4: "Moon", 5: "Jupiter", 6: "Mars", 7: "Venus", 8: "Saturn", 9: "Jupiter", 10: "Sun", 11: "Jupiter", 12: "Saturn" };
+  function vnTrinetraMarkdown(chart, input) {
+    if (input && input.birthInstant && chart.ayanamshaKey !== "lahiri") {
+      try { chart = buildChart(input.birthInstant, Number(input.latitude), Number(input.longitude), Number(input.timezone), { ascendantOverride: input.ascendantOverride, ayanamshaKey: "lahiri" }); } catch (e) {}
+    }
+    var d = vnCcData(chart, input), asc = chart.ascendant, L = [];
+    var order = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+    var classical = CLASSICAL_PLANETS;
+    var lvl = ["MD", "AD", "PD", "SD", "PR"];
+    var nm = (input && (input.nativeName || input.name)) || "Chart";
+    var nowMs = Date.now();
+    function row(c) { return "| " + c.join(" | ") + " |"; }
+    function sep(n) { return "|" + new Array(n + 1).join("---|"); }
+    var moon = chart.planetsByName.Moon, sun = chart.planetsByName.Sun;
+    var moonNak = nakshatraInfo(moon.lon), lagNak = nakshatraInfo(asc.lon);
+    var conf = (input && input.birthTimeConfidence) || "";
+    // owned houses per planet
+    var owned = {}; classical.forEach(function (n) { owned[n] = []; });
+    for (var oh = 1; oh <= 12; oh++) { var lo = lordOfHouse(chart, oh); if (owned[lo]) owned[lo].push(oh); }
+    function tara(fromIdx, lon) { var t = nakshatraInfo(lon).index; var count = ((t - fromIdx + 27) % 27) + 1; var idx = (count - 1) % 9; return { idx: idx, name: VN_TARA_NAMES[idx], malefic: [2, 4, 6].indexOf(idx) >= 0 }; }
+    function gandDist(lon) { var pts = [0, 120, 240], best = Infinity; pts.forEach(function (g) { var raw = Math.abs(normalize(lon) - g); raw = Math.min(raw, 360 - raw); best = Math.min(best, raw); }); return best; }
+    function funcNature(n) {
+      var hs = owned[n] || [], tags = [];
+      // Kendra/trikona ownership for yogakaraka excludes the 1st (which is both);
+      // owning the Lagna is called out separately as Lagnesha.
+      var kendra = hs.some(function (h) { return [4, 7, 10].indexOf(h) >= 0; });
+      var trikona = hs.some(function (h) { return [5, 9].indexOf(h) >= 0; });
+      if (kendra && trikona) tags.push("Yogakaraka");
+      if (hs.indexOf(1) >= 0) tags.push("Lagnesha");
+      if (hs.indexOf(2) >= 0 || hs.indexOf(7) >= 0) tags.push("Maraka");
+      if (hs.indexOf(8) >= 0) tags.push("Ashtamesha");
+      if (["Jupiter", "Venus", "Mercury", "Moon"].indexOf(n) >= 0 && kendra) tags.push("Kendradhipati-dosha");
+      if (["Mars", "Saturn", "Sun"].indexOf(n) >= 0 && [6, 8, 12].some(function (x) { return hs.indexOf(x) >= 0; })) tags.push("Dusthana-lord");
+      return tags.length ? tags.join(", ") : "neutral";
+    }
+    var avd = null; try { avd = samudayaAshtakavargaData(chart); } catch (e) {}
+    function savOfSign(sgn) { if (!avd) return "-"; return avd.columnTotals[houseFromSign(asc.sign, sgn) - 1]; }
+    function bavOfSign(n, sgn) { if (!avd || !avd.rows[n]) return "-"; return avd.rows[n][houseFromSign(asc.sign, sgn) - 1]; }
+    var trChart = null; try { trChart = buildChart(new Date(), Number(input.latitude), Number(input.longitude), Number(input.timezone), { ayanamshaKey: "lahiri" }); } catch (e) {}
+
+    L.push("# TRINETRA MASTER RUN — " + nm);
+    L.push("");
+    L.push("_Three eyes, never blended. Promise → Star → Time. Sidereal Lahiri (Chitrapaksha), whole-sign, Vimshottari primary. Generated by VedNetra on " + vnFmtFullDate(nowMs) + "._");
+    L.push("");
+    L.push("> **How to read this sheet.** VedNetra computes every chart factor below (positions, dignities, nakshatra-pada, Navatara, dasha windows, transits, Ashtakavarga, Jaimini, functional nature, firing tests). The external rule corpora — **RBPM** rule library, **Sutton** pages, **UPT LP/GO** pages — are *not* embedded in VedNetra; their citation columns are left as a scaffold to be filled from those sources rather than gap-filled here (per the template's own no-gap-fill guardrail).");
+    L.push("");
+
+    // ===== SECTION 0 =====
+    L.push("## §0 · Intake & Ayanamsa Gate");
+    L.push(row(["Gate", "Value"])); L.push(sep(2));
+    L.push(row(["Ayanamsa", "**Lahiri confirmed** — Chitrapaksha, sidereal, whole-sign, Vimshottari primary (" + chart.ayanamsa.toFixed(4) + "°)"]));
+    var confNote = /exact/i.test(conf) ? "Exact — all techniques available (degree-level work ON)." :
+      /round|uncert|approx/i.test(conf) ? "Rounded/uncertain — degree-level work OFF (gandanta 48', pada dignity, third-of-sign, D60 suppressed)." :
+      /unknown/i.test(conf) ? "Unknown — Moon-sign reading only; no Lagna, no house cusps, no fine timing." :
+      "Not stated — set Birth-time confidence in the form; degree-level work is used but flag it.";
+    L.push(row(["Birth-time confidence", (conf || "not stated") + " → " + confNote]));
+    L.push(row(["Birth date / time / place", String((input && input.birthDate) || "-") + " · " + String((input && input.birthTime) || "-") + " · " + String((input && input.birthPlace) || "-")]));
+    L.push(row(["Lagna (rising)", asc.signName + " " + vnCcDms(asc.deg) + " · nakshatra " + NAKSHATRAS[lagNak.index] + "-" + lagNak.pada]));
+    L.push("");
+    L.push("**Always-required — nine grahas (D1 Rashi):**");
+    L.push(row(["Body", "Sign", "House", "Degree", "Dignity", "R/C", "Nakshatra-Pada", "Nak lord"])); L.push(sep(8));
+    d.planets.forEach(function (p) {
+      var pl = chart.planetsByName[p.name], nk = nakshatraInfo(pl.lon);
+      L.push(row([p.name, p.signName, p.house, vnCcDms(p.deg), p.dignity, ((p.retro ? "R" : "") + (p.combust ? "C" : "")) || "—", NAKSHATRAS[nk.index] + "-" + nk.pada, nk.lord]));
+    });
+    L.push("");
+    L.push("**D9 Navamsa:**");
+    var d9 = makeVargaChart(chart, 9);
+    L.push(row(["Body", "D9 Sign", "D9 House"])); L.push(sep(3));
+    L.push(row(["Lagna", d9.ascendant.signName, "1"]));
+    order.forEach(function (n) { var vp = d9.planetsByName[n]; if (vp) L.push(row([n, vp.signName, vp.house])); });
+    L.push("");
+    L.push("**Vimshottari — current, past & future (MD → AD → PD):**");
+    L.push(row(["Level", "Lord", "From", "To", "Now"])); L.push(sep(5));
+    (d.timeline || []).forEach(function (md) {
+      var cur = md.start.getTime() <= nowMs && nowMs < md.end.getTime();
+      L.push(row(["MD", md.lord, vnFmtFullDate(md.start.getTime()), vnFmtFullDate(md.end.getTime()), cur ? "◄ MD" : ""]));
+    });
+    if (d.stack[0]) {
+      try {
+        subPeriods(d.stack[0], "AD").forEach(function (ad) {
+          var cur = ad.start.getTime() <= nowMs && nowMs < ad.end.getTime();
+          L.push(row([" AD", d.stack[0].lord + "-" + ad.lord, vnFmtFullDate(ad.start.getTime()), vnFmtFullDate(ad.end.getTime()), cur ? "◄ AD" : ""]));
+        });
+      } catch (e) {}
+    }
+    if (d.stack[1]) {
+      try {
+        subPeriods(d.stack[1], "PD").forEach(function (pd) {
+          var cur = pd.start.getTime() <= nowMs && nowMs < pd.end.getTime();
+          L.push(row(["  PD", d.stack[1].lord + "-" + pd.lord, vnFmtFullDate(pd.start.getTime()), vnFmtFullDate(pd.end.getTime()), cur ? "◄ PD" : ""]));
+        });
+      } catch (e) {}
+    }
+    L.push("");
+    L.push("**Eye-specific data — PROMISE divisionals (area charts):**");
+    var vg = [["D3", 3], ["D4", 4], ["D7", 7], ["D9", 9], ["D10", 10], ["D24", 24], ["D30", 30]];
+    var vch = vg.map(function (v) { return makeVargaChart(chart, v[1]); });
+    L.push(row(["Body"].concat(vg.map(function (v) { return v[0]; })))); L.push(sep(vg.length + 1));
+    L.push(row(["Lagna"].concat(vch.map(function (vc) { return vc.ascendant.signName; }))));
+    order.forEach(function (n) { L.push(row([n].concat(vch.map(function (vc) { var vp = vc.planetsByName[n]; return vp ? vp.signName : "—"; })))); });
+    L.push("_D3 siblings · D4 property · D7 progeny · D9 dharma/spouse · D10 career · D24 education · D30 disease._");
+    L.push("");
+    if (avd) {
+      L.push("**Ashtakavarga (SAV per house from Lagna):** " + avd.houseNumbers.map(function (h, i) { return "H" + h + ":" + avd.columnTotals[i]; }).join(" · ") + " (total " + avd.grandTotal + ").");
+      L.push("");
+    }
+    try {
+      var k8 = jaiminiKarakas(chart, true).slice().sort(function (a, b) { return b.degree - a.degree; });
+      L.push("**Jaimini Chara Karakas:** " + k8.map(function (k) { return k.role + " " + k.planet; }).join(" · ") + ".");
+      L.push("");
+    } catch (e) {}
+    if (input && input.lifeEvents && String(input.lifeEvents).trim()) {
+      L.push("**Back-test gate — supplied life events (retrodict first; if the engine cannot reproduce them, lower forward confidence):**");
+      String(input.lifeEvents).split(/\n+/).forEach(function (ln) { if (ln.trim()) L.push("- " + ln.trim()); });
+      L.push("");
+    } else {
+      L.push("**Back-test gate:** no past events supplied — enter them in the chart form's \"Known life events\" box to enable retrodiction.");
+      L.push("");
+    }
+
+    // ===== SECTION 1 — EYE 1 PROMISE =====
+    L.push("## §1 · Eye 1 — PROMISE  `[tag: RBPM]`");
+    L.push("_Only this eye can create an event. The eight-factor engine (house + lord + dispositor + karaka + house-from-karaka; dignity sets magnitude) is computed below. RBPM rule IDs/sutram are an external corpus — map the fired chart factors to their rule text from RBPM RULES._");
+    L.push("");
+    L.push("**Eight-factor promise engine (per bhava):**");
+    L.push(row(["Bhava", "Sign", "Lord", "Lord placed (H / sign / dignity)", "Dispositor", "Karaka", "H-from-karaka", "Occupants", "Magnitude"])); L.push(sep(9));
+    d.houses.forEach(function (hh) {
+      var lp = chart.planetsByName[hh.lord];
+      var disp = lp ? SIGNS[lp.sign].lord : "—";
+      var kar = VN_TRI_HOUSE_KARAKA[hh.house];
+      var karP = chart.planetsByName[kar];
+      var hFromKar = karP ? houseFromSign(karP.sign, SIGNS[(asc.sign + hh.house - 1) % 12] ? normalizeSign(asc.sign + hh.house - 1) : 0) : "—";
+      var mag = /Exalt|Own|Mool/i.test(hh.lordDignity) ? "Strong" : /Friend/i.test(hh.lordDignity) ? "Moderate" : /Debilit|Enemy/i.test(hh.lordDignity) ? "Weak" : "Mixed";
+      L.push(row([hh.house, hh.signName, hh.lord, hh.lordHouse + " / " + hh.lordSign + " / " + hh.lordDignity, disp, kar, hFromKar, (hh.occupants.join(", ") || "—"), mag]));
+    });
+    L.push("");
+    // Longevity gate (ordinal only — guardrail: no lifespan number, no death timing)
+    try {
+      var lv = longevityVerdict(longevityRules(chart));
+      L.push("**Longevity & constitution gate (grave matters; ordinal class only — no lifespan number):** " + lv + ".");
+      L.push("");
+    } catch (e) {}
+    // Yogas + bhanga
+    try {
+      var yogas = scanYogas(chart);
+      L.push("**Quality, yogas & denial (credit a yoga only if fully formed and its bhanga absent):**");
+      if (yogas.length) yogas.forEach(function (y) { L.push("- **" + y.name + "** (" + y.category + ") — " + (y.planets && y.planets.length ? y.planets.join(", ") + "; " : "") + (y.effect || "") + " · strength " + (y.strength || "Applicable")); });
+      else L.push("- No named yoga auto-detected.");
+      var debils = classical.filter(function (n) { var p = chart.planetsByName[n]; return p.dignity === "Debilitated"; });
+      debils.forEach(function (n) { var p = chart.planetsByName[n]; var nb = false; try { nb = neechabhanga(chart, p); } catch (e) {} L.push("- Neecha-bhanga check: " + n + " debilitated → " + (nb ? "**cancelled** (bhanga present)" : "stands (no cancellation)") + "."); });
+      L.push("");
+    } catch (e) {}
+    L.push("**RULES APPLIED** (map each fired chart factor to its RBPM rule text — minimum 3–5 cited IDs):");
+    L.push(row(["Rule ID (RBPM)", "Condition quoted", "Present chart factor", "Result"])); L.push(sep(4));
+    L.push(row(["_supply from RBPM_", "_…_", "e.g. " + (d.houses[0] ? "1L " + d.houses[0].lord + " in H" + d.houses[0].lordHouse + " (" + d.houses[0].lordDignity + ")" : "—"), "GIVEN / DENIED / CONDITIONAL"]));
+    L.push(row(["_supply from RBPM_", "_…_", "_map a fired yoga / dignity above_", "—"]));
+    L.push("");
+    L.push("**CONTRARY RULES** (actively hunt the other side; if none, you under-searched):");
+    L.push(row(["Rule ID (RBPM)", "What it argues", "Why outweighed (precedence step)"])); L.push(sep(3));
+    L.push(row(["_supply from RBPM_", "_…_", "system → layer → strength → cancellation → timing → source"]));
+    L.push("");
+    L.push("**Handoff object:** verdict per option (GIVEN / DENIED / CONDITIONAL) + magnitude, with significators (house, lord, dispositor, karaka, house-from-karaka) as tabulated above.");
+    L.push("");
+
+    // ===== SECTION 2 — EYE 2 STAR =====
+    L.push("## §2 · Eye 2 — STAR  `[tag: SUTTON DIRECT / IMPLIED]`  _(Mehta layer OFF)_");
+    L.push("_Resolution to nakshatra (13°20') and pada (3°20'). When pada dignity contradicts the sign dignity Eye 1 used, carry the pada dignity forward._");
+    L.push("");
+    L.push(row(["Body", "Nakshatra-Pada", "Sign dignity", "Pada (D9) dignity", "Navatara (Moon)", "Navatara (Lagna)", "Flags"])); L.push(sep(7));
+    ["Lagna"].concat(order).forEach(function (n) {
+      var lon = n === "Lagna" ? asc.lon : (chart.planetsByName[n] ? chart.planetsByName[n].lon : null);
+      if (lon === null) return;
+      var nk = nakshatraInfo(lon);
+      var signDig = n === "Lagna" ? "—" : (["Rahu", "Ketu"].indexOf(n) >= 0 ? "—" : chart.planetsByName[n].dignity);
+      var padaDig = (["Lagna", "Rahu", "Ketu"].indexOf(n) >= 0) ? "—" : vnDignityInSign(n, vargaSign(lon, 9));
+      var tM = tara(moonNak.index, lon), tL = tara(lagNak.index, lon);
+      var gd = gandDist(lon);
+      var flags = [];
+      if (tM.malefic) flags.push("malefic tara/Moon");
+      if (tL.malefic) flags.push("malefic tara/Lagna");
+      if (gd <= 0.8) flags.push("**gandanta knot ≤48'**");
+      else if (gd <= 3.3333) flags.push("gandanta zone ≤3°20'");
+      if (padaDig !== "—" && signDig !== "—" && padaDig !== signDig && (/Debil|Enemy/i.test(padaDig) !== /Debil|Enemy/i.test(signDig))) flags.push("pada≠sign → carry pada");
+      L.push(row([n, NAKSHATRAS[nk.index] + "-" + nk.pada, signDig, padaDig, tM.name + (tM.malefic ? " ✗" : ""), tL.name + (tL.malefic ? " ✗" : ""), (flags.join("; ") || "—")]));
+    });
+    L.push("_Malefic taras: 3rd Vipat, 5th Pratyari (Prayatak), 7th Vadha (Naidhana)._");
+    L.push("");
+    L.push("**THE ONE OVERRIDE (one way only — can only downgrade, never promote; SUTTON DIRECT).** A promised significator that is a house-lord or karaka sitting in a malefic tara (from Moon or Lagna) or inside a gandanta knot is DOWNGRADED even if exalted/vargottama:");
+    var anyOverride = false;
+    classical.forEach(function (n) {
+      var p = chart.planetsByName[n];
+      var tM = tara(moonNak.index, p.lon), tL = tara(lagNak.index, p.lon), gd = gandDist(p.lon);
+      var isKaraka = Object.keys(VN_TRI_HOUSE_KARAKA).some(function (h) { return VN_TRI_HOUSE_KARAKA[h] === n; });
+      var isLord = (owned[n] || []).length > 0;
+      if ((isLord || isKaraka) && (tM.malefic || tL.malefic || gd <= 0.8)) {
+        anyOverride = true;
+        L.push("- **" + n + "** (lord of H" + (owned[n] || []).join(",") + (isKaraka ? "; karaka" : "") + ") → " + (gd <= 0.8 ? "gandanta knot; " : "") + (tM.malefic ? "Vipat/Pratyari/Vadha from Moon; " : "") + (tL.malefic ? "from Lagna; " : "") + "**DOWNGRADE** its promised significations.");
+      }
+    });
+    if (!anyOverride) L.push("- No promised significator is caught by the override (no house-lord/karaka in a malefic tara or gandanta knot).");
+    L.push("");
+
+    // ===== SECTION 3 — EYE 3 TIME =====
+    L.push("## §3 · Eye 3 — TIME  `[tag: UPT / LP-GO]`");
+    L.push("_Runs only if Eye 1 promised and Eye 2 did not veto. Vimshottari only, three levels. Route by house, never by score; UPT ROUTE (vocation) is a flagged tie-breaker only._");
+    L.push("");
+    L.push("**Functional classification (magnitude only):**");
+    L.push(row(["Planet", "Owns houses", "Functional nature"])); L.push(sep(3));
+    classical.forEach(function (n) { L.push(row([n, (owned[n] || []).map(function (h) { return "H" + h; }).join(", ") || "—", funcNature(n)])); });
+    L.push("");
+    L.push("**Danger — maraka & gated windows** (a maraka window SUPPRESSES a happy prediction; it is never a death forecast): 2nd lord " + (lordOfHouse(chart, 2)) + ", 7th lord " + (lordOfHouse(chart, 7)) + " (pravala maraka), 8th lord " + (lordOfHouse(chart, 8)) + "; Saturn is doubly gated.");
+    L.push("");
+    L.push("**Trigger — firing test per bhavesha** (FIRE when the MD/AD/PD is favourable for the bhavesha AND the bhavesha in transit is in a trikona 1/5/9 from its OWN natal sign, and/or transiting Guru is 1/5/9 from the bhavesha; then corroborate with vedha, AV rekha ≥5, third-of-sign):");
+    if (trChart) {
+      var trJup = trChart.planetsByName.Jupiter;
+      L.push(row(["Bhava", "Bhavesha", "Natal sign", "Transit sign", "Trikona from own?", "Guru 1/5/9 from bhavesha?", "BAV of transit sign", "Fires?"])); L.push(sep(8));
+      for (var hf = 1; hf <= 12; hf++) {
+        var bl = lordOfHouse(chart, hf), np = chart.planetsByName[bl], tp = trChart.planetsByName[bl];
+        if (!np || !tp) continue;
+        var trik = [1, 5, 9].indexOf(((tp.sign - np.sign + 12) % 12) + 1) >= 0;
+        var guru = [1, 5, 9].indexOf(((trJup.sign - np.sign + 12) % 12) + 1) >= 0;
+        var bav = bavOfSign(bl, tp.sign);
+        var fires = (trik || guru) ? "candidate (gate on dasha+vedha)" : "no";
+        L.push(row([hf, bl, np.signName, tp.signName, trik ? "**yes**" : "no", guru ? "**yes**" : "no", bav, fires]));
+      }
+      L.push("_Both Lagna and Moon references reconcile via the transit table in §0-adjacent gochara; Shani is a veto, not a switch._");
+    } else {
+      L.push("_Transit chart unavailable._");
+    }
+    L.push("");
+    if (trChart) {
+      L.push("**Gochara now (" + vnFmtFullDate(nowMs) + ") — Lagna & Moon references:**");
+      L.push(row(["Transit", "Sign", "Deg", "R", "H from Lagna", "H from Moon", "BAV"])); L.push(sep(7));
+      order.forEach(function (n) { var tp = trChart.planetsByName[n]; if (!tp) return; L.push(row([n, tp.signName, vnCcDms(tp.deg), (tp.retrograde ? "R" : "—"), houseFromSign(asc.sign, tp.sign), houseFromSign(moon.sign, tp.sign), (["Rahu", "Ketu"].indexOf(n) >= 0 ? "—" : bavOfSign(n, tp.sign))])); });
+      L.push("");
+    }
+
+    // ===== SECTION 4 — GRADE & RESOLVE =====
+    L.push("## §4 · Grade & Resolve  _(never average across eyes)_");
+    L.push("- **Uttam (very high):** PROMISE GIVEN with D1+divisional+Sudarshan convergence, not downgraded by the Star override, firing rule satisfied in a favourable non-maraka window, un-vedhaed, AV rekha ≥5.");
+    L.push("- **Madhyam (moderate):** promise given and a window found, but one eye is contrary or silent.");
+    L.push("- **Adham (low / hold):** promise present but firing rule unmet, or a maraka window overlaps, or the Star override effectively vetoes, or only one reference lagna confirms.");
+    L.push("- **Maun (decline):** no natal promise, or the corpus is genuinely silent — say *not promised* or *source silent*.");
+    L.push("");
+    L.push("**Cross-eye conflict ladder (apply in order, stop at first decision):** (1) governing law — Promise governs, Time & Star only subtract; a DENIED promise stays denied. (2) Promise clashes resolve inside Eye 1 via the RBPM precedence ladder. (3) Star vs Promise via the ONE OVERRIDE (one way only). (4) Time vs Promise — Promise wins on *whether*, Time wins on *when*; diverging deliverer dashas → run the firing test on the RBPM significator dasha, report both, drop one band. (5) A surviving divergence is printed, not hidden, at −1 band.");
+    L.push("");
+
+    // ===== SECTION 5 — OUTPUT CONTRACT =====
+    L.push("## §5 · Output Contract");
+    L.push("A finished reading built on this sheet must contain: **ANSWER** (option + MD/AD/PD window + transit band + confidence band + one-line synthesis); **EYE 1 PROMISE** (verdict + magnitude + significators + both tables); **EYE 2 STAR** (nakshatra-pada table + override result + Navatara from Moon & Lagna); **EYE 3 TIME** (firing test + dasha grading + vedha + AV + window); **CROSS-EYE VERDICT** (harmonious / one eye contrary / genuine divergence + governing-law check that nothing was created above the promise); **COVERAGE & GUARDRAILS** (RBPM coverage line, rules-cited count, Star status, Time three-levels-only note, ethics framing).");
+    L.push("");
+
+    // ===== SECTION 6 — GUARDRAILS =====
+    L.push("## §6 · Guardrails (binding)");
+    L.push("- No lifespan number, no death timing, no diagnosis. Maraka material only suppresses positive predictions.");
+    L.push("- Health, disease, fertility, mental-illness and sexual material stays classical-analytical only — never a verdict about a real person.");
+    L.push("- Dated or value-laden dicta are recorded as historical text, never used to judge a person.");
+    L.push("- Say the source is silent rather than gap-filling from another corpus or memory.");
+    L.push("- Never blend tags — every astrological sentence is RBPM, SUTTON DIRECT, SUTTON IMPLIED, or UPT with a rule ID or book page.");
+    L.push("");
+
+    // ===== SECTION 7 — SELF CHECK =====
+    L.push("## §7 · Self-check");
+    L.push("- [ ] Ran the eyes in order; Time/Star never created an event Promise did not give.");
+    L.push("- [ ] Every astrological sentence tagged and cited; no untagged general Jyotish.");
+    L.push("- [ ] Eye 1 produced both tables and the contrary side was actively hunted.");
+    L.push("- [ ] The ONE OVERRIDE applied one way only; the Mehta layer stayed out.");
+    L.push("- [ ] UPT ROUTE kept out of the primary determination.");
+    L.push("- [ ] On a denial, a maraka window, or a surviving divergence — declined / suppressed / printed both.");
+    L.push("- [ ] Lahiri confirmed and birth-time confidence checked before any degree-level work.");
+    L.push("");
+
+    // ===== SECTION 8 — HINDI SUMMARY =====
+    L.push("## §8 · Final Hindi Summary (format)");
+    L.push("```");
+    if (input && input.question && String(input.question).trim()) {
+      L.push("प्रश्न 1 " + String(input.question).trim());
+      L.push("उत्तर — [Option] · कारण, ग्रह भाव दृष्टि दशा आधारित संक्षिप्त तर्क सिद्धांत सहित।");
+    } else {
+      L.push("प्रश्न 1 Option a उत्तर");
+      L.push("कारण, ग्रह भाव दृष्टि दशा आधारित संक्षिप्त तर्क सिद्धांत सहित।");
+      L.push("");
+      L.push("प्रश्न 2 Option c उत्तर");
+      L.push("कारण।");
+    }
+    L.push("```");
+    L.push("_एक पंक्ति प्रति प्रश्न — प्रयुक्त ग्रह, भाव, दृष्टि, दशा स्पष्ट रूप से नामित।_");
+    L.push("");
+    L.push("**Coverage:** §0 intake + §1 promise engine + §2 star resolution/override + §3 time firing-test are computed from the chart; the RBPM/Sutton/UPT rule citations are a scaffold to be filled from those corpora. No lifespan/death timing is emitted (guardrail).");
+    L.push("");
+    L.push("_Generated by VedNetra — Trinetra Master Run (Lahiri) — " + vnFmtFullDate(nowMs) + "_");
+    return L.join("\n");
+  }
+  function trinetraReportSection(chart, input) {
+    var md;
+    try { md = vnTrinetraMarkdown(chart, input); }
+    catch (e) { md = "Could not build the report: " + (e && e.message ? e.message : e); }
+    return '<section id="viewA-trinetrareport" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Master Export · Trinetra</p><h3>Trinetra Master Run</h3></div><span class="small-pill">Lahiri · §0–§8</span></div>' +
+      '<p class="fine-print">The three-eye worksheet — <strong>Promise → Star → Time</strong>, never blended — always cast on <strong>Lahiri (Chitrapaksha)</strong>. §0 intake &amp; ayanamsa gate (birth-time confidence, nine grahas, D9, full Vimshottari MD→AD→PD, area divisionals, Ashtakavarga, Jaimini karakas), §1 Eye 1 Promise (eight-factor engine, longevity ordinal, yogas + bhanga, RULES-APPLIED / CONTRARY scaffolds), §2 Eye 2 Star (nakshatra-pada + pada-vs-sign dignity, Navatara from Moon &amp; Lagna, the one-way override), §3 Eye 3 Time (functional nature, maraka danger, per-bhavesha firing test + gochara), §4 grade &amp; resolve, §5 output contract, §6 guardrails, §7 self-check, §8 Hindi summary. The external RBPM / Sutton / UPT rule corpora are not embedded — their citation columns are scaffolded, never gap-filled.</p>' +
+      '<div class="vn-tool-actions" style="margin-bottom:10px"><button type="button" id="vnTrinetraPdf" class="primary-action vn-generate-btn">Save as PDF</button> <button type="button" id="vnTrinetraMd" class="input-toggle-btn">Download Markdown</button> <button type="button" id="vnTrinetraCopy" class="input-toggle-btn">Copy (Markdown)</button> <span id="vnTrinetraCopyStatus" class="fine-print"></span></div>' +
+      '<div class="panel-box"><pre class="vn-native-pre">' + escapeHtml(md) + '</pre></div>' +
+      '</section>';
+  }
+  function wireTrinetraReportControls(chart, input) {
+    var pdf = document.getElementById("vnTrinetraPdf");
+    if (pdf) pdf.addEventListener("click", function () { try { downloadTrinetraReport("pdf"); } catch (e) {} });
+    var mdBtn = document.getElementById("vnTrinetraMd");
+    if (mdBtn) mdBtn.addEventListener("click", function () { try { downloadTrinetraReport("md"); } catch (e) {} });
+    var copy = document.getElementById("vnTrinetraCopy");
+    if (copy) copy.addEventListener("click", function () {
+      var md = vnTrinetraMarkdown(chart, input), status = document.getElementById("vnTrinetraCopyStatus");
+      function done() { if (status) { status.textContent = "Copied!"; setTimeout(function () { status.textContent = ""; }, 2500); } }
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(md).then(done, function () { vnCcFallbackCopy(md, done); });
+        else vnCcFallbackCopy(md, done);
+      } catch (e) { vnCcFallbackCopy(md, done); }
+    });
   }
   function triveniReportSection(chart, input) {
     var md;
