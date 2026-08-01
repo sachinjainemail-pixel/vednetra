@@ -13,7 +13,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.svg">
-  <link rel="stylesheet" href="styles.css?v=101">
+  <link rel="stylesheet" href="styles.css?v=102">
 </head>
 <body>
   <div id="vnSplash" class="vn-splash" role="dialog" aria-label="Welcome to VedNetra">
@@ -53,7 +53,7 @@
           <div>
             <h1 class="brand-title">VedNetra</h1>
           </div>
-          <span class="status-pill" id="appVersionPill">v1.101</span>
+          <span class="status-pill" id="appVersionPill">v1.102</span>
         </div>
 
         <form id="birthForm" autocomplete="off">
@@ -240,8 +240,8 @@
               <label>
                 Report
                 <select id="reportDownloadType">
-                  <option value="consolidatedmaster" selected>Consolidated Master Run (Lahiri · all 4 projects)</option>
-                  <option value="kp">KP System Report (Krishnamurti · Placidus)</option>
+                  <option value="kp" selected>KP System Report (Krishnamurti · Placidus) — default</option>
+                  <option value="consolidatedmaster">Consolidated Master Run (Lahiri · all 4 projects)</option>
                   <option value="triveni">Triveni Chart Intake (Lahiri · §0–§10)</option>
                   <option value="trinetra">Trinetra Master Run (Lahiri · §0–§8)</option>
                   <option value="vapmnak">VAPM + Nakshatra Report (Lahiri · §1–§15)</option>
@@ -366,9 +366,9 @@
           <div class="nav-category">
             <button type="button" class="nav-category-title" data-nav-category-toggle aria-expanded="false">Reports &amp; Remedies</button>
             <div class="nav-category-actions">
+              <button type="button" data-view-a-target="viewA-kpreport">KP System Report</button>
               <button type="button" data-view-a-target="viewA-ccreport">Natal Report (CC)</button>
               <button type="button" data-view-a-target="viewA-consolidatedmaster">Consolidated Master Run</button>
-              <button type="button" data-view-a-target="viewA-kpreport">KP System Report</button>
               <button type="button" data-view-a-target="viewA-trivenireport">Triveni Chart Intake</button>
               <button type="button" data-view-a-target="viewA-trinetrareport">Trinetra Master Run</button>
               <button type="button" data-view-a-target="viewA-vapmnakreport">VAPM + Nakshatra Report</button>
@@ -450,9 +450,9 @@
                 <option value="viewA-predictive">Predictive</option>
               </optgroup>
               <optgroup label="Reports &amp; Remedies">
+                <option value="viewA-kpreport">KP System Report</option>
                 <option value="viewA-ccreport">Natal Report (CC)</option>
                 <option value="viewA-consolidatedmaster">Consolidated Master Run</option>
-                <option value="viewA-kpreport">KP System Report</option>
                 <option value="viewA-trivenireport">Triveni Chart Intake</option>
                 <option value="viewA-trinetrareport">Trinetra Master Run</option>
                 <option value="viewA-vapmnakreport">VAPM + Nakshatra Report</option>
@@ -506,7 +506,7 @@
           </div>
           <p class="empty-state-tagline">A complete Vedic workbench: divisional charts (D-1 to D-60), Vimshottari dasha, Shadbala, Ashtakavarga, KP, Jaimini and Varshfal â plus a daily dashboard, muhurta windows, numerology, card readings and more. Pick anything below to jump straight in.</p>
           <div id="vnHomeShowcase" class="vn-home-showcase"></div>
-          <p class="empty-state-version" id="appVersionLabel">Version 1.101</p>
+          <p class="empty-state-version" id="appVersionLabel">Version 1.102</p>
         </div>
         <article id="report" class="report hidden"></article>
       </section>
@@ -547,8 +547,8 @@
         <div class="focus-download-options">
           <label>Report
             <select id="railReportDownloadType">
-              <option value="consolidatedmaster" selected>Consolidated Master Run (Lahiri · all 4 projects)</option>
-              <option value="kp">KP System Report (Krishnamurti · Placidus)</option>
+              <option value="kp" selected>KP System Report (Krishnamurti · Placidus) — default</option>
+              <option value="consolidatedmaster">Consolidated Master Run (Lahiri · all 4 projects)</option>
               <option value="native">Native Input Report (full §0–§16)</option>
                   <option value="trinetra">Trinetra Master Run (Lahiri · §0–§8)</option>
                   <option value="vapm">VAPM Export (Lahiri · §1–§14 + Part B)</option>
@@ -620,6 +620,6 @@
       </div>
     </div>
   </main>
-  <script src="app.js?v=101"></script>
+  <script src="app.js?v=102"></script>
 </body>
 </html>
