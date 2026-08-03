@@ -18033,7 +18033,7 @@
       { id: "viewA-vapmreport", label: "VAPM Export", desc: "VAPM export spec (Lahiri, §1–§14 + Part B): master table, aspect/Kartari table, functional nature, Chandra/Surya Lagna, all vargas + Dashavarga count, Ashtakavarga incl. Shodhya Pinda, Vimshottari/Yogini/Jaimini, Indu Lagna, Tara Chakra, transits, four-fold scaffolds." },
       { id: "viewA-vapmnakreport", label: "VAPM + Nakshatra Report", desc: "Full export (Lahiri): the whole VAPM export plus the §15 Nakshatra Layer — within-nakshatra degrees, Gandanta (48′/3°20′), Abhijit, Navatara points, pada-level navamsa dignity, Nadi/dosha and Yoni/Gana matching factors." },
       { id: "viewA-consolidatedmaster", label: "Consolidated Master Run", desc: "One-sheet master run covering all four projects (Lahiri): Mehta+Sutton (VAPM), Trinetra (Promise/Star/Time), Umesh Puri (LP+Gochar) and Triveni (BPHS·BJ·PD). Part I is the universal computed data core; Part II re-frames it through each project's method lens." },
-      { id: "viewA-kpreport", label: "KP System Report", desc: "DEFAULT — dedicated Krishnamurti Paddhati export (Krishnamurti ayanamsa − Lahiri−0.1°, Placidus, mean nodes, sub-lords to the second). Natal AND horary (Prashna 1–249): A0 header + birth-time-sensitivity, A1 twelve cusps with the CSL and its OWN sub-lord (final verdict layer), A2 nine planets star/sub/sub-sub + house + retro, A4 karaka/body-part master, A5 relative-rotation map, A3 four-level Vimshottari, B1–B4 significators/ruling-planets/CSL promise board (with CSL-sub), B5 event-group scan, B6 money-direction flag, B7 badhaka/maraka, C1 natal-house transit + Moon star-lord + rising lagna, C2 Prana ladder, and an anti-anchoring self-check." },
+      { id: "viewA-kpreport", label: "KP System Report", desc: "DEFAULT — dedicated Krishnamurti Paddhati export (Krishnamurti ayanamsa − Lahiri−0.1°, Placidus, mean nodes, sub-lords to the second). Natal AND horary (Prashna 1–249): A0 header + birth-time-sensitivity, A1 twelve cusps with the CSL and its OWN sub-lord (final verdict layer), A1/A2 also print Sub→NEXT / Sub←PREV (minutes of birth-time error that flip each sub-lord, and to which lord), A2 nine planets star/sub/sub-sub + house + retro, A6 a ±2-min sub-lord stability roll-up, A4 karaka/body-part master, A5 relative-rotation map, A3 four-level Vimshottari, B1–B4 significators/ruling-planets/CSL promise board (with CSL-sub), B5 event-group scan, B6 money-direction flag, B7 badhaka/maraka, C1 natal-house transit + Moon star-lord + rising lagna, C2 Prana ladder, and an anti-anchoring self-check." },
       { id: "viewA-trivenireport", label: "Triveni Chart Intake", desc: "Intake sheet (Lahiri, §0–§17): D1 sign-deg-min, unequal Sripati bhava cusps, Dasavarga, Shadbala pass/fail + Vimsopaka + Ishta/Kashta + bhava-sandhi, Ashtakavarga + Shodhya Pinda, Vimshottari, Jaimini 8-karaka, longevity + conditional dashas, full MD-AD-PD, gochara, Sahams, Varshaphal, Panchang, planetary strength." },
       { id: "viewA-trinetrareport", label: "Trinetra Master Run", desc: "Three-eye worksheet (Lahiri, §0–§8): intake/ayanamsa gate, Eye 1 Promise (eight-factor engine, yogas+bhanga, longevity ordinal), Eye 2 Star (nakshatra-pada, Navatara from Moon & Lagna, the one-way override), Eye 3 Time (functional nature, maraka danger, per-bhavesha firing test + gochara), grade/resolve, guardrails." },
       { id: "viewA-lifereport", label: "Life Report", desc: "One consolidated report — save it as a PDF." },
@@ -22411,6 +22411,102 @@
     var nak = nakshatraInfo(lon), sub = kpSubSegment(nak.within, nak.lord, NAK_SIZE);
     return Math.min(sub.within, sub.size - sub.within) * 60;
   }
+  // ---- KP birth-time sub-lord sensitivity (natal only) ----
+  // For every cusp and planet, how many minutes of birth-time error would flip
+  // its KP SUB-LORD (the verdict decider) and to which lord. An analytic
+  // longitude rate (two re-casts at T±1 min) gives a first estimate; a bisection
+  // of real re-casts then pins the crossing to 0.1 min and names the new lord —
+  // so the printed minute round-trips (re-casting at T±m yields that sub-lord).
+  // Non-Moon planets barely move, so they resolve to "> cap stable" cheaply; only
+  // the Moon and the (re-cast) Placidus cusps carry finite values.
+  var VN_KP_SENS_CAP = 30;
+  // Lightweight shifted-longitude getters (avoid a full buildKpChart per step).
+  // Cusps depend only on the Placidus geometry (no planets); each planet needs
+  // only its own ephemeris call — so the scan is fast even at thousands of steps.
+  function vnKpJdAt(input, offsetMin) { return julianDay(new Date(input.birthInstant.getTime() + offsetMin * 60000)); }
+  function vnKpCuspLonsAt(input, offsetMin) {
+    var jd = vnKpJdAt(input, offsetMin), ayan = kp2Ayanamsa(jd);
+    var chart = { jd: jd, latitude: Number(input.latitude), longitude: Number(input.longitude) };
+    var lonByHouse = placidusCuspLongitudes(chart) || quadrantCuspLongitudes(chart);
+    var out = [];
+    for (var h = 1; h <= 12; h += 1) out.push(normalize(lonByHouse[h] - ayan));
+    return out;
+  }
+  function vnKpPlanetLonAt(input, name, offsetMin) {
+    var jd = vnKpJdAt(input, offsetMin), ayan = kp2Ayanamsa(jd);
+    var trop = name === "Moon" ? moonTropicalLongitude(jd)
+      : name === "Rahu" ? meanNodeTropical(jd)
+        : name === "Ketu" ? normalize(meanNodeTropical(jd) + 180)
+          : planetTropicalLongitude(name, jd);
+    return normalize(trop - ayan);
+  }
+  function vnKpSensitivity(input, kpBase) {
+    var CAP = VN_KP_SENS_CAP;
+    var order = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+    var cuspP = vnKpCuspLonsAt(input, 1), cuspM = vnKpCuspLonsAt(input, -1);
+    // analytic minutes to the next/prev sub edge (sign of the rate carries retro)
+    function estimate(lon0, lonP, lonM) {
+      var r = signedDelta(lonP, lonM) / 2;                     // deg per minute, wrap-safe
+      var nak = nakshatraInfo(lon0), sub = kpSubSegment(nak.within, nak.lord, NAK_SIZE);
+      var distFwd = sub.size - sub.within, distBack = sub.within;
+      if (Math.abs(r) < 1e-7) return { next: Infinity, prev: Infinity };
+      if (r > 0) return { next: distFwd / r, prev: distBack / r };
+      return { next: distBack / (-r), prev: distFwd / (-r) };
+    }
+    // pin the crossing with real re-casts: bisection in the birth-time offset
+    function pin(lonAt, L0, sideSign, estMin) {
+      function lordAt(delta) { return kpLordInfo(lonAt(sideSign * delta)).subLord; }
+      var hi;
+      if (!isFinite(estMin) || estMin > CAP) {
+        if (lordAt(CAP) === L0) return null;                   // truly stable within the cap
+        hi = CAP;
+      } else {
+        hi = Math.min(CAP, Math.max(0.2, estMin * 1.5 + 0.2));
+        if (lordAt(hi) === L0) {
+          hi = CAP;
+          if (lordAt(hi) === L0) return null;                  // stable within cap
+        }
+      }
+      var lo = 0;
+      for (var i = 0; i < 16 && (hi - lo) > 0.05; i += 1) {
+        var mid = (lo + hi) / 2;
+        if (lordAt(mid) === L0) lo = mid; else hi = mid;
+      }
+      var min = Math.round(hi * 10) / 10; if (min < 0.1) min = 0.1;
+      var lord = lordAt(min);
+      if (lord === L0) { min = Math.round((hi + 0.1) * 10) / 10; lord = lordAt(min); }
+      return { min: min, lord: lord };
+    }
+    var cuspRes = [], planetRes = {};
+    kpBase.cusps.forEach(function (c, i) {
+      var L0 = c.kp.subLord, est = estimate(c.lon, cuspP[i], cuspM[i]);
+      var lonAt = function (delta) { return vnKpCuspLonsAt(input, delta)[i]; };
+      cuspRes.push({ house: c.house, L0: L0, next: pin(lonAt, L0, 1, est.next), prev: pin(lonAt, L0, -1, est.prev) });
+    });
+    order.forEach(function (nm) {
+      var p = kpBase.planetsByName[nm]; if (!p) return;
+      var lp = vnKpPlanetLonAt(input, nm, 1), lm = vnKpPlanetLonAt(input, nm, -1);
+      var est = estimate(p.lon, lp, lm), L0 = p.kp.subLord;
+      var lonAt = function (delta) { return vnKpPlanetLonAt(input, nm, delta); };
+      planetRes[nm] = { name: nm, L0: L0, next: pin(lonAt, L0, 1, est.next), prev: pin(lonAt, L0, -1, est.prev) };
+    });
+    function sideUnstable(s) { return s && s.min != null && s.min <= 2.0; }
+    var uc = [], up = [];
+    cuspRes.forEach(function (r) {
+      if (sideUnstable(r.next)) uc.push({ pt: "Cusp " + r.house, from: r.L0, to: r.next.lord, dir: "+", min: r.next.min });
+      if (sideUnstable(r.prev)) uc.push({ pt: "Cusp " + r.house, from: r.L0, to: r.prev.lord, dir: "−", min: r.prev.min });
+    });
+    order.forEach(function (nm) {
+      var r = planetRes[nm]; if (!r) return;
+      if (sideUnstable(r.next)) up.push({ pt: nm, from: r.L0, to: r.next.lord, dir: "+", min: r.next.min });
+      if (sideUnstable(r.prev)) up.push({ pt: nm, from: r.L0, to: r.prev.lord, dir: "−", min: r.prev.min });
+    });
+    return { cusps: cuspRes, planets: planetRes, order: order, unstableCusps: uc, unstablePlanets: up, cap: CAP };
+  }
+  function vnKpSensFmt(side, sign, cap) {
+    if (!side || side.min == null) return "> " + cap + " stable";
+    return (sign > 0 ? "+" : "−") + side.min.toFixed(1) + " → " + side.lord;
+  }
   function vnKpHoraryNumber(input) {
     if (!input || input.kpHoraryNumber == null || String(input.kpHoraryNumber).trim() === "") return null;
     var n = parseInt(input.kpHoraryNumber, 10);
@@ -22449,6 +22545,10 @@
     function occupantsOf(h) { return kp.planets.filter(function (p) { return p.house === h; }).map(function (p) { return p.name; }); }
     function starOf(x) { return kp.planets.filter(function (p) { return p.kp.starLord === x; }).map(function (p) { return p.name; }); }
     function ownerOf(h) { return kp.cusps[h - 1].signLord; }
+    // birth-time sub-lord sensitivity (natal only; each cusp/planet: minutes to flip its sub-lord)
+    var subSens = null; try { if (input && input.birthInstant) subSens = vnKpSensitivity(input, kp); } catch (e) { subSens = null; }
+    function sensCusp(house) { if (!subSens) return ["n/a", "n/a"]; var r = subSens.cusps.filter(function (x) { return x.house === house; })[0]; if (!r) return ["n/a", "n/a"]; return [vnKpSensFmt(r.next, 1, subSens.cap), vnKpSensFmt(r.prev, -1, subSens.cap)]; }
+    function sensPlanet(nm) { if (!subSens) return ["n/a", "n/a"]; var r = subSens.planets[nm]; if (!r) return ["n/a", "n/a"]; return [vnKpSensFmt(r.next, 1, subSens.cap), vnKpSensFmt(r.prev, -1, subSens.cap)]; }
 
     // running dasa stack at the reading moment
     var stack = []; try { stack = findDashaStack(chart.vimshottari.timeline, asOf); } catch (e) {}
@@ -22465,7 +22565,7 @@
     L.push("Ayanamsa       : Krishnamurti (KP-Old)   value " + decimalToDms(kp.ayanamsa) + "   (= Lahiri Chitrapaksha − 6′00″; e.g. 2001 = 23°46′32″)");
     L.push("House system   : Placidus");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.102");
+    L.push("Software / ver : VedNetra 1.103");
     L.push("Native         : " + nm + "            Sex: " + ((input && input.gender) || "-"));
     L.push("DoB / ToB      : " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
@@ -22484,19 +22584,45 @@
 
     // ===== A1 twelve cusps (CSL → CSL's own sub-lord is the final verdict layer) =====
     L.push("## A1 · Twelve cusps (KP core — Sub Lord IS the CSL; the CSL's OWN sub-lord is the final verdict layer)");
-    L.push(row(["Cusp", "Longitude (Sign d:m:s)", "Sign Lord", "Star Lord", "Sub Lord (CSL)", "CSL signifies", "CSL's sub-lord", "CSL-sub signifies"])); L.push(sep(8));
+    L.push(row(["Cusp", "Longitude (Sign d:m:s)", "Sign Lord", "Star Lord", "Sub Lord (CSL)", "CSL signifies", "CSL's sub-lord", "CSL-sub signifies", "Sub→NEXT", "Sub←PREV"])); L.push(sep(10));
     kp.cusps.forEach(function (c) {
       var csl = c.kp.subLord, cslP = kp.planetsByName[csl], cslSub = cslP ? cslP.kp.subLord : "—";
       var subSig = (cslSub && kp.planetsByName[cslSub]) ? (signified(cslSub).join(",") || "—") : "—";
-      L.push(row([c.house, lonTxt(c.lon), c.signLord, c.kp.starLord, "**" + csl + "**", (signified(csl).join(",") || "—"), "**" + cslSub + "**", subSig]));
+      var sc = sensCusp(c.house);
+      L.push(row([c.house, lonTxt(c.lon), c.signLord, c.kp.starLord, "**" + csl + "**", (signified(csl).join(",") || "—"), "**" + cslSub + "**", subSig, sc[0], sc[1]]));
     });
-    L.push("_For every promise cusp read CSL → its sub-lord: if the CSL house-list looks weak, the CSL-sub often carries the true promise. Never deny a matter on the CSL house-list alone._");
+    L.push("_For every promise cusp read CSL → its sub-lord: if the CSL house-list looks weak, the CSL-sub often carries the true promise. Never deny a matter on the CSL house-list alone. **Sub→NEXT / Sub←PREV** = minutes of later / earlier birth time that would flip this cusp's CSL, and the lord it becomes (`> " + VN_KP_SENS_CAP + " stable` = robust within the search cap) — a single-chart ±minute alternative read with no re-casting._");
     L.push("");
 
     // ===== A2 nine planets =====
     L.push("## A2 · Nine planets (Placidus house = the cusp span the planet falls in)");
-    L.push(row(["Planet", "Longitude (Sign d:m:s)", "Placidus House", "Retro", "Star Lord", "Sub Lord", "Sub-Sub Lord"])); L.push(sep(7));
-    order.forEach(function (n) { var p = kp.planetsByName[n]; if (!p) return; L.push(row([n, lonTxt(p.lon), p.house, (p.retrograde ? "R" : "–"), p.kp.starLord, p.kp.subLord, p.kp.subSubLord])); });
+    L.push(row(["Planet", "Longitude (Sign d:m:s)", "Placidus House", "Retro", "Star Lord", "Sub Lord", "Sub-Sub Lord", "Sub→NEXT", "Sub←PREV"])); L.push(sep(9));
+    order.forEach(function (n) { var p = kp.planetsByName[n]; if (!p) return; var sp = sensPlanet(n); L.push(row([n, lonTxt(p.lon), p.house, (p.retrograde ? "R" : "–"), p.kp.starLord, p.kp.subLord, p.kp.subSubLord, sp[0], sp[1]])); });
+    L.push("_**Sub→NEXT / Sub←PREV** = minutes of later / earlier birth time to flip the planet's sub-lord (non-Moon planets barely move → `> " + VN_KP_SENS_CAP + " stable`; the Moon carries finite values)._");
+    L.push("");
+
+    // ===== A6 sub-lord birth-time stability (±2 min) =====
+    L.push("## A6 · Sub-lord stability (±2-min birth-time test — the KP best-option gate)");
+    if (subSens) {
+      var stabLine = function (list) {
+        if (!list.length) return "none";
+        return list.map(function (u) { return u.pt + " (" + u.from + " → " + u.to + ", " + u.dir + u.min.toFixed(1) + ")"; }).join("; ");
+      };
+      L.push("- **Unstable cusps (flip ≤ ±2.0 min):** " + stabLine(subSens.unstableCusps) + ".");
+      L.push("- **Unstable planets (flip ≤ ±2.0 min):** " + stabLine(subSens.unstablePlanets) + ".");
+      var anyUnstable = subSens.unstableCusps.length + subSens.unstablePlanets.length;
+      if (anyUnstable) {
+        var mattersHit = {};
+        var cuspMatter = { 1: "self/health", 2: "wealth/family", 3: "siblings/effort", 4: "home/mother", 5: "children/mind", 6: "disease/debts/service", 7: "marriage/partnership", 8: "longevity/obstacles", 9: "fortune/father", 10: "profession/status", 11: "gains", 12: "loss/foreign/moksha" };
+        subSens.unstableCusps.forEach(function (u) { var h = parseInt(String(u.pt).replace(/\D/g, ""), 10); if (cuspMatter[h]) mattersHit[cuspMatter[h]] = 1; });
+        L.push("- **Birth-time confidence:** a sub-lord flips within ±2 min — treat the affected matters (" + (Object.keys(mattersHit).join(", ") || "see above") + ") as **time-sensitive**. Read the given time first, then the ±2-min alternative (the flipped sub-lord) as a second opinion; if they disagree, rectify or hedge the verdict.");
+      } else {
+        L.push("- **Birth-time confidence:** no cusp or planet sub-lord flips within ±2 min — the chart is **time-robust** for the ±2-min test; the given-time verdict stands without a re-cast.");
+      }
+      L.push("_Round-trip-verified: re-casting at exactly the printed ±minute reproduces the named sub-lord. Cusp minutes reflect the actual re-cast Placidus rate (latitude- and rising-sign-dependent), not a fixed value._");
+    } else {
+      L.push("_Sensitivity scan unavailable for this input (no natal birth instant, or the re-cast failed)._");
+    }
     L.push("");
 
     // ===== A4 karaka/body-part + A5 relative-rotation (static/pre-built references) =====
@@ -22692,7 +22818,7 @@
     L.push("KP number      : " + hnum + " / 249");
     L.push("House system   : " + kp.houseSystem + "  (equal 30° cusps from the number-seed ascendant — VedNetra KP-horary convention)");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.102");
+    L.push("Software / ver : VedNetra 1.103");
     L.push("Question       : " + ((input && input.question) ? String(input.question) : "-"));
     L.push("Judgment moment: " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
@@ -22793,7 +22919,7 @@
     try { md = vnKpMarkdown(chart, input); }
     catch (e) { md = "Could not build the report: " + (e && e.message ? e.message : e); }
     return '<section id="viewA-kpreport" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Master Export · Default</p><h3>KP System Report</h3></div><span class="small-pill">Krishnamurti · Placidus</span></div>' +
-      '<p class="fine-print">A dedicated <strong>Krishnamurti Paddhati</strong> export — cast on <strong>Krishnamurti ayanamsa (Lahiri − 0.1°)</strong> with <strong>Placidus</strong> cusps and mean nodes, sub-lords to the second, separate from the whole-sign default report. <strong>Natal</strong> (default): A0 header (with birth-time-sensitivity flag), A1 twelve cusps with the <strong>Cuspal Sub-Lord (CSL)</strong>, A2 nine planets with star/sub/sub-sub + Placidus house + retro, A3 four-level Vimshottari with dates, B1–B4 significators / four-step / ruling-planets / CSL promise board, and C1 a transit snapshot. <strong>Horary (Prashna):</strong> enter a <strong>KP number 1–249</strong> in the birth form and put the moment &amp; place of judgment in the date/time/place fields — the report then casts a full KP horary chart (ascendant seeded from the number, cusps, planets, significators, ruling planets, promise board, Prashna-Moon dasa) with no birth data needed. Paste it into the KP project and it runs with no missing inputs.</p>' +
+      '<p class="fine-print">A dedicated <strong>Krishnamurti Paddhati</strong> export — cast on <strong>Krishnamurti ayanamsa (Lahiri − 0.1°)</strong> with <strong>Placidus</strong> cusps and mean nodes, sub-lords to the second, separate from the whole-sign default report. <strong>Natal</strong> (default): A0 header (with birth-time-sensitivity flag), A1 twelve cusps with the <strong>Cuspal Sub-Lord (CSL)</strong> plus <strong>Sub→NEXT / Sub←PREV</strong> birth-time columns (minutes of later / earlier birth time that flip each sub-lord, and the lord it becomes — a single-chart ±minute alternative read), A2 nine planets with the same sub-lord columns, <strong>A6</strong> a ±2-min sub-lord stability roll-up (which cusps/planets are time-sensitive), A3 four-level Vimshottari with dates, B1–B4 significators / four-step / ruling-planets / CSL promise board, and C1 a transit snapshot. <strong>Horary (Prashna):</strong> enter a <strong>KP number 1–249</strong> in the birth form and put the moment &amp; place of judgment in the date/time/place fields — the report then casts a full KP horary chart (ascendant seeded from the number, cusps, planets, significators, ruling planets, promise board, Prashna-Moon dasa) with no birth data needed. Paste it into the KP project and it runs with no missing inputs.</p>' +
       '<div class="vn-tool-actions" style="margin-bottom:10px"><button type="button" id="vnKpPdf" class="primary-action vn-generate-btn">Save as PDF</button> <button type="button" id="vnKpMd" class="input-toggle-btn">Download Markdown</button> <button type="button" id="vnKpCopy" class="input-toggle-btn">Copy (Markdown)</button> <span id="vnKpReportCopyStatus" class="fine-print"></span></div>' +
       '<div class="panel-box"><pre class="vn-native-pre">' + escapeHtml(md) + '</pre></div>' +
       '</section>';
