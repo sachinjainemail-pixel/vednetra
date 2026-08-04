@@ -6177,6 +6177,7 @@
       { id: "viewA-ephemeris",      label: "Ephemeris",         render: function () { return ephemerisSection(chart, input); }, wire: function () { wireEphemerisControls(chart, input); } },
       { id: "viewA-references",     label: "Reference tables",  render: function () { return referenceTablesSection(chart); } },
       { id: "viewA-shadbala",       label: "Shadbala",          render: function () { return shadbalaSection(chart); } },
+      { id: "viewA-planetstrength", label: "Planetary Strength (32-pointer)", render: function () { return planetaryStrengthSection(chart, input); } },
       { id: "viewA-sahams",         label: "Sahams",            render: function () { return sahamsSection(chart, input); } },
       { id: "viewA-jaimini",        label: "Jaimini",           render: function () { return jaiminiSection(chart); } },
       { id: "viewA-compatibility",  label: "Compatibility",     render: function () { return marriageCompatibilityReportSection(chart, input); }, wire: wireCompatibilityInlineControls },
@@ -11226,6 +11227,49 @@
       '</div><p class="fine-print">Classical Shadbala (BPHS / Parashari) in Shashtiamsas: 60 virupas = 1 Rupa. Six heads &mdash; Sthana (Uccha, Saptavargaja, Ojayugma, Kendradi, Drekkana), Dig, Kala (Nathonnatha, Paksha, Tribhaga, Abda/Masa/Vara/Hora, Ayana), Cheshta, Naisargika and Drik. Ratio = total obtained &divide; classically required strength. Rahu/Ketu are judged through dispositor, dignity and house logic elsewhere.</p></section>';
   }
 
+  // Standalone tile for the 32-pointer Planetary Strength composite (same data as
+  // the Consolidated Master Run §I-H), so it can be viewed on its own in the app.
+  function planetaryStrengthSection(chart, input) {
+    var useChart = chart;
+    try {
+      if (input && input.birthInstant && chart.ayanamshaKey !== "lahiri") {
+        useChart = buildChart(input.birthInstant, Number(input.latitude), Number(input.longitude), Number(input.timezone), { ascendantOverride: input.ascendantOverride, ayanamshaKey: "lahiri" });
+      }
+    } catch (e) {}
+    var s32;
+    try { s32 = vnStrength32(useChart, input); }
+    catch (e) { return '<section id="viewA-planetstrength" class="section"><div class="section-head"><div><p class="eyebrow">Balas &amp; Phalas</p><h3>Planetary Strength (32-pointer)</h3></div></div><p class="fine-print">Unavailable: ' + escapeHtml(e && e.message ? e.message : String(e)) + '</p></section>'; }
+    var order = s32.order;
+    var maleficRows = { 17: 1, 18: 1, 25: 1, 28: 1, 29: 1 }; // 0-indexed rows scored "absent = good"
+    var summary = '<div class="table-wrap"><table><thead><tr><th>Planet</th><th>Net score</th><th>Percent</th><th>Auspiciousness band</th></tr></thead><tbody>' +
+      order.map(function (n) {
+        var r = s32.rows[n];
+        return "<tr><td><strong>" + escapeHtml(n) + "</strong></td><td><strong>" + r.total.toFixed(1) + " / 32</strong></td><td>" + r.pct.toFixed(0) + "%</td><td>" + escapeHtml(r.band) + "</td></tr>";
+      }).join("") + "</tbody></table></div>";
+    var bars = '<div class="panel-box shadbala-graph-panel"><h3>Net strength &amp; auspiciousness (out of 32)</h3>' +
+      order.map(function (n) {
+        var r = s32.rows[n], percent = Math.round(clamp(r.total / 32, 0, 1) * 100);
+        return '<div class="strength-bar-row"><strong>' + escapeHtml(n) + '</strong><div class="strength-track"><span style="width:' + percent + '%"></span></div><em>' + r.total.toFixed(1) + " / 32</em></div>";
+      }).join("") + "</div>";
+    var head = "<tr><th>Pointer</th>" + order.map(function (n) { return "<th>" + escapeHtml(n) + "</th>"; }).join("") + "</tr>";
+    var body = s32.names.map(function (nm, i) {
+      var cells = order.map(function (n) {
+        var v = s32.rows[n].points[i];
+        var cls = v >= 0.75 ? ' class="ps-hi"' : v <= 0.25 ? ' class="ps-lo"' : '';
+        return "<td" + cls + ">" + v.toFixed(2) + "</td>";
+      }).join("");
+      return "<tr" + (maleficRows[i] ? ' class="ps-malefic"' : "") + "><td>" + escapeHtml(nm) + "</td>" + cells + "</tr>";
+    }).join("");
+    var totalRow = '<tr class="ps-total"><td><strong>Net / 32</strong></td>' + order.map(function (n) { return "<td><strong>" + s32.rows[n].total.toFixed(1) + "</strong></td>"; }).join("") + "</tr>";
+    var pctRow = '<tr class="ps-total"><td><strong>Percent</strong></td>' + order.map(function (n) { return "<td>" + s32.rows[n].pct.toFixed(0) + "%</td>"; }).join("") + "</tr>";
+    var matrix = '<div class="table-wrap"><table class="ps-matrix"><thead>' + head + "</thead><tbody>" + body + totalRow + pctRow + "</tbody></table></div>";
+    return '<section id="viewA-planetstrength" class="section planet-strength-section">' +
+      '<div class="section-head"><div><p class="eyebrow">Balas &amp; Phalas</p><h3>Planetary Strength &amp; Auspiciousness (32-pointer)</h3></div><span class="small-pill">Lahiri · equal-weight</span></div>' +
+      '<p class="fine-print">Each of the nine planets scored across <strong>32 classical strength pointers</strong>, every pointer weighted equally (0–1), giving a <strong>net score out of 32</strong>, a percent and an auspiciousness band. Same composite as the Consolidated Master Run <strong>§I-H</strong>, now viewable on its own.</p>' +
+      summary + bars + matrix +
+      '<p class="fine-print">Positive-quality pointers score higher with more of the quality. The five <strong>malefic-quality</strong> pointers (highlighted rows) &mdash; #18 Combustion, #19 Planetary War, #26 Kendr&#257;dhipati Do&#7779;a, #29 Debilitation (uncancelled), #30 Affliction &mdash; award the point when that quality is <strong>absent</strong>. &#7778;a&#7693;bala heads, I&#7779;&#7789;a&ndash;Ka&#7779;&#7789;a, Vim&#347;opaka and Ashtakavarga come from the classical engines; relative balas are normalised across the seven classical planets. R&#257;hu/Ketu take classical-only balas via their sign-dispositor. A computed strength lens (Lahiri) &mdash; not a life-outcome verdict.</p>' +
+      '</section>';
+  }
   function shadbalaRows(chart) {
     return CLASSICAL_PLANETS.map(function (name) {
       var p = chart.planetsByName[name];
@@ -18012,6 +18056,7 @@
     ] },
     { title: "Strengths & Systems", items: [
       { id: "viewA-shadbala", label: "Shadbala", desc: "Six-fold planetary strength." },
+      { id: "viewA-planetstrength", label: "Planetary Strength (32-pointer)", desc: "Equal-weight composite scoring all 9 planets across 32 classical strength pointers (dignity, Bhava/Shadbala heads, Vimshopaka, divisional, Ashtakavarga, Ishta–Kashta, avastha, combustion, war, conjunctions, aspects, dispositor/nakshatra-lord strength, functional status, yogas, neecha-bhanga, affliction, significations) — with a net score out of 32, percent and auspiciousness band per planet. Same as Consolidated Master Run §I-H." },
       { id: "viewA-sahams", label: "Sahams", desc: "Full set of Tajika Sahams (sensitive points) — Punya, Vidya, Vivaha, Putra, Karma, Roga, Ayu and 20 more, with sign/degree/house and formula." },
       { id: "viewA-sav", label: "Ashtakavarga (SAV)", desc: "Sarvashtakavarga bindu totals." },
       { id: "viewA-bav", label: "Bhinnashtakavarga", desc: "Per-planet ashtakavarga." },
@@ -22696,7 +22741,7 @@
     L.push("Ayanamsa       : Krishnamurti (KP-Old)   value " + decimalToDms(kp.ayanamsa) + "   (= Lahiri Chitrapaksha − 6′00″; e.g. 2001 = 23°46′32″)");
     L.push("House system   : Placidus");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.104");
+    L.push("Software / ver : VedNetra 1.105");
     L.push("Native         : " + nm + "            Sex: " + ((input && input.gender) || "-"));
     L.push("DoB / ToB      : " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
@@ -22949,7 +22994,7 @@
     L.push("KP number      : " + hnum + " / 249");
     L.push("House system   : " + kp.houseSystem + "  (equal 30° cusps from the number-seed ascendant — VedNetra KP-horary convention)");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.104");
+    L.push("Software / ver : VedNetra 1.105");
     L.push("Question       : " + ((input && input.question) ? String(input.question) : "-"));
     L.push("Judgment moment: " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
