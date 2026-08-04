@@ -1406,6 +1406,28 @@ button:hover {
   background: linear-gradient(90deg, var(--amber), var(--accent));
 }
 
+/* 32-pointer Planetary Strength matrix */
+.ps-matrix th:first-child,
+.ps-matrix td:first-child {
+  text-align: left;
+  white-space: nowrap;
+  position: sticky;
+  left: 0;
+  background: var(--panel, #fff);
+}
+.ps-matrix td { text-align: center; }
+.ps-matrix td.ps-hi { background: rgba(46, 160, 67, 0.16); font-weight: 600; }
+.ps-matrix td.ps-lo { background: rgba(210, 70, 70, 0.14); }
+.ps-matrix tr.ps-malefic td:first-child { font-style: italic; }
+.ps-matrix tr.ps-malefic td:first-child::after { content: " ⚠"; opacity: 0.7; }
+.ps-matrix tr.ps-total td { border-top: 2px solid var(--accent, #b07a2c); background: rgba(176, 122, 44, 0.10); }
+@media (prefers-color-scheme: dark) {
+  .ps-matrix th:first-child,
+  .ps-matrix td:first-child { background: var(--panel, #1b1b1f); }
+  .ps-matrix td.ps-hi { background: rgba(46, 160, 67, 0.24); }
+  .ps-matrix td.ps-lo { background: rgba(210, 70, 70, 0.22); }
+}
+
 table {
   width: max-content;
   border-collapse: collapse;
