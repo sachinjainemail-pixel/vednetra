@@ -11241,12 +11241,12 @@
     catch (e) { return '<section id="viewA-planetstrength" class="section"><div class="section-head"><div><p class="eyebrow">Balas &amp; Phalas</p><h3>Planetary Strength (32-pointer)</h3></div></div><p class="fine-print">Unavailable: ' + escapeHtml(e && e.message ? e.message : String(e)) + '</p></section>'; }
     var order = s32.order;
     var maleficRows = { 17: 1, 18: 1, 25: 1, 28: 1, 29: 1 }; // 0-indexed rows scored "absent = good"
-    var summary = '<div class="table-wrap"><table><thead><tr><th>Planet</th><th>Net score</th><th>Percent</th><th>Auspiciousness band</th></tr></thead><tbody>' +
+    var summary = '<div class="table-wrap"><table><thead><tr><th>Planet</th><th>Net score</th><th>Percent</th><th>Strength band</th></tr></thead><tbody>' +
       order.map(function (n) {
         var r = s32.rows[n];
         return "<tr><td><strong>" + escapeHtml(n) + "</strong></td><td><strong>" + r.total.toFixed(1) + " / 32</strong></td><td>" + r.pct.toFixed(0) + "%</td><td>" + escapeHtml(r.band) + "</td></tr>";
       }).join("") + "</tbody></table></div>";
-    var bars = '<div class="panel-box shadbala-graph-panel"><h3>Net strength &amp; auspiciousness (out of 32)</h3>' +
+    var bars = '<div class="panel-box shadbala-graph-panel"><h3>Net strength (out of 32)</h3>' +
       order.map(function (n) {
         var r = s32.rows[n], percent = Math.round(clamp(r.total / 32, 0, 1) * 100);
         return '<div class="strength-bar-row"><strong>' + escapeHtml(n) + '</strong><div class="strength-track"><span style="width:' + percent + '%"></span></div><em>' + r.total.toFixed(1) + " / 32</em></div>";
@@ -11264,8 +11264,8 @@
     var pctRow = '<tr class="ps-total"><td><strong>Percent</strong></td>' + order.map(function (n) { return "<td>" + s32.rows[n].pct.toFixed(0) + "%</td>"; }).join("") + "</tr>";
     var matrix = '<div class="table-wrap"><table class="ps-matrix"><thead>' + head + "</thead><tbody>" + body + totalRow + pctRow + "</tbody></table></div>";
     return '<section id="viewA-planetstrength" class="section planet-strength-section">' +
-      '<div class="section-head"><div><p class="eyebrow">Balas &amp; Phalas</p><h3>Planetary Strength &amp; Auspiciousness (32-pointer)</h3></div><span class="small-pill">Lahiri · equal-weight</span></div>' +
-      '<p class="fine-print">Each of the nine planets scored across <strong>32 classical strength pointers</strong>, every pointer weighted equally (0–1), giving a <strong>net score out of 32</strong>, a percent and an auspiciousness band. Same composite as the Consolidated Master Run <strong>§I-H</strong>, now viewable on its own.</p>' +
+      '<div class="section-head"><div><p class="eyebrow">Balas &amp; Phalas</p><h3>Planetary Strength (32-pointer)</h3></div><span class="small-pill">Lahiri · equal-weight</span></div>' +
+      '<p class="fine-print">Each of the nine planets scored across <strong>32 classical strength pointers</strong>, every pointer weighted equally (0–1), giving a <strong>net score out of 32</strong>, a percent and a strength band. Same composite as the Consolidated Master Run <strong>§I-H</strong>, now viewable on its own. This is a measure of a planet&rsquo;s <strong>strength/condition</strong> only &mdash; <strong>not</strong> the auspiciousness of its results: a very strong planet can still give difficult outcomes depending on its ownership, dasha and the question.</p>' +
       summary + bars + matrix +
       '<p class="fine-print">Positive-quality pointers score higher with more of the quality. The five <strong>malefic-quality</strong> pointers (highlighted rows) &mdash; #18 Combustion, #19 Planetary War, #26 Kendr&#257;dhipati Do&#7779;a, #29 Debilitation (uncancelled), #30 Affliction &mdash; award the point when that quality is <strong>absent</strong>. &#7778;a&#7693;bala heads, I&#7779;&#7789;a&ndash;Ka&#7779;&#7789;a, Vim&#347;opaka and Ashtakavarga come from the classical engines; relative balas are normalised across the seven classical planets. R&#257;hu/Ketu take classical-only balas via their sign-dispositor. A computed strength lens (Lahiri) &mdash; not a life-outcome verdict.</p>' +
       '</section>';
@@ -18056,7 +18056,7 @@
     ] },
     { title: "Strengths & Systems", items: [
       { id: "viewA-shadbala", label: "Shadbala", desc: "Six-fold planetary strength." },
-      { id: "viewA-planetstrength", label: "Planetary Strength (32-pointer)", desc: "Equal-weight composite scoring all 9 planets across 32 classical strength pointers (dignity, Bhava/Shadbala heads, Vimshopaka, divisional, Ashtakavarga, Ishta–Kashta, avastha, combustion, war, conjunctions, aspects, dispositor/nakshatra-lord strength, functional status, yogas, neecha-bhanga, affliction, significations) — with a net score out of 32, percent and auspiciousness band per planet. Same as Consolidated Master Run §I-H." },
+      { id: "viewA-planetstrength", label: "Planetary Strength (32-pointer)", desc: "Equal-weight composite scoring all 9 planets across 32 classical strength pointers (dignity, Bhava/Shadbala heads, Vimshopaka, divisional, Ashtakavarga, Ishta–Kashta, avastha, combustion, war, conjunctions, aspects, dispositor/nakshatra-lord strength, functional status, yogas, neecha-bhanga, affliction, significations) — with a net score out of 32, percent and strength band per planet. Measures strength/condition, not auspiciousness of results. Same as Consolidated Master Run §I-H." },
       { id: "viewA-sahams", label: "Sahams", desc: "Full set of Tajika Sahams (sensitive points) — Punya, Vidya, Vivaha, Putra, Karma, Roga, Ayu and 20 more, with sign/degree/house and formula." },
       { id: "viewA-sav", label: "Ashtakavarga (SAV)", desc: "Sarvashtakavarga bindu totals." },
       { id: "viewA-bav", label: "Bhinnashtakavarga", desc: "Per-planet ashtakavarga." },
@@ -18077,7 +18077,7 @@
       { id: "viewA-nativereport", label: "Native Input Report", desc: "Full v3 native export (§0–§16): fragility flags, guna, sphutas, sahams, rupa Ṣaḍbala, prastarāṣṭakavarga, D16, Parivritti-D10, full-life dashas, ingress + natal-return transits." },
       { id: "viewA-vapmreport", label: "VAPM Export", desc: "VAPM export spec (Lahiri, §1–§14 + Part B): master table, aspect/Kartari table, functional nature, Chandra/Surya Lagna, all vargas + Dashavarga count, Ashtakavarga incl. Shodhya Pinda, Vimshottari/Yogini/Jaimini, Indu Lagna, Tara Chakra, transits, four-fold scaffolds." },
       { id: "viewA-vapmnakreport", label: "VAPM + Nakshatra Report", desc: "Full export (Lahiri): the whole VAPM export plus the §15 Nakshatra Layer — within-nakshatra degrees, Gandanta (48′/3°20′), Abhijit, Navatara points, pada-level navamsa dignity, Nadi/dosha and Yoni/Gana matching factors." },
-      { id: "viewA-consolidatedmaster", label: "Consolidated Master Run", desc: "One-sheet master run covering all four projects (Lahiri): Mehta+Sutton (VAPM), Trinetra (Promise/Star/Time), Umesh Puri (LP+Gochar) and Triveni (BPHS·BJ·PD). Part I is the universal computed data core — incl. §I-H, a 32-pointer equal-weight Planetary Strength & Auspiciousness composite with a net score out of 32 per planet; Part II re-frames it through each project's method lens." },
+      { id: "viewA-consolidatedmaster", label: "Consolidated Master Run", desc: "One-sheet master run covering all four projects (Lahiri): Mehta+Sutton (VAPM), Trinetra (Promise/Star/Time), Umesh Puri (LP+Gochar) and Triveni (BPHS·BJ·PD). Part I is the universal computed data core — incl. §I-H, a 32-pointer equal-weight Planetary Strength composite with a net score out of 32 per planet (strength, not auspiciousness of results); Part II re-frames it through each project's method lens." },
       { id: "viewA-kpreport", label: "KP System Report", desc: "DEFAULT — dedicated Krishnamurti Paddhati export (Krishnamurti ayanamsa − Lahiri−0.1°, Placidus, mean nodes, sub-lords to the second). Natal AND horary (Prashna 1–249): A0 header + birth-time-sensitivity, A1 twelve cusps with the CSL and its OWN sub-lord (final verdict layer), A1/A2 also print Sub→NEXT / Sub←PREV (minutes of birth-time error that flip each sub-lord, and to which lord), A2 nine planets star/sub/sub-sub + house + retro, A6 a ±2-min sub-lord stability roll-up, A4 karaka/body-part master, A5 relative-rotation map, A3 four-level Vimshottari, B1–B4 significators/ruling-planets/CSL promise board (with CSL-sub), B5 event-group scan, B6 money-direction flag, B7 badhaka/maraka, C1 natal-house transit + Moon star-lord + rising lagna, C2 Prana ladder, and an anti-anchoring self-check." },
       { id: "viewA-trivenireport", label: "Triveni Chart Intake", desc: "Intake sheet (Lahiri, §0–§17): D1 sign-deg-min, unequal Sripati bhava cusps, Dasavarga, Shadbala pass/fail + Vimsopaka + Ishta/Kashta + bhava-sandhi, Ashtakavarga + Shodhya Pinda, Vimshottari, Jaimini 8-karaka, longevity + conditional dashas, full MD-AD-PD, gochara, Sahams, Varshaphal, Panchang, planetary strength." },
       { id: "viewA-trinetrareport", label: "Trinetra Master Run", desc: "Three-eye worksheet (Lahiri, §0–§8): intake/ayanamsa gate, Eye 1 Promise (eight-factor engine, yogas+bhanga, longevity ordinal), Eye 2 Star (nakshatra-pada, Navatara from Moon & Lagna, the one-way override), Eye 3 Time (functional nature, maraka danger, per-bhavesha firing test + gochara), grade/resolve, guardrails." },
@@ -22081,7 +22081,7 @@
     for (var i = 0; i < keys.length; i++) if (t.indexOf(keys[i]) >= 0) return VN_ROUTING[map[keys[i]]];
     return null;
   }
-  // ===== 32-pointer Planetary Strength & Auspiciousness (Consolidated §I-H) =====
+  // ===== 32-pointer Planetary Strength (Consolidated §I-H) =====
   // Each of 32 classical dimensions scores 0..1 per planet with EQUAL weight; the
   // net score is their sum (max 32). Positive-quality pointers score higher with
   // more of the quality. The five malefic-quality pointers (#18 combustion,
@@ -22101,7 +22101,7 @@
     var classical = CLASSICAL_PLANETS, asc = chart.ascendant;
     function clamp(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
     function dispClamp(score) { return clamp((score || 0) / 60); }
-    function band(pct) { return pct >= 80 ? "Highly auspicious" : pct >= 65 ? "Auspicious / strong" : pct >= 50 ? "Moderate" : pct >= 35 ? "Weak" : "Very weak / afflicted"; }
+    function band(pct) { return pct >= 80 ? "Very strong" : pct >= 65 ? "Strong" : pct >= 50 ? "Moderate" : pct >= 35 ? "Weak" : "Very weak"; }
     function coScore(list) { var s = 0; list.forEach(function (o) { s += o.naturalNature === "Benefic" ? 1 : o.naturalNature === "Malefic" ? 0 : 0.5; }); return clamp(s / list.length); }
     var owned = {}; classical.forEach(function (n) { owned[n] = []; });
     for (var h = 1; h <= 12; h++) { var lo = lordOfHouse(chart, h); if (owned[lo]) owned[lo].push(h); }
@@ -22227,7 +22227,7 @@
 
     // ============ PART I — UNIVERSAL DATA CORE ============
     L.push("# PART I · UNIVERSAL DATA CORE");
-    L.push("_The computed spine all four projects read. §I-0 → §I-17 below are the full VedNetra data export (intake, D1, bhava, Dasavarga, nine strength dimensions, Ashtakavarga + Shodhya Pinda, sub-planets & sphutas, full Vimshottari MD→AD→PD, Jaimini, longevity, Jupiter/Saturn gochara, Sahams, Varshaphal, Panchang, yogas); §I-A → §I-G add the cross-project connective data; §I-H is the 32-pointer equal-weight planetary-strength & auspiciousness composite (net score per planet)._");
+    L.push("_The computed spine all four projects read. §I-0 → §I-17 below are the full VedNetra data export (intake, D1, bhava, Dasavarga, nine strength dimensions, Ashtakavarga + Shodhya Pinda, sub-planets & sphutas, full Vimshottari MD→AD→PD, Jaimini, longevity, Jupiter/Saturn gochara, Sahams, Varshaphal, Panchang, yogas); §I-A → §I-G add the cross-project connective data; §I-H is the 32-pointer equal-weight planetary-strength composite (net score per planet — strength, not a verdict on auspiciousness of results)._");
     L.push("");
     var triv = ""; try { triv = vnTriveniMarkdown(chart, input); } catch (e) {}
     var trivCore = sliceMd(triv, "## 0 · Header", "**Coverage:**");
@@ -22336,12 +22336,12 @@
     L.push("- **This native's question:** " + ((input && input.question) ? String(input.question) : "_(none entered — set the Question/topic in the chart form)_") + (routed ? " → **routed to " + routed[0] + "** (house " + routed[1] + ", karaka " + routed[2] + ", varga " + routed[3] + ", file " + routed[4] + ")." : "."));
     L.push("");
 
-    // §I-H · 32-pointer Planetary Strength & Auspiciousness (equal-weight composite)
-    L.push("## §I-H · Planetary Strength & Auspiciousness (32-pointer composite, equal weight)");
+    // §I-H · 32-pointer Planetary Strength (equal-weight composite)
+    L.push("## §I-H · Planetary Strength (32-pointer composite, equal weight)");
     try {
       var s32 = vnStrength32(chart, input);
-      L.push("**Net strength & auspiciousness score — each of the 9 planets, max 32 (all 32 classical pointers weighted equally; a planet carrying every quality scores 32):**");
-      L.push(row(["Planet", "Net score /32", "Percent", "Auspiciousness band"])); L.push(sep(4));
+      L.push("**Net strength score — each of the 9 planets, max 32 (all 32 classical pointers weighted equally; a planet carrying every strength quality scores 32):**");
+      L.push(row(["Planet", "Net score /32", "Percent", "Strength band"])); L.push(sep(4));
       s32.order.forEach(function (n) { var r = s32.rows[n]; L.push(row([n, "**" + r.total.toFixed(1) + " / 32**", r.pct.toFixed(0) + "%", r.band])); });
       L.push("");
       L.push("**Per-pointer breakdown (each cell 0–1; the five malefic-quality pointers score 1 when the negative quality is ABSENT):**");
@@ -22350,7 +22350,7 @@
       L.push(row(["**Net /32**"].concat(s32.order.map(function (n) { return "**" + s32.rows[n].total.toFixed(1) + "**"; }))));
       L.push(row(["**Percent**"].concat(s32.order.map(function (n) { return s32.rows[n].pct.toFixed(0) + "%"; }))));
       L.push("");
-      L.push("_Method: every pointer contributes **0–1 with equal weight**, so the maximum net is 32. Positive-quality pointers score higher with more of the quality; the malefic-quality pointers — **#18 Combustion, #19 Planetary War, #26 Kendrādhipati Doṣa, #29 Debilitation (uncancelled), #30 Affliction** — award the point when that quality is **absent**. Ṣaḍbala components (Sthāna/Dig/Kāla/Cheshtā/Naisargika/Drik), Kāla-dependent balas and Iṣṭa–Kaṣṭa come from the classical Ṣaḍbala engine; relative balas are normalised across the seven classical planets so the strongest scores full. **Rāhu/Ketu** take the classical-only balas (Ṣaḍbala, Iṣṭa–Kaṣṭa, Vimśopaka, dignity, divisional, Ashtakavarga) via their **sign-dispositor**, while house/avasthā/conjunction/aspect/node-direct pointers are computed for the node itself. This is a **computed strength lens (Lahiri)** — not a life-outcome verdict; read it beside the project lenses in Part II._");
+      L.push("_Method: every pointer contributes **0–1 with equal weight**, so the maximum net is 32. Positive-quality pointers score higher with more of the quality; the malefic-quality pointers — **#18 Combustion, #19 Planetary War, #26 Kendrādhipati Doṣa, #29 Debilitation (uncancelled), #30 Affliction** — award the point when that quality is **absent**. Ṣaḍbala components (Sthāna/Dig/Kāla/Cheshtā/Naisargika/Drik), Kāla-dependent balas and Iṣṭa–Kaṣṭa come from the classical Ṣaḍbala engine; relative balas are normalised across the seven classical planets so the strongest scores full. **Rāhu/Ketu** take the classical-only balas (Ṣaḍbala, Iṣṭa–Kaṣṭa, Vimśopaka, dignity, divisional, Ashtakavarga) via their **sign-dispositor**, while house/avasthā/conjunction/aspect/node-direct pointers are computed for the node itself. This is a **computed strength lens (Lahiri)** — a measure of a planet's strength/condition, **not** the auspiciousness of its results: a very strong planet can still deliver difficult (inauspicious) outcomes depending on its ownership, dasha and the question. Read it beside the project lenses in Part II._");
       L.push("");
     } catch (e) { L.push("_Planetary-strength composite unavailable: " + (e && e.message ? e.message : e) + "_"); L.push(""); }
 
@@ -22441,7 +22441,7 @@
     try { md = vnConsolidatedMarkdown(chart, input); }
     catch (e) { md = "Could not build the report: " + (e && e.message ? e.message : e); }
     return '<section id="viewA-consolidatedmaster" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Master Export</p><h3>Consolidated Master Run</h3></div><span class="small-pill">Lahiri · 4 projects</span></div>' +
-      '<p class="fine-print">The <strong>default</strong> one-sheet master run that covers all four projects at once — <strong>Mehta + Sutton (VAPM)</strong>, <strong>Trinetra (Promise/Star/Time)</strong>, <strong>Umesh Puri (Laghu Parashari + Gochar)</strong> and <strong>Triveni (BPHS·BJ·PD three-witness)</strong>. Always Lahiri (Chitrapaksha). <strong>Part I</strong> is the universal computed data core (full VedNetra export §I-0→§I-17 plus reference lagnas, planet-ledger union with pada dignity + Navatara from Moon &amp; Lagna + gandanta + BAV, LP p.68 scores + functional nature, sambandhas/raja-yoga, Yogini/Chara/Sade-Sati, nakshatra sweep, routing map, and a <strong>§I-H 32-pointer equal-weight Planetary Strength &amp; Auspiciousness composite</strong> with a net score out of 32 per planet); <strong>Part II</strong> re-frames the same data through each project&rsquo;s method lens. External book corpora are scaffolded, never gap-filled; guardrails are the union of all four (no lifespan/death timing).</p>' +
+      '<p class="fine-print">The <strong>default</strong> one-sheet master run that covers all four projects at once — <strong>Mehta + Sutton (VAPM)</strong>, <strong>Trinetra (Promise/Star/Time)</strong>, <strong>Umesh Puri (Laghu Parashari + Gochar)</strong> and <strong>Triveni (BPHS·BJ·PD three-witness)</strong>. Always Lahiri (Chitrapaksha). <strong>Part I</strong> is the universal computed data core (full VedNetra export §I-0→§I-17 plus reference lagnas, planet-ledger union with pada dignity + Navatara from Moon &amp; Lagna + gandanta + BAV, LP p.68 scores + functional nature, sambandhas/raja-yoga, Yogini/Chara/Sade-Sati, nakshatra sweep, routing map, and a <strong>§I-H 32-pointer equal-weight Planetary Strength composite</strong> with a net score out of 32 per planet — strength/condition, not a verdict on auspiciousness of results); <strong>Part II</strong> re-frames the same data through each project&rsquo;s method lens. External book corpora are scaffolded, never gap-filled; guardrails are the union of all four (no lifespan/death timing).</p>' +
       '<div class="vn-tool-actions" style="margin-bottom:10px"><button type="button" id="vnConsPdf" class="primary-action vn-generate-btn">Save as PDF</button> <button type="button" id="vnConsMd" class="input-toggle-btn">Download Markdown</button> <button type="button" id="vnConsCopy" class="input-toggle-btn">Copy (Markdown)</button> <span id="vnConsCopyStatus" class="fine-print"></span></div>' +
       '<div class="panel-box"><pre class="vn-native-pre">' + escapeHtml(md) + '</pre></div>' +
       '</section>';
@@ -22741,7 +22741,7 @@
     L.push("Ayanamsa       : Krishnamurti (KP-Old)   value " + decimalToDms(kp.ayanamsa) + "   (= Lahiri Chitrapaksha − 6′00″; e.g. 2001 = 23°46′32″)");
     L.push("House system   : Placidus");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.105");
+    L.push("Software / ver : VedNetra 1.106");
     L.push("Native         : " + nm + "            Sex: " + ((input && input.gender) || "-"));
     L.push("DoB / ToB      : " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
@@ -22994,7 +22994,7 @@
     L.push("KP number      : " + hnum + " / 249");
     L.push("House system   : " + kp.houseSystem + "  (equal 30° cusps from the number-seed ascendant — VedNetra KP-horary convention)");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.105");
+    L.push("Software / ver : VedNetra 1.106");
     L.push("Question       : " + ((input && input.question) ? String(input.question) : "-"));
     L.push("Judgment moment: " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
