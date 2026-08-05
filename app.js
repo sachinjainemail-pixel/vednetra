@@ -6178,6 +6178,7 @@
       { id: "viewA-references",     label: "Reference tables",  render: function () { return referenceTablesSection(chart); } },
       { id: "viewA-shadbala",       label: "Shadbala",          render: function () { return shadbalaSection(chart); } },
       { id: "viewA-planetstrength", label: "Planetary Strength (32-pointer)", render: function () { return planetaryStrengthSection(chart, input); } },
+      { id: "viewA-trinetra",       label: "Trinetra (rule-base)", render: function () { return trinetraSection(chart, input); } },
       { id: "viewA-sahams",         label: "Sahams",            render: function () { return sahamsSection(chart, input); } },
       { id: "viewA-jaimini",        label: "Jaimini",           render: function () { return jaiminiSection(chart); } },
       { id: "viewA-compatibility",  label: "Compatibility",     render: function () { return marriageCompatibilityReportSection(chart, input); }, wire: wireCompatibilityInlineControls },
@@ -11269,6 +11270,105 @@
       summary + bars + matrix +
       '<p class="fine-print">Positive-quality pointers score higher with more of the quality. The five <strong>malefic-quality</strong> pointers (highlighted rows) &mdash; #18 Combustion, #19 Planetary War, #26 Kendr&#257;dhipati Do&#7779;a, #29 Debilitation (uncancelled), #30 Affliction &mdash; award the point when that quality is <strong>absent</strong>. &#7778;a&#7693;bala heads, I&#7779;&#7789;a&ndash;Ka&#7779;&#7789;a, Vim&#347;opaka and Ashtakavarga come from the classical engines; relative balas are normalised across the seven classical planets. R&#257;hu/Ketu take classical-only balas via their sign-dispositor. A computed strength lens (Lahiri) &mdash; not a life-outcome verdict.</p>' +
       '</section>';
+  }
+  // ===================================================================
+  // TRINETRA — Promise (classical rules) / Star (nakshatra) / Time (dasha-transit)
+  // rule-matching engine. Rules are compiled offline into predicate clauses
+  // (window.TRINETRA_RULES); this evaluates them against the native's chart.
+  // ===================================================================
+  function trinetraEvalClause(chart, c) {
+    var P = chart.planetsByName;
+    switch (c.t) {
+      case "planetInHouse": return !!(P[c.p] && P[c.p].house === c.h);
+      case "planetInSign": return !!(P[c.p] && P[c.p].sign === c.s);
+      case "planetInNak": return !!(P[c.p] && nakshatraInfo(P[c.p].lon).index === c.n);
+      case "lordInHouse": { var L = P[lordOfHouse(chart, c.of)]; return !!(L && L.house === c.h); }
+      case "lordInSign": { var L2 = P[lordOfHouse(chart, c.of)]; return !!(L2 && L2.sign === c.s); }
+      case "planetHouseFrom": { var rp = c.ref === "Lagna" ? chart.ascendant : P[c.ref]; var tp = P[c.p]; return !!(rp && tp && houseFromSign(rp.sign, tp.sign) === c.h); }
+      case "lordHouseFrom": { var rp2 = c.ref === "Lagna" ? chart.ascendant : P[c.ref]; var tp2 = P[lordOfHouse(chart, c.of)]; return !!(rp2 && tp2 && houseFromSign(rp2.sign, tp2.sign) === c.h); }
+      case "assoc": return (P[c.a] && P[c.b]) ? hasSambandha(chart, c.a, c.b) : false;
+      case "aspectsHouse": return !!(P[c.p] && planetAspectsHouse(P[c.p], c.h));
+      case "dignity": {
+        var p = P[c.p]; if (!p) return false;
+        if (c.d === "Retro") return !!p.retrograde;
+        if (c.d === "Combust") return !!p.combust;
+        if (c.d === "Own") return p.dignity === "Own sign" || p.dignity === "Moolatrikona";
+        return p.dignity === c.d;
+      }
+    }
+    return false;
+  }
+  var TRINETRA_CLAUSE_TXT = {
+    planetInHouse: function (c) { return c.p + " in H" + c.h; },
+    planetInSign: function (c) { return c.p + " in " + SIGNS[c.s].name; },
+    planetInNak: function (c) { return c.p + " in " + NAKSHATRAS[c.n]; },
+    lordInHouse: function (c) { return c.of + "L in H" + c.h; },
+    lordInSign: function (c) { return c.of + "L in " + SIGNS[c.s].name; },
+    planetHouseFrom: function (c) { return c.p + " in H" + c.h + " from " + c.ref; },
+    lordHouseFrom: function (c) { return c.of + "L in H" + c.h + " from " + c.ref; },
+    assoc: function (c) { return c.a + "↔" + c.b; },
+    aspectsHouse: function (c) { return c.p + " aspects H" + c.h; },
+    dignity: function (c) { return c.p + " " + c.d; }
+  };
+  function trinetraFiredText(fired) {
+    return fired.map(function (c) { var f = TRINETRA_CLAUSE_TXT[c.t]; return f ? f(c) : c.t; }).join(", ");
+  }
+  // match all rules (optionally one area) against the chart; OR-semantics with the
+  // fired triggers shown, so the reader verifies the full stated condition.
+  function trinetraMatch(chart, area) {
+    var rules = (typeof window !== "undefined" && window.TRINETRA_RULES) || [];
+    var matched = [], total = 0, compiled = 0;
+    rules.forEach(function (r) {
+      if (area && r.area !== area) return;
+      total++;
+      if (!r.clauses || !r.clauses.length) return;
+      compiled++;
+      var fired = r.clauses.filter(function (c) { try { return trinetraEvalClause(chart, c); } catch (e) { return false; } });
+      if (fired.length) matched.push({ r: r, fired: fired });
+    });
+    return { matched: matched, total: total, compiled: compiled };
+  }
+  function trinetraSection(chart, input) {
+    var useChart = chart;
+    try {
+      if (input && input.birthInstant && chart.ayanamshaKey !== "lahiri") {
+        useChart = buildChart(input.birthInstant, Number(input.latitude), Number(input.longitude), Number(input.timezone), { ascendantOverride: input.ascendantOverride, ayanamshaKey: "lahiri" });
+      }
+    } catch (e) {}
+    var loaded = (typeof window !== "undefined" && window.TRINETRA_RULES && window.TRINETRA_RULES.length) || 0;
+    var head = '<section id="viewA-trinetra" class="section trinetra-section"><div class="section-head"><div><p class="eyebrow">Trinetra · Promise / Star / Time</p><h3>Trinetra — Applicable Classical Rules</h3></div><span class="small-pill">Lahiri · rule-base</span></div>';
+    if (!loaded) {
+      return head + '<p class="fine-print">The Trinetra rule-base (<code>trinetra-rules.js</code>) is not loaded in this build yet. This section lists every classical dictum whose stated placement is present in the native\'s chart, grouped by life area.</p></section>';
+    }
+    var res = trinetraMatch(useChart);
+    // group matched by area then sub-event
+    var byArea = {};
+    res.matched.forEach(function (mo) { var a = mo.r.area || "General"; (byArea[a] = byArea[a] || []).push(mo); });
+    var areas = Object.keys(byArea).sort();
+    var pctC = res.total ? (100 * res.compiled / res.total).toFixed(0) : "0";
+    var html = head +
+      '<p class="fine-print"><strong>' + res.matched.length + ' applicable rules</strong> for this native, drawn from <strong>' + res.total + '</strong> loaded classical dictums (' + res.compiled + ' machine-evaluable, ~' + pctC + '%; the rest are reference-only and not matched here). Each row shows the rule text and the <em>trigger(s)</em> in this chart that fired it — always read the full stated condition. Cast on <strong>Lahiri</strong>.</p>';
+    areas.forEach(function (a) {
+      var list = byArea[a];
+      // group by sub-event within area
+      var bySub = {};
+      list.forEach(function (mo) { var s = mo.r.sub || "—"; (bySub[s] = bySub[s] || []).push(mo); });
+      html += '<div class="panel-box"><h3>' + escapeHtml(a) + ' <span class="fine-print">(' + list.length + ' rules)</span></h3>';
+      Object.keys(bySub).sort().forEach(function (s) {
+        html += '<p class="vn-muh-subhead" style="margin:8px 0 4px"><strong>' + escapeHtml(s) + '</strong></p>';
+        html += '<div class="table-wrap"><table class="trinetra-table"><thead><tr><th>ID</th><th>Rule (condition → result)</th><th>Fired by</th><th>Source</th></tr></thead><tbody>';
+        bySub[s].forEach(function (mo) {
+          var r = mo.r;
+          var txt = escapeHtml(r.cond || r.name || "");
+          if (r.result) txt += ' <span class="fine-print">→ ' + escapeHtml(r.result) + '</span>';
+          html += '<tr><td>' + escapeHtml(r.id) + '</td><td>' + txt + '</td><td>' + escapeHtml(trinetraFiredText(mo.fired)) + '</td><td class="fine-print">' + escapeHtml(r.src || "") + '</td></tr>';
+        });
+        html += '</tbody></table></div>';
+      });
+      html += '</div>';
+    });
+    html += '<p class="fine-print">Matching is indicative (OR over a rule\'s stated placements) — the fired trigger is shown so you can verify the complete condition, its cancellations and timing in the rule text. Reference-only dictums (definitional/qualitative/multi-condition prose) are omitted here by design. This is the <strong>Promise eye</strong>; the Star (nakshatra) and Time (dasha-transit) eyes join as their rule-bases load.</p></section>';
+    return html;
   }
   function shadbalaRows(chart) {
     return CLASSICAL_PLANETS.map(function (name) {
