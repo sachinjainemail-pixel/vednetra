@@ -6123,11 +6123,12 @@
     // -------------------------------------------------------------------------
     pendingSectionRenders.clear();
     navAliasToPendingId.clear();
-    if (!opts.preserveActiveSection) activeChartDataSectionId = "viewA-consolidated";
+    if (!opts.preserveActiveSection) activeChartDataSectionId = "viewA-persona";
 
     var sections = [
       // ---- immediate (above the fold) ----
       { html: reportHeaderHtml("View A", "Chart Data Report", nativeReportName(input), "D-1, planets, vargas, transit chart and Vimshottari timeline", "Technical dossier"), immediate: true },
+      { id: "viewA-persona",        immediate: true, render: function () { return nativePersonaSection(chart, input); } },
       { id: "viewA-output-library", immediate: true, render: function () { return outputLibrarySection(); }, wire: wireOutputLibraryControls },
       { id: "viewA-worksheets",     immediate: true, render: function () { return worksheetsSection(chart, input, interactiveState.worksheet); }, wire: function () { wireWorksheetControls(chart, input); } },
       { id: "viewA-d1-d9-top",      immediate: true, render: function () { return topD1D9ChartsSection(chart); } },
@@ -11487,6 +11488,72 @@
     L.push("- **Transits now (Lahiri):** " + tm.transits.map(function (t) { return t.p + " in " + t.sign + " (H" + t.fromLagna + " Lagna, H" + t.fromMoon + " Moon)"; }).join(" · ") + ". **Sade Sati:** " + tm.sade + ".");
     L.push("");
     return L.join("\n");
+  }
+  // ===================================================================
+  // NATIVE'S PERSONA — a life-portrait assembled entirely from the Trinetra
+  // rules that FULLY fire for the native (Promise + Star + Time). Every line is
+  // the result of a rule whose conditions are all satisfied. Default view on load.
+  // ===================================================================
+  var PERSONA_THEME = {
+    Judgment: "Nature, character &amp; destiny", Marriage: "Relationships, marriage &amp; intimacy",
+    Profession: "Career, work &amp; status", Disease: "Health &amp; constitution",
+    Progeny: "Children &amp; progeny", Siblings: "Siblings, courage &amp; peers",
+    Education: "Education, learning &amp; intellect", Yogas: "Special combinations (yogas)",
+    Sutram: "General dictums &amp; aphorisms"
+  };
+  var PERSONA_ORDER = ["Judgment", "Marriage", "Profession", "Education", "Progeny", "Siblings", "Disease", "Yogas", "Sutram"];
+  function nativePersonaSection(chart, input) {
+    var useChart = chart;
+    try {
+      if (input && input.birthInstant && chart.ayanamshaKey !== "lahiri") {
+        useChart = buildChart(input.birthInstant, Number(input.latitude), Number(input.longitude), Number(input.timezone), { ascendantOverride: input.ascendantOverride, ayanamshaKey: "lahiri" });
+      }
+    } catch (e) {}
+    var nm = (input && (input.nativeName || input.name)) || "This native";
+    var head = '<section id="viewA-persona" class="section persona-section"><div class="section-head"><div><p class="eyebrow">Native&rsquo;s Persona</p><h3>' + escapeHtml(nm) + ' — Persona &amp; Life Portrait</h3></div><span class="small-pill">Trinetra-derived</span></div>';
+    var loaded = (typeof window !== "undefined" && window.TRINETRA_RULES && window.TRINETRA_RULES.length) || 0;
+    if (!loaded) return head + '<p class="fine-print">The persona is synthesized from the Trinetra rule-base (<code>trinetra-rules.js</code>), which is not loaded in this build.</p></section>';
+    var pr, st, tm;
+    try { pr = trinetraPromiseGroups(useChart); st = trinetraStarGroups(useChart); tm = trinetraTimeData(useChart, input); }
+    catch (e) { return head + '<p class="fine-print">Persona unavailable: ' + escapeHtml(e && e.message ? e.message : String(e)) + '</p></section>'; }
+    var prCount = 0; Object.keys(pr.byArea).forEach(function (a) { prCount += pr.byArea[a].length; });
+    var starCount = 0; Object.keys(st.byNak).forEach(function (n) { starCount += st.byNak[n].length; });
+    function bullets(items) { return '<ul class="persona-list">' + items.map(function (it) { return '<li>' + it.txt + (it.meta ? ' <span class="fine-print">— ' + it.meta + '</span>' : '') + '</li>'; }).join('') + '</ul>'; }
+    var html = head +
+      '<p class="fine-print">A portrait of ' + escapeHtml(nm) + ' assembled <strong>entirely from the classical rules that fully apply</strong> to this chart — <strong>' + prCount + '</strong> life-area dictums + <strong>' + starCount + '</strong> nakshatra readings for the occupied stars, plus the running dasha. Every statement below is the result of a rule whose conditions are <em>all</em> satisfied (cast on Lahiri). Read it as a weighted mosaic of classical voices, not a single verdict; where texts differ, both are kept. This is analytical — not a personal, medical or financial judgement.</p>';
+
+    // Temperament — from the occupied nakshatras
+    if (starCount) {
+      html += '<div class="panel-box"><h3>🧠 Temperament, mind &amp; inner self</h3>';
+      html += '<p class="fine-print">From the nakshatras occupied in the chart — the <strong>Moon-star</strong> governs the mind &amp; emotions, the <strong>Lagna-star</strong> the self &amp; body, and each graha-star colours its own significations.</p>';
+      Object.keys(st.byNak).map(Number).sort(function (a, b) { return a - b; }).forEach(function (n) {
+        html += '<p class="persona-sub"><strong>' + escapeHtml(NAKSHATRAS[n]) + '</strong> — occupied by ' + escapeHtml(st.occ[n].join(", ")) + '</p>';
+        html += bullets(st.byNak[n].map(function (r) { return { txt: escapeHtml(r.result || r.cond || ""), meta: escapeHtml(r.src || "") }; }));
+      });
+      html += '</div>';
+    }
+
+    // Life areas — from the fired Promise rules
+    function renderArea(area) {
+      var list = pr.byArea[area]; if (!list || !list.length) return "";
+      var bySub = {}; list.forEach(function (mo) { var s = mo.r.sub || "—"; (bySub[s] = bySub[s] || []).push(mo); });
+      var h = '<div class="panel-box"><h3>' + (PERSONA_THEME[area] || escapeHtml(area)) + ' <span class="fine-print">(' + list.length + ')</span></h3>';
+      Object.keys(bySub).sort().forEach(function (s) {
+        h += '<p class="persona-sub"><strong>' + escapeHtml(s) + '</strong></p>';
+        h += bullets(bySub[s].map(function (mo) { var r = mo.r; return { txt: escapeHtml(r.result || r.cond || ""), meta: escapeHtml(trinetraFiredText(mo.fired)) + " · " + escapeHtml(r.src || "") }; }));
+      });
+      return h + '</div>';
+    }
+    PERSONA_ORDER.forEach(function (a) { html += renderArea(a); });
+    Object.keys(pr.byArea).sort().forEach(function (a) { if (PERSONA_ORDER.indexOf(a) < 0) html += renderArea(a); });
+
+    // Current life phase — the Time eye
+    html += '<div class="panel-box"><h3>⏳ Current life phase (running dasha &amp; transits)</h3>';
+    html += '<ul class="persona-list">' + tm.stack.map(function (r) { var matters = r.owns.map(function (h) { return "H" + h + " " + TR_HOUSE_MATTER[h]; }).join("; ") || "—"; return '<li><strong>' + r.level + ' ' + escapeHtml(r.lord) + '</strong> — activates ' + escapeHtml(matters) + (r.tags.length ? ' <span class="fine-print">(' + escapeHtml(r.tags.join(", ")) + ')</span>' : '') + '</li>'; }).join('') + '</ul>';
+    html += '<p class="fine-print"><strong>Transits now:</strong> ' + tm.transits.map(function (t) { return escapeHtml(t.p + " in " + t.sign); }).join(" · ") + '. ' + escapeHtml(tm.sade) + '.</p></div>';
+
+    html += '<p class="fine-print">The persona is a computed synthesis of every classical rule that fully applies (all conditions met). Dictums whose conditions the engine cannot fully verify are excluded here — see the <strong>Trinetra</strong> section for the full fired-rules list and reference dictums.</p></section>';
+    return html;
   }
   function shadbalaRows(chart) {
     return CLASSICAL_PLANETS.map(function (name) {
@@ -18292,6 +18359,7 @@
       { id: "viewA-faq-pillars", label: "Query Pillars", desc: "Structured question analysis." }
     ] },
     { title: "Reports & Remedies", items: [
+      { id: "viewA-persona", label: "Native's Persona", desc: "DEFAULT view on chart load — the native's personality, traits and life portrait, synthesized entirely from the Trinetra classical rules that fully fire for the chart (Promise life-area dictums + Sutton nakshatra readings for the occupied stars + running dasha/transits). Every line is the result of a rule whose conditions are all met." },
       { id: "viewA-ccreport", label: "Natal Report (CC)", desc: "Full Chamatkār Chintāmaṇi data export — PDF & Markdown." },
       { id: "viewA-nativereport", label: "Native Input Report", desc: "Full v3 native export (§0–§16): fragility flags, guna, sphutas, sahams, rupa Ṣaḍbala, prastarāṣṭakavarga, D16, Parivritti-D10, full-life dashas, ingress + natal-return transits." },
       { id: "viewA-vapmreport", label: "VAPM Export", desc: "VAPM export spec (Lahiri, §1–§14 + Part B): master table, aspect/Kartari table, functional nature, Chandra/Surya Lagna, all vargas + Dashavarga count, Ashtakavarga incl. Shodhya Pinda, Vimshottari/Yogini/Jaimini, Indu Lagna, Tara Chakra, transits, four-fold scaffolds." },
@@ -22971,7 +23039,7 @@
     L.push("Ayanamsa       : Krishnamurti (KP-Old)   value " + decimalToDms(kp.ayanamsa) + "   (= Lahiri Chitrapaksha − 6′00″; e.g. 2001 = 23°46′32″)");
     L.push("House system   : Placidus");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.108");
+    L.push("Software / ver : VedNetra 1.109");
     L.push("Native         : " + nm + "            Sex: " + ((input && input.gender) || "-"));
     L.push("DoB / ToB      : " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
@@ -23224,7 +23292,7 @@
     L.push("KP number      : " + hnum + " / 249");
     L.push("House system   : " + kp.houseSystem + "  (equal 30° cusps from the number-seed ascendant — VedNetra KP-horary convention)");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.108");
+    L.push("Software / ver : VedNetra 1.109");
     L.push("Question       : " + ((input && input.question) ? String(input.question) : "-"));
     L.push("Judgment moment: " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));

@@ -1406,6 +1406,12 @@ button:hover {
   background: linear-gradient(90deg, var(--amber), var(--accent));
 }
 
+/* Native's Persona */
+.persona-list { margin: 4px 0 10px; padding-left: 20px; }
+.persona-list li { margin: 3px 0; line-height: 1.5; }
+.persona-sub { margin: 10px 0 2px; opacity: 0.85; }
+.persona-section .panel-box { margin-bottom: 14px; }
+
 /* 32-pointer Planetary Strength matrix */
 .ps-matrix th:first-child,
 .ps-matrix td:first-child {
