@@ -6178,6 +6178,7 @@
       { id: "viewA-references",     label: "Reference tables",  render: function () { return referenceTablesSection(chart); } },
       { id: "viewA-shadbala",       label: "Shadbala",          render: function () { return shadbalaSection(chart); } },
       { id: "viewA-planetstrength", label: "Planetary Strength (32-pointer)", render: function () { return planetaryStrengthSection(chart, input); } },
+      { id: "viewA-trinetra",       label: "Trinetra (Promise/Star/Time)", render: function () { return trinetraSection(chart, input); } },
       { id: "viewA-sahams",         label: "Sahams",            render: function () { return sahamsSection(chart, input); } },
       { id: "viewA-jaimini",        label: "Jaimini",           render: function () { return jaiminiSection(chart); } },
       { id: "viewA-compatibility",  label: "Compatibility",     render: function () { return marriageCompatibilityReportSection(chart, input); }, wire: wireCompatibilityInlineControls },
@@ -11269,6 +11270,213 @@
       summary + bars + matrix +
       '<p class="fine-print">Positive-quality pointers score higher with more of the quality. The five <strong>malefic-quality</strong> pointers (highlighted rows) &mdash; #18 Combustion, #19 Planetary War, #26 Kendr&#257;dhipati Do&#7779;a, #29 Debilitation (uncancelled), #30 Affliction &mdash; award the point when that quality is <strong>absent</strong>. &#7778;a&#7693;bala heads, I&#7779;&#7789;a&ndash;Ka&#7779;&#7789;a, Vim&#347;opaka and Ashtakavarga come from the classical engines; relative balas are normalised across the seven classical planets. R&#257;hu/Ketu take classical-only balas via their sign-dispositor. A computed strength lens (Lahiri) &mdash; not a life-outcome verdict.</p>' +
       '</section>';
+  }
+  // ===================================================================
+  // TRINETRA — Promise (classical rules) / Star (nakshatra) / Time (dasha-transit)
+  // rule-matching engine. Rules are compiled offline into predicate clauses
+  // (window.TRINETRA_RULES); this evaluates them against the native's chart.
+  // ===================================================================
+  function trinetraEvalClause(chart, c) {
+    var P = chart.planetsByName;
+    switch (c.t) {
+      case "planetInHouse": return !!(P[c.p] && P[c.p].house === c.h);
+      case "planetInSign": return !!(P[c.p] && P[c.p].sign === c.s);
+      case "planetInNak": return !!(P[c.p] && nakshatraInfo(P[c.p].lon).index === c.n);
+      case "nakOccupied": return trinetraNakOccupants(chart, c.n).length > 0;
+      case "lordInHouse": { var L = P[lordOfHouse(chart, c.of)]; return !!(L && L.house === c.h); }
+      case "lordInSign": { var L2 = P[lordOfHouse(chart, c.of)]; return !!(L2 && L2.sign === c.s); }
+      case "planetHouseFrom": { var rp = c.ref === "Lagna" ? chart.ascendant : P[c.ref]; var tp = P[c.p]; return !!(rp && tp && houseFromSign(rp.sign, tp.sign) === c.h); }
+      case "lordHouseFrom": { var rp2 = c.ref === "Lagna" ? chart.ascendant : P[c.ref]; var tp2 = P[lordOfHouse(chart, c.of)]; return !!(rp2 && tp2 && houseFromSign(rp2.sign, tp2.sign) === c.h); }
+      case "assoc": return (P[c.a] && P[c.b]) ? hasSambandha(chart, c.a, c.b) : false;
+      case "aspectsHouse": return !!(P[c.p] && planetAspectsHouse(P[c.p], c.h));
+      case "dignity": {
+        var p = P[c.p]; if (!p) return false;
+        if (c.d === "Retro") return !!p.retrograde;
+        if (c.d === "Combust") return !!p.combust;
+        if (c.d === "Own") return p.dignity === "Own sign" || p.dignity === "Moolatrikona";
+        return p.dignity === c.d;
+      }
+    }
+    return false;
+  }
+  // points (Lagna + 9 grahas) sitting in nakshatra index n
+  function trinetraNakOccupants(chart, n) {
+    var out = [];
+    try { if (nakshatraInfo(chart.ascendant.lon).index === n) out.push("Lagna"); } catch (e) {}
+    ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"].forEach(function (nm) {
+      var p = chart.planetsByName[nm]; if (p && nakshatraInfo(p.lon).index === n) out.push(nm);
+    });
+    return out;
+  }
+  var TRINETRA_CLAUSE_TXT = {
+    nakOccupied: function (c) { return (NAKSHATRAS[c.n] || ("nak " + (c.n + 1))) + " occupied"; },
+    planetInHouse: function (c) { return c.p + " in H" + c.h; },
+    planetInSign: function (c) { return c.p + " in " + SIGNS[c.s].name; },
+    planetInNak: function (c) { return c.p + " in " + NAKSHATRAS[c.n]; },
+    lordInHouse: function (c) { return c.of + "L in H" + c.h; },
+    lordInSign: function (c) { return c.of + "L in " + SIGNS[c.s].name; },
+    planetHouseFrom: function (c) { return c.p + " in H" + c.h + " from " + c.ref; },
+    lordHouseFrom: function (c) { return c.of + "L in H" + c.h + " from " + c.ref; },
+    assoc: function (c) { return c.a + "↔" + c.b; },
+    aspectsHouse: function (c) { return c.p + " aspects H" + c.h; },
+    dignity: function (c) { return c.p + " " + c.d; }
+  };
+  function trinetraFiredText(fired) {
+    return fired.map(function (c) { var f = TRINETRA_CLAUSE_TXT[c.t]; return f ? f(c) : c.t; }).join(", ");
+  }
+  // match all rules (optionally one area) against the chart; OR-semantics with the
+  // fired triggers shown, so the reader verifies the full stated condition.
+  function trinetraMatch(chart, area) {
+    var rules = (typeof window !== "undefined" && window.TRINETRA_RULES) || [];
+    var matched = [], total = 0, compiled = 0;
+    rules.forEach(function (r) {
+      if (area && r.area !== area) return;
+      total++;
+      if (!r.clauses || !r.clauses.length) return;
+      compiled++;
+      var fired = r.clauses.filter(function (c) { try { return trinetraEvalClause(chart, c); } catch (e) { return false; } });
+      if (fired.length) matched.push({ r: r, fired: fired });
+    });
+    return { matched: matched, total: total, compiled: compiled };
+  }
+  // ---- Time eye (computed dasha + transit, from VedNetra's own engine) ----
+  var TR_HOUSE_MATTER = { 1: "self/health", 2: "wealth/family", 3: "siblings/courage", 4: "home/mother/property", 5: "children/education/mind", 6: "disease/debts/enemies", 7: "marriage/partnership", 8: "longevity/upheaval", 9: "fortune/father/dharma", 10: "career/status", 11: "gains/elder sibling", 12: "loss/foreign/moksha" };
+  function trinetraOwnedMap(chart) { var o = {}; CLASSICAL_PLANETS.forEach(function (n) { o[n] = []; }); for (var h = 1; h <= 12; h++) { var l = lordOfHouse(chart, h); if (o[l]) o[l].push(h); } return o; }
+  function trinetraTimeData(chart, input) {
+    var asOf = (input && input.asOfInstant) || new Date();
+    var stack = []; try { stack = findDashaStack(chart.vimshottari.timeline, asOf); } catch (e) {}
+    var owned = trinetraOwnedMap(chart), lvl = ["MD", "AD", "PD", "SD", "PR"];
+    var rows = stack.map(function (p, i) {
+      var lord = p.lord, pl = chart.planetsByName[lord], oh = owned[lord] || [];
+      var kendra = oh.some(function (h) { return [4, 7, 10].indexOf(h) >= 0; }), trikona = oh.some(function (h) { return [5, 9].indexOf(h) >= 0; });
+      var tag = []; if (kendra && trikona) tag.push("Yogakaraka"); if (oh.indexOf(2) >= 0 || oh.indexOf(7) >= 0) tag.push("Maraka"); if ([6, 8, 12].some(function (h) { return oh.indexOf(h) >= 0; })) tag.push("Dusthana-lord");
+      return { level: lvl[i] || ("L" + i), lord: lord, house: pl ? pl.house : null, dignity: (pl && CLASSICAL_PLANETS.indexOf(lord) >= 0) ? pl.dignity : "—", owns: oh, tags: tag };
+    });
+    var moon = chart.planetsByName.Moon, tr = null, transits = [], sade = "—";
+    try { tr = buildChart(asOf, Number(input.latitude), Number(input.longitude), Number(input.timezone), { ayanamshaKey: "lahiri" }); } catch (e) {}
+    if (tr) {
+      ["Jupiter", "Saturn", "Rahu"].forEach(function (n) { var tp = tr.planetsByName[n]; if (!tp) return; transits.push({ p: n, sign: tp.signName, fromLagna: houseFromSign(chart.ascendant.sign, tp.sign), fromMoon: houseFromSign(moon.sign, tp.sign) }); });
+      var hSat = houseFromSign(moon.sign, tr.planetsByName.Saturn.sign);
+      sade = [12, 1, 2].indexOf(hSat) >= 0 ? "Sade Sati (Saturn H" + hSat + " from Moon)" : [4, 8].indexOf(hSat) >= 0 ? "Dhaiyya (Saturn H" + hSat + " from Moon)" : "not in Sade Sati (Saturn H" + hSat + " from Moon)";
+    }
+    return { stack: rows, transits: transits, sade: sade };
+  }
+  // ---- shared matchers for the three eyes ----
+  function trinetraPromiseGroups(chart) {
+    var res = trinetraMatch(chart), byArea = {};
+    res.matched.forEach(function (mo) { if (mo.r.area === "Nakshatra") return; var a = mo.r.area || "General"; (byArea[a] = byArea[a] || []).push(mo); });
+    return { byArea: byArea, total: res.total, compiled: res.compiled };
+  }
+  function trinetraStarGroups(chart) {
+    // occupied nakshatras -> their dictums (+ occupants)
+    var occ = {}, i;
+    for (i = 0; i < 27; i++) { var o = trinetraNakOccupants(chart, i); if (o.length) occ[i] = o; }
+    var rules = (typeof window !== "undefined" && window.TRINETRA_RULES) || [];
+    var byNak = {};
+    rules.forEach(function (r) {
+      if (r.area !== "Nakshatra" || !r.clauses) return;
+      r.clauses.forEach(function (c) { if (c.t === "nakOccupied" && occ[c.n]) { (byNak[c.n] = byNak[c.n] || []).push(r); } });
+    });
+    return { occ: occ, byNak: byNak };
+  }
+  function trinetraSection(chart, input) {
+    var useChart = chart;
+    try {
+      if (input && input.birthInstant && chart.ayanamshaKey !== "lahiri") {
+        useChart = buildChart(input.birthInstant, Number(input.latitude), Number(input.longitude), Number(input.timezone), { ascendantOverride: input.ascendantOverride, ayanamshaKey: "lahiri" });
+      }
+    } catch (e) {}
+    var loaded = (typeof window !== "undefined" && window.TRINETRA_RULES && window.TRINETRA_RULES.length) || 0;
+    var head = '<section id="viewA-trinetra" class="section trinetra-section"><div class="section-head"><div><p class="eyebrow">Trinetra · Promise / Star / Time</p><h3>Trinetra — Applicable Rules &amp; Timing</h3></div><span class="small-pill">Lahiri · 3 eyes</span></div>';
+    if (!loaded) {
+      return head + '<p class="fine-print">The Trinetra rule-base (<code>trinetra-rules.js</code>) is not loaded in this build. The three eyes are: <strong>Promise</strong> (classical dictums), <strong>Star</strong> (nakshatra dictums), <strong>Time</strong> (dasha/transit timing).</p></section>';
+    }
+    var pr = trinetraPromiseGroups(useChart), st = trinetraStarGroups(useChart), tm = trinetraTimeData(useChart, input);
+    var prCount = 0; Object.keys(pr.byArea).forEach(function (a) { prCount += pr.byArea[a].length; });
+    var starCount = 0; Object.keys(st.byNak).forEach(function (n) { starCount += st.byNak[n].length; });
+    var pctC = pr.total ? (100 * pr.compiled / pr.total).toFixed(0) : "0";
+    var html = head +
+      '<p class="fine-print">The three-eye view for this native, cast on <strong>Lahiri</strong>. <strong>Promise</strong> = ' + prCount + ' classical dictums whose stated placement is present; <strong>Star</strong> = ' + starCount + ' nakshatra dictums for the occupied stars; <strong>Time</strong> = the running dasha and current transits. Each rule shows the trigger that fired it — read the full condition (and its cancellations/timing) in the source. Reference-only dictums (definitional/qualitative/compound prose; ~' + (100 - pctC) + '% of the base) are not asserted here.</p>';
+
+    // EYE 1 — PROMISE
+    html += '<div class="panel-box"><h3>👁 Promise — classical dictums by life area <span class="fine-print">(' + prCount + ')</span></h3>';
+    Object.keys(pr.byArea).sort().forEach(function (a) {
+      var list = pr.byArea[a], bySub = {};
+      list.forEach(function (mo) { var s = mo.r.sub || "—"; (bySub[s] = bySub[s] || []).push(mo); });
+      html += '<p class="vn-muh-subhead" style="margin:10px 0 2px"><strong>' + escapeHtml(a) + '</strong> (' + list.length + ')</p>';
+      html += '<div class="table-wrap"><table class="trinetra-table"><thead><tr><th>ID</th><th>Sub</th><th>Rule → result</th><th>Fired by</th><th>Source</th></tr></thead><tbody>';
+      Object.keys(bySub).sort().forEach(function (s) {
+        bySub[s].forEach(function (mo) {
+          var r = mo.r, txt = escapeHtml(r.cond || "");
+          if (r.result) txt += ' <span class="fine-print">→ ' + escapeHtml(r.result) + '</span>';
+          html += '<tr><td>' + escapeHtml(r.id) + '</td><td class="fine-print">' + escapeHtml(s) + '</td><td>' + txt + '</td><td>' + escapeHtml(trinetraFiredText(mo.fired)) + '</td><td class="fine-print">' + escapeHtml(r.src || "") + '</td></tr>';
+        });
+      });
+      html += '</tbody></table></div>';
+    });
+    html += '</div>';
+
+    // EYE 2 — STAR
+    html += '<div class="panel-box"><h3>⭐ Star — nakshatra dictums for the occupied stars <span class="fine-print">(' + starCount + ')</span></h3>';
+    Object.keys(st.byNak).map(Number).sort(function (a, b) { return a - b; }).forEach(function (n) {
+      html += '<p class="vn-muh-subhead" style="margin:10px 0 2px"><strong>' + escapeHtml(NAKSHATRAS[n]) + '</strong> — occupied by ' + escapeHtml(st.occ[n].join(", ")) + ' (' + st.byNak[n].length + ' dictums)</p>';
+      html += '<div class="table-wrap"><table class="trinetra-table"><thead><tr><th>ID</th><th>Dictum → result</th><th>Source</th></tr></thead><tbody>';
+      st.byNak[n].forEach(function (r) {
+        var txt = escapeHtml(r.cond || ""); if (r.result) txt += ' <span class="fine-print">→ ' + escapeHtml(r.result) + '</span>';
+        html += '<tr><td>' + escapeHtml(r.id) + '</td><td>' + txt + '</td><td class="fine-print">' + escapeHtml(r.src || "") + '</td></tr>';
+      });
+      html += '</tbody></table></div>';
+    });
+    html += '</div>';
+
+    // EYE 3 — TIME
+    html += '<div class="panel-box"><h3>⏳ Time — running dasha &amp; current transits</h3>';
+    html += '<div class="table-wrap"><table class="trinetra-table"><thead><tr><th>Level</th><th>Lord</th><th>In house</th><th>Dignity</th><th>Activates (owned houses → matters)</th><th>Role</th></tr></thead><tbody>';
+    tm.stack.forEach(function (r) {
+      var matters = r.owns.map(function (h) { return "H" + h + " " + TR_HOUSE_MATTER[h]; }).join("; ") || "—";
+      html += '<tr><td><strong>' + r.level + '</strong></td><td>' + escapeHtml(r.lord) + '</td><td>' + (r.house || "—") + '</td><td>' + escapeHtml(r.dignity) + '</td><td>' + escapeHtml(matters) + '</td><td>' + escapeHtml(r.tags.join(", ") || "—") + '</td></tr>';
+    });
+    html += '</tbody></table></div>';
+    html += '<p class="fine-print"><strong>Transits now (Lahiri):</strong> ' + tm.transits.map(function (t) { return t.p + " in " + t.sign + " (H" + t.fromLagna + " from Lagna, H" + t.fromMoon + " from Moon)"; }).join(" · ") + '. <strong>Sade Sati:</strong> ' + escapeHtml(tm.sade) + '. A promised matter fires when its running dasha lord activates the house AND transiting Jupiter/Saturn support it.</p>';
+    html += '</div>';
+
+    html += '<p class="fine-print">Promise matching is indicative (OR over a rule\'s stated placements); the fired trigger is shown so you verify the complete condition. The Time eye is computed from VedNetra\'s Vimshottari + gochara engine (Umesh Puri / Laghu-Parashari + Gochar).</p></section>';
+    return html;
+  }
+  // ---- Trinetra as Markdown (for the Consolidated Master Run report) ----
+  function trinetraMarkdown(chart, input) {
+    var loaded = (typeof window !== "undefined" && window.TRINETRA_RULES && window.TRINETRA_RULES.length) || 0;
+    if (!loaded) return "";
+    var pr = trinetraPromiseGroups(chart), st = trinetraStarGroups(chart), tm = trinetraTimeData(chart, input);
+    var L = [];
+    function row(c) { return "| " + c.join(" | ") + " |"; }
+    function sep(n) { return "|" + new Array(n + 1).join("---|"); }
+    var prCount = 0; Object.keys(pr.byArea).forEach(function (a) { prCount += pr.byArea[a].length; });
+    var starCount = 0; Object.keys(st.byNak).forEach(function (n) { starCount += st.byNak[n].length; });
+    L.push("### Eye 1 · Promise — applicable classical dictums (" + prCount + ")");
+    Object.keys(pr.byArea).sort().forEach(function (a) {
+      L.push("**" + a + "** (" + pr.byArea[a].length + ")");
+      L.push(row(["ID", "Sub", "Rule → result", "Fired by", "Source"])); L.push(sep(5));
+      pr.byArea[a].forEach(function (mo) {
+        var r = mo.r;
+        L.push(row([r.id, (r.sub || "—"), ((r.cond || "").replace(/\|/g, "/") + (r.result ? " → " + r.result.replace(/\|/g, "/") : "")), trinetraFiredText(mo.fired), (r.src || "").replace(/\|/g, "/")]));
+      });
+      L.push("");
+    });
+    L.push("### Eye 2 · Star — nakshatra dictums for the occupied stars (" + starCount + ")");
+    Object.keys(st.byNak).map(Number).sort(function (a, b) { return a - b; }).forEach(function (n) {
+      L.push("**" + NAKSHATRAS[n] + "** — occupied by " + st.occ[n].join(", ") + " (" + st.byNak[n].length + ")");
+      L.push(row(["ID", "Dictum → result", "Source"])); L.push(sep(3));
+      st.byNak[n].forEach(function (r) { L.push(row([r.id, ((r.cond || "").replace(/\|/g, "/") + (r.result ? " → " + r.result.replace(/\|/g, "/") : "")), (r.src || "").replace(/\|/g, "/")])); });
+      L.push("");
+    });
+    L.push("### Eye 3 · Time — running dasha & current transits");
+    L.push(row(["Level", "Lord", "House", "Dignity", "Activates (owned → matters)", "Role"])); L.push(sep(6));
+    tm.stack.forEach(function (r) { L.push(row([r.level, r.lord, (r.house || "—"), r.dignity, (r.owns.map(function (h) { return "H" + h + " " + TR_HOUSE_MATTER[h]; }).join("; ") || "—"), (r.tags.join(", ") || "—")])); });
+    L.push("");
+    L.push("- **Transits now (Lahiri):** " + tm.transits.map(function (t) { return t.p + " in " + t.sign + " (H" + t.fromLagna + " Lagna, H" + t.fromMoon + " Moon)"; }).join(" · ") + ". **Sade Sati:** " + tm.sade + ".");
+    L.push("");
+    return L.join("\n");
   }
   function shadbalaRows(chart) {
     return CLASSICAL_PLANETS.map(function (name) {
@@ -18057,6 +18265,7 @@
     { title: "Strengths & Systems", items: [
       { id: "viewA-shadbala", label: "Shadbala", desc: "Six-fold planetary strength." },
       { id: "viewA-planetstrength", label: "Planetary Strength (32-pointer)", desc: "Equal-weight composite scoring all 9 planets across 32 classical strength pointers (dignity, Bhava/Shadbala heads, Vimshopaka, divisional, Ashtakavarga, Ishta–Kashta, avastha, combustion, war, conjunctions, aspects, dispositor/nakshatra-lord strength, functional status, yogas, neecha-bhanga, affliction, significations) — with a net score out of 32, percent and strength band per planet. Measures strength/condition, not auspiciousness of results. Same as Consolidated Master Run §I-H." },
+      { id: "viewA-trinetra", label: "Trinetra (Promise/Star/Time)", desc: "Matches the native's chart against a rule-base of ~7,670 dictums: the Promise eye (classical dictums across marriage, profession, disease, progeny, siblings, education, judgment, yogas, sutram), the Star eye (Komilla Sutton's nakshatra dictums for the occupied stars), and the Time eye (running dasha + current transits via the Umesh Puri / Laghu-Parashari + Gochar engine). Lists every applicable dictum with the trigger that fired it and its source. Also in Consolidated Master Run §I-I." },
       { id: "viewA-sahams", label: "Sahams", desc: "Full set of Tajika Sahams (sensitive points) — Punya, Vidya, Vivaha, Putra, Karma, Roga, Ayu and 20 more, with sign/degree/house and formula." },
       { id: "viewA-sav", label: "Ashtakavarga (SAV)", desc: "Sarvashtakavarga bindu totals." },
       { id: "viewA-bav", label: "Bhinnashtakavarga", desc: "Per-planet ashtakavarga." },
@@ -22227,7 +22436,7 @@
 
     // ============ PART I — UNIVERSAL DATA CORE ============
     L.push("# PART I · UNIVERSAL DATA CORE");
-    L.push("_The computed spine all four projects read. §I-0 → §I-17 below are the full VedNetra data export (intake, D1, bhava, Dasavarga, nine strength dimensions, Ashtakavarga + Shodhya Pinda, sub-planets & sphutas, full Vimshottari MD→AD→PD, Jaimini, longevity, Jupiter/Saturn gochara, Sahams, Varshaphal, Panchang, yogas); §I-A → §I-G add the cross-project connective data; §I-H is the 32-pointer equal-weight planetary-strength composite (net score per planet — strength, not a verdict on auspiciousness of results)._");
+    L.push("_The computed spine all four projects read. §I-0 → §I-17 below are the full VedNetra data export (intake, D1, bhava, Dasavarga, nine strength dimensions, Ashtakavarga + Shodhya Pinda, sub-planets & sphutas, full Vimshottari MD→AD→PD, Jaimini, longevity, Jupiter/Saturn gochara, Sahams, Varshaphal, Panchang, yogas); §I-A → §I-G add the cross-project connective data; §I-H is the 32-pointer equal-weight planetary-strength composite (net score per planet — strength, not a verdict on auspiciousness of results); §I-I is the Trinetra rule-base (Promise classical dictums · Star nakshatra dictums · Time dasha/transit) listing the dictums applicable to this native._");
     L.push("");
     var triv = ""; try { triv = vnTriveniMarkdown(chart, input); } catch (e) {}
     var trivCore = sliceMd(triv, "## 0 · Header", "**Coverage:**");
@@ -22354,6 +22563,17 @@
       L.push("");
     } catch (e) { L.push("_Planetary-strength composite unavailable: " + (e && e.message ? e.message : e) + "_"); L.push(""); }
 
+    // §I-I · Trinetra rule-base — applicable classical + nakshatra dictums + timing
+    try {
+      var triMd = trinetraMarkdown(chart, input);
+      if (triMd) {
+        L.push("## §I-I · Trinetra rule-base (Promise · Star · Time) — applicable dictums for this native");
+        L.push("_Matched against a rule-base of classical dictums (7 life-event areas + Yogas + Sutram), Komilla Sutton's nakshatra dictums, and the Umesh Puri dasha/transit timing engine. A dictum is listed when its stated placement is present in the chart; the fired trigger is shown — read the full condition (with its cancellations/timing) in the source. Reference-only dictums (definitional/qualitative/compound-prose) are not asserted. Cast on Lahiri._");
+        L.push("");
+        L.push(triMd);
+      }
+    } catch (e) { L.push("_Trinetra rule-base unavailable: " + (e && e.message ? e.message : e) + "_"); L.push(""); }
+
     // ============ PART II — PROJECT LENSES ============
     L.push("# PART II · PROJECT LENSES  _(same data, four methods — never blended)_");
     L.push("");
@@ -22441,7 +22661,7 @@
     try { md = vnConsolidatedMarkdown(chart, input); }
     catch (e) { md = "Could not build the report: " + (e && e.message ? e.message : e); }
     return '<section id="viewA-consolidatedmaster" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Master Export</p><h3>Consolidated Master Run</h3></div><span class="small-pill">Lahiri · 4 projects</span></div>' +
-      '<p class="fine-print">The <strong>default</strong> one-sheet master run that covers all four projects at once — <strong>Mehta + Sutton (VAPM)</strong>, <strong>Trinetra (Promise/Star/Time)</strong>, <strong>Umesh Puri (Laghu Parashari + Gochar)</strong> and <strong>Triveni (BPHS·BJ·PD three-witness)</strong>. Always Lahiri (Chitrapaksha). <strong>Part I</strong> is the universal computed data core (full VedNetra export §I-0→§I-17 plus reference lagnas, planet-ledger union with pada dignity + Navatara from Moon &amp; Lagna + gandanta + BAV, LP p.68 scores + functional nature, sambandhas/raja-yoga, Yogini/Chara/Sade-Sati, nakshatra sweep, routing map, and a <strong>§I-H 32-pointer equal-weight Planetary Strength composite</strong> with a net score out of 32 per planet — strength/condition, not a verdict on auspiciousness of results); <strong>Part II</strong> re-frames the same data through each project&rsquo;s method lens. External book corpora are scaffolded, never gap-filled; guardrails are the union of all four (no lifespan/death timing).</p>' +
+      '<p class="fine-print">The <strong>default</strong> one-sheet master run that covers all four projects at once — <strong>Mehta + Sutton (VAPM)</strong>, <strong>Trinetra (Promise/Star/Time)</strong>, <strong>Umesh Puri (Laghu Parashari + Gochar)</strong> and <strong>Triveni (BPHS·BJ·PD three-witness)</strong>. Always Lahiri (Chitrapaksha). <strong>Part I</strong> is the universal computed data core (full VedNetra export §I-0→§I-17 plus reference lagnas, planet-ledger union with pada dignity + Navatara from Moon &amp; Lagna + gandanta + BAV, LP p.68 scores + functional nature, sambandhas/raja-yoga, Yogini/Chara/Sade-Sati, nakshatra sweep, routing map, a <strong>§I-H 32-pointer equal-weight Planetary Strength composite</strong> with a net score out of 32 per planet — strength/condition, not a verdict on auspiciousness of results; and a <strong>§I-I Trinetra rule-base</strong> that lists the classical dictums (Promise), Sutton nakshatra dictums (Star) and dasha/transit timing (Time) applicable to this native); <strong>Part II</strong> re-frames the same data through each project&rsquo;s method lens. External book corpora are scaffolded, never gap-filled; guardrails are the union of all four (no lifespan/death timing).</p>' +
       '<div class="vn-tool-actions" style="margin-bottom:10px"><button type="button" id="vnConsPdf" class="primary-action vn-generate-btn">Save as PDF</button> <button type="button" id="vnConsMd" class="input-toggle-btn">Download Markdown</button> <button type="button" id="vnConsCopy" class="input-toggle-btn">Copy (Markdown)</button> <span id="vnConsCopyStatus" class="fine-print"></span></div>' +
       '<div class="panel-box"><pre class="vn-native-pre">' + escapeHtml(md) + '</pre></div>' +
       '</section>';
@@ -22741,7 +22961,7 @@
     L.push("Ayanamsa       : Krishnamurti (KP-Old)   value " + decimalToDms(kp.ayanamsa) + "   (= Lahiri Chitrapaksha − 6′00″; e.g. 2001 = 23°46′32″)");
     L.push("House system   : Placidus");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.106");
+    L.push("Software / ver : VedNetra 1.107");
     L.push("Native         : " + nm + "            Sex: " + ((input && input.gender) || "-"));
     L.push("DoB / ToB      : " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
@@ -22994,7 +23214,7 @@
     L.push("KP number      : " + hnum + " / 249");
     L.push("House system   : " + kp.houseSystem + "  (equal 30° cusps from the number-seed ascendant — VedNetra KP-horary convention)");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.106");
+    L.push("Software / ver : VedNetra 1.107");
     L.push("Question       : " + ((input && input.question) ? String(input.question) : "-"));
     L.push("Judgment moment: " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
