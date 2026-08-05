@@ -125,10 +125,15 @@ for(const f of files){
   for(const r of rules){
     const F=r.fields;
     const cond=F.condition||"", apply=F.apply||"";
-    const clauses = compile(cond, apply);
-    const rec={ id:r.id, area, sub:(F["sub-event"]||F.subtopic||F.topic||""), name:r.name||"",
-      cond, apply, result:F.result||F.effect||"", prio:F["strength/priority"]||F["strength/confidence"]||"",
-      cancel:F["cancel/except"]||"", timing:F.timing||"", sys:F.system||"", src:F.source||"", clauses };
+    // Nakshatra dictums (Sutton): per-nakshatra IDs S-Nnn compile to "that nakshatra
+    // is occupied by some point"; S-CH technique dictums fall back to the prose compiler.
+    let clauses;
+    const nm = area==="Nakshatra" && /^S-N(\d{2})/.exec(r.id);
+    if(nm){ const idx=(+nm[1])-1; clauses = (idx>=0&&idx<=26)? [{t:"nakOccupied",n:idx}] : compile(cond,apply); }
+    else clauses = compile(cond, apply);
+    // compact record: only what the app needs to match + display
+    const rec={ id:r.id, area, sub:(F["sub-event"]||F.subtopic||F.topic||""),
+      cond, result:F.result||F.effect||"", src:F.source||F.page||"", clauses };
     all.push(rec); perArea[area].total++; if(clauses) perArea[area].compiled++;
   }
 }
