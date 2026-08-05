@@ -11326,16 +11326,25 @@
   }
   // match all rules (optionally one area) against the chart; OR-semantics with the
   // fired triggers shown, so the reader verifies the full stated condition.
+  // AND-of-OR-groups: a rule fires only when EVERY group has at least one true
+  // clause (so all distinct stated conditions must hold, not just one).
   function trinetraMatch(chart, area) {
     var rules = (typeof window !== "undefined" && window.TRINETRA_RULES) || [];
     var matched = [], total = 0, compiled = 0;
     rules.forEach(function (r) {
       if (area && r.area !== area) return;
       total++;
-      if (!r.clauses || !r.clauses.length) return;
+      var groups = r.g || r.clauses; // r.clauses kept for back-compat
+      if (!groups || !groups.length) return;
       compiled++;
-      var fired = r.clauses.filter(function (c) { try { return trinetraEvalClause(chart, c); } catch (e) { return false; } });
-      if (fired.length) matched.push({ r: r, fired: fired });
+      var fired = [], ok = true;
+      for (var gi = 0; gi < groups.length; gi++) {
+        var grp = groups[gi], hit = null;
+        for (var ci = 0; ci < grp.length; ci++) { try { if (trinetraEvalClause(chart, grp[ci])) { hit = grp[ci]; break; } } catch (e) {} }
+        if (!hit) { ok = false; break; }
+        fired.push(hit);
+      }
+      if (ok) matched.push({ r: r, fired: fired });
     });
     return { matched: matched, total: total, compiled: compiled };
   }
@@ -11374,8 +11383,9 @@
     var rules = (typeof window !== "undefined" && window.TRINETRA_RULES) || [];
     var byNak = {};
     rules.forEach(function (r) {
-      if (r.area !== "Nakshatra" || !r.clauses) return;
-      r.clauses.forEach(function (c) { if (c.t === "nakOccupied" && occ[c.n]) { (byNak[c.n] = byNak[c.n] || []).push(r); } });
+      var groups = r.g || r.clauses;
+      if (r.area !== "Nakshatra" || !groups) return;
+      groups.forEach(function (grp) { grp.forEach(function (c) { if (c.t === "nakOccupied" && occ[c.n]) { (byNak[c.n] = byNak[c.n] || []).push(r); } }); });
     });
     return { occ: occ, byNak: byNak };
   }
@@ -11396,7 +11406,7 @@
     var starCount = 0; Object.keys(st.byNak).forEach(function (n) { starCount += st.byNak[n].length; });
     var pctC = pr.total ? (100 * pr.compiled / pr.total).toFixed(0) : "0";
     var html = head +
-      '<p class="fine-print">The three-eye view for this native, cast on <strong>Lahiri</strong>. <strong>Promise</strong> = ' + prCount + ' classical dictums whose stated placement is present; <strong>Star</strong> = ' + starCount + ' nakshatra dictums for the occupied stars; <strong>Time</strong> = the running dasha and current transits. Each rule shows the trigger that fired it — read the full condition (and its cancellations/timing) in the source. Reference-only dictums (definitional/qualitative/compound prose; ~' + (100 - pctC) + '% of the base) are not asserted here.</p>';
+      '<p class="fine-print">The three-eye view for this native, cast on <strong>Lahiri</strong>. <strong>Promise</strong> = ' + prCount + ' classical dictums <strong>all</strong> of whose stated conditions are satisfied (every planet/lord/house in the rule must hold — AND, not partial); <strong>Star</strong> = ' + starCount + ' nakshatra dictums for the occupied stars; <strong>Time</strong> = the running dasha and current transits. Each rule shows the trigger(s) that fired it. A dictum is auto-fired only when the engine can verify <em>every</em> condition; rules that also depend on factors it can\'t check from placement alone (strength/affliction, benefic-malefic aspect, paksha/day-night, or special divisional/Jaimini frames) are held back as <strong>reference</strong>, never asserted.</p>';
 
     // EYE 1 — PROMISE
     html += '<div class="panel-box"><h3>👁 Promise — classical dictums by life area <span class="fine-print">(' + prCount + ')</span></h3>';
@@ -11440,7 +11450,7 @@
     html += '<p class="fine-print"><strong>Transits now (Lahiri):</strong> ' + tm.transits.map(function (t) { return t.p + " in " + t.sign + " (H" + t.fromLagna + " from Lagna, H" + t.fromMoon + " from Moon)"; }).join(" · ") + '. <strong>Sade Sati:</strong> ' + escapeHtml(tm.sade) + '. A promised matter fires when its running dasha lord activates the house AND transiting Jupiter/Saturn support it.</p>';
     html += '</div>';
 
-    html += '<p class="fine-print">Promise matching is indicative (OR over a rule\'s stated placements); the fired trigger is shown so you verify the complete condition. The Time eye is computed from VedNetra\'s Vimshottari + gochara engine (Umesh Puri / Laghu-Parashari + Gochar).</p></section>';
+    html += '<p class="fine-print">Promise matching requires <strong>all</strong> of a rule\'s stated conditions (AND); a rule fires only when every planet/lord/house it names is placed as required. Rules with conditions the engine can\'t verify from placement alone are shown as reference (in the report), not fired. The Time eye is computed from VedNetra\'s Vimshottari + gochara engine (Umesh Puri / Laghu-Parashari + Gochar).</p></section>';
     return html;
   }
   // ---- Trinetra as Markdown (for the Consolidated Master Run report) ----
@@ -22568,7 +22578,7 @@
       var triMd = trinetraMarkdown(chart, input);
       if (triMd) {
         L.push("## §I-I · Trinetra rule-base (Promise · Star · Time) — applicable dictums for this native");
-        L.push("_Matched against a rule-base of classical dictums (7 life-event areas + Yogas + Sutram), Komilla Sutton's nakshatra dictums, and the Umesh Puri dasha/transit timing engine. A dictum is listed when its stated placement is present in the chart; the fired trigger is shown — read the full condition (with its cancellations/timing) in the source. Reference-only dictums (definitional/qualitative/compound-prose) are not asserted. Cast on Lahiri._");
+        L.push("_Matched against a rule-base of classical dictums (7 life-event areas + Yogas + Sutram), Komilla Sutton's nakshatra dictums, and the Umesh Puri dasha/transit timing engine. A dictum is listed only when **all** of its stated conditions are satisfied in the chart (AND — every planet/lord/house it names must hold, not a partial match); the fired trigger is shown. Dictums that also depend on factors the engine can't verify from placement alone (strength/affliction, benefic-malefic aspect, paksha/day-night, special divisional/Jaimini frames) are held back as reference, never asserted. Cast on Lahiri._");
         L.push("");
         L.push(triMd);
       }
@@ -22961,7 +22971,7 @@
     L.push("Ayanamsa       : Krishnamurti (KP-Old)   value " + decimalToDms(kp.ayanamsa) + "   (= Lahiri Chitrapaksha − 6′00″; e.g. 2001 = 23°46′32″)");
     L.push("House system   : Placidus");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.107");
+    L.push("Software / ver : VedNetra 1.108");
     L.push("Native         : " + nm + "            Sex: " + ((input && input.gender) || "-"));
     L.push("DoB / ToB      : " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
@@ -23214,7 +23224,7 @@
     L.push("KP number      : " + hnum + " / 249");
     L.push("House system   : " + kp.houseSystem + "  (equal 30° cusps from the number-seed ascendant — VedNetra KP-horary convention)");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.107");
+    L.push("Software / ver : VedNetra 1.108");
     L.push("Question       : " + ((input && input.question) ? String(input.question) : "-"));
     L.push("Judgment moment: " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
