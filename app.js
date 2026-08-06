@@ -11518,17 +11518,38 @@
     catch (e) { return head + '<p class="fine-print">Persona unavailable: ' + escapeHtml(e && e.message ? e.message : String(e)) + '</p></section>'; }
     var prCount = 0; Object.keys(pr.byArea).forEach(function (a) { prCount += pr.byArea[a].length; });
     var starCount = 0; Object.keys(st.byNak).forEach(function (n) { starCount += st.byNak[n].length; });
-    function bullets(items) { return '<ul class="persona-list">' + items.map(function (it) { return '<li>' + it.txt + (it.meta ? ' <span class="fine-print">— ' + it.meta + '</span>' : '') + '</li>'; }).join('') + '</ul>'; }
+    // condense a rule's result to its life-shaping crux (1–2 short sentences, no
+    // sources/authors/markdown), and drop branch labels and trailing citations.
+    function condense(s) {
+      if (!s) return "";
+      s = String(s).replace(/\*\*/g, "").replace(/\s+/g, " ").trim();
+      s = s.replace(/^(base|note|result|effect)\s*[:—-]\s*/i, "");
+      s = s.replace(/\s*\((?:[^)]*(?:p\.?\s*\d+|PDF|shloka|aphorism|verse|Puranic|remedy|donate|Book\d)[^)]*)\)\s*/gi, " ").trim();
+      s = s.replace(/\s*[;.]?\s*(?:remedy|source)\s*:.*$/i, "").trim();
+      var sent = s.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [s];
+      var main = sent.filter(function (x) { return !/^\s*if\b/i.test(x); }); // drop "If X:" conditional branches
+      if (!main.length) main = sent;
+      var out = main.slice(0, 2).join(" ").trim();
+      if (out.length > 190) out = (main[0] || s).trim();
+      if (out.length > 210) out = out.slice(0, 200).replace(/\s+\S*$/, "") + "…";
+      out = out.replace(/\s+/g, " ").trim();
+      return out ? out.charAt(0).toUpperCase() + out.slice(1) : "";
+    }
+    function bullets(texts) {
+      var seen = {}, out = [];
+      texts.forEach(function (t) { var c = condense(t); if (c && !seen[c.toLowerCase()]) { seen[c.toLowerCase()] = 1; out.push(c); } });
+      return '<ul class="persona-list">' + out.map(function (c) { return '<li>' + escapeHtml(c) + '</li>'; }).join('') + '</ul>';
+    }
     var html = head +
-      '<p class="fine-print">A portrait of ' + escapeHtml(nm) + ' assembled <strong>entirely from the classical rules that fully apply</strong> to this chart — <strong>' + prCount + '</strong> life-area dictums + <strong>' + starCount + '</strong> nakshatra readings for the occupied stars, plus the running dasha. Every statement below is the result of a rule whose conditions are <em>all</em> satisfied (cast on Lahiri). Read it as a weighted mosaic of classical voices, not a single verdict; where texts differ, both are kept. This is analytical — not a personal, medical or financial judgement.</p>';
+      '<p class="fine-print">How this chart shapes ' + escapeHtml(nm) + '&rsquo;s character, temperament and life — read from the yogas and dictums that <strong>fully apply</strong> (every condition met). Each line is the crux of one shaping influence. Read it as a weighted mosaic, not a single verdict; where the classics differ, both voices are kept. Analytical only — not a personal, medical or financial judgement.</p>';
 
     // Temperament — from the occupied nakshatras
     if (starCount) {
       html += '<div class="panel-box"><h3>🧠 Temperament, mind &amp; inner self</h3>';
       html += '<p class="fine-print">From the nakshatras occupied in the chart — the <strong>Moon-star</strong> governs the mind &amp; emotions, the <strong>Lagna-star</strong> the self &amp; body, and each graha-star colours its own significations.</p>';
       Object.keys(st.byNak).map(Number).sort(function (a, b) { return a - b; }).forEach(function (n) {
-        html += '<p class="persona-sub"><strong>' + escapeHtml(NAKSHATRAS[n]) + '</strong> — occupied by ' + escapeHtml(st.occ[n].join(", ")) + '</p>';
-        html += bullets(st.byNak[n].map(function (r) { return { txt: escapeHtml(r.result || r.cond || ""), meta: escapeHtml(r.src || "") }; }));
+        html += '<p class="persona-sub"><strong>' + escapeHtml(NAKSHATRAS[n]) + '</strong> (' + escapeHtml(st.occ[n].join(", ")) + ')</p>';
+        html += bullets(st.byNak[n].map(function (r) { return r.result || r.cond || ""; }));
       });
       html += '</div>';
     }
@@ -11540,7 +11561,7 @@
       var h = '<div class="panel-box"><h3>' + (PERSONA_THEME[area] || escapeHtml(area)) + ' <span class="fine-print">(' + list.length + ')</span></h3>';
       Object.keys(bySub).sort().forEach(function (s) {
         h += '<p class="persona-sub"><strong>' + escapeHtml(s) + '</strong></p>';
-        h += bullets(bySub[s].map(function (mo) { var r = mo.r; return { txt: escapeHtml(r.result || r.cond || ""), meta: escapeHtml(trinetraFiredText(mo.fired)) + " · " + escapeHtml(r.src || "") }; }));
+        h += bullets(bySub[s].map(function (mo) { return mo.r.result || mo.r.cond || ""; }));
       });
       return h + '</div>';
     }
@@ -23039,7 +23060,7 @@
     L.push("Ayanamsa       : Krishnamurti (KP-Old)   value " + decimalToDms(kp.ayanamsa) + "   (= Lahiri Chitrapaksha − 6′00″; e.g. 2001 = 23°46′32″)");
     L.push("House system   : Placidus");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.109");
+    L.push("Software / ver : VedNetra 1.110");
     L.push("Native         : " + nm + "            Sex: " + ((input && input.gender) || "-"));
     L.push("DoB / ToB      : " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
@@ -23292,7 +23313,7 @@
     L.push("KP number      : " + hnum + " / 249");
     L.push("House system   : " + kp.houseSystem + "  (equal 30° cusps from the number-seed ascendant — VedNetra KP-horary convention)");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.109");
+    L.push("Software / ver : VedNetra 1.110");
     L.push("Question       : " + ((input && input.question) ? String(input.question) : "-"));
     L.push("Judgment moment: " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
