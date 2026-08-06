@@ -2724,9 +2724,9 @@
   function showVargaSectionAfterChartChange() {
     window.setTimeout(function () {
       if (vnPendingHomeTarget) { var t = vnPendingHomeTarget; vnPendingHomeTarget = null; showSingleChartDataSection(t, { skipScroll: false }); return; }
-      // Land on the Consolidated View (all key charts on one screen) by default
-      // whenever a chart is generated or selected.
-      showSingleChartDataSection("viewA-consolidated", { skipScroll: false });
+      // Land on the Native's Persona (the life portrait) by default whenever a
+      // chart is generated or selected.
+      showSingleChartDataSection("viewA-persona", { skipScroll: false });
     }, 0);
   }
 
@@ -23117,7 +23117,7 @@
     L.push("Ayanamsa       : Krishnamurti (KP-Old)   value " + decimalToDms(kp.ayanamsa) + "   (= Lahiri Chitrapaksha − 6′00″; e.g. 2001 = 23°46′32″)");
     L.push("House system   : Placidus");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.111");
+    L.push("Software / ver : VedNetra 1.112");
     L.push("Native         : " + nm + "            Sex: " + ((input && input.gender) || "-"));
     L.push("DoB / ToB      : " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
@@ -23370,7 +23370,7 @@
     L.push("KP number      : " + hnum + " / 249");
     L.push("House system   : " + kp.houseSystem + "  (equal 30° cusps from the number-seed ascendant — VedNetra KP-horary convention)");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.111");
+    L.push("Software / ver : VedNetra 1.112");
     L.push("Question       : " + ((input && input.question) ? String(input.question) : "-"));
     L.push("Judgment moment: " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
