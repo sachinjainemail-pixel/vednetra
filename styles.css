@@ -1411,6 +1411,9 @@ button:hover {
 .persona-list li { margin: 3px 0; line-height: 1.5; }
 .persona-sub { margin: 10px 0 2px; opacity: 0.85; }
 .persona-section .panel-box { margin-bottom: 14px; }
+.persona-place { opacity: 0.6; font-size: 0.88em; white-space: nowrap; }
+.persona-journey { margin: 8px 0; padding-left: 10px; border-left: 3px solid rgba(176, 122, 44, 0.35); }
+.persona-journey .persona-list { margin-top: 2px; }
 
 /* 32-pointer Planetary Strength matrix */
 .ps-matrix th:first-child,

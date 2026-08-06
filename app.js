@@ -3997,7 +3997,7 @@
 
   function generate(options) {
     var opts = options || {};
-    var nextActiveSection = opts.preserveActiveSection ? (activeChartDataSectionId || "viewA-output-library") : "viewA-output-library";
+    var nextActiveSection = opts.preserveActiveSection ? (activeChartDataSectionId || "viewA-persona") : "viewA-persona";
     if (opts.preserveInteractiveState) opts.interactiveState = collectReportInteractiveState();
     try {
       clearMemoCaches();
@@ -11494,14 +11494,29 @@
   // rules that FULLY fire for the native (Promise + Star + Time). Every line is
   // the result of a rule whose conditions are all satisfied. Default view on load.
   // ===================================================================
-  var PERSONA_THEME = {
-    Judgment: "Nature, character &amp; destiny", Marriage: "Relationships, marriage &amp; intimacy",
-    Profession: "Career, work &amp; status", Disease: "Health &amp; constitution",
-    Progeny: "Children &amp; progeny", Siblings: "Siblings, courage &amp; peers",
-    Education: "Education, learning &amp; intellect", Yogas: "Special combinations (yogas)",
-    Sutram: "General dictums &amp; aphorisms"
-  };
-  var PERSONA_ORDER = ["Judgment", "Marriage", "Profession", "Education", "Progeny", "Siblings", "Disease", "Yogas", "Sutram"];
+  // canonical life-event buckets (consolidate predictions across source areas)
+  var PERSONA_BUCKETS = [
+    ["mind", "🧠 Mind, temperament &amp; character"], ["body", "🩺 Body, health &amp; vitality"],
+    ["marriage", "💍 Marriage, love &amp; relationships"], ["children", "👶 Children &amp; progeny"],
+    ["career", "💼 Career, work &amp; status"], ["wealth", "💰 Wealth, finance &amp; gains"],
+    ["education", "📚 Education, intellect &amp; skills"], ["family", "👪 Family, parents &amp; siblings"],
+    ["fortune", "🍀 Fortune, dharma &amp; spirituality"], ["general", "✨ Other life themes"]
+  ];
+  function personaBucket(area, sub, txt) {
+    var s = ((sub || "") + " " + (txt || "")).toLowerCase();
+    if (/child|progen|putra|\bson\b|daughter|pregnan|conception|issueless|barren|miscarriage|abortion/.test(s)) return "children";
+    if (/marriage|marital|spouse|wife|husband|conjugal|love affair|romance|\bsex|libido|passion|partner|divorce|separat|fidelity|adulter|widow/.test(s)) return "marriage";
+    if (/career|profession|\bjob\b|business|occupation|employ|service|status|position|authorit|\bpower\b|\bfame\b|livelihood|\btrade\b/.test(s)) return "career";
+    if (/wealth|money|dhana|riches|income|financ|\bgain|prosper|povert|\bpoor\b|earning|affluen/.test(s)) return "wealth";
+    if (/educat|learning|\bstudy|vidya|knowledge|intellect|scholar|degree|examina|wisdom|\bskill|science|literat/.test(s)) return "education";
+    if (/disease|health|illness|ailment|\broga|longevity|injury|accident|surgery|\beyes?\b|\bear\b|skin|mental|\bbody\b|physical|constitution|vitality|deaf|blind|leprosy|diabet/.test(s)) return "body";
+    if (/sibling|brother|sister|co-born|mother|father|parent|\bfamily|maternal|paternal/.test(s)) return "family";
+    if (/fortune|dharma|\bluck|religio|spiritual|moksha|\bguru\b|pilgrim|charit|virtue|piety|\bgod\b|temple|worship/.test(s)) return "fortune";
+    if (/nature|temperament|character|\bmind\b|emotion|dispositio|behaviou?r|personalit|attitude|conduct|\bhabit/.test(s)) return "mind";
+    var A = { Marriage: "marriage", Progeny: "children", Profession: "career", Disease: "body", Siblings: "family", Education: "education" };
+    if (A[area]) return A[area];
+    return (area === "Nakshatra" || area === "Judgment") ? "mind" : "general";
+  }
   function nativePersonaSection(chart, input) {
     var useChart = chart;
     try {
@@ -11513,67 +11528,109 @@
     var head = '<section id="viewA-persona" class="section persona-section"><div class="section-head"><div><p class="eyebrow">Native&rsquo;s Persona</p><h3>' + escapeHtml(nm) + ' — Persona &amp; Life Portrait</h3></div><span class="small-pill">Trinetra-derived</span></div>';
     var loaded = (typeof window !== "undefined" && window.TRINETRA_RULES && window.TRINETRA_RULES.length) || 0;
     if (!loaded) return head + '<p class="fine-print">The persona is synthesized from the Trinetra rule-base (<code>trinetra-rules.js</code>), which is not loaded in this build.</p></section>';
-    var pr, st, tm;
-    try { pr = trinetraPromiseGroups(useChart); st = trinetraStarGroups(useChart); tm = trinetraTimeData(useChart, input); }
+    var pr, st;
+    try { pr = trinetraPromiseGroups(useChart); st = trinetraStarGroups(useChart); }
     catch (e) { return head + '<p class="fine-print">Persona unavailable: ' + escapeHtml(e && e.message ? e.message : String(e)) + '</p></section>'; }
-    var prCount = 0; Object.keys(pr.byArea).forEach(function (a) { prCount += pr.byArea[a].length; });
-    var starCount = 0; Object.keys(st.byNak).forEach(function (n) { starCount += st.byNak[n].length; });
-    // condense a rule's result to its life-shaping crux (1–2 short sentences, no
-    // sources/authors/markdown), and drop branch labels and trailing citations.
+
+    // condense a rule result to its life-shaping crux (keeps **bold** markers)
     function condense(s) {
       if (!s) return "";
-      s = String(s).replace(/\*\*/g, "").replace(/\s+/g, " ").trim();
+      s = String(s).replace(/\s+/g, " ").trim();
       s = s.replace(/^(base|note|result|effect)\s*[:—-]\s*/i, "");
       s = s.replace(/\s*\((?:[^)]*(?:p\.?\s*\d+|PDF|shloka|aphorism|verse|Puranic|remedy|donate|Book\d)[^)]*)\)\s*/gi, " ").trim();
       s = s.replace(/\s*[;.]?\s*(?:remedy|source)\s*:.*$/i, "").trim();
       var sent = s.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [s];
-      var main = sent.filter(function (x) { return !/^\s*if\b/i.test(x); }); // drop "If X:" conditional branches
+      var main = sent.filter(function (x) { return !/^\s*if\b/i.test(x); });
       if (!main.length) main = sent;
       var out = main.slice(0, 2).join(" ").trim();
-      if (out.length > 190) out = (main[0] || s).trim();
-      if (out.length > 210) out = out.slice(0, 200).replace(/\s+\S*$/, "") + "…";
+      if (out.length > 200) out = (main[0] || s).trim();
+      if (out.length > 220) out = out.slice(0, 210).replace(/\s+\S*$/, "") + "…";
       out = out.replace(/\s+/g, " ").trim();
       return out ? out.charAt(0).toUpperCase() + out.slice(1) : "";
     }
-    function bullets(texts) {
-      var seen = {}, out = [];
-      texts.forEach(function (t) { var c = condense(t); if (c && !seen[c.toLowerCase()]) { seen[c.toLowerCase()] = 1; out.push(c); } });
-      return '<ul class="persona-list">' + out.map(function (c) { return '<li>' + escapeHtml(c) + '</li>'; }).join('') + '</ul>';
+    // format a condensed line: bold the takeaway (source **bold** or auto-bold the
+    // lead clause). Operates on RAW text and escapes each part, so HTML entities
+    // (e.g. apostrophes) are never split by the boundary punctuation.
+    function personaFmt(c) {
+      if (/\*\*.+?\*\*/.test(c)) {
+        var parts = c.replace(/\*\*(.+?)\*\*/g, "$1").replace(/\*\*/g, "").split("");
+        return parts.map(function (p, i) { return i % 2 ? '<strong>' + escapeHtml(p) + '</strong>' : escapeHtml(p); }).join("");
+      }
+      var m = c.match(/^([\s\S]{6,72}?)(\s*[—,;:.]|$)/);
+      var lead = m ? m[1] : c;
+      return '<strong>' + escapeHtml(lead) + '</strong>' + escapeHtml(c.slice(lead.length));
     }
+    function keyClean(c) { return c.replace(/\*\*/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
+
+    // ---- aggregate every fired rule into {bucket, text, placement, planets} ----
+    function firedPlanets(fired) { var z = {}; (fired || []).forEach(function (c) { if (c.p) z[c.p] = 1; if (c.a) { z[c.a] = 1; z[c.b] = 1; } if (c.of) { var l = lordOfHouse(useChart, c.of); if (l) z[l] = 1; } if (c.ref && c.ref !== "Lagna") z[c.ref] = 1; }); return Object.keys(z); }
+    var items = [];
+    Object.keys(pr.byArea).forEach(function (area) {
+      pr.byArea[area].forEach(function (mo) { var r = mo.r; items.push({ bucket: personaBucket(area, r.sub, r.result || r.cond), text: r.result || r.cond || "", place: trinetraFiredText(mo.fired), planets: firedPlanets(mo.fired) }); });
+    });
+    Object.keys(st.byNak).map(Number).forEach(function (n) {
+      st.byNak[n].forEach(function (r) { items.push({ bucket: personaBucket("Nakshatra", r.sub, r.result || r.cond), text: r.result || r.cond || "", place: NAKSHATRAS[n] + " · " + st.occ[n].join("/"), planets: st.occ[n].slice() }); });
+    });
+    // planet -> condensed prediction texts (for the life-journey blocks)
+    var byPlanet = {};
+    items.forEach(function (it) { var c = condense(it.text); if (!c) return; it.cond = c; it.planets.forEach(function (p) { (byPlanet[p] = byPlanet[p] || []).push(c); }); });
+
+    var total = items.length;
     var html = head +
-      '<p class="fine-print">How this chart shapes ' + escapeHtml(nm) + '&rsquo;s character, temperament and life — read from the yogas and dictums that <strong>fully apply</strong> (every condition met). Each line is the crux of one shaping influence. Read it as a weighted mosaic, not a single verdict; where the classics differ, both voices are kept. Analytical only — not a personal, medical or financial judgement.</p>';
+      '<p class="fine-print">How this chart shapes ' + escapeHtml(nm) + '&rsquo;s character, temperament and life — assembled from <strong>' + total + '</strong> yogas &amp; dictums that <strong>fully apply</strong> (every condition met), consolidated by life area. The <strong>bold</strong> phrase is the takeaway; the placement that produces it is shown in brackets at the end. A weighted mosaic, not a single verdict — analytical only, not a personal/medical/financial judgement.</p>';
 
-    // Temperament — from the occupied nakshatras
-    if (starCount) {
-      html += '<div class="panel-box"><h3>🧠 Temperament, mind &amp; inner self</h3>';
-      html += '<p class="fine-print">From the nakshatras occupied in the chart — the <strong>Moon-star</strong> governs the mind &amp; emotions, the <strong>Lagna-star</strong> the self &amp; body, and each graha-star colours its own significations.</p>';
-      Object.keys(st.byNak).map(Number).sort(function (a, b) { return a - b; }).forEach(function (n) {
-        html += '<p class="persona-sub"><strong>' + escapeHtml(NAKSHATRAS[n]) + '</strong> (' + escapeHtml(st.occ[n].join(", ")) + ')</p>';
-        html += bullets(st.byNak[n].map(function (r) { return r.result || r.cond || ""; }));
-      });
-      html += '</div>';
-    }
+    // ---- consolidated life-area buckets ----
+    var byBucket = {}; items.forEach(function (it) { (byBucket[it.bucket] = byBucket[it.bucket] || []).push(it); });
+    PERSONA_BUCKETS.forEach(function (b) {
+      var list = byBucket[b[0]]; if (!list || !list.length) return;
+      var seen = {}, lis = [];
+      list.forEach(function (it) { var c = it.cond || condense(it.text); if (!c) return; var k = keyClean(c); if (seen[k]) return; seen[k] = 1; lis.push('<li>' + personaFmt(c) + (it.place ? ' <span class="persona-place">(' + escapeHtml(it.place) + ')</span>' : '') + '</li>'); });
+      if (!lis.length) return;
+      html += '<div class="panel-box"><h3>' + b[1] + ' <span class="fine-print">(' + lis.length + ')</span></h3><ul class="persona-list">' + lis.join('') + '</ul></div>';
+    });
 
-    // Life areas — from the fired Promise rules
-    function renderArea(area) {
-      var list = pr.byArea[area]; if (!list || !list.length) return "";
-      var bySub = {}; list.forEach(function (mo) { var s = mo.r.sub || "—"; (bySub[s] = bySub[s] || []).push(mo); });
-      var h = '<div class="panel-box"><h3>' + (PERSONA_THEME[area] || escapeHtml(area)) + ' <span class="fine-print">(' + list.length + ')</span></h3>';
-      Object.keys(bySub).sort().forEach(function (s) {
-        h += '<p class="persona-sub"><strong>' + escapeHtml(s) + '</strong></p>';
-        h += bullets(bySub[s].map(function (mo) { return mo.r.result || mo.r.cond || ""; }));
-      });
-      return h + '</div>';
-    }
-    PERSONA_ORDER.forEach(function (a) { html += renderArea(a); });
-    Object.keys(pr.byArea).sort().forEach(function (a) { if (PERSONA_ORDER.indexOf(a) < 0) html += renderArea(a); });
+    // ---- life journey — Dasha–Antar(–Pratyantar) blocks with activated persona points ----
+    try {
+      var birth = input && input.birthInstant; var owned = trinetraOwnedMap(useChart);
+      if (birth && useChart.vimshottari && useChart.vimshottari.timeline) {
+        var YMS = 365.2425 * 86400000, nowMs = Date.now(), horizon = nowMs + 10 * YMS, bMs = birth.getTime();
+        var tl = useChart.vimshottari.timeline;
+        function ageAt(ms) { return Math.max(0, Math.floor((ms - bMs) / YMS)); }
+        function predsFor(lords) { var s = {}, out = []; lords.forEach(function (l) { (byPlanet[l] || []).forEach(function (t) { var k = keyClean(t); if (!s[k]) { s[k] = 1; out.push(t); } }); }); return out; }
+        function mattersOf(lords) { var s = {}; lords.forEach(function (l) { (owned[l] || []).forEach(function (h) { s[h] = 1; }); }); return Object.keys(s).map(Number).sort(function (a, b) { return a - b; }).map(function (h) { return TR_HOUSE_MATTER[h]; }); }
+        function block(md, ad, pd, s, e, depth3) {
+          var lords = [md, ad]; if (pd) lords.push(pd);
+          var lbl = "MD " + md + " – AD " + ad + (pd ? " – PD " + pd : "");
+          var preds = predsFor(lords).slice(0, depth3 ? 3 : 5);
+          var h = '<div class="persona-journey"><p class="persona-sub"><strong>Age ' + ageAt(s) + '–' + ageAt(e) + '</strong> · ' + new Date(s).getFullYear() + '–' + new Date(e).getFullYear() + ' · ' + escapeHtml(lbl) + '</p>';
+          if (preds.length) h += '<ul class="persona-list">' + preds.map(function (t) { return '<li>' + personaFmt(t) + '</li>'; }).join('') + '</ul>';
+          else { var mm = mattersOf(lords); h += '<p class="fine-print">Activates: ' + escapeHtml(mm.join("; ") || "—") + '.</p>'; }
+          return h + '</div>';
+        }
+        function journey(title, note, fromMs, toMs, three) {
+          var h = '', any = false;
+          tl.forEach(function (mdp) {
+            if (mdp.end.getTime() < fromMs || mdp.start.getTime() > toMs) return;
+            subPeriods(mdp, "AD").forEach(function (adp) {
+              var s = adp.start.getTime(), e = adp.end.getTime();
+              if (e < fromMs || s > toMs) return;
+              if (three) {
+                subPeriods(adp, "PD").forEach(function (pdp) {
+                  var ps = pdp.start.getTime(), pe = pdp.end.getTime();
+                  if (pe < fromMs || ps > toMs) return;
+                  any = true; h += block(mdp.lord, adp.lord, pdp.lord, Math.max(ps, fromMs), pe, true);
+                });
+              } else { any = true; h += block(mdp.lord, adp.lord, null, Math.max(s, fromMs), e, false); }
+            });
+          });
+          return any ? ('<div class="panel-box"><h3>' + title + '</h3><p class="fine-print">' + note + '</p>' + h + '</div>') : "";
+        }
+        html += journey("🛤️ Life journey so far (Dasha–Antardasha)", "Each block is a Vimshottari Dasha–Antardasha period (with age &amp; years); the lines are the persona points its ruling planets activate.", bMs, nowMs, false);
+        html += journey("🔮 Next 10 years (Dasha–Antar–Pratyantar)", "Upcoming periods to Pratyantar depth, with the persona points they will activate.", nowMs, horizon, true);
+      }
+    } catch (e) { html += '<p class="fine-print">Life-journey timeline unavailable: ' + escapeHtml(e && e.message ? e.message : String(e)) + '</p>'; }
 
-    // Current life phase — the Time eye
-    html += '<div class="panel-box"><h3>⏳ Current life phase (running dasha &amp; transits)</h3>';
-    html += '<ul class="persona-list">' + tm.stack.map(function (r) { var matters = r.owns.map(function (h) { return "H" + h + " " + TR_HOUSE_MATTER[h]; }).join("; ") || "—"; return '<li><strong>' + r.level + ' ' + escapeHtml(r.lord) + '</strong> — activates ' + escapeHtml(matters) + (r.tags.length ? ' <span class="fine-print">(' + escapeHtml(r.tags.join(", ")) + ')</span>' : '') + '</li>'; }).join('') + '</ul>';
-    html += '<p class="fine-print"><strong>Transits now:</strong> ' + tm.transits.map(function (t) { return escapeHtml(t.p + " in " + t.sign); }).join(" · ") + '. ' + escapeHtml(tm.sade) + '.</p></div>';
-
-    html += '<p class="fine-print">The persona is a computed synthesis of every classical rule that fully applies (all conditions met). Dictums whose conditions the engine cannot fully verify are excluded here — see the <strong>Trinetra</strong> section for the full fired-rules list and reference dictums.</p></section>';
+    html += '<p class="fine-print">The persona is a computed synthesis of every classical rule that fully applies (all conditions met), consolidated by life area and projected across the dasha timeline. Dictums whose conditions the engine cannot fully verify are excluded — see the <strong>Trinetra</strong> section for the full fired-rules list and reference dictums.</p></section>';
     return html;
   }
   function shadbalaRows(chart) {
@@ -23060,7 +23117,7 @@
     L.push("Ayanamsa       : Krishnamurti (KP-Old)   value " + decimalToDms(kp.ayanamsa) + "   (= Lahiri Chitrapaksha − 6′00″; e.g. 2001 = 23°46′32″)");
     L.push("House system   : Placidus");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.110");
+    L.push("Software / ver : VedNetra 1.111");
     L.push("Native         : " + nm + "            Sex: " + ((input && input.gender) || "-"));
     L.push("DoB / ToB      : " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
@@ -23313,7 +23370,7 @@
     L.push("KP number      : " + hnum + " / 249");
     L.push("House system   : " + kp.houseSystem + "  (equal 30° cusps from the number-seed ascendant — VedNetra KP-horary convention)");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.110");
+    L.push("Software / ver : VedNetra 1.111");
     L.push("Question       : " + ((input && input.question) ? String(input.question) : "-"));
     L.push("Judgment moment: " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
