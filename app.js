@@ -6178,7 +6178,7 @@
       { id: "viewA-ephemeris",      label: "Ephemeris",         render: function () { return ephemerisSection(chart, input); }, wire: function () { wireEphemerisControls(chart, input); } },
       { id: "viewA-references",     label: "Reference tables",  render: function () { return referenceTablesSection(chart); } },
       { id: "viewA-shadbala",       label: "Shadbala",          render: function () { return shadbalaSection(chart); } },
-      { id: "viewA-planetstrength", label: "Planetary Strength (32-pointer)", render: function () { return planetaryStrengthSection(chart, input); } },
+      { id: "viewA-planetstrength", label: "Planetary Strength (33-pointer)", render: function () { return planetaryStrengthSection(chart, input); } },
       { id: "viewA-trinetra",       label: "Trinetra (Promise/Star/Time)", render: function () { return trinetraSection(chart, input); } },
       { id: "viewA-sahams",         label: "Sahams",            render: function () { return sahamsSection(chart, input); } },
       { id: "viewA-jaimini",        label: "Jaimini",           render: function () { return jaiminiSection(chart); } },
@@ -11229,8 +11229,8 @@
       '</div><p class="fine-print">Classical Shadbala (BPHS / Parashari) in Shashtiamsas: 60 virupas = 1 Rupa. Six heads &mdash; Sthana (Uccha, Saptavargaja, Ojayugma, Kendradi, Drekkana), Dig, Kala (Nathonnatha, Paksha, Tribhaga, Abda/Masa/Vara/Hora, Ayana), Cheshta, Naisargika and Drik. Ratio = total obtained &divide; classically required strength. Rahu/Ketu are judged through dispositor, dignity and house logic elsewhere.</p></section>';
   }
 
-  // Standalone tile for the 32-pointer Planetary Strength composite (same data as
-  // the Consolidated Master Run §I-H), so it can be viewed on its own in the app.
+  // Standalone tile for the 33-pointer weighted Planetary Strength composite (same
+  // data as the Consolidated Master Run §I-H), so it can be viewed on its own.
   function planetaryStrengthSection(chart, input) {
     var useChart = chart;
     try {
@@ -11238,38 +11238,80 @@
         useChart = buildChart(input.birthInstant, Number(input.latitude), Number(input.longitude), Number(input.timezone), { ascendantOverride: input.ascendantOverride, ayanamshaKey: "lahiri" });
       }
     } catch (e) {}
-    var s32;
-    try { s32 = vnStrength32(useChart, input); }
-    catch (e) { return '<section id="viewA-planetstrength" class="section"><div class="section-head"><div><p class="eyebrow">Balas &amp; Phalas</p><h3>Planetary Strength (32-pointer)</h3></div></div><p class="fine-print">Unavailable: ' + escapeHtml(e && e.message ? e.message : String(e)) + '</p></section>'; }
-    var order = s32.order;
-    var maleficRows = { 17: 1, 18: 1, 25: 1, 28: 1, 29: 1 }; // 0-indexed rows scored "absent = good"
-    var summary = '<div class="table-wrap"><table><thead><tr><th>Planet</th><th>Net score</th><th>Percent</th><th>Strength band</th></tr></thead><tbody>' +
-      order.map(function (n) {
-        var r = s32.rows[n];
-        return "<tr><td><strong>" + escapeHtml(n) + "</strong></td><td><strong>" + r.total.toFixed(1) + " / 32</strong></td><td>" + r.pct.toFixed(0) + "%</td><td>" + escapeHtml(r.band) + "</td></tr>";
+    var bala;
+    try { bala = vnBala33(useChart, input); }
+    catch (e) { return '<section id="viewA-planetstrength" class="section"><div class="section-head"><div><p class="eyebrow">Balas &amp; Phalas</p><h3>Planetary Strength (33-pointer)</h3></div></div><p class="fine-print">Unavailable: ' + escapeHtml(e && e.message ? e.message : String(e)) + '</p></section>'; }
+    var order = bala.order, rows = bala.rows;
+    var absLbl = { freedom_from_affliction: 1, not_combust: 1, not_debilitated: 1, no_kendradhipati_dosha: 1, not_defeated_yuddha: 1 };
+    // uncertainty note
+    var uncertainNote = bala.birthCertain ? "" : '<p class="fine-print" style="color:#b45309">जन्म समय अनिश्चित, मद 22 और 23 शून्य किए गए</p>';
+    // summary table: Score /100 · Top-10 /59 · Order (no band)
+    var summary = '<div class="table-wrap"><table><thead><tr><th>Graha</th><th>Score of 100</th><th>Top-10 subtotal of 59</th><th>Order</th></tr></thead><tbody>' +
+      order.map(function (n, i) {
+        var r = rows[n];
+        return "<tr><td><strong>" + escapeHtml(n) + "</strong></td><td><strong>" + r.total.toFixed(1) + "</strong></td><td>" + r.top10.toFixed(1) + "</td><td>" + (i + 1) + "</td></tr>";
       }).join("") + "</tbody></table></div>";
-    var bars = '<div class="panel-box shadbala-graph-panel"><h3>Net strength (out of 32)</h3>' +
+    if (bala.naturalTie) summary += '<p class="fine-print">एक या अधिक ग्रह समान बल के थे; क्रम नैसर्गिक क्रम (सूर्य→केतु) से स्वाभाविक रूप से तय किया गया.</p>';
+    // spread line
+    var hi = rows[order[0]].total, lo = rows[order[order.length - 1]].total, spread = Math.round((hi - lo) * 10) / 10;
+    var spreadLine = '<p class="fine-print"><strong>Spread (highest &minus; lowest):</strong> ' + spread.toFixed(1) + ' अंक.' +
+      (spread < 8 ? ' <strong>फैलाव ' + spread.toFixed(1) + ' अंक, सभी ग्रह लगभग समान बल के हैं.</strong>' : '') + '</p>';
+    // bars (out of 100)
+    var bars = '<div class="panel-box shadbala-graph-panel"><h3>Score (out of 100)</h3>' +
       order.map(function (n) {
-        var r = s32.rows[n], percent = Math.round(clamp(r.total / 32, 0, 1) * 100);
-        return '<div class="strength-bar-row"><strong>' + escapeHtml(n) + '</strong><div class="strength-track"><span style="width:' + percent + '%"></span></div><em>' + r.total.toFixed(1) + " / 32</em></div>";
+        var r = rows[n], percent = Math.round(clamp(r.total / 100, 0, 1) * 100);
+        return '<div class="strength-bar-row"><strong>' + escapeHtml(n) + '</strong><div class="strength-track"><span style="width:' + percent + '%"></span></div><em>' + r.total.toFixed(1) + " / 100</em></div>";
       }).join("") + "</div>";
+    // tier-grouped 33×9 matrix, cells "earned / max", tier subtotal rows
     var head = "<tr><th>Pointer</th>" + order.map(function (n) { return "<th>" + escapeHtml(n) + "</th>"; }).join("") + "</tr>";
-    var body = s32.names.map(function (nm, i) {
-      var cells = order.map(function (n) {
-        var v = s32.rows[n].points[i];
-        var cls = v >= 0.75 ? ' class="ps-hi"' : v <= 0.25 ? ' class="ps-lo"' : '';
-        return "<td" + cls + ">" + v.toFixed(2) + "</td>";
-      }).join("");
-      return "<tr" + (maleficRows[i] ? ' class="ps-malefic"' : "") + "><td>" + escapeHtml(nm) + "</td>" + cells + "</tr>";
-    }).join("");
-    var totalRow = '<tr class="ps-total"><td><strong>Net / 32</strong></td>' + order.map(function (n) { return "<td><strong>" + s32.rows[n].total.toFixed(1) + "</strong></td>"; }).join("") + "</tr>";
-    var pctRow = '<tr class="ps-total"><td><strong>Percent</strong></td>' + order.map(function (n) { return "<td>" + s32.rows[n].pct.toFixed(0) + "%</td>"; }).join("") + "</tr>";
-    var matrix = '<div class="table-wrap"><table class="ps-matrix"><thead>' + head + "</thead><tbody>" + body + totalRow + pctRow + "</tbody></table></div>";
+    var bodyParts = [];
+    bala.tiers.forEach(function (tier) {
+      var idxs = []; bala.pointers.forEach(function (p, i) { if (p[3] === tier) idxs.push(i); });
+      var tierMax = 0; idxs.forEach(function (i) { tierMax += bala.pointers[i][2]; });
+      bodyParts.push('<tr class="ps-tier"><td colspan="' + (order.length + 1) + '"><strong>' + escapeHtml(tier) + '</strong></td></tr>');
+      idxs.forEach(function (i) {
+        var p = bala.pointers[i], lbl = escapeHtml(p[1]) + (absLbl[p[0]] ? ' <sup>†</sup>' : '');
+        var cells = order.map(function (n) {
+          var c = rows[n].cells[i], frac = c.weight ? c.score / c.weight : 0;
+          var cls = frac >= 0.75 ? ' class="ps-hi"' : frac <= 0.25 ? ' class="ps-lo"' : '';
+          var extra = (p[0] === "baladi_avastha") ? ' <small>(' + escapeHtml(rows[n].baladi || "-") + ')</small>' : '';
+          return "<td" + cls + ">" + c.score.toFixed(1) + " / " + p[2] + extra + "</td>";
+        }).join("");
+        bodyParts.push("<tr" + (absLbl[p[0]] ? ' class="ps-malefic"' : "") + "><td>" + lbl + "</td>" + cells + "</tr>");
+      });
+      bodyParts.push('<tr class="ps-total"><td><strong>' + escapeHtml(tier) + ' subtotal / ' + tierMax + '</strong></td>' +
+        order.map(function (n) { var s = 0; idxs.forEach(function (i) { s += rows[n].cells[i].score; }); return "<td><strong>" + (Math.round(s * 10) / 10).toFixed(1) + "</strong></td>"; }).join("") + "</tr>");
+    });
+    var totalRow = '<tr class="ps-total"><td><strong>Score / 100</strong></td>' + order.map(function (n) { return "<td><strong>" + rows[n].total.toFixed(1) + "</strong></td>"; }).join("") + "</tr>";
+    var top10Row = '<tr class="ps-total"><td><strong>Top-10 / 59</strong></td>' + order.map(function (n) { return "<td>" + rows[n].top10.toFixed(1) + "</td>"; }).join("") + "</tr>";
+    var matrix = '<div class="table-wrap"><table class="ps-matrix"><thead>' + head + "</thead><tbody>" + bodyParts.join("") + totalRow + top10Row + "</tbody></table></div>";
+    // three-time variant + boundary flags
+    var threeTime = "", boundaryNotes = "";
+    try {
+      var bd = vnBala33Boundary(useChart, input);
+      if (bd.flags.baladi) boundaryNotes += '<p class="fine-print" style="color:#b45309">⚠ बलादि सीमा ±5 मिनट के भीतर: किसी ग्रह का 6° बलादि खंड बदल रहा है — मद 22 अस्थिर.</p>';
+      if (bd.flags.janmaNak) boundaryNotes += '<p class="fine-print" style="color:#b45309">⚠ जन्म-नक्षत्र सीमा ±5 मिनट के भीतर: चन्द्र नक्षत्र बदल रहा है' + (bd.flags.altLord ? ' (वैकल्पिक स्वामी ' + escapeHtml(bd.flags.altLord) + ')' : '') + ' — मद 23 अस्थिर.</p>';
+      if (bd.plus || bd.minus) {
+        function cellAt(res, n, key) { if (!res || !res.rows[n]) return "—"; var cs = res.rows[n].cells; for (var k = 0; k < cs.length; k++) if (cs[k].key === key) return cs[k].score.toFixed(1); return "—"; }
+        threeTime = '<div class="table-wrap"><table><thead><tr><th>Graha</th><th>Given</th><th>+5 min</th><th>&minus;5 min</th><th>मद22 (g/+5/&minus;5)</th><th>मद23 (g/+5/&minus;5)</th></tr></thead><tbody>' +
+          order.map(function (n) {
+            return "<tr><td><strong>" + escapeHtml(n) + "</strong></td><td>" + rows[n].total.toFixed(1) + "</td><td>" +
+              ((bd.plus && bd.plus.rows[n]) ? bd.plus.rows[n].total.toFixed(1) : "—") + "</td><td>" +
+              ((bd.minus && bd.minus.rows[n]) ? bd.minus.rows[n].total.toFixed(1) : "—") + "</td><td>" +
+              cellAt(bala, n, "baladi_avastha") + "/" + cellAt(bd.plus, n, "baladi_avastha") + "/" + cellAt(bd.minus, n, "baladi_avastha") + "</td><td>" +
+              cellAt(bala, n, "janma_nakshatra_lord") + "/" + cellAt(bd.plus, n, "janma_nakshatra_lord") + "/" + cellAt(bd.minus, n, "janma_nakshatra_lord") + "</td></tr>";
+          }).join("") + "</tbody></table></div>";
+        threeTime = '<h3 style="margin-top:1em">Three-time variant (given · +5 min · &minus;5 min)</h3><p class="fine-print">Pointers 22 (baladi) and 23 (janma-nakshatra lord) are the most time-sensitive, so they are called out per casting.</p>' + threeTime;
+      }
+    } catch (e) {}
+    var footNote = '<div class="panel-box" style="margin-top:1em"><p class="fine-print">यह अंक केवल तीव्रता बताता है, शुभता नहीं। ऊँचा अंक पाने वाला ग्रह अपना सौंपा हुआ फल अधिक ज़ोर से देगा, चाहे वह फल शुभ हो या अशुभ। 63 अंक वाला अष्टमेश उतनी ही तीव्रता से कष्ट देगा जितनी तीव्रता से 63 अंक वाला नवमेश भाग्य। शुभ अशुभ का निर्णय केवल PROMISE और STAR नेत्र करते हैं।</p>' +
+      '<p class="fine-print">The 33 individual pointers are each classical Par&#257;&#347;ari doctrines. The additive weighted scheme, its weights, and its tie-break order are this project&rsquo;s own synthesis, computed by VedNetra. <code>[BALA]</code> cites a VedNetra score, never a page number, and is never presented as a classical text.</p></div>';
     return '<section id="viewA-planetstrength" class="section planet-strength-section">' +
-      '<div class="section-head"><div><p class="eyebrow">Balas &amp; Phalas</p><h3>Planetary Strength (32-pointer)</h3></div><span class="small-pill">Lahiri · equal-weight</span></div>' +
-      '<p class="fine-print">Each of the nine planets scored across <strong>32 classical strength pointers</strong>, every pointer weighted equally (0–1), giving a <strong>net score out of 32</strong>, a percent and a strength band. Same composite as the Consolidated Master Run <strong>§I-H</strong>, now viewable on its own. This is a measure of a planet&rsquo;s <strong>strength/condition</strong> only &mdash; <strong>not</strong> the auspiciousness of its results: a very strong planet can still give difficult outcomes depending on its ownership, dasha and the question.</p>' +
-      summary + bars + matrix +
-      '<p class="fine-print">Positive-quality pointers score higher with more of the quality. The five <strong>malefic-quality</strong> pointers (highlighted rows) &mdash; #18 Combustion, #19 Planetary War, #26 Kendr&#257;dhipati Do&#7779;a, #29 Debilitation (uncancelled), #30 Affliction &mdash; award the point when that quality is <strong>absent</strong>. &#7778;a&#7693;bala heads, I&#7779;&#7789;a&ndash;Ka&#7779;&#7789;a, Vim&#347;opaka and Ashtakavarga come from the classical engines; relative balas are normalised across the seven classical planets. R&#257;hu/Ketu take classical-only balas via their sign-dispositor. A computed strength lens (Lahiri) &mdash; not a life-outcome verdict.</p>' +
+      '<div class="section-head"><div><p class="eyebrow">Balas &amp; Phalas</p><h3>Planetary Strength (33-pointer)</h3></div><span class="small-pill">Lahiri · weighted /100</span></div>' +
+      '<p class="fine-print">Each of the nine grahas scored across <strong>33 classical strength pointers</strong>, each pointer carrying its own weight, giving a <strong>score out of 100</strong> and a <strong>Top-10 subtotal (of 59)</strong>. Same composite as the Consolidated Master Run <strong>§I-H</strong>, now viewable on its own. This is a measure of a planet&rsquo;s <strong>intensity/condition</strong> only &mdash; <strong>not</strong> the auspiciousness of its results: a very strong planet can still give difficult outcomes depending on its ownership, dasha and the question.</p>' +
+      uncertainNote + summary + spreadLine + bars +
+      '<p class="fine-print">Each matrix cell shows <code>earned / max</code>. Rows are grouped by tier with a tier subtotal. Pointers marked <sup>†</sup> are <strong>absence-scoring</strong> (Freedom from affliction, Not combust, Not debilitated, Free of kendr&#257;dhipati do&#7779;a, Not defeated in planetary war): the point is earned when the negative quality is <strong>absent</strong>.</p>' +
+      matrix + boundaryNotes + threeTime + footNote +
       '</section>';
   }
   // ===================================================================
@@ -18419,7 +18461,7 @@
     ] },
     { title: "Strengths & Systems", items: [
       { id: "viewA-shadbala", label: "Shadbala", desc: "Six-fold planetary strength." },
-      { id: "viewA-planetstrength", label: "Planetary Strength (32-pointer)", desc: "Equal-weight composite scoring all 9 planets across 32 classical strength pointers (dignity, Bhava/Shadbala heads, Vimshopaka, divisional, Ashtakavarga, Ishta–Kashta, avastha, combustion, war, conjunctions, aspects, dispositor/nakshatra-lord strength, functional status, yogas, neecha-bhanga, affliction, significations) — with a net score out of 32, percent and strength band per planet. Measures strength/condition, not auspiciousness of results. Same as Consolidated Master Run §I-H." },
+      { id: "viewA-planetstrength", label: "Planetary Strength (33-pointer)", desc: "Weighted composite scoring all 9 grahas across 33 classical strength pointers (dignity, Shadbala total + heads, house placement/lordship, functional nature, Vimshopaka, divisional, Ashtakavarga, Ishta–Kashta, baladi avastha, janma-nakshatra lord, combustion, war, conjunctions, aspects, dispositor/nakshatra-lord strength, yogas, neecha-bhanga, affliction) — each pointer carrying its own weight for a score out of 100 and a Top-10 subtotal (of 59) per planet, grouped by tier with earned/max cells. Measures intensity/condition, not auspiciousness of results. Same as Consolidated Master Run §I-H." },
       { id: "viewA-trinetra", label: "Trinetra (Promise/Star/Time)", desc: "Matches the native's chart against a rule-base of ~7,670 dictums: the Promise eye (classical dictums across marriage, profession, disease, progeny, siblings, education, judgment, yogas, sutram), the Star eye (Komilla Sutton's nakshatra dictums for the occupied stars), and the Time eye (running dasha + current transits via the Umesh Puri / Laghu-Parashari + Gochar engine). Lists every applicable dictum with the trigger that fired it and its source. Also in Consolidated Master Run §I-I." },
       { id: "viewA-sahams", label: "Sahams", desc: "Full set of Tajika Sahams (sensitive points) — Punya, Vidya, Vivaha, Putra, Karma, Roga, Ayu and 20 more, with sign/degree/house and formula." },
       { id: "viewA-sav", label: "Ashtakavarga (SAV)", desc: "Sarvashtakavarga bindu totals." },
@@ -18442,7 +18484,7 @@
       { id: "viewA-nativereport", label: "Native Input Report", desc: "Full v3 native export (§0–§16): fragility flags, guna, sphutas, sahams, rupa Ṣaḍbala, prastarāṣṭakavarga, D16, Parivritti-D10, full-life dashas, ingress + natal-return transits." },
       { id: "viewA-vapmreport", label: "VAPM Export", desc: "VAPM export spec (Lahiri, §1–§14 + Part B): master table, aspect/Kartari table, functional nature, Chandra/Surya Lagna, all vargas + Dashavarga count, Ashtakavarga incl. Shodhya Pinda, Vimshottari/Yogini/Jaimini, Indu Lagna, Tara Chakra, transits, four-fold scaffolds." },
       { id: "viewA-vapmnakreport", label: "VAPM + Nakshatra Report", desc: "Full export (Lahiri): the whole VAPM export plus the §15 Nakshatra Layer — within-nakshatra degrees, Gandanta (48′/3°20′), Abhijit, Navatara points, pada-level navamsa dignity, Nadi/dosha and Yoni/Gana matching factors." },
-      { id: "viewA-consolidatedmaster", label: "Consolidated Master Run", desc: "One-sheet master run covering all four projects (Lahiri): Mehta+Sutton (VAPM), Trinetra (Promise/Star/Time), Umesh Puri (LP+Gochar) and Triveni (BPHS·BJ·PD). Part I is the universal computed data core — incl. §I-H, a 32-pointer equal-weight Planetary Strength composite with a net score out of 32 per planet (strength, not auspiciousness of results); Part II re-frames it through each project's method lens." },
+      { id: "viewA-consolidatedmaster", label: "Consolidated Master Run", desc: "One-sheet master run covering all four projects (Lahiri): Mehta+Sutton (VAPM), Trinetra (Promise/Star/Time), Umesh Puri (LP+Gochar) and Triveni (BPHS·BJ·PD). Part I is the universal computed data core — incl. §I-H, a 33-pointer weighted Planetary Strength composite with a score out of 100 per planet (intensity, not auspiciousness of results); Part II re-frames it through each project's method lens." },
       { id: "viewA-kpreport", label: "KP System Report", desc: "DEFAULT — dedicated Krishnamurti Paddhati export (Krishnamurti ayanamsa − Lahiri−0.1°, Placidus, mean nodes, sub-lords to the second). Natal AND horary (Prashna 1–249): A0 header + birth-time-sensitivity, A1 twelve cusps with the CSL and its OWN sub-lord (final verdict layer), A1/A2 also print Sub→NEXT / Sub←PREV (minutes of birth-time error that flip each sub-lord, and to which lord), A2 nine planets star/sub/sub-sub + house + retro, A6 a ±2-min sub-lord stability roll-up, A4 karaka/body-part master, A5 relative-rotation map, A3 four-level Vimshottari, B1–B4 significators/ruling-planets/CSL promise board (with CSL-sub), B5 event-group scan, B6 money-direction flag, B7 badhaka/maraka, C1 natal-house transit + Moon star-lord + rising lagna, C2 Prana ladder, and an anti-anchoring self-check." },
       { id: "viewA-trivenireport", label: "Triveni Chart Intake", desc: "Intake sheet (Lahiri, §0–§17): D1 sign-deg-min, unequal Sripati bhava cusps, Dasavarga, Shadbala pass/fail + Vimsopaka + Ishta/Kashta + bhava-sandhi, Ashtakavarga + Shodhya Pinda, Vimshottari, Jaimini 8-karaka, longevity + conditional dashas, full MD-AD-PD, gochara, Sahams, Varshaphal, Panchang, planetary strength." },
       { id: "viewA-trinetrareport", label: "Trinetra Master Run", desc: "Three-eye worksheet (Lahiri, §0–§8): intake/ayanamsa gate, Eye 1 Promise (eight-factor engine, yogas+bhanga, longevity ordinal), Eye 2 Star (nakshatra-pada, Navatara from Moon & Lagna, the one-way override), Eye 3 Time (functional nature, maraka danger, per-bhavesha firing test + gochara), grade/resolve, guardrails." },
@@ -22446,27 +22488,62 @@
     for (var i = 0; i < keys.length; i++) if (t.indexOf(keys[i]) >= 0) return VN_ROUTING[map[keys[i]]];
     return null;
   }
-  // ===== 32-pointer Planetary Strength (Consolidated §I-H) =====
+  // ===== 33-pointer weighted Planetary Strength (Consolidated §I-H) =====
   // Each of 32 classical dimensions scores 0..1 per planet with EQUAL weight; the
   // net score is their sum (max 32). Positive-quality pointers score higher with
   // more of the quality. The five malefic-quality pointers (#18 combustion,
   // #19 planetary war, #26 kendradhipati dosha, #29 uncancelled debilitation,
   // #30 affliction) award the point when that quality is ABSENT.
-  var VN_S32_NAMES = [
-    "1 · Rāśi Dignity", "2 · House Placement", "3 · Bhāva Bala", "4 · Shadbala", "5 · Sthāna Bala",
-    "6 · Dig Bala", "7 · Kāla Bala", "8 · Cheshtā Bala", "9 · Naisargika Bala", "10 · Drik Bala",
-    "11 · Vargottama", "12 · Vimshopaka Bala", "13 · Divisional Strength", "14 · Ashtakavarga", "15 · Ishta–Kashta Phala",
-    "16 · Avasthā", "17 · Retrogression", "18 · Combustion (absent✓)", "19 · Planetary War (absent✓)", "20 · Conjunctions",
-    "21 · Benefic Aspects", "22 · Dispositor Strength", "23 · Nakshatra-Lord Strength", "24 · Functional Status", "25 · House Lordship",
-    "26 · Kendrādhipati Doṣa (absent✓)", "27 · Yogakāraka", "28 · Raja/Dhana Yoga", "29 · Debilitation Cancellation", "30 · Affliction (absent✓)",
-    "31 · Natural Significations", "32 · Relevant-House Significations"
+  // ===== §I-H BALA — 33-pointer weighted composite, score out of 100 =====
+  // key, label, max-weight, tier, absence-scoring (point earned when the negative
+  // quality is ABSENT). Weights sum to 100; tier maxima 34/15/13/17/8/13.
+  var VN_BALA33 = [
+    ["rashi_dignity", "Rashi dignity", 9, "Foundation", false],
+    ["shadbala_total", "Shadbala total", 8, "Bala machinery", false],
+    ["house_placement", "House placement", 8, "Foundation", false],
+    ["house_lordship", "House lordship", 7, "Foundation", false],
+    ["functional_nature", "Functional nature", 6, "Foundation", false],
+    ["freedom_from_affliction", "Freedom from affliction", 5, "Blemish", true],
+    ["dispositor_strength", "Dispositor strength", 4, "Fine & karakatva", false],
+    ["not_combust", "Not combust", 4, "Blemish", true],
+    ["ashtakavarga", "Ashtakavarga", 4, "Varga & Ashtakavarga", false],
+    ["vimshopaka", "Vimshopaka bala", 4, "Varga & Ashtakavarga", false],
+    ["vargottama", "Vargottama", 3, "Varga & Ashtakavarga", false],
+    ["not_debilitated", "Not debilitated / neechabhanga", 3, "Blemish", true],
+    ["no_kendradhipati_dosha", "Free of kendradhipati dosha", 3, "Blemish", true],
+    ["conjunction", "Conjunction", 3, "Association & yoga", false],
+    ["benefic_aspect", "Benefic aspect", 3, "Association & yoga", false],
+    ["dig_bala", "Dig bala", 2, "Bala machinery", false],
+    ["divisional_strength", "Divisional strength", 2, "Varga & Ashtakavarga", false],
+    ["not_defeated_yuddha", "Not defeated in planetary war", 2, "Blemish", true],
+    ["bhava_bala", "Bhava bala", 2, "Foundation", false],
+    ["nakshatra_lord_strength", "Nakshatra-lord strength", 2, "Fine & karakatva", false],
+    ["natural_karakatva", "Natural karakatva", 2, "Foundation", false],
+    ["baladi_avastha", "Baladi avastha (by degree)", 2, "Fine & karakatva", false],
+    ["janma_nakshatra_lord", "Janma-nakshatra lord", 2, "Fine & karakatva", false],
+    ["drik_bala", "Drik bala", 1, "Bala machinery", false],
+    ["sthana_bala", "Sthana bala", 1, "Bala machinery", false],
+    ["kala_bala", "Kala bala", 1, "Bala machinery", false],
+    ["cheshta_bala", "Cheshta bala", 1, "Bala machinery", false],
+    ["naisargika_bala", "Naisargika bala", 1, "Bala machinery", false],
+    ["yogakaraka", "Yogakaraka", 1, "Association & yoga", false],
+    ["rajayoga_dhanayoga", "Rajayoga / dhanayoga", 1, "Association & yoga", false],
+    ["ishta_kashta", "Ishta-kashta phala", 1, "Fine & karakatva", false],
+    ["avastha_jagradadi_deeptadi", "Avastha (jagradadi + deeptadi)", 1, "Fine & karakatva", false],
+    ["retrogression", "Retrogression", 1, "Fine & karakatva", false]
   ];
-  function vnStrength32(chart, input) {
+  var VN_BALA33_TIERS = ["Foundation", "Bala machinery", "Varga & Ashtakavarga", "Blemish", "Association & yoga", "Fine & karakatva"];
+  (function () { // startup assertions
+    var sum = 0; VN_BALA33.forEach(function (r) { sum += r[2]; });
+    if (sum !== 100) throw new Error("VN_BALA33 weights must sum to 100, got " + sum);
+    var t10 = 0; for (var i = 0; i < 10; i++) t10 += VN_BALA33[i][2];
+    if (t10 !== 59) throw new Error("VN_BALA33 top-10 must sum to 59, got " + t10);
+  })();
+  function vnBala33(chart, input) {
     var order = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
     var classical = CLASSICAL_PLANETS, asc = chart.ascendant;
     function clamp(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
-    function dispClamp(score) { return clamp((score || 0) / 60); }
-    function band(pct) { return pct >= 80 ? "Very strong" : pct >= 65 ? "Strong" : pct >= 50 ? "Moderate" : pct >= 35 ? "Weak" : "Very weak"; }
+    function dispClamp(s) { return clamp((s || 0) / 60); }
     function coScore(list) { var s = 0; list.forEach(function (o) { s += o.naturalNature === "Benefic" ? 1 : o.naturalNature === "Malefic" ? 0 : 0.5; }); return clamp(s / list.length); }
     var owned = {}; classical.forEach(function (n) { owned[n] = []; });
     for (var h = 1; h <= 12; h++) { var lo = lordOfHouse(chart, h); if (owned[lo]) owned[lo].push(h); }
@@ -22482,8 +22559,33 @@
     function inWar(p) { if (["Sun", "Moon", "Rahu", "Ketu"].indexOf(p.name) >= 0) return false; return ["Mars", "Mercury", "Jupiter", "Venus", "Saturn"].some(function (o) { if (o === p.name) return false; var q = chart.planetsByName[o]; return q && q.sign === p.sign && vnArc180(p.lon, q.lon) < 1; }); }
     var DIGNITY_PT = { "Exalted": 1, "Moolatrikona": 1, "Own sign": 1, "Friendly sign": 0.75, "Neutral sign": 0.5, "Enemy sign": 0.25, "Debilitated": 0 };
     var HOUSE_PT = { 1: 1, 4: 1, 5: 1, 7: 1, 9: 1, 10: 1, 2: 0.7, 11: 0.7, 3: 0.5, 6: 0.2, 8: 0.15, 12: 0.2 };
-    var AVA_PT = { "Bala": 0.5, "Kumara": 0.75, "Yuva": 1, "Vriddha": 0.35, "Mrita": 0 };
     var DASHAVARGA = [1, 2, 3, 9, 10, 12, 16, 30];
+    // birth-time certainty (pointers 22/23 zeroed & flagged when uncertain)
+    var conf = String((input && input.birthTimeConfidence) || "");
+    var birthCertain = !/unknown|hr|approx|round|uncert/i.test(conf);
+    // janma / lagna nakshatra lords
+    var moon = chart.planetsByName.Moon;
+    var moonNakIdx = moon ? nakshatraInfo(moon.lon).index : 0, moonNakLord = NAK_LORDS[moonNakIdx];
+    var lagnaNakLord = NAK_LORDS[nakshatraInfo(asc.lon).index];
+    function nakLordedBy(n) { var a = []; for (var i = 0; i < 27; i++) if (NAK_LORDS[i] === n) a.push(i); return a; }
+    var AUSP_TARA = { 2: 1, 4: 1, 6: 1, 8: 1, 9: 1 };
+    function janmaNakLordFrac(n) {
+      if (n === moonNakLord) return 1;
+      var ok = nakLordedBy(n).some(function (i) { var count = ((i - moonNakIdx + 27) % 27) + 1; var tara = ((count - 1) % 9) + 1; return AUSP_TARA[tara]; });
+      if (ok) return 0.5;
+      if (n === lagnaNakLord) return 0.5;
+      return 0;
+    }
+    var BALADI_STATES = ["bala", "kumara", "yuva", "vriddha", "mrita"];
+    var BALADI_FRAC = { bala: 0.25, kumara: 0.6, yuva: 1.0, vriddha: 0.4, mrita: 0.0 };
+    function baladi(deg, sign) { var idx = Math.min(4, Math.floor(deg / 6)); var st = BALADI_STATES.slice(); if (sign % 2 === 1) st.reverse(); var name = st[idx]; return { name: name, frac: BALADI_FRAC[name] }; }
+    function jagDeepta(p) {
+      var d = p.dignity;
+      var jag = (d === "Exalted" || d === "Own sign" || d === "Moolatrikona") ? 1 : (d === "Friendly sign" || d === "Neutral sign") ? 0.5 : 0;
+      var dp = d === "Exalted" ? 1 : (d === "Own sign" || d === "Moolatrikona") ? 0.85 : d === "Friendly sign" ? 0.7 : d === "Neutral sign" ? 0.5 : d === "Enemy sign" ? 0.3 : d === "Debilitated" ? 0.1 : 0.5;
+      if (p.combust) dp = 0;
+      return (jag + dp) / 2;
+    }
     function funcStatusPt(n, hs) {
       var kendra = hs.some(function (h) { return [4, 7, 10].indexOf(h) >= 0; }), trikona = hs.some(function (h) { return [5, 9].indexOf(h) >= 0; });
       if (kendra && trikona) return 1;
@@ -22493,71 +22595,132 @@
       if (hs.some(function (h) { return [1, 2, 4, 5, 7, 9, 10, 11].indexOf(h) >= 0; })) return 0.75;
       return 0.5;
     }
-    function scoreClassical(n) {
-      var p = chart.planetsByName[n], r = sb[n] || {}, pts = [];
-      pts[0] = DIGNITY_PT[p.dignity] != null ? DIGNITY_PT[p.dignity] : 0.5;
-      pts[1] = HOUSE_PT[p.house] != null ? HOUSE_PT[p.house] : 0.5;
-      pts[2] = clamp(houseScore(p.house) / maxHouse);
-      pts[3] = clamp((r.ratio || 0) / 1.2);
-      pts[4] = clamp((r.sthana || 0) / maxS);
-      pts[5] = clamp((r.dig || 0) / 60);
-      pts[6] = clamp((r.kala || 0) / maxK);
-      pts[7] = clamp((r.cheshta || 0) / 60);
-      pts[8] = clamp((r.naisargika || 0) / 60);
-      pts[9] = clamp(((r.drik || 0) - minDrik) / ((maxDrik - minDrik) || 1));
-      pts[10] = (p.sign === vargaSign(p.lon, 9)) ? 1 : 0;
-      var vim = 0; SHADVARGA.forEach(function (it) { vim += it.w * vargaDignity(n, vargaSign(p.lon, it.d)).frac; }); pts[11] = clamp(vim / 20);
-      var df = 0; DASHAVARGA.forEach(function (d) { df += vargaDignity(n, vargaSign(p.lon, d)).frac; }); pts[12] = clamp(df / DASHAVARGA.length);
-      var b = bav(n, p.sign); pts[13] = b == null ? 0.5 : clamp(b / 8);
-      var ish = ishtaPhala(r), kash = kashtaPhala(r); pts[14] = (ish + kash) ? clamp(ish / (ish + kash)) : 0.5;
-      pts[15] = AVA_PT[baaladiAvastha(p.deg, p.sign)] != null ? AVA_PT[baaladiAvastha(p.deg, p.sign)] : 0.5;
-      pts[16] = p.retrograde ? 1 : (["Sun", "Moon"].indexOf(n) >= 0 ? 0.75 : 0.6);
-      pts[17] = p.combust ? 0 : 1;
-      pts[18] = inWar(p) ? 0 : 1;
-      var cot = chart.planets.filter(function (o) { return o.name !== n && o.sign === p.sign; });
-      pts[19] = cot.length ? coScore(cot) : 0.75;
-      var asp = planetsAspectingPlanet(chart, p); pts[20] = asp.length ? coScore(asp) : 0.5;
-      var disp = chart.planetsByName[SIGNS[p.sign].lord]; pts[21] = disp ? dispClamp(disp.strength.score) : 0.5;
-      var nl = chart.planetsByName[p.nakLord]; pts[22] = nl ? dispClamp(nl.strength.score) : 0.5;
-      pts[23] = funcStatusPt(n, owned[n] || []);
-      var lpSum = (owned[n] || []).reduce(function (x, h) { return x + (VN_LP68[h] || 0); }, 0); pts[24] = clamp((lpSum + 6) / 10);
-      var kdosha = (["Jupiter", "Venus", "Mercury", "Moon"].indexOf(n) >= 0) && (owned[n] || []).some(function (h) { return [4, 7, 10].indexOf(h) >= 0; });
-      pts[25] = kdosha ? 0 : 1;
-      var kendra = (owned[n] || []).some(function (h) { return [4, 7, 10].indexOf(h) >= 0; }), trikona = (owned[n] || []).some(function (h) { return [5, 9].indexOf(h) >= 0; });
-      pts[26] = (kendra && trikona) ? 1 : 0;
-      pts[27] = inYogaCat(n, ["Raja"]) ? 1 : inYogaCat(n, ["Wealth", "Prosperity", "Dhana", "Fortune"]) ? 0.7 : 0;
-      pts[28] = p.dignity !== "Debilitated" ? 1 : (neechabhanga(chart, p) ? 1 : 0);
-      pts[29] = clamp(1 - 0.25 * Math.min((p.afflictions ? p.afflictions.length : 0), 4));
-      var ns = 1; if ([6, 8, 12].indexOf(p.house) >= 0) ns -= 0.5; if (p.combust) ns -= 0.5; if (p.dignity === "Debilitated") ns -= 0.25; pts[30] = clamp(ns);
-      var oh = owned[n] || []; if (oh.length) { var sm = 0; oh.forEach(function (h) { sm += houseScore(h); }); pts[31] = clamp((sm / oh.length) / maxHouse); } else pts[31] = pts[2];
-      return pts;
+    // fraction (0..1) per pointer key, for a classical planet
+    function fracFor(n) {
+      var p = chart.planetsByName[n], r = sb[n] || {}, f = {}, oh = owned[n] || [];
+      f.rashi_dignity = DIGNITY_PT[p.dignity] != null ? DIGNITY_PT[p.dignity] : 0.5;
+      f.shadbala_total = clamp((r.ratio || 0) / 1.2);
+      f.house_placement = HOUSE_PT[p.house] != null ? HOUSE_PT[p.house] : 0.5;
+      var lpSum = oh.reduce(function (x, h) { return x + (VN_LP68[h] || 0); }, 0); f.house_lordship = clamp((lpSum + 6) / 10);
+      f.functional_nature = funcStatusPt(n, oh);
+      f.freedom_from_affliction = clamp(1 - 0.25 * Math.min((p.afflictions ? p.afflictions.length : 0), 4));
+      var disp = chart.planetsByName[SIGNS[p.sign].lord]; f.dispositor_strength = disp ? dispClamp(disp.strength.score) : 0.5;
+      f.not_combust = p.combust ? 0 : 1;
+      var b = bav(n, p.sign); f.ashtakavarga = b == null ? 0.5 : clamp(b / 8);
+      var vim = 0; SHADVARGA.forEach(function (it) { vim += it.w * vargaDignity(n, vargaSign(p.lon, it.d)).frac; }); f.vimshopaka = clamp(vim / 20);
+      f.vargottama = (p.sign === vargaSign(p.lon, 9)) ? 1 : 0;
+      f.not_debilitated = p.dignity !== "Debilitated" ? 1 : (neechabhanga(chart, p) ? 1 : 0);
+      f.no_kendradhipati_dosha = ((["Jupiter", "Venus", "Mercury", "Moon"].indexOf(n) >= 0) && oh.some(function (h) { return [4, 7, 10].indexOf(h) >= 0; })) ? 0 : 1;
+      var cot = chart.planets.filter(function (o) { return o.name !== n && o.sign === p.sign; }); f.conjunction = cot.length ? coScore(cot) : 0.75;
+      var aspx = planetsAspectingPlanet(chart, p); f.benefic_aspect = aspx.length ? coScore(aspx) : 0.5;
+      f.dig_bala = clamp((r.dig || 0) / 60);
+      var dfr = 0; DASHAVARGA.forEach(function (d) { dfr += vargaDignity(n, vargaSign(p.lon, d)).frac; }); f.divisional_strength = clamp(dfr / DASHAVARGA.length);
+      f.not_defeated_yuddha = inWar(p) ? 0 : 1;
+      f.bhava_bala = clamp(houseScore(p.house) / maxHouse);
+      var nl = chart.planetsByName[p.nakLord]; f.nakshatra_lord_strength = nl ? dispClamp(nl.strength.score) : 0.5;
+      var ns = 1; if ([6, 8, 12].indexOf(p.house) >= 0) ns -= 0.5; if (p.combust) ns -= 0.5; if (p.dignity === "Debilitated") ns -= 0.25; f.natural_karakatva = clamp(ns);
+      var bl = baladi(p.deg, p.sign); f.baladi_avastha = birthCertain ? bl.frac : 0; f._baladi = bl.name;
+      f.janma_nakshatra_lord = birthCertain ? janmaNakLordFrac(n) : 0;
+      f.drik_bala = clamp(((r.drik || 0) - minDrik) / ((maxDrik - minDrik) || 1));
+      f.sthana_bala = clamp((r.sthana || 0) / maxS);
+      f.kala_bala = clamp((r.kala || 0) / maxK);
+      f.cheshta_bala = clamp((r.cheshta || 0) / 60);
+      f.naisargika_bala = clamp((r.naisargika || 0) / 60);
+      var kendra = oh.some(function (h) { return [4, 7, 10].indexOf(h) >= 0; }), trikona = oh.some(function (h) { return [5, 9].indexOf(h) >= 0; });
+      f.yogakaraka = (kendra && trikona) ? 1 : 0;
+      f.rajayoga_dhanayoga = inYogaCat(n, ["Raja"]) ? 1 : inYogaCat(n, ["Wealth", "Prosperity", "Dhana", "Fortune"]) ? 0.7 : 0;
+      var ish = ishtaPhala(r), kash = kashtaPhala(r); f.ishta_kashta = (ish + kash) ? clamp(ish / (ish + kash)) : 0.5;
+      f.avastha_jagradadi_deeptadi = jagDeepta(p);
+      f.retrogression = p.retrograde ? 1 : (["Sun", "Moon"].indexOf(n) >= 0 ? 0.75 : 0.6);
+      return f;
     }
-    var pts = {};
-    classical.forEach(function (n) { pts[n] = scoreClassical(n); });
+    var fracs = {};
+    classical.forEach(function (n) { fracs[n] = fracFor(n); });
     ["Rahu", "Ketu"].forEach(function (n) {
       var p = chart.planetsByName[n]; if (!p) return;
-      var disp = SIGNS[p.sign].lord, dp = pts[disp] || [], np = [];
-      for (var i = 0; i < 32; i++) np[i] = (dp[i] != null ? dp[i] : 0.5);   // classical-only balas via dispositor
-      np[1] = HOUSE_PT[p.house] != null ? HOUSE_PT[p.house] : 0.5;
-      np[2] = clamp(houseScore(p.house) / maxHouse);
-      np[10] = (p.sign === vargaSign(p.lon, 9)) ? 1 : 0;
-      np[15] = AVA_PT[baaladiAvastha(p.deg, p.sign)] != null ? AVA_PT[baaladiAvastha(p.deg, p.sign)] : 0.5;
-      np[16] = 1; np[17] = 1; np[18] = 1;                                    // node: retro, not-combust, no-war
-      var cot = chart.planets.filter(function (o) { return o.name !== n && o.sign === p.sign; });
-      np[19] = cot.length ? coScore(cot) : 0.75;
-      var asp = planetsAspectingPlanet(chart, p); np[20] = asp.length ? coScore(asp) : 0.5;
-      var dpl = chart.planetsByName[disp]; np[21] = dpl ? dispClamp(dpl.strength.score) : 0.5;
-      var nl = chart.planetsByName[p.nakLord]; np[22] = nl ? dispClamp(nl.strength.score) : 0.5;
-      np[23] = 0.5; np[25] = 1; np[26] = 0; np[28] = 1;                      // functional n/a, no kendradhipati, not yogakaraka, no debilitation
-      np[27] = inYogaCat(n, ["Raja"]) ? 1 : inYogaCat(n, ["Wealth", "Prosperity", "Dhana", "Fortune"]) ? 0.7 : 0;
-      np[29] = clamp(1 - 0.25 * Math.min((p.afflictions ? p.afflictions.length : 0), 4));
-      var ns = 1; if ([6, 8, 12].indexOf(p.house) >= 0) ns -= 0.5; np[30] = clamp(ns);
-      np[31] = np[2];
-      pts[n] = np;
+      var disp = SIGNS[p.sign].lord, base = fracs[disp] || {}, f = {};
+      VN_BALA33.forEach(function (row) { f[row[0]] = (base[row[0]] != null ? base[row[0]] : 0.5); });
+      // node-direct overrides
+      f.house_placement = HOUSE_PT[p.house] != null ? HOUSE_PT[p.house] : 0.5;
+      f.bhava_bala = clamp(houseScore(p.house) / maxHouse);
+      f.vargottama = (p.sign === vargaSign(p.lon, 9)) ? 1 : 0;
+      var bl = baladi(p.deg, p.sign); f.baladi_avastha = birthCertain ? bl.frac : 0; f._baladi = bl.name;
+      f.janma_nakshatra_lord = birthCertain ? janmaNakLordFrac(n) : 0;   // nodes eligible directly (own nakshatras)
+      f.retrogression = 1; f.not_combust = 1; f.not_defeated_yuddha = 1;
+      var cot = chart.planets.filter(function (o) { return o.name !== n && o.sign === p.sign; }); f.conjunction = cot.length ? coScore(cot) : 0.75;
+      var aspx = planetsAspectingPlanet(chart, p); f.benefic_aspect = aspx.length ? coScore(aspx) : 0.5;
+      var dpl = chart.planetsByName[disp]; f.dispositor_strength = dpl ? dispClamp(dpl.strength.score) : 0.5;
+      var nl = chart.planetsByName[p.nakLord]; f.nakshatra_lord_strength = nl ? dispClamp(nl.strength.score) : 0.5;
+      f.functional_nature = 0.5; f.no_kendradhipati_dosha = 1; f.yogakaraka = 0; f.not_debilitated = 1;
+      f.rajayoga_dhanayoga = inYogaCat(n, ["Raja"]) ? 1 : inYogaCat(n, ["Wealth", "Prosperity", "Dhana", "Fortune"]) ? 0.7 : 0;
+      f.freedom_from_affliction = clamp(1 - 0.25 * Math.min((p.afflictions ? p.afflictions.length : 0), 4));
+      var ns = 1; if ([6, 8, 12].indexOf(p.house) >= 0) ns -= 0.5; f.natural_karakatva = clamp(ns);
+      f.avastha_jagradadi_deeptadi = jagDeepta(p);
+      fracs[n] = f;
     });
+    function r1(x) { return Math.round(x * 10) / 10; }
     var rows = {};
-    order.forEach(function (n) { var arr = pts[n] || [], tot = 0; arr.forEach(function (v) { tot += v; }); var pct = tot / 32 * 100; rows[n] = { points: arr, total: tot, pct: pct, band: band(pct) }; });
-    return { order: order, names: VN_S32_NAMES, rows: rows };
+    order.forEach(function (n) {
+      var f = fracs[n] || {}, cells = [], tot = 0, top10 = 0;
+      VN_BALA33.forEach(function (row, i) { var sc = r1(clamp(f[row[0]] != null ? f[row[0]] : 0) * row[2]); cells.push({ key: row[0], label: row[1], weight: row[2], tier: row[3], absence: row[4], frac: (f[row[0]] != null ? f[row[0]] : 0), score: sc }); tot += sc; if (i < 10) top10 += sc; });
+      rows[n] = { cells: cells, total: r1(tot), top10: r1(top10), baladi: f._baladi || "-" };
+    });
+    // ordering: total desc, then tie-breaks (top10, foundation4, rashi, naisargika order)
+    var NAT = { Sun: 0, Moon: 1, Mars: 2, Mercury: 3, Jupiter: 4, Venus: 5, Saturn: 6, Rahu: 7, Ketu: 8 };
+    function found4(n) { var c = rows[n].cells; return c[0].score + c[1].score + c[2].score + c[3].score; }
+    order = order.slice().sort(function (a, b) {
+      return (rows[b].total - rows[a].total) || (rows[b].top10 - rows[a].top10) || (found4(b) - found4(a)) || (rows[b].cells[0].score - rows[a].cells[0].score) || (NAT[a] - NAT[b]);
+    });
+    // detect ties resolved by the naisargika fallback (all prior keys equal)
+    var naturalTie = false;
+    for (var oi = 1; oi < order.length; oi++) {
+      var a = order[oi - 1], b = order[oi];
+      if (rows[a].total === rows[b].total && rows[a].top10 === rows[b].top10 && found4(a) === found4(b) && rows[a].cells[0].score === rows[b].cells[0].score) naturalTie = true;
+    }
+    return { order: order, pointers: VN_BALA33, tiers: VN_BALA33_TIERS, rows: rows, birthCertain: birthCertain, naturalTie: naturalTie };
+  }
+  // Recast BALA at a ±minute offset from birth (for the three-time variant block).
+  function vnBala33Recast(input, deltaMin) {
+    if (!input || !input.birthInstant || typeof input.birthInstant.getTime !== "function") return null;
+    try {
+      var shifted = new Date(input.birthInstant.getTime() + deltaMin * 60000);
+      var c = buildChart(shifted, Number(input.latitude), Number(input.longitude), Number(input.timezone), { ascendantOverride: input.ascendantOverride, ayanamshaKey: "lahiri" });
+      return vnBala33(c, input);
+    } catch (e) { return null; }
+  }
+  // Degree-boundary sensitivity: does any planet cross a 6° baladi boundary, or the
+  // Moon a nakshatra boundary, inside the −5..+5 min window?
+  function vnBala33Boundary(chart, input) {
+    var out = { baladi: false, janmaNak: false, altLord: null };
+    var pm = vnBala33Recast(input, 5), mm = vnBala33Recast(input, -5);
+    try {
+      var deg0 = {}; CLASSICAL_PLANETS.concat(["Rahu", "Ketu"]).forEach(function (n) { var p = chart.planetsByName[n]; if (p) deg0[n] = p.deg; });
+      function crossings(res) {
+        if (!res) return;
+        // baladi boundary: any planet's 6° band index changes vs base
+        [chart].forEach(function () {});
+      }
+      // Rebuild the ±5 charts once for degree comparison
+      var pC = null, mC = null;
+      if (input && input.birthInstant && typeof input.birthInstant.getTime === "function") {
+        try { pC = buildChart(new Date(input.birthInstant.getTime() + 5 * 60000), Number(input.latitude), Number(input.longitude), Number(input.timezone), { ayanamshaKey: "lahiri" }); } catch (e) {}
+        try { mC = buildChart(new Date(input.birthInstant.getTime() - 5 * 60000), Number(input.latitude), Number(input.longitude), Number(input.timezone), { ayanamshaKey: "lahiri" }); } catch (e) {}
+      }
+      function bandIdx(deg) { return Math.min(4, Math.floor(deg / 6)); }
+      CLASSICAL_PLANETS.concat(["Rahu", "Ketu"]).forEach(function (n) {
+        var p0 = chart.planetsByName[n]; if (!p0) return;
+        var b0 = bandIdx(p0.deg);
+        [pC, mC].forEach(function (cc) { if (cc && cc.planetsByName[n] && bandIdx(cc.planetsByName[n].deg) !== b0) out.baladi = true; });
+      });
+      var moon0 = chart.planetsByName.Moon;
+      if (moon0) {
+        var nak0 = nakshatraInfo(moon0.lon).index;
+        [pC, mC].forEach(function (cc) {
+          if (cc && cc.planetsByName.Moon) { var ni = nakshatraInfo(cc.planetsByName.Moon.lon).index; if (ni !== nak0) { out.janmaNak = true; out.altLord = NAK_LORDS[ni]; } }
+        });
+      }
+    } catch (e) {}
+    return { flags: out, plus: pm, minus: mm };
   }
   function vnConsolidatedMarkdown(chart, input) {
     if (input && input.birthInstant && chart.ayanamshaKey !== "lahiri") {
@@ -22592,7 +22755,7 @@
 
     // ============ PART I — UNIVERSAL DATA CORE ============
     L.push("# PART I · UNIVERSAL DATA CORE");
-    L.push("_The computed spine all four projects read. §I-0 → §I-17 below are the full VedNetra data export (intake, D1, bhava, Dasavarga, nine strength dimensions, Ashtakavarga + Shodhya Pinda, sub-planets & sphutas, full Vimshottari MD→AD→PD, Jaimini, longevity, Jupiter/Saturn gochara, Sahams, Varshaphal, Panchang, yogas); §I-A → §I-G add the cross-project connective data; §I-H is the 32-pointer equal-weight planetary-strength composite (net score per planet — strength, not a verdict on auspiciousness of results); §I-I is the Trinetra rule-base (Promise classical dictums · Star nakshatra dictums · Time dasha/transit) listing the dictums applicable to this native._");
+    L.push("_The computed spine all four projects read. §I-0 → §I-17 below are the full VedNetra data export (intake, D1, bhava, Dasavarga, nine strength dimensions, Ashtakavarga + Shodhya Pinda, sub-planets & sphutas, full Vimshottari MD→AD→PD, Jaimini, longevity, Jupiter/Saturn gochara, Sahams, Varshaphal, Panchang, yogas); §I-A → §I-G add the cross-project connective data; §I-H is the 33-pointer weighted planetary-strength composite (score out of 100 per planet — intensity, not a verdict on auspiciousness of results); §I-I is the Trinetra rule-base (Promise classical dictums · Star nakshatra dictums · Time dasha/transit) listing the dictums applicable to this native._");
     L.push("");
     var triv = ""; try { triv = vnTriveniMarkdown(chart, input); } catch (e) {}
     var trivCore = sliceMd(triv, "## 0 · Header", "**Coverage:**");
@@ -22701,21 +22864,70 @@
     L.push("- **This native's question:** " + ((input && input.question) ? String(input.question) : "_(none entered — set the Question/topic in the chart form)_") + (routed ? " → **routed to " + routed[0] + "** (house " + routed[1] + ", karaka " + routed[2] + ", varga " + routed[3] + ", file " + routed[4] + ")." : "."));
     L.push("");
 
-    // §I-H · 32-pointer Planetary Strength (equal-weight composite)
-    L.push("## §I-H · Planetary Strength (32-pointer composite, equal weight)");
+    // §I-H · 33-pointer weighted Planetary Strength composite (score out of 100)
+    L.push("## §I-H · Planetary Strength (33-pointer weighted composite, score out of 100)");
     try {
-      var s32 = vnStrength32(chart, input);
-      L.push("**Net strength score — each of the 9 planets, max 32 (all 32 classical pointers weighted equally; a planet carrying every strength quality scores 32):**");
-      L.push(row(["Planet", "Net score /32", "Percent", "Strength band"])); L.push(sep(4));
-      s32.order.forEach(function (n) { var r = s32.rows[n]; L.push(row([n, "**" + r.total.toFixed(1) + " / 32**", r.pct.toFixed(0) + "%", r.band])); });
+      var bala = vnBala33(chart, input);
+      var bord = bala.order, brows = bala.rows;
+      // degree-certainty note
+      if (!bala.birthCertain) L.push("> जन्म समय अनिश्चित, मद 22 और 23 शून्य किए गए");
+      // 7.1 summary table (Score /100 · Top-10 subtotal /59 · Order) — NO band
+      L.push("**Score out of 100 — each of the 9 grahas (33 classical pointers, each carrying its own weight; per-pointer breakdown below):**");
+      L.push(row(["Graha", "Score of 100", "Top-10 subtotal of 59", "Order"])); L.push(sep(4));
+      bord.forEach(function (n, i) { var r = brows[n]; L.push(row([n, "**" + r.total.toFixed(1) + "**", r.top10.toFixed(1), String(i + 1)])); });
+      if (bala.naturalTie) L.push("_एक या अधिक ग्रह समान बल के थे; क्रम नैसर्गिक क्रम (सूर्य→केतु) से स्वाभाविक रूप से तय किया गया._");
       L.push("");
-      L.push("**Per-pointer breakdown (each cell 0–1; the five malefic-quality pointers score 1 when the negative quality is ABSENT):**");
-      L.push(row(["Pointer"].concat(s32.order))); L.push(sep(1 + s32.order.length));
-      s32.names.forEach(function (nm, i) { L.push(row([nm].concat(s32.order.map(function (n) { return s32.rows[n].points[i].toFixed(2); })))); });
-      L.push(row(["**Net /32**"].concat(s32.order.map(function (n) { return "**" + s32.rows[n].total.toFixed(1) + "**"; }))));
-      L.push(row(["**Percent**"].concat(s32.order.map(function (n) { return s32.rows[n].pct.toFixed(0) + "%"; }))));
+      // 7.2 spread line
+      var hi = brows[bord[0]].total, lo = brows[bord[bord.length - 1]].total, spread = Math.round((hi - lo) * 10) / 10;
+      L.push("**Spread (highest − lowest):** " + spread.toFixed(1) + " अंक.");
+      if (spread < 8) L.push("> फैलाव " + spread.toFixed(1) + " अंक, सभी ग्रह लगभग समान बल के हैं");
       L.push("");
-      L.push("_Method: every pointer contributes **0–1 with equal weight**, so the maximum net is 32. Positive-quality pointers score higher with more of the quality; the malefic-quality pointers — **#18 Combustion, #19 Planetary War, #26 Kendrādhipati Doṣa, #29 Debilitation (uncancelled), #30 Affliction** — award the point when that quality is **absent**. Ṣaḍbala components (Sthāna/Dig/Kāla/Cheshtā/Naisargika/Drik), Kāla-dependent balas and Iṣṭa–Kaṣṭa come from the classical Ṣaḍbala engine; relative balas are normalised across the seven classical planets so the strongest scores full. **Rāhu/Ketu** take the classical-only balas (Ṣaḍbala, Iṣṭa–Kaṣṭa, Vimśopaka, dignity, divisional, Ashtakavarga) via their **sign-dispositor**, while house/avasthā/conjunction/aspect/node-direct pointers are computed for the node itself. This is a **computed strength lens (Lahiri)** — a measure of a planet's strength/condition, **not** the auspiciousness of its results: a very strong planet can still deliver difficult (inauspicious) outcomes depending on its ownership, dasha and the question. Read it beside the project lenses in Part II._");
+      // 7.3 full 33×9 matrix grouped by tier, cells "earned / max", tier subtotal rows
+      var absLbl = { freedom_from_affliction: 1, not_combust: 1, not_debilitated: 1, no_kendradhipati_dosha: 1, not_defeated_yuddha: 1 };
+      L.push("**Per-pointer breakdown — each cell shows `earned / max`. Rows grouped by tier with a tier subtotal. Pointers marked † are absence-scoring: the point is earned when the negative quality is ABSENT.**");
+      L.push(row(["Pointer / माद"].concat(bord))); L.push(sep(1 + bord.length));
+      bala.tiers.forEach(function (tier) {
+        var idxs = []; bala.pointers.forEach(function (p, i) { if (p[3] === tier) idxs.push(i); });
+        var tierMax = 0; idxs.forEach(function (i) { tierMax += bala.pointers[i][2]; });
+        L.push(row(["**" + tier + "**"].concat(bord.map(function () { return ""; }))));
+        idxs.forEach(function (i) {
+          var p = bala.pointers[i], lbl = p[1] + (absLbl[p[0]] ? " †" : "");
+          if (p[0] === "baladi_avastha") {
+            L.push(row([lbl].concat(bord.map(function (n) { var c = brows[n].cells[i]; return c.score.toFixed(1) + " / " + p[2] + " (" + (brows[n].baladi || "-") + ")"; }))));
+          } else {
+            L.push(row([lbl].concat(bord.map(function (n) { var c = brows[n].cells[i]; return c.score.toFixed(1) + " / " + p[2]; }))));
+          }
+        });
+        L.push(row(["**" + tier + " subtotal / " + tierMax + "**"].concat(bord.map(function (n) {
+          var s = 0; idxs.forEach(function (i) { s += brows[n].cells[i].score; }); return "**" + (Math.round(s * 10) / 10).toFixed(1) + "**";
+        }))));
+      });
+      L.push(row(["**Score / 100**"].concat(bord.map(function (n) { return "**" + brows[n].total.toFixed(1) + "**"; }))));
+      L.push(row(["**Top-10 / 59**"].concat(bord.map(function (n) { return brows[n].top10.toFixed(1); }))));
+      L.push("");
+      // 7.4 three-time variant block (given, +5min, −5min)
+      var bd = vnBala33Boundary(chart, input);
+      if (bd.flags.baladi) L.push("> ⚠ बलादि सीमा ±5 मिनट के भीतर: किसी ग्रह का 6° बलादि खंड बदल रहा है — मद 22 अस्थिर.");
+      if (bd.flags.janmaNak) L.push("> ⚠ जन्म-नक्षत्र सीमा ±5 मिनट के भीतर: चन्द्र नक्षत्र बदल रहा है" + (bd.flags.altLord ? " (वैकल्पिक स्वामी " + bd.flags.altLord + ")" : "") + " — मद 23 अस्थिर.");
+      if (bd.plus || bd.minus) {
+        L.push("**Three-time variant (given · +5 min · −5 min) — Score of 100, with pointers 22/23 called out as the most time-sensitive:**");
+        L.push(row(["Graha", "Given", "+5 min", "−5 min", "मद22 (given/+5/−5)", "मद23 (given/+5/−5)"])); L.push(sep(6));
+        function cellAt(res, n, key) { if (!res || !res.rows[n]) return "—"; var cs = res.rows[n].cells; for (var k = 0; k < cs.length; k++) if (cs[k].key === key) return cs[k].score.toFixed(1); return "—"; }
+        bord.forEach(function (n) {
+          L.push(row([n,
+            brows[n].total.toFixed(1),
+            (bd.plus && bd.plus.rows[n]) ? bd.plus.rows[n].total.toFixed(1) : "—",
+            (bd.minus && bd.minus.rows[n]) ? bd.minus.rows[n].total.toFixed(1) : "—",
+            cellAt(bala, n, "baladi_avastha") + "/" + cellAt(bd.plus, n, "baladi_avastha") + "/" + cellAt(bd.minus, n, "baladi_avastha"),
+            cellAt(bala, n, "janma_nakshatra_lord") + "/" + cellAt(bd.plus, n, "janma_nakshatra_lord") + "/" + cellAt(bd.minus, n, "janma_nakshatra_lord")
+          ]));
+        });
+        L.push("");
+      }
+      // 10 · foot notes
+      L.push("> यह अंक केवल तीव्रता बताता है, शुभता नहीं। ऊँचा अंक पाने वाला ग्रह अपना सौंपा हुआ फल अधिक ज़ोर से देगा, चाहे वह फल शुभ हो या अशुभ। 63 अंक वाला अष्टमेश उतनी ही तीव्रता से कष्ट देगा जितनी तीव्रता से 63 अंक वाला नवमेश भाग्य। शुभ अशुभ का निर्णय केवल PROMISE और STAR नेत्र करते हैं।");
+      L.push("");
+      L.push("_The 33 individual pointers are each classical Parashari doctrines. The additive weighted scheme, its weights, and its tie-break order are this project's own synthesis, computed by VedNetra. `[BALA]` cites a VedNetra score, never a page number, and is never presented as a classical text._");
       L.push("");
     } catch (e) { L.push("_Planetary-strength composite unavailable: " + (e && e.message ? e.message : e) + "_"); L.push(""); }
 
@@ -22817,7 +23029,7 @@
     try { md = vnConsolidatedMarkdown(chart, input); }
     catch (e) { md = "Could not build the report: " + (e && e.message ? e.message : e); }
     return '<section id="viewA-consolidatedmaster" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Master Export</p><h3>Consolidated Master Run</h3></div><span class="small-pill">Lahiri · 4 projects</span></div>' +
-      '<p class="fine-print">The <strong>default</strong> one-sheet master run that covers all four projects at once — <strong>Mehta + Sutton (VAPM)</strong>, <strong>Trinetra (Promise/Star/Time)</strong>, <strong>Umesh Puri (Laghu Parashari + Gochar)</strong> and <strong>Triveni (BPHS·BJ·PD three-witness)</strong>. Always Lahiri (Chitrapaksha). <strong>Part I</strong> is the universal computed data core (full VedNetra export §I-0→§I-17 plus reference lagnas, planet-ledger union with pada dignity + Navatara from Moon &amp; Lagna + gandanta + BAV, LP p.68 scores + functional nature, sambandhas/raja-yoga, Yogini/Chara/Sade-Sati, nakshatra sweep, routing map, a <strong>§I-H 32-pointer equal-weight Planetary Strength composite</strong> with a net score out of 32 per planet — strength/condition, not a verdict on auspiciousness of results; and a <strong>§I-I Trinetra rule-base</strong> that lists the classical dictums (Promise), Sutton nakshatra dictums (Star) and dasha/transit timing (Time) applicable to this native); <strong>Part II</strong> re-frames the same data through each project&rsquo;s method lens. External book corpora are scaffolded, never gap-filled; guardrails are the union of all four (no lifespan/death timing).</p>' +
+      '<p class="fine-print">The <strong>default</strong> one-sheet master run that covers all four projects at once — <strong>Mehta + Sutton (VAPM)</strong>, <strong>Trinetra (Promise/Star/Time)</strong>, <strong>Umesh Puri (Laghu Parashari + Gochar)</strong> and <strong>Triveni (BPHS·BJ·PD three-witness)</strong>. Always Lahiri (Chitrapaksha). <strong>Part I</strong> is the universal computed data core (full VedNetra export §I-0→§I-17 plus reference lagnas, planet-ledger union with pada dignity + Navatara from Moon &amp; Lagna + gandanta + BAV, LP p.68 scores + functional nature, sambandhas/raja-yoga, Yogini/Chara/Sade-Sati, nakshatra sweep, routing map, a <strong>§I-H 33-pointer weighted Planetary Strength composite</strong> with a score out of 100 per planet — intensity/condition, not a verdict on auspiciousness of results; and a <strong>§I-I Trinetra rule-base</strong> that lists the classical dictums (Promise), Sutton nakshatra dictums (Star) and dasha/transit timing (Time) applicable to this native); <strong>Part II</strong> re-frames the same data through each project&rsquo;s method lens. External book corpora are scaffolded, never gap-filled; guardrails are the union of all four (no lifespan/death timing).</p>' +
       '<div class="vn-tool-actions" style="margin-bottom:10px"><button type="button" id="vnConsPdf" class="primary-action vn-generate-btn">Save as PDF</button> <button type="button" id="vnConsMd" class="input-toggle-btn">Download Markdown</button> <button type="button" id="vnConsCopy" class="input-toggle-btn">Copy (Markdown)</button> <span id="vnConsCopyStatus" class="fine-print"></span></div>' +
       '<div class="panel-box"><pre class="vn-native-pre">' + escapeHtml(md) + '</pre></div>' +
       '</section>';
@@ -23117,7 +23329,7 @@
     L.push("Ayanamsa       : Krishnamurti (KP-Old)   value " + decimalToDms(kp.ayanamsa) + "   (= Lahiri Chitrapaksha − 6′00″; e.g. 2001 = 23°46′32″)");
     L.push("House system   : Placidus");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.112");
+    L.push("Software / ver : VedNetra 1.113");
     L.push("Native         : " + nm + "            Sex: " + ((input && input.gender) || "-"));
     L.push("DoB / ToB      : " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
@@ -23370,7 +23582,7 @@
     L.push("KP number      : " + hnum + " / 249");
     L.push("House system   : " + kp.houseSystem + "  (equal 30° cusps from the number-seed ascendant — VedNetra KP-horary convention)");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.112");
+    L.push("Software / ver : VedNetra 1.113");
     L.push("Question       : " + ((input && input.question) ? String(input.question) : "-"));
     L.push("Judgment moment: " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
