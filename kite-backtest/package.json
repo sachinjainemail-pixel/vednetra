@@ -1,0 +1,16 @@
+{
+  "name": "kite-backtest",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Local backtest engine for a 5-min/1-min ITM NIFTY options pattern strategy using Kite Connect historical data.",
+  "type": "commonjs",
+  "scripts": {
+    "login": "node src/login.js",
+    "backtest": "node src/backtest.js"
+  },
+  "dependencies": {
+    "csv-writer": "^1.6.0",
+    "dotenv": "^16.4.5",
+    "kiteconnect": "^4.1.0"
+  }
+}
