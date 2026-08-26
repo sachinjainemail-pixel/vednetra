@@ -20277,6 +20277,110 @@
   var VAPM_MKS = { Sun: 12, Moon: 8, Mars: 7, Mercury: 7, Jupiter: 3, Venus: 6, Saturn: 1, Rahu: 9, Ketu: 12 };
   var VAPM_RASI_PINDA = [7, 10, 8, 4, 10, 5, 7, 8, 9, 5, 11, 12];
   var VAPM_GRAHA_PINDA = { Sun: 5, Moon: 5, Mars: 8, Mercury: 5, Jupiter: 10, Venus: 7, Saturn: 5 };
+  // ================================================================
+  // ASHTAKAVARGA TIMING HELPERS (shared by the VAPM export and the
+  // Ashtakvarga Engine Report's TIMING lane).
+  // ================================================================
+  // Shodhya Pinda for one graha, with every reduction step retained so
+  // callers can print the working. Trikona (trine) reduction is
+  // deterministic; the Ekadhipatya (two-sign-lordship) step is
+  // occupancy-dependent and its equal-value case is disputed across
+  // sources, so the HEADLINE figure stays the post-Trikona one and the
+  // Ekadhipatya value is offered only as a refinement.
+  // CALIBRATION KNOB. How much a year of distance costs a candidate window
+  // when it is ranked against a better-converged one further out. Set from
+  // a backtest over real dated events (tools/av-timing-backtest.js), never
+  // by eye: at 0 the engine quotes tidy windows a decade away, and set too
+  // high it always answers "soon" regardless of the chart.
+  var VN_AV_PROXIMITY_PENALTY = 0.2;
+  var VN_EKA_PAIRS = [[0, 7], [1, 6], [2, 5], [8, 11], [9, 10]]; // Ma, Ve, Me, Ju, Sa
+  function vnShodhyaPindaFor(chart, avd, name) {
+    var asc = chart.ascendant;
+    var bySign = new Array(12).fill(0);
+    for (var i = 0; i < 12; i++) bySign[normalizeSign(asc.sign + i)] = avd.rows[name][i];
+    var original = bySign.slice();
+    [[0, 4, 8], [1, 5, 9], [2, 6, 10], [3, 7, 11]].forEach(function (tri) {
+      var mn = Math.min(bySign[tri[0]], bySign[tri[1]], bySign[tri[2]]);
+      tri.forEach(function (s) { bySign[s] = bySign[s] - mn; });
+    });
+    var afterTri = bySign.slice();
+    VN_EKA_PAIRS.forEach(function (pr) {
+      var s1 = pr[0], s2 = pr[1], b1 = bySign[s1], b2 = bySign[s2];
+      if (b1 === 0 || b2 === 0) return;
+      var o1 = chart.planets.some(function (p) { return p.sign === s1; });
+      var o2 = chart.planets.some(function (p) { return p.sign === s2; });
+      if (!o1 && !o2) { var mn2 = Math.min(b1, b2); bySign[s1] = mn2; bySign[s2] = mn2; }
+      else if (o1 && !o2) { if (b2 <= b1) bySign[s2] = 0; }
+      else if (!o1 && o2) { if (b1 <= b2) bySign[s1] = 0; }
+    });
+    var afterEka = bySign.slice();
+    function pinda(arr) {
+      var rp = 0, gp = 0;
+      for (var s3 = 0; s3 < 12; s3++) rp += arr[s3] * VAPM_RASI_PINDA[s3];
+      CLASSICAL_PLANETS.forEach(function (g) { for (var s4 = 0; s4 < 12; s4++) if (SIGNS[s4].lord === g) gp += arr[s4] * VAPM_GRAHA_PINDA[g]; });
+      return { rp: rp, gp: gp, total: rp + gp };
+    }
+    var pTri = pinda(afterTri), pEka = pinda(afterEka);
+    return { original: original, afterTri: afterTri, afterEka: afterEka, tri: pTri, eka: pEka };
+  }
+
+  // ---------------------------------------------------------------
+  // Dated transit scanner. Walks a graha's sidereal longitude over a
+  // window that reaches BACKWARD as well as forward (retrodiction needs
+  // the past just as much as prediction needs the future) and returns
+  // every contiguous spell it spends inside a target set of signs or
+  // nakshatras. Each spell carries real dates, so a hit is a window the
+  // engine can quote rather than a sentence telling the reader to go
+  // and look it up.
+  // ---------------------------------------------------------------
+  function vnAvTransitSpells(chart, graha, opts) {
+    opts = opts || {};
+    var ay = chart.ayanamsa;
+    var signs = opts.signs || null;               // array of sign indices 0..11
+    var naks = opts.nakshatras || null;           // array of nakshatra indices 0..26
+    var fromMs = opts.fromMs, toMs = opts.toMs;
+    var stepDays = opts.stepDays || (naks ? 2 : 5);
+    var spells = [], open = null;
+    for (var ms = fromMs; ms <= toMs; ms += stepDays * DAY_MS) {
+      var jd = ms / DAY_MS + 2440587.5, pl = null;
+      try { pl = computePlanets(jd).filter(function (p) { return p.name === graha; })[0]; } catch (e) { continue; }
+      if (!pl) continue;
+      var lon = normalize(pl.tropical - ay);
+      var inSet = signs ? signs.indexOf(signIndex(lon)) >= 0
+                        : naks.indexOf(nakshatraInfo(lon).index) >= 0;
+      if (inSet && !open) open = { start: ms, graha: graha };
+      else if (!inSet && open) { open.end = ms; spells.push(open); open = null; }
+    }
+    if (open) { open.end = toMs; spells.push(open); }
+    // a retrograde graha can re-enter the same sign; merge spells separated
+    // by less than one step so a single passage is not reported as three.
+    var merged = [];
+    spells.forEach(function (s) {
+      var last = merged[merged.length - 1];
+      if (last && s.start - last.end <= stepDays * DAY_MS * 2) last.end = s.end;
+      else merged.push(s);
+    });
+    return merged.map(function (s) {
+      return {
+        graha: graha, startMs: s.start, endMs: s.end,
+        start: new Date(s.start).toISOString().slice(0, 10),
+        end: new Date(s.end).toISOString().slice(0, 10),
+        midMs: (s.start + s.end) / 2,
+        months: Math.round((s.end - s.start) / DAY_MS / 30.44)
+      };
+    });
+  }
+  // The spell nearest a reference instant, and how far off it is.
+  function vnAvNearestSpell(spells, refMs) {
+    if (!spells || !spells.length) return null;
+    var best = null, bestGap = Infinity;
+    spells.forEach(function (s) {
+      var gap = (refMs >= s.startMs && refMs <= s.endMs) ? 0
+        : Math.min(Math.abs(refMs - s.startMs), Math.abs(refMs - s.endMs));
+      if (gap < bestGap) { bestGap = gap; best = s; }
+    });
+    return { spell: best, gapDays: Math.round(bestGap / DAY_MS) };
+  }
 
   function vnVapmFiveFold(chart, planet) {
     // full dignity wording per VAPM §2 col 5
@@ -20514,39 +20618,11 @@
       L.push("");
       // Shodhya Pinda with the reduction steps shown
       var sgnAbbr = SIGNS.map(function (s) { return s.name.slice(0, 2); });
-      var EKA_PAIRS = [[0, 7], [1, 6], [2, 5], [8, 11], [9, 10]]; // Ma, Ve, Me, Ju, Sa (two-sign lords)
       L.push("### §7c Shodhya Pinda - with reduction steps (BAV -> Trikona -> Ekadhipatya)");
       classical.forEach(function (n) {
-        var bySign = new Array(12).fill(0);
-        for (var i = 0; i < 12; i++) bySign[normalizeSign(asc.sign + i)] = avd.rows[n][i];
-        var original = bySign.slice();
-        // Trikona (trine) reduction: subtract the least of each trine from all three
-        [[0, 4, 8], [1, 5, 9], [2, 6, 10], [3, 7, 11]].forEach(function (tri) {
-          var mn = Math.min(bySign[tri[0]], bySign[tri[1]], bySign[tri[2]]);
-          tri.forEach(function (s) { bySign[s] = bySign[s] - mn; });
-        });
-        var afterTri = bySign.slice();
-        // Ekadhipatya (two-sign lordship) reduction - unambiguous cases applied:
-        //  both signs empty  -> both take the lower value
-        //  both occupied     -> unchanged
-        //  one empty/one not -> the empty sign is dropped to 0 when it is the weaker
-        EKA_PAIRS.forEach(function (pr) {
-          var s1 = pr[0], s2 = pr[1], b1 = bySign[s1], b2 = bySign[s2];
-          if (b1 === 0 || b2 === 0) return;
-          var o1 = chart.planets.some(function (p) { return p.sign === s1; });
-          var o2 = chart.planets.some(function (p) { return p.sign === s2; });
-          if (!o1 && !o2) { var mn2 = Math.min(b1, b2); bySign[s1] = mn2; bySign[s2] = mn2; }
-          else if (o1 && !o2) { if (b2 <= b1) bySign[s2] = 0; }
-          else if (!o1 && o2) { if (b1 <= b2) bySign[s1] = 0; }
-        });
-        var afterEka = bySign.slice();
-        function pinda(arr) {
-          var rp = 0, gp = 0;
-          for (var s3 = 0; s3 < 12; s3++) rp += arr[s3] * VAPM_RASI_PINDA[s3];
-          classical.forEach(function (g) { for (var s4 = 0; s4 < 12; s4++) if (SIGNS[s4].lord === g) gp += arr[s4] * VAPM_GRAHA_PINDA[g]; });
-          return { rp: rp, gp: gp, total: rp + gp };
-        }
-        var pTri = pinda(afterTri), pEka = pinda(afterEka);
+        var sp = vnShodhyaPindaFor(chart, avd, n);
+        var original = sp.original, afterTri = sp.afterTri, afterEka = sp.afterEka;
+        var pTri = sp.tri, pEka = sp.eka;
         // Headline Shodhya Pinda = Trikona-reduced (deterministic & reproducible);
         // the occupancy-dependent Ekadhipatya value is shown as an optional refinement.
         L.push("**" + n + "** - Rasi Pinda " + pTri.rp + " · Graha Pinda " + pTri.gp + " · **Shodhya Pinda " + pTri.total + "** (post-Trikona)" + (pEka.total !== pTri.total ? " · with Ekadhipatya = " + pEka.total : ""));
@@ -24213,9 +24289,18 @@
     L.push("");
 
     // ===== 3 · TIMING =====
+    // The lane is split in two on purpose. SUPPORT instruments run at
+    // period scale — they answer "is this stretch of life backing the
+    // matter", and cannot resolve a date. WINDOW instruments are dated
+    // transits — they answer "when". Grading them as one confirmation
+    // count conflated the two questions and let five instruments that
+    // pointed at five different years score like five that agreed, so
+    // the window is now graded on CONVERGENCE: how many independent
+    // dated instruments land on the same stretch of time.
     L.push("### 3 · TIMING   [lane TIMING]");
     var age = 0; try { age = completedYears(input.birthInstant, new Date(nowMs), tz); } catch (e) {}
     var ageFrac = age; try { ageFrac = (nowMs - input.birthInstant.getTime()) / (365.25 * DAY_MS); } catch (e) {}
+    var birthMs = (input && input.birthInstant) ? input.birthInstant.getTime() : nowMs;
     // AV daśā — VedNetra's own SAV-proportional rāśi daśā: each sign's dasha years =
     // its SAV bindus scaled so the 12-sign cycle from the Lagna spans 120 years.
     // This is VedNetra's construction, NOT the AMN engine's AV daśā (which is not embedded).
@@ -24231,58 +24316,144 @@
       return { mdSign: mdSign, mdLord: SIGNS[mdSign].lord, mdSAV: savBySign[mdSign], mdStart: r1(mdStart), mdEnd: r1(mdStart + mdYears), mdEndDate: ageToDate(mdStart + mdYears), adSign: adSign, adLord: SIGNS[adSign].lord, adSAV: savBySign[adSign], adEnd: r1(adStart + adYears), adEndDate: ageToDate(adStart + adYears) };
     })();
     var avdSupports = (avDasha.mdSign === gSign || avDasha.adSign === gSign || (kp && (avDasha.mdSign === kp.sign || avDasha.adSign === kp.sign)) || [0, 4, 8].indexOf(((avDasha.mdSign - gSign + 12) % 12)) >= 0);
-    // instruments
-    var confirm = 0;
-    // life-third khanda
+
+    // ---------- SUPPORT (period scale — whether, not when) ----------
+    var support = 0, supportOf = 3;
     var khandaOfAge = age < 27 ? 1 : age < 54 ? 2 : 3;
     var khandaHouses = khandaOfAge === 1 ? [1, 2, 3, 4] : khandaOfAge === 2 ? [5, 6, 7, 8] : [9, 10, 11, 12];
     var khandaSum = sumH(khandaHouses);
     var khandaKashta = khandaSum < 4 * MIN;
-    if (!khandaKashta) confirm++;
-    // sudarshana age-year
+    if (!khandaKashta) support++;
     var ageHouse = (age % 12) + 1, ageHouseSAV = savOfHouse(ageHouse);
     var ageGrade = ageHouseSAV >= 34 ? "strong" : ageHouseSAV >= 28 ? "fair" : "weak";
-    if (ageHouseSAV >= 28) confirm++;
-    // age-trigger
-    var trigAge = Math.round(gSAV * 7 / 27), trigRem = (gSAV * 7) % 27, trigNak = NAKSHATRAS[((trigRem % 27) + 27) % 27];
-    if (Math.abs(trigAge - age) <= 3) confirm++;
-    // relative window (karaka nakshatra + trines)
-    var kNak = kp ? nakshatraInfo(kp.lon) : null;
-    var kNakTrines = kNak ? [kNak.index, (kNak.index + 9) % 27, (kNak.index + 18) % 27].map(function (i) { return NAKSHATRAS[i]; }) : [];
-    // transit window from the slow lord over the governing sign (± 6-month lead)
-    var transitWindow = "not datable by a slow transit for this kāraka", winGraded = false;
+    if (ageHouseSAV >= 28) support++;
+    if (avdSupports) support++;
+
+    // ---------- WINDOW (dated transits — when) ----------
+    // Scan the native's whole life plus 25 years, BACKWARD as well as
+    // forward: a "what happened in 2014" question needs the past, and a
+    // 3-year forward-only scan missed Saturn's return to any given sign
+    // roughly nine times in ten (Saturn takes 29.5 yrs to come round).
+    var scanFrom = Math.min(birthMs, nowMs - 25 * 365.25 * DAY_MS);
+    var scanTo = nowMs + 25 * 365.25 * DAY_MS;
+    // The piṇḍa nakṣatra. The previous age-trigger read
+    // `SAV × 7 ÷ 27`, which with a per-house SAV of 18–40 can only ever
+    // return ages 5–10 — it could not fire for any native past their
+    // early teens. The piṇḍa (not the raw SAV) is the figure the
+    // classical remainder is taken from, so the kāraka's Śodhya Piṇḍa
+    // mod 27 now names a nakṣatra, and a slow graha crossing it dates
+    // the trigger. Declared as VedNetra's construction, like the daśā.
+    var pindaInfo = null;
     try {
-      var ing = vnIngressEvents(chart, nowMs, 3);
-      var slow = (["Saturn", "Jupiter"].indexOf(karaka) >= 0) ? karaka : "Saturn";
-      var hit = ing.filter(function (e) { return e.planet === slow && e.event.indexOf("ingress -> " + SIGNS[gSign].name) >= 0; })[0];
-      if (hit) { var start = new Date(hit.ms - 182 * DAY_MS), end = new Date(hit.ms + 182 * DAY_MS); transitWindow = start.toISOString().slice(0, 10) + " – " + end.toISOString().slice(0, 10) + " (" + slow + " over " + SIGNS[gSign].name + ", 6-mo lead applied)"; winGraded = true; confirm++; }
+      var spK = vnShodhyaPindaFor(chart, av, karaka);
+      var pTot = spK.tri.total, pRem = ((pTot % 27) + 27) % 27;
+      // Remainders are counted 1-based in the classical reckoning: a
+      // remainder of r names the r-th nakṣatra, and r = 0 the 27th.
+      var pIdx = (pRem === 0 ? 27 : pRem) - 1;
+      pindaInfo = { total: pTot, rem: pRem, nakIdx: pIdx, nak: NAKSHATRAS[pIdx] };
+    } catch (e) { pindaInfo = null; }
+    var kNak = kp ? nakshatraInfo(kp.lon) : null;
+    var kNakSet = kNak ? [kNak.index, (kNak.index + 9) % 27, (kNak.index + 18) % 27] : [];
+
+    var windows = [];   // every dated spell, tagged with the instrument that found it
+    function addSpells(tag, spells) { (spells || []).forEach(function (s) { s.tag = tag; windows.push(s); }); }
+    var slowSet = ["Saturn", "Jupiter"];
+    try {
+      slowSet.forEach(function (g) {
+        addSpells("governing sign", vnAvTransitSpells(chart, g, { signs: [gSign], fromMs: scanFrom, toMs: scanTo, stepDays: g === "Saturn" ? 8 : 4 }));
+        if (pindaInfo) addSpells("piṇḍa nakṣatra", vnAvTransitSpells(chart, g, { nakshatras: [pindaInfo.nakIdx], fromMs: scanFrom, toMs: scanTo, stepDays: g === "Saturn" ? 6 : 3 }));
+        if (kNakSet.length) addSpells("kāraka nakṣatra + trines", vnAvTransitSpells(chart, g, { nakshatras: kNakSet, fromMs: scanFrom, toMs: scanTo, stepDays: g === "Saturn" ? 6 : 3 }));
+      });
     } catch (e) {}
-    // transit chart snapshot for month/day witness
-    var trChart = null; try { trChart = buildChart(new Date(nowMs), Number(input.latitude), Number(input.longitude), tz, { ayanamshaKey: "lahiri" }); } catch (e) {}
-    var monthWit = "—";
-    if (trChart && kp) { var ts = trChart.planetsByName[karaka]; if (ts) { var bhinna = bavInSign(karaka, ts.sign); monthWit = "bhinna " + bhinna + "/8 against 4 · transit " + karaka + " in " + ts.signName + " SAV " + savOfSign(ts.sign) + "/56"; if (bhinna >= 4) confirm++; } }
-    if (avdSupports) confirm++;
-    L.push("**Confirmation count: " + confirm + " / 7**   (`ENGINE-11` §D)");
+    // Cluster overlapping spells; a cluster fed by more DISTINCT
+    // instruments is a tighter call than one instrument firing alone.
+    var clusters = [];
+    windows.sort(function (a, b) { return a.startMs - b.startMs; }).forEach(function (w) {
+      var last = clusters[clusters.length - 1];
+      if (last && w.startMs <= last.endMs) {
+        last.endMs = Math.max(last.endMs, w.endMs);
+        last.members.push(w);
+      } else clusters.push({ startMs: w.startMs, endMs: w.endMs, members: [w] });
+    });
+    clusters.forEach(function (c) {
+      c.tags = c.members.map(function (m) { return m.tag; }).filter(function (t, i, a) { return a.indexOf(t) === i; });
+      c.grahas = c.members.map(function (m) { return m.graha; }).filter(function (t, i, a) { return a.indexOf(t) === i; });
+      c.converge = c.tags.length;
+      c.months = Math.round((c.endMs - c.startMs) / DAY_MS / 30.44);
+      c.start = new Date(c.startMs).toISOString().slice(0, 10);
+      c.end = new Date(c.endMs).toISOString().slice(0, 10);
+      c.future = c.endMs >= nowMs;
+    });
+    // The quoted window: the best-converged cluster that has not already
+    // passed; ties broken by proximity to the enquiry date.
+    // Rank on convergence AND proximity together. Sorting by convergence
+    // alone let a 3/3 cluster a decade out beat a 2/3 cluster six months
+    // out, which is the wrong answer to "when" — a question about timing
+    // means the next plausible occurrence, not the tidiest one in the
+    // native's whole remaining life. Each year of distance costs a fifth
+    // of an instrument, so convergence still wins between near windows
+    // but cannot drag the answer far downstream.
+    var live = clusters.filter(function (c) { return c.future; });
+    var pool = live.length ? live : clusters;
+    pool.forEach(function (c) {
+      c.yearsOff = Math.max(0, (c.startMs - nowMs)) / (365.25 * DAY_MS);
+      c.rank = c.converge - c.yearsOff * VN_AV_PROXIMITY_PENALTY;
+    });
+    pool.sort(function (a, b) { return (b.rank - a.rank) || (a.startMs - b.startMs); });
+    var pick = pool[0] || null;
+
+    // Month & day witness — read INSIDE the quoted window, not at the
+    // moment of enquiry, which is the date the old build tested.
+    var monthWit = "—", monthFires = false;
+    if (pick && kp) {
+      try {
+        var midChart = buildChart(new Date(pick.startMs + (pick.endMs - pick.startMs) / 2), Number(input.latitude), Number(input.longitude), tz, { ayanamshaKey: "lahiri" });
+        var ts = midChart.planetsByName[karaka];
+        if (ts) {
+          var bhinna = bavInSign(karaka, ts.sign);
+          monthFires = bhinna >= 4;
+          monthWit = "at the window's centre (" + new Date(pick.startMs + (pick.endMs - pick.startMs) / 2).toISOString().slice(0, 10) + ") " + karaka + " is in " + ts.signName + " — bhinna " + bhinna + "/8 against 4, sign SAV " + savOfSign(ts.sign) + "/56";
+        }
+      } catch (e) {}
+    }
+
+    L.push("**SUPPORT " + support + "/" + supportOf + "**  (period scale — whether)   ·   **WINDOW convergence " + (pick ? pick.converge : 0) + "/3**  (dated transits — when)   (`ENGINE-11` §D)");
     L.push("");
-    L.push(row(["level", "instrument", "reading"])); L.push(sep(3));
-    L.push(row(["life-third", "khaṇḍa " + khandaOfAge + " (houses " + khandaHouses.join(",") + ") sum " + khandaSum, (khandaKashta ? "kaṣṭa — below 4×min" : "sound")]));
-    L.push(row(["year", "Sudarśana age-year, age " + age + " → house " + ageHouse + ", SAV " + ageHouseSAV, ageGrade]));
-    L.push(row(["age-trigger", "SAV " + gSAV + " × 7 ÷ 27 = **age " + trigAge + "**, rem " + trigRem + " = " + trigNak, (Math.abs(trigAge - age) <= 3 ? "near the current age" : "distant")]));
-    L.push(row(["period", "AV daśā (VedNetra SAV-proportional rāśi daśā) **" + SIGNS[avDasha.mdSign].name + "** (SAV " + avDasha.mdSAV + ", lord " + avDasha.mdLord + ", to age " + avDasha.mdEnd + " ≈ " + avDasha.mdEndDate + ") / AD **" + SIGNS[avDasha.adSign].name + "** (SAV " + avDasha.adSAV + ", to age " + avDasha.adEnd + " ≈ " + avDasha.adEndDate + ")", (avdSupports ? "the running sign supports the matter" : "running, neutral to the matter") + " — VedNetra's own daśā, not the AMN engine's"]));
-    L.push(row(["relative window", "kāraka " + karaka + ", nakṣatra " + (kNak ? kNak.name : "—") + " + trines " + (kNakTrines.length ? kNakTrines.join("/") : "—") + ", Saturn over them", "watch Saturn's transit of those three stars"]));
-    L.push(row(["transit window", (winGraded ? "**" + transitWindow + "**" : transitWindow), (winGraded ? "dated" : "coarse")]));
-    L.push(row(["month & day", monthWit, "witness"]));
+    L.push(row(["lane", "instrument", "reading"])); L.push(sep(3));
+    L.push(row(["support", "khaṇḍa " + khandaOfAge + " (houses " + khandaHouses.join(",") + ") sum " + khandaSum + " vs 4×" + MIN, (khandaKashta ? "kaṣṭa — below 4×min" : "sound") + " · resolution 27 yrs, cannot date"]));
+    L.push(row(["support", "Sudarśana age-year, age " + age + " → house " + ageHouse + ", SAV " + ageHouseSAV, ageGrade + " · resolution 1 yr"]));
+    L.push(row(["support", "AV daśā (VedNetra SAV-proportional rāśi daśā) **" + SIGNS[avDasha.mdSign].name + "** (SAV " + avDasha.mdSAV + ", lord " + avDasha.mdLord + ", to age " + avDasha.mdEnd + " ≈ " + avDasha.mdEndDate + ") / AD **" + SIGNS[avDasha.adSign].name + "** (SAV " + avDasha.adSAV + ", to age " + avDasha.adEnd + " ≈ " + avDasha.adEndDate + ")", (avdSupports ? "the running sign supports the matter" : "running, neutral to the matter") + " — VedNetra's own daśā, not the AMN engine's"]));
+    var wRows = [
+      ["governing sign", "Saturn/Jupiter over " + SIGNS[gSign].name + " (H" + gHouse + ")"],
+      ["piṇḍa nakṣatra", pindaInfo ? ("kāraka " + karaka + " Śodhya Piṇḍa " + pindaInfo.total + " mod 27 = " + pindaInfo.rem + " → **" + pindaInfo.nak + "**, slow graha crossing it") : "UNAVAILABLE — piṇḍa not computable"],
+      ["kāraka nakṣatra + trines", kNak ? (karaka + " in " + kNak.name + " + trines " + kNakSet.map(function (i) { return NAKSHATRAS[i]; }).join("/") + ", slow graha crossing them") : "UNAVAILABLE — no kāraka longitude"]
+    ];
+    wRows.forEach(function (r) {
+      var hits = clusters.filter(function (c) { return c.tags.indexOf(r[0]) >= 0 && c.future; }).length;
+      L.push(row(["window", r[1], hits ? hits + " dated spell" + (hits > 1 ? "s" : "") + " ahead" : "no future crossing in the scanned range"]));
+    });
+    L.push(row(["month & day", monthWit, monthFires ? "witness fires" : "witness weak"]));
     L.push("");
-    var grade = confirm >= 6 ? "**dated window**" : confirm >= 4 ? "**strong window — give a tolerance**" : confirm >= 2 ? "**candidate window — say the word**" : "**not datable by this instrument**";
-    L.push("**Grade:** " + confirm + "/7 → " + grade + ".");
+    if (clusters.length) {
+      L.push("**Dated windows, best-converged first** (life span " + new Date(scanFrom).toISOString().slice(0, 4) + "–" + new Date(scanTo).toISOString().slice(0, 4) + ", scanned both directions):");
+      L.push(row(["window", "converge", "rank", "instruments", "grahas", "when"])); L.push(sep(6));
+      pool.slice(0, 6).forEach(function (c) {
+        L.push(row([c.start + " – " + c.end + " (" + c.months + " mo)", c.converge + "/3", r1(c.rank), c.tags.join(" + "), c.grahas.join("/"), c.future ? (c.startMs > nowMs ? "in " + r1(c.yearsOff) + " yr" : "running now") : "past"]));
+      });
+      L.push("");
+    }
+    var grade = !pick ? "**not datable by this instrument**"
+      : (pick.converge >= 3 && support >= 2) ? "**dated window**"
+      : (pick.converge >= 2) ? "**strong window — hold a tolerance**"
+      : "**candidate window — say the word**";
+    L.push("**Grade:** SUPPORT " + support + "/" + supportOf + " · convergence " + (pick ? pick.converge : 0) + "/3 → " + grade + ".");
     L.push("");
     // GRAVE four-fire (only material when the routed matter is longevity/health and the reading is adverse)
     var graveContext = ([8, 6].indexOf(gHouse) >= 0) && verdict < 25;
     if (graveContext) {
       L.push("⚑ **GRAVE verdict — `AMN-ARI-003` four must ALL fire, else CANDIDATE only:**");
-      var f1 = khandaKashta, f2 = false, f3 = avDasha.mdSAV <= 25, f4 = false;
+      var f1 = khandaKashta, f2 = false, f3 = avDasha.mdSAV <= 25, f4 = !!(pick && pick.converge >= 2);
       try { var ing2 = vnIngressEvents(chart, nowMs, 3); f2 = ing2.some(function (e) { return (e.planet === "Jupiter" || e.planet === "Saturn") && bavInSign(e.planet, gSign) <= 1; }); } catch (e) {}
-      f4 = winGraded;
       L.push(row(["kaṣṭa-khaṇḍa inside the āyu-khaṇḍa", f1 ? "fired" : "not"]));
       L.push(row(["Jupiter/Saturn over a rekhā-less sign or its trine", f2 ? "fired" : "not"]));
       L.push(row(["an inauspicious Aṣṭakavarga daśā", (avDasha.mdSAV <= 25 ? "fired — running AV MD " + SIGNS[avDasha.mdSign].name + " SAV " + avDasha.mdSAV + " ≤ 25" : "not — running AV MD SAV " + avDasha.mdSAV)]));
@@ -24290,7 +24461,11 @@
       L.push("_" + ([f1, f2, f3, f4].filter(Boolean).length === 4 ? "All four fire — the grave reading stands." : "Not all four fire — this is a CANDIDATE only, never asserted.") + "_");
       L.push("");
     }
-    L.push("> **The window:** " + (winGraded ? transitWindow + " — " + (confirm >= 6 ? "dated" : "strong, hold a tolerance") : "no slow-transit lock; " + grade.replace(/\*/g, "")) + ".");
+    L.push("> **The window:** " + (pick
+      ? pick.start + " – " + pick.end + " (" + pick.months + " months, " + pick.converge + "/3 instruments: " + pick.tags.join(" + ") + ") — " + grade.replace(/\*/g, "")
+      : "no dated crossing in the scanned range; " + grade.replace(/\*/g, "")) + ".");
+    L.push("");
+    L.push("_Window width is what the transits actually give, not a fixed ±6 months. A 1/3 convergence is one instrument talking to itself — treat it as a candidate, not a date._");
     L.push("");
 
     // ===== 4 · TRANSFER CHECK =====
@@ -24316,7 +24491,7 @@
     L.push("---");
     L.push("");
     var blWord = verdict >= 60 ? "PROMISED" : verdict >= 40 ? "THINLY PROMISED" : verdict >= 25 ? "WEAKLY PROMISED" : verdict >= 0 ? "NOT PROMISED" : "ADVERSE";
-    L.push("**BOTTOM LINE —** on the Ashtakavarga instrument the matter routed to the " + gHouse + "th house (SAV " + gSAV + ", kāraka " + karaka + " " + R + " rekhās) reads **VERDICT " + r1(verdict) + " % — " + blWord + "**" + (winGraded ? ", timed to **" + transitWindow.split(" (")[0] + "**" : "") + ".");
+    L.push("**BOTTOM LINE —** on the Ashtakavarga instrument the matter routed to the " + gHouse + "th house (SAV " + gSAV + ", kāraka " + karaka + " " + R + " rekhās) reads **VERDICT " + r1(verdict) + " % — " + blWord + "**" + (pick ? ", timed to **" + pick.start + " – " + pick.end + "** (" + pick.converge + "/3 instruments)" : "") + ".");
     L.push("");
     L.push("_Generated by VedNetra — Ashtakvarga Engine Report (Lahiri) — " + vnFmtFullDate(nowMs) + ". Figures VedNetra-computed; AMN/PAA/RSG/ENGINE rule IDs are engine-spec references, never classical page numbers._");
     return L.join("\n");
@@ -25090,7 +25265,23 @@
     getEventDay: function () { return { date: vnAvDayState.date, time: vnAvDayState.time }; },
     dayEngine: function (chart, input) { return vnAvDayEngine(chart, input, vnAvDayResolve(input)); },
     dayOneLiner: function (chart, input) { return vnAvDayOneLiner(vnAvDayEngine(chart, input, vnAvDayResolve(input)), input); },
-    intakeOneLiner: function (chart, input) { return vnIntakeOneLiner(chart, input, vnAvDayEngine(chart, input, vnAvDayResolve(input))); }
+    intakeOneLiner: function (chart, input) { return vnIntakeOneLiner(chart, input, vnAvDayEngine(chart, input, vnAvDayResolve(input))); },
+    // ---- Ashtakvarga Engine Report, for calibration ----
+    // Lets a harness cast many charts and read many verdicts inside ONE
+    // page load instead of reloading the app per native, which is what
+    // makes a backtest over dozens of dated events practical.
+    avEngineFor: function (spec) {
+      var inst = new Date(spec.birthISO);
+      var chart = buildChart(inst, Number(spec.lat), Number(spec.lon), Number(spec.tz), { ayanamshaKey: "lahiri" });
+      var input = {
+        nativeName: spec.name || "Native", gender: spec.gender || "unspecified",
+        birthInstant: inst, latitude: Number(spec.lat), longitude: Number(spec.lon),
+        timezone: Number(spec.tz), birthPlace: spec.place || "",
+        question: spec.question || "", topic: spec.question || "",
+        asOfInstant: spec.asOfISO ? new Date(spec.asOfISO) : new Date()
+      };
+      return { markdown: vnAshtakavargaEngineMarkdown(chart, input) };
+    }
   };
   if (typeof window !== "undefined") window.VedicCore = coreApi;
   if (typeof globalThis !== "undefined") globalThis.VedicCore = coreApi;

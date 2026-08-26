@@ -1,0 +1,16 @@
+[
+  {
+    "_comment": "One object per native. birthISO is LOCAL clock time at the birth place; tz converts it. Add as many dated events as you can verify — the harness scores each one separately. 20-30 events across 10+ natives is enough for the hit rates to mean something; fewer than ~10 and the confidence interval swamps the result.",
+    "name": "Native A",
+    "gender": "male",
+    "birthISO": "1991-12-01T01:15:00",
+    "tz": 5.5,
+    "lat": 28.9931,
+    "lon": 77.0151,
+    "place": "Sonipat, India",
+    "events": [
+      { "question": "When will my marriage happen?", "date": "2019-02-11" },
+      { "question": "When will I change job?",       "date": "2016-07-04" }
+    ]
+  }
+]
