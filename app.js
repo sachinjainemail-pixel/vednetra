@@ -13772,7 +13772,7 @@
     var types = [
       ["kp", "KP System Report (Krishnamurti · Placidus · sub-lords) — default"],
       ["consolidatedmaster", "Consolidated Master Run (Lahiri · all 4 projects)"],
-      ["intakeform", "Intake Form (§17 · Lahiri · §1–§10 + chart.json)"],
+      ["intakeform", "Intake Form (§17 · Lahiri · §1–§11 + day engine + one-liner)"],
       ["triveni", "Triveni Chart Intake (Lahiri · §0–§10)"],
       ["trinetra", "Trinetra Master Run (Lahiri · §0–§8 · Promise/Star/Time)"],
       ["vapmnak", "VAPM + Nakshatra Report (Lahiri · §1–§15 + Part B)"],
@@ -18521,7 +18521,7 @@
       { id: "viewA-vapmreport", label: "VAPM Export", desc: "VAPM export spec (Lahiri, §1–§14 + Part B): master table, aspect/Kartari table, functional nature, Chandra/Surya Lagna, all vargas + Dashavarga count, Ashtakavarga incl. Shodhya Pinda, Vimshottari/Yogini/Jaimini, Indu Lagna, Tara Chakra, transits, four-fold scaffolds." },
       { id: "viewA-vapmnakreport", label: "VAPM + Nakshatra Report", desc: "Full export (Lahiri): the whole VAPM export plus the §15 Nakshatra Layer — within-nakshatra degrees, Gandanta (48′/3°20′), Abhijit, Navatara points, pada-level navamsa dignity, Nadi/dosha and Yoni/Gana matching factors." },
       { id: "viewA-consolidatedmaster", label: "Consolidated Master Run", desc: "One-sheet master run covering all four projects (Lahiri): Mehta+Sutton (VAPM), Trinetra (Promise/Star/Time), Umesh Puri (LP+Gochar) and Triveni (BPHS·BJ·PD). Part I is the universal computed data core — incl. §I-H, a 37-pointer weighted three-frame Sudarshan Planetary Strength composite with a score out of 100 per planet (intensity, not auspiciousness of results); Part II re-frames it through each project's method lens." },
-      { id: "viewA-intakeform", label: "Intake Form (§17)", desc: "The ashtakavarga-engine intake form (template '17 — THE INTAKE FORM'), filled by VedNetra from the computed chart (Lahiri): §1 birth data & settings, §2 D-1 master table (D°M'S″, dignity, combustion, graha-yuddha loser, navamsa, retro), §3 Ṣaḍbala rupas + the 8-entry rank including the Lagna, §4 aspects onto each sign, §5 Navamsa spouse facts, §6 benefic/malefic split + longevity validity gate + house-lords, §7 Ashtakavarga SAV/BAV, §8 transit block (positions, Jupiter/Saturn ingress, solar sankranti, Sade-Sati), §9 special points (Gulika/Mandi, upagrahas, 64th navamsa, 22nd drekkana), §10 data-quality declaration, plus a ready-to-run chart.json. Uncomputable fields read NOT SUPPLIED." },
+      { id: "viewA-intakeform", label: "Intake Form (§17)", desc: "The ashtakavarga-engine intake form (template '17 — THE INTAKE FORM'), filled by VedNetra from the computed chart (Lahiri): §1 birth data & settings, §2 D-1 master table (D°M'S″, dignity, combustion, graha-yuddha loser, navamsa, retro), §3 Ṣaḍbala rupas + the 8-entry rank including the Lagna, §4 aspects onto each sign, §5 Navamsa spouse facts, §6 benefic/malefic split + longevity validity gate + house-lords, §7 Ashtakavarga SAV/BAV, §8 transit block (positions, Jupiter/Saturn ingress, solar sankranti, Sade-Sati), §9 special points (Gulika/Mandi, upagrahas, 64th navamsa, 22nd drekkana), §10 data-quality declaration, §11 the EVENT-ON-A-DAY engine — pick any day of the native’s life and it reads that day’s kakshya-transit bindus, BAV/SAV grading, gochara from Moon and Lagna, the Vimshottari MD–AD–PD–SD then running and the Moon’s contacts, then ranks the bhavas lit and names what may have happened — plus a ready-to-run chart.json and a closing one-liner. Uncomputable fields read NOT SUPPLIED." },
       { id: "viewA-kpreport", label: "KP System Report", desc: "DEFAULT — dedicated Krishnamurti Paddhati export (Krishnamurti ayanamsa − Lahiri−0.1°, Placidus, mean nodes, sub-lords to the second). Natal AND horary (Prashna 1–249): A0 header + birth-time-sensitivity, A1 twelve cusps with the CSL and its OWN sub-lord (final verdict layer), A1/A2 also print Sub→NEXT / Sub←PREV (minutes of birth-time error that flip each sub-lord, and to which lord), A2 nine planets star/sub/sub-sub + house + retro, A6 a ±2-min sub-lord stability roll-up, A4 karaka/body-part master, A5 relative-rotation map, A3 four-level Vimshottari, B1–B4 significators/ruling-planets/CSL promise board (with CSL-sub), B5 event-group scan, B6 money-direction flag, B7 badhaka/maraka, C1 natal-house transit + Moon star-lord + rising lagna, C2 Prana ladder, and an anti-anchoring self-check." },
       { id: "viewA-trivenireport", label: "Triveni Chart Intake", desc: "Intake sheet (Lahiri, §0–§17): D1 sign-deg-min, unequal Sripati bhava cusps, Dasavarga, Shadbala pass/fail + Vimsopaka + Ishta/Kashta + bhava-sandhi, Ashtakavarga + Shodhya Pinda, Vimshottari, Jaimini 8-karaka, longevity + conditional dashas, full MD-AD-PD, gochara, Sahams, Varshaphal, Panchang, planetary strength." },
       { id: "viewA-trinetrareport", label: "Trinetra Master Run", desc: "Three-eye worksheet (Lahiri, §0–§8): intake/ayanamsa gate, Eye 1 Promise (eight-factor engine, yogas+bhanga, longevity ordinal), Eye 2 Star (nakshatra-pada, Navatara from Moon & Lagna, the one-way override), Eye 3 Time (functional nature, maraka danger, per-bhavesha firing test + gochara), grade/resolve, guardrails." },
@@ -23261,6 +23261,429 @@
     });
   }
   // ================================================================
+  // ASHTAKAVARGA DAY ENGINE — "what may have happened on this day"
+  // ----------------------------------------------------------------
+  // Given ANY calendar day of the native's life the engine reads that
+  // day through four classical layers and returns a ranked set of
+  // candidate events plus a one-line verdict:
+  //
+  //   1. KAKSHYA TRANSIT — the Ashtakavarga day meter. Every sign is cut
+  //      into eight kakshyas of 3°45'; a transiting graha yields the
+  //      result of the kakshya lord it is passing. If that lord gave a
+  //      bindu to the graha's own BAV in that sign the day runs "bindu
+  //      ON" for it, else "bindu OFF". 0–7 lit kakshyas is the headline.
+  //   2. BAV / SAV CONTEXT — the graha's own bindus in the sign it
+  //      transits and that sign's SAV grade the SIZE of the result.
+  //   3. GOCHARA HOUSES — each transit is booked to the house it holds
+  //      from the natal Moon (primary) and from the Lagna, plus the
+  //      houses the graha owns and occupies natally.
+  //   4. VIMSHOTTARI — the MD/AD/PD/SD lords running on that day add
+  //      their own owned/occupied houses, signed by the lord's natal
+  //      condition; the Moon's daily contact with those lords is the
+  //      classical trigger.
+  //
+  // Every activation is signed (+ favourable / − adverse) and pooled per
+  // house. The loudest houses name the life-area, the sign of their net
+  // names the kind of event, and the total intensity says whether an
+  // event of note was likely to have happened at all.
+  // ================================================================
+  var VN_KAKSHYA_LORDS = ["Saturn", "Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon", "Lagna"];
+  // Day-weight per transiting graha: slow movers set the tone of the
+  // period, fast movers fire the day itself. The Moon is the day's own
+  // karaka and therefore carries the heaviest trigger weight.
+  var VN_DAY_TRANSIT_WEIGHT = { Moon: 1.8, Sun: 1.1, Mars: 1.1, Mercury: 0.8, Venus: 0.8, Jupiter: 1.3, Saturn: 1.4 };
+  var VN_DAY_DASHA_WEIGHT = { MD: 0.8, AD: 1.1, PD: 1.0, SD: 0.7 };
+  var VN_DAY_HOUSE_EVENTS = {
+    1: { area: "self, body, vitality, personal standing",
+      pos: "a personal gain — health, confidence, a fresh start made on your own initiative",
+      neg: "a knock to health, energy or personal standing that you had to absorb yourself" },
+    2: { area: "money, family, food, speech",
+      pos: "money came in, or a family/speech matter settled in your favour",
+      neg: "a money drain, a family quarrel, or words that cost you something" },
+    3: { area: "courage, siblings, short travel, effort, communication",
+      pos: "a bold effort paid off — a sibling, a short journey, or a piece of self-made courage",
+      neg: "strain with a sibling, a journey gone wrong, or effort spent for nothing" },
+    4: { area: "mother, home, land, vehicles, schooling, peace of mind",
+      pos: "a home, land, vehicle or mother-related gain, or plain peace of mind",
+      neg: "trouble at home or with the mother, a property/vehicle problem, or loss of mental peace" },
+    5: { area: "children, intelligence, romance, speculation, purva punya",
+      pos: "a child, a romance, an exam or a speculative bet that went right",
+      neg: "worry over a child, a romance broken, or a speculation that lost" },
+    6: { area: "illness, debt, enemies, service, litigation, competition",
+      pos: "an enemy, debt, illness or competitor was beaten — service matters went your way",
+      neg: "illness, debt, a dispute or an enemy/service problem surfaced" },
+    7: { area: "marriage, spouse, partnership, contracts, public dealing",
+      pos: "a marriage, partnership, contract or public dealing moved forward",
+      neg: "friction with the spouse or a partner, or a deal that broke down" },
+    8: { area: "longevity, sudden events, surgery, inheritance, occult, hidden matters",
+      pos: "a sudden inflow — inheritance, insurance, a hidden matter resolved, a research breakthrough",
+      neg: "a sudden shock, accident, surgery, scandal or a hidden loss" },
+    9: { area: "fortune, father, guru, dharma, long travel, higher learning",
+      pos: "luck ran — father, guru, a long journey, higher study or a dharmic act favoured you",
+      neg: "trouble with the father or guru, a pilgrimage/journey disturbed, or faith tested" },
+    10: { area: "career, status, authority, karma in the world",
+      pos: "career recognition — a promotion, an order won, or a public result in your name",
+      neg: "career pressure — a reprimand, a demotion, a delay or loss of position" },
+    11: { area: "gains, income, elder siblings, networks, fulfilment of desire",
+      pos: "a gain — income, a friend's help, a network paying off, a wish fulfilled",
+      neg: "a promised gain failed, or a friend/network let you down" },
+    12: { area: "expense, loss, foreign lands, hospital, sleep, moksha",
+      pos: "a fruitful expense — a foreign move, a retreat, a spiritual or charitable turn",
+      neg: "expense, loss, hospitalisation, confinement or a foreign complication" }
+  };
+  var VN_DAY_PLANET_FLAVOUR = {
+    Sun: { pos: "backing from an authority, the father or the government", neg: "friction with an authority, the father or the establishment" },
+    Moon: { pos: "news, a change of place, or support from the mother or a woman", neg: "emotional strain, unrest at home, or worry through the mother" },
+    Mars: { pos: "a bold push that landed — property, machinery, sport, or surgery well handled", neg: "a quarrel, cut, fever, accident or a fight over property" },
+    Mercury: { pos: "papers, news, an exam or a negotiation that went right", neg: "a miscommunication, a document or exam problem, nervous strain" },
+    Jupiter: { pos: "a blessing — funds, a child, an elder's help, a ceremony, expansion", neg: "over-extension, an empty promise, or a costly duty" },
+    Venus: { pos: "comfort, a relationship, a purchase or a celebration", neg: "a relationship strain, an indulgent expense or a spoiled pleasure" },
+    Saturn: { pos: "a slow labour finally paying — land, elders, staff, endurance rewarded", neg: "delay, denial, grief, chronic trouble or heavy responsibility" },
+    Rahu: { pos: "a sudden unconventional opening — foreign, technology, an outsider's help", neg: "a sudden shock, deception, addiction or a foreign complication" },
+    Ketu: { pos: "a detachment that freed you — insight, a spiritual turn", neg: "an abrupt separation, an unexplained loss or a setback with no visible cause" }
+  };
+  var VN_DAY_HOUSE_SHORT = { 1: "self/health", 2: "money/family", 3: "effort/siblings", 4: "home/mother", 5: "children/creativity", 6: "health/disputes", 7: "marriage/partners", 8: "sudden events", 9: "fortune/father", 10: "career", 11: "gains", 12: "expense/foreign" };
+  var VN_DAY_SHORT_WEEKDAY = { Sunday: "Sun", Monday: "Mon", Tuesday: "Tue", Wednesday: "Wed", Thursday: "Thu", Friday: "Fri", Saturday: "Sat" };
+  var VN_DAY_TARA_TONE = { Janma: 0, Sampat: 1, Vipat: -1, Kshema: 1, Pratyari: -1, Sadhaka: 1, Vadha: -1, Mitra: 1, "Ati-Mitra": 1 };
+  var VN_WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  var VN_VARA_LORDS = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
+  // Chandra bala — the transiting Moon's house from the natal Moon.
+  var VN_CHANDRA_GOOD = [1, 3, 6, 7, 10, 11];
+
+  // The queried day. Held at module scope so the on-screen picker, the
+  // section re-render and every download path all read the same day.
+  var vnAvDayState = { date: null, time: "12:00" };
+
+  function vnAvDayResolve(input) {
+    var tz = Number(input && input.timezone) || 0;
+    var ds = vnAvDayState.date, ts = vnAvDayState.time || "12:00";
+    if (!ds) {
+      var nowMs = (input && input.asOfInstant && input.asOfInstant.getTime) ? input.asOfInstant.getTime() : Date.now();
+      ds = new Date(nowMs + tz * 3600000).toISOString().slice(0, 10);
+    }
+    var d = String(ds).split("-"), t = String(ts).split(":");
+    var y = Number(d[0]), mo = Number(d[1]) - 1, da = Number(d[2]);
+    var hh = Number(t[0]), mi = Number(t[1]);
+    if (!Number.isFinite(y) || !Number.isFinite(mo) || !Number.isFinite(da)) return { date: new Date(), iso: ds, time: ts };
+    if (!Number.isFinite(hh)) hh = 12;
+    if (!Number.isFinite(mi)) mi = 0;
+    var utc = Date.UTC(y, mo, da, hh, mi, 0);
+    if (y < 100) utc = new Date(utc).setUTCFullYear(y); // keep 2-digit years literal
+    return { date: new Date(utc - tz * 3600000), iso: ds, time: pad(hh) + ":" + pad(mi), weekday: VN_WEEKDAYS[new Date(utc).getUTCDay()], varaLord: VN_VARA_LORDS[new Date(utc).getUTCDay()] };
+  }
+
+  // The heart of the engine. Pure computation — no DOM, no formatting.
+  function vnAvDayEngine(chart, input, resolved) {
+    resolved = resolved || vnAvDayResolve(input);
+    var tz = Number(input && input.timezone) || 0;
+    var lat = Number(input && input.latitude), lon = Number(input && input.longitude);
+    var asc = chart.ascendant, P = chart.planetsByName;
+    var rules = ashtakavargaRules();
+    var bySign = sarvashtakavargaBySign(chart);
+    var natalMoonSign = P.Moon ? P.Moon.sign : asc.sign;
+    var janmaNak = P.Moon ? nakshatraInfo(P.Moon.lon).index : 0;
+
+    var tr = null;
+    try { tr = buildChart(resolved.date, lat, lon, tz, { ayanamshaKey: "lahiri" }); } catch (e) { tr = null; }
+    if (!tr) return null;
+
+    var houses = {}; // 1..12 -> { pos, neg, why: [] }
+    for (var h = 1; h <= 12; h++) houses[h] = { house: h, pos: 0, neg: 0, why: [] };
+    function book(h, amount, why) {
+      if (!h || h < 1 || h > 12 || !amount) return;
+      if (amount > 0) houses[h].pos += amount; else houses[h].neg += -amount;
+      houses[h].why.push({ amount: Math.round(amount * 100) / 100, why: why });
+    }
+
+    // ---- layer 1+2+3 : kakshya transit, BAV/SAV context, gochara houses
+    var kakRows = [], lit = 0, litOf = 0;
+    CLASSICAL_PLANETS.forEach(function (name) {
+      var t = tr.planetsByName[name]; if (!t) return;
+      var part = Math.max(0, Math.min(7, Math.floor(t.deg / 3.75)));
+      var kLord = VN_KAKSHYA_LORDS[part];
+      var baseSign = kLord === "Lagna" ? asc.sign : (P[kLord] ? P[kLord].sign : asc.sign);
+      var relative = houseFromSign(baseSign, t.sign);
+      var on = rules[name] && rules[name][kLord] ? rules[name][kLord].indexOf(relative) >= 0 : false;
+      var bav = bySign[t.sign].bav[name], sav = bySign[t.sign].sav;
+      litOf += 1; if (on) lit += 1;
+      // bindu quality of the sign for this graha, and the sign's own SAV grade
+      var q = bav >= 6 ? 1.3 : bav >= 5 ? 1.15 : bav >= 4 ? 1 : bav >= 3 ? 0.85 : bav >= 1 ? 0.7 : 0.55;
+      var sq = sav >= 32 ? 1.15 : sav >= 28 ? 1.05 : sav >= 25 ? 1 : sav >= 20 ? 0.9 : 0.8;
+      var w = VN_DAY_TRANSIT_WEIGHT[name] || 1;
+      var score = (on ? 1 : -1) * w * q * sq;
+      // a 0-bindu kakshya is called severe by the classics — deepen it
+      if (!on && bav <= 2) score *= 1.3;
+      var fromMoon = houseFromSign(natalMoonSign, t.sign);
+      var fromLagna = houseFromSign(asc.sign, t.sign);
+      var natal = P[name];
+      book(fromMoon, score * 1.0, name + " transits H" + fromMoon + " from Moon, kakshya of " + kLord + " (" + (on ? "bindu ON" : "bindu OFF") + "), BAV " + bav + "/8, SAV " + sav);
+      book(fromLagna, score * 0.8, name + " transits H" + fromLagna + " from Lagna");
+      if (natal && natal.lordships) natal.lordships.forEach(function (oh) { book(oh, score * 0.7, name + " owns H" + oh + " natally"); });
+      if (natal && natal.house) book(natal.house, score * 0.5, name + " sits in H" + natal.house + " natally");
+      kakRows.push({
+        planet: name, sign: t.signName, deg: t.deg, retro: !!t.retrograde,
+        kakshya: part + 1, kakshyaLord: kLord, on: on, bav: bav, sav: sav,
+        fromMoon: fromMoon, fromLagna: fromLagna, score: Math.round(score * 100) / 100
+      });
+    });
+    // Rahu / Ketu carry no bindus of their own; they are booked by house alone.
+    ["Rahu", "Ketu"].forEach(function (name) {
+      var t = tr.planetsByName[name]; if (!t) return;
+      var fromMoon = houseFromSign(natalMoonSign, t.sign), fromLagna = houseFromSign(asc.sign, t.sign);
+      var sav = bySign[t.sign].sav;
+      var score = (sav >= 30 ? 0.35 : sav >= 25 ? -0.2 : -0.7);
+      book(fromMoon, score, name + " transits H" + fromMoon + " from Moon (SAV " + sav + "; nodes carry no bindus)");
+      book(fromLagna, score * 0.8, name + " transits H" + fromLagna + " from Lagna");
+      kakRows.push({ planet: name, sign: t.signName, deg: t.deg, retro: true, kakshya: null, kakshyaLord: "—", on: null, bav: null, sav: sav, fromMoon: fromMoon, fromLagna: fromLagna, score: Math.round(score * 100) / 100 });
+    });
+
+    // ---- layer 4 : Vimshottari MD/AD/PD/SD on that day
+    var stack = [], dashaRows = [];
+    try {
+      var vs = vimshottariSummary(chart);
+      stack = findDashaStack(vs.timeline, resolved.date).slice(0, 4);
+    } catch (e) { stack = []; }
+    stack.forEach(function (period) {
+      var name = period.lord, np = P[name]; if (!np) return;
+      var w = VN_DAY_DASHA_WEIGHT[period.level] || 0.8;
+      // sign of the lord: natal dignity, own BAV, and the trik-lordship penalty
+      var dig = np.dignity || "";
+      var tone = /Exalt|Moolatrikona|Own/.test(dig) ? 1 : /Friendly/.test(dig) ? 0.6 : /Debilit|Enemy/.test(dig) ? -0.9 : 0.1;
+      var ownBav = CLASSICAL_PLANETS.indexOf(name) >= 0 ? bySign[np.sign].bav[name] : null;
+      if (ownBav != null) tone += (ownBav - 4) * 0.15;
+      if (np.combust) tone -= 0.4;
+      var trik = (np.lordships || []).filter(function (x) { return [6, 8, 12].indexOf(x) >= 0; }).length;
+      var kona = (np.lordships || []).filter(function (x) { return [1, 4, 5, 7, 9, 10].indexOf(x) >= 0; }).length;
+      tone += kona * 0.2 - trik * 0.35;
+      tone = Math.max(-1.6, Math.min(1.6, tone));
+      var score = tone * w;
+      (np.lordships || []).forEach(function (oh) { book(oh, score, period.level + " lord " + name + " owns H" + oh); });
+      if (np.house) book(np.house, score * 0.8, period.level + " lord " + name + " sits in H" + np.house);
+      dashaRows.push({ level: period.level, lord: name, dignity: dig || "—", house: np.house, owns: (np.lordships || []).join(","), tone: Math.round(tone * 100) / 100, score: Math.round(score * 100) / 100 });
+    });
+
+    // ---- day triggers : the Moon's contacts, tara and chandra bala
+    var triggers = [], moonInfo = null, taraTone = 0, trMoon = tr.planetsByName.Moon;
+    if (trMoon) {
+      var dashaLords = stack.map(function (p) { return p.lord; });
+      PLANETS.forEach(function (name) {
+        var np = P[name]; if (!np) return;
+        var orb = vnArc180(trMoon.lon, np.lon);
+        if (orb <= 4) {
+          var isDl = dashaLords.indexOf(name) >= 0;
+          var pol = (np.naturalNature === "Benefic") ? 1 : -1;
+          var amt = pol * (isDl ? 1.4 : 0.8) * (1 - orb / 8);
+          var tgt = np.house || houseFromSign(asc.sign, np.sign);
+          book(tgt, amt, "transiting Moon within " + (Math.round(orb * 10) / 10) + "° of natal " + name + (isDl ? " (a running dasha lord — a firing trigger)" : ""));
+          triggers.push("Moon " + (Math.round(orb * 10) / 10) + "° from natal " + name + (isDl ? " ⭐ running dasha lord" : ""));
+        }
+      });
+      var tnak = nakshatraInfo(trMoon.lon);
+      var count = ((tnak.index - janmaNak + 27) % 27) + 1;
+      var taraName = VN_TARA_NAMES[(count - 1) % 9];
+      taraTone = VN_DAY_TARA_TONE[taraName] || 0;
+      var chandra = houseFromSign(natalMoonSign, trMoon.sign);
+      var chandraGood = VN_CHANDRA_GOOD.indexOf(chandra) >= 0;
+      book(chandra, (chandraGood ? 0.6 : -0.6), "chandra bala — Moon in H" + chandra + " from natal Moon");
+      moonInfo = {
+        nakshatra: tnak.name, pada: tnak.pada, tara: taraName, taraTone: taraTone,
+        chandraHouse: chandra, chandraGood: chandraGood,
+        sign: trMoon.signName, sav: bySign[trMoon.sign].sav
+      };
+    }
+
+    // ---- Sade Sati on that day
+    var sade = null;
+    try {
+      var satSign = tr.planetsByName.Saturn.sign;
+      var rel = ((satSign - natalMoonSign + 12) % 12);
+      sade = rel === 11 ? "Sade Sati — first phase (Saturn 12th from natal Moon)"
+        : rel === 0 ? "Sade Sati — peak phase (Saturn over natal Moon)"
+        : rel === 1 ? "Sade Sati — last phase (Saturn 2nd from natal Moon)"
+        : (rel === 3 || rel === 6) ? "Dhaiya / Kantaka Sani (Saturn " + (rel + 1) + "th from natal Moon)"
+        : "no Sade Sati (Saturn " + (rel + 1) + "th from natal Moon)";
+    } catch (e) { sade = null; }
+
+    // ---- pool, rank, verdict
+    var list = [];
+    for (var h3 = 1; h3 <= 12; h3++) {
+      var e = houses[h3];
+      e.net = Math.round((e.pos - e.neg) * 100) / 100;
+      e.load = Math.round((e.pos + e.neg) * 100) / 100;
+      e.pos = Math.round(e.pos * 100) / 100; e.neg = Math.round(e.neg * 100) / 100;
+      list.push(e);
+    }
+    var ranked = list.slice().sort(function (a, b) { return b.load - a.load; });
+    // Each graha books several bhavas, so the raw sums are not comparable
+    // across charts. The day is graded on the SHARE of the pooled load that
+    // came out signed (-1 .. +1), which is scale-free, and separately on how
+    // eventful the day is at all.
+    // The day's tara from the janma nakshatra shifts the whole day's tone.
+    var netTotal = Math.round((list.reduce(function (s, e) { return s + e.net; }, 0) + taraTone * 0.8) * 100) / 100;
+    var loadTotal = Math.round(list.reduce(function (s, e) { return s + e.load; }, 0) * 100) / 100;
+    var netPct = loadTotal > 0 ? netTotal / loadTotal : 0;
+    var topLoad = ranked.length ? ranked[0].load : 0;
+    var band = netPct >= 0.35 ? "STRONGLY FAVOURABLE" : netPct >= 0.12 ? "FAVOURABLE"
+      : netPct > -0.12 ? "MIXED / ORDINARY" : netPct > -0.35 ? "ADVERSE" : "STRONGLY ADVERSE";
+    // eventfulness: how one-sided the day is, how far the kakshya meter sits
+    // from a neutral 3.5/7, how many Moon triggers fired, how concentrated the
+    // loudest bhava is.
+    var chargeScore = Math.abs(netPct) * 7 + (triggers.length * 1.1) + (Math.abs(lit - 3.5) / 3.5) * 1.8 + (topLoad / 5);
+    var charge = chargeScore >= 5 ? "HIGH" : chargeScore >= 3.2 ? "MODERATE" : "LOW";
+    var likelihood = (charge === "HIGH" && Math.abs(netPct) >= 0.2) ? "an event of note was very likely"
+      : (charge === "HIGH" || (charge === "MODERATE" && Math.abs(netPct) >= 0.2)) ? "an event of note was likely"
+      : charge === "MODERATE" ? "a small, ordinary-scale event at most" : "a quiet day, nothing of note indicated";
+
+    // the loudest contributing graha per house names the flavour
+    function topGraha(entry) {
+      var best = null, bestAbs = 0;
+      entry.why.forEach(function (w) {
+        if (!w.why) return;
+        var nm = String(w.why).split(" ")[0];
+        if (PLANETS.indexOf(nm) < 0) return;
+        if (Math.abs(w.amount) > bestAbs) { bestAbs = Math.abs(w.amount); best = nm; }
+      });
+      return best;
+    }
+    var events = ranked.slice(0, 3).filter(function (e) { return e.load > 0.8; }).map(function (e) {
+      var favourable = e.net >= 0;
+      var base = VN_DAY_HOUSE_EVENTS[e.house];
+      var g = topGraha(e);
+      var flavour = g && VN_DAY_PLANET_FLAVOUR[g] ? VN_DAY_PLANET_FLAVOUR[g][favourable ? "pos" : "neg"] : null;
+      return {
+        house: e.house, area: base.area, favourable: favourable,
+        net: e.net, load: e.load, graha: g,
+        text: (favourable ? base.pos : base.neg) + (flavour ? " (" + g + ": " + flavour + ")" : "") + ".",
+        confidence: e.load >= 8 ? "high" : e.load >= 4 ? "medium" : "low"
+      };
+    });
+
+    return {
+      resolved: resolved,
+      transitChart: tr,
+      kakshya: kakRows, kakshyaLit: lit, kakshyaOf: litOf,
+      dasha: dashaRows, dashaCode: stack.map(function (p) { return p.lord.slice(0, 2); }).join("/"),
+      moon: moonInfo,
+      triggers: triggers, sadeSati: sade,
+      houses: list, ranked: ranked,
+      netTotal: netTotal, loadTotal: loadTotal,
+      netPct: Math.round(netPct * 1000) / 1000, chargeScore: Math.round(chargeScore * 100) / 100,
+      band: band, charge: charge, likelihood: likelihood,
+      events: events,
+      age: (function () { try { return completedYears(input.birthInstant, resolved.date, tz); } catch (e) { return null; } })(),
+      beforeBirth: !!(input && input.birthInstant && resolved.date < input.birthInstant)
+    };
+  }
+
+  // A single readable sentence — the engine always ends its reply on one line.
+  function vnAvDayOneLiner(model, input) {
+    if (!model) return "**In one line —** the day could not be computed, so no verdict is offered.";
+    var who = (input && (input.nativeName || input.name)) ? String(input.nativeName || input.name) : "The native";
+    var d = model.resolved;
+    if (model.beforeBirth) return "**In one line —** " + vnAvDayPretty(d.iso) + " falls before " + who + "'s birth, so no day-reading applies.";
+    return "**In one line —** " + who + " on " + vnAvDaySpan(model) + ".";
+  }
+  // The shared clause both one-liners end on: what the day was and what it did.
+  function vnAvDaySpan(model) {
+    var d = model.resolved;
+    var when = vnAvDayPretty(d.iso) + (d.weekday ? " (" + (VN_DAY_SHORT_WEEKDAY[d.weekday] || d.weekday) + ")" : "");
+    var houseBit = model.ranked.slice(0, 2).filter(function (e) { return e.load > 0.8; })
+      .map(function (e) { return "H" + e.house + " " + (VN_DAY_HOUSE_SHORT[e.house] || houseMeaning(e.house)); }).join(" + ");
+    var top = (model.charge !== "LOW" && model.events && model.events.length) ? model.events[0] : null;
+    return when + ", under " + model.dashaCode + " with " + model.kakshyaLit + "/" + model.kakshyaOf +
+      " kakshya bindus lit, reads **" + model.band + "** at **" + model.charge + "** charge on " +
+      (houseBit || "no strongly lit bhava") + ", so " + model.likelihood +
+      (top ? " — most plausibly " + vnAvLowerFirst(top.text.replace(/\.$/, "")) : "");
+  }
+  function vnAvLowerFirst(s) { return s ? s.charAt(0).toLowerCase() + s.slice(1) : s; }
+  function vnAvDayPretty(iso) {
+    var MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    var p = String(iso).split("-");
+    if (p.length !== 3) return String(iso);
+    return Number(p[2]) + " " + (MON[Number(p[1]) - 1] || p[1]) + " " + p[0];
+  }
+
+  // The single closing sentence every engine response ends on. Folds the
+  // chart's crux and the queried day's verdict into one readable line.
+  function vnIntakeOneLiner(chart, input, model) {
+    var who = (input && (input.nativeName || input.name)) ? String(input.nativeName || input.name) : "This native";
+    var P = chart.planetsByName;
+    var bits = [];
+    bits.push(SIGNS[chart.ascendant.sign].name + " lagna");
+    if (P.Moon) bits.push(P.Moon.signName + " Moon (" + nakshatraInfo(P.Moon.lon).name + ")");
+    try {
+      var sbr = {}; shadbalaRows(chart).forEach(function (r) { sbr[r.planet] = r; });
+      var best = null; CLASSICAL_PLANETS.forEach(function (n) { if (sbr[n] && (!best || sbr[n].rupas > sbr[best].rupas)) best = n; });
+      var worst = null; CLASSICAL_PLANETS.forEach(function (n) { if (sbr[n] && (!worst || sbr[n].rupas < sbr[worst].rupas)) worst = n; });
+      if (best) bits.push(best + " strongest" + (worst && worst !== best ? ", " + worst + " weakest" : ""));
+    } catch (e) {}
+    try { bits.push("SAV " + samudayaAshtakavargaData(chart).grandTotal); } catch (e) {}
+    var head = "**In one line —** " + who + ": " + bits.join(", ");
+    if (!model) return head + "; the day engine could not be run, so no day verdict is offered.";
+    if (model.beforeBirth) return head + "; the queried day " + vnAvDayPretty(model.resolved.iso) + " falls before birth, so no day-reading applies.";
+    return head + "; " + vnAvDaySpan(model) + ".";
+  }
+
+  // §11 markdown block for the intake form / engine export.
+  function vnAvDayBlockLines(chart, input, model) {
+    var L = [], NS = "NOT SUPPLIED";
+    function row(c) { return "| " + c.join(" | ") + " |"; }
+    function sep(n) { return "|" + new Array(n + 1).join("---|"); }
+    L.push("### §11 · EVENT-ON-A-DAY — the Ashtakavarga day engine  [C]");
+    if (!model) { L.push("Day engine: " + NS + " (the day's transit chart could not be built)."); L.push(""); return L; }
+    var d = model.resolved;
+    L.push("```");
+    L.push("QUERY DAY               : " + vnAvDayPretty(d.iso) + "  " + d.time + (d.weekday ? "   (" + d.weekday + ", vara lord " + d.varaLord + ")" : ""));
+    L.push("Native's age that day   : " + (model.beforeBirth ? "not yet born" : (model.age == null ? NS : model.age)));
+    L.push("Vimshottari that day    : " + (model.dashaCode || NS) + "   (MD/AD/PD/SD)");
+    L.push("Kakshya bindu meter     : " + model.kakshyaLit + " of " + model.kakshyaOf + " grahas in a kakshya whose lord gave them a bindu");
+    L.push("Sade Sati that day      : " + (model.sadeSati || NS));
+    if (model.moon) {
+      L.push("Moon that day           : " + model.moon.sign + " · " + model.moon.nakshatra + " pada " + model.moon.pada +
+        " · tara " + model.moon.tara + " · H" + model.moon.chandraHouse + " from natal Moon (" + (model.moon.chandraGood ? "chandra bala GOOD" : "chandra bala WEAK") + ") · sign SAV " + model.moon.sav);
+    }
+    L.push("Day verdict             : " + model.band + "   ·   charge " + model.charge +
+      "   ·   signed share " + (model.netPct > 0 ? "+" : "") + Math.round(model.netPct * 100) + "%  (net " + model.netTotal + " of load " + model.loadTotal + ")");
+    L.push("Event likelihood        : " + model.likelihood);
+    L.push("```");
+    L.push("");
+    if (model.beforeBirth) { L.push("⚠ The queried day precedes the birth instant — the day-reading below is not applicable."); L.push(""); }
+    L.push("**§11a · Kakshya transit table** — each sign in 8 parts of 3°45′; lords in order Sa · Ju · Ma · Su · Ve · Me · Mo · La. A graha gives the result of the kakshya it occupies: `ON` if that lord contributed a bindu to the graha's own BAV in that sign, `OFF` if not.");
+    L.push(row(["Graha", "Transit sign", "Deg", "Kakshya", "Kakshya lord", "Bindu", "Own BAV", "Sign SAV", "H from Moon", "H from Lagna", "Signed"])); L.push(sep(11));
+    model.kakshya.forEach(function (k) {
+      L.push(row([k.planet + (k.retro ? " (R)" : ""), k.sign, (Math.floor(k.deg) + "°" + pad(Math.round((k.deg - Math.floor(k.deg)) * 60)) + "'"),
+        (k.kakshya == null ? "—" : k.kakshya + "/8"), k.kakshyaLord,
+        (k.on == null ? "—" : (k.on ? "ON" : "OFF")), (k.bav == null ? "—" : k.bav + "/8"), k.sav,
+        "H" + k.fromMoon, "H" + k.fromLagna, (k.score > 0 ? "+" : "") + k.score]));
+    });
+    L.push("");
+    if (model.dasha.length) {
+      L.push("**§11b · Vimshottari lords running that day**");
+      L.push(row(["Level", "Lord", "Natal dignity", "Sits in", "Owns houses", "Tone", "Signed"])); L.push(sep(7));
+      model.dasha.forEach(function (r) { L.push(row([r.level, r.lord, r.dignity, "H" + r.house, r.owns || "—", (r.tone > 0 ? "+" : "") + r.tone, (r.score > 0 ? "+" : "") + r.score])); });
+      L.push("");
+    }
+    L.push("**§11c · Day triggers (transiting Moon on natal points, ≤4°):** " + (model.triggers.length ? model.triggers.join("  ·  ") : "none — no natal graha was contacted by the Moon that day"));
+    L.push("");
+    L.push("**§11d · House activation on the day** — every signed contribution above pooled per bhava; the loudest bhava names the life-area, its net names the kind of event.");
+    L.push(row(["House", "Life area", "Favourable", "Adverse", "Net", "Load"])); L.push(sep(6));
+    model.ranked.forEach(function (e) {
+      if (e.load <= 0) return;
+      L.push(row(["H" + e.house, houseMeaning(e.house), e.pos ? "+" + e.pos : "0", e.neg ? "−" + e.neg : "0", (e.net > 0 ? "+" : "") + e.net, e.load]));
+    });
+    L.push("");
+    L.push("**§11e · What may have happened on " + vnAvDayPretty(d.iso) + "** — ranked, most-loaded bhava first.");
+    if (!model.events.length) L.push("- Nothing crosses the threshold: the day carries no strongly lit bhava. A routine day.");
+    else if (model.charge === "LOW") L.push("_The day's charge is LOW, so read the lines below as the day's colouring rather than as an event that must have occurred._");
+    model.events.forEach(function (ev, i) {
+      L.push("- **" + (i + 1) + ". H" + ev.house + " — " + ev.area + "** (" + (ev.favourable ? "favourable" : "adverse") + ", confidence " + ev.confidence + ", net " + (ev.net > 0 ? "+" : "") + ev.net + "): " + ev.text);
+    });
+    L.push("");
+    L.push("_Method: kakshya-transit bindu (Ashtakavarga day meter) × BAV/SAV grading × gochara from Moon and Lagna × Vimshottari MD–AD–PD–SD × the transiting Moon's contacts, tara and chandra bala. The engine names the LIKELIHOOD and the DOMAIN of an event, never a certainty — corroborate against what the native actually recalls._");
+    L.push("");
+    return L;
+  }
+  // ================================================================
   // §17 INTAKE FORM — the ashtakavarga-engine intake export. Fills the
   // "17 — THE INTAKE FORM" template (§1–§10 + chart.json) from the computed
   // chart. Anything genuinely unavailable is written NOT SUPPLIED (never
@@ -23513,6 +23936,12 @@
     L.push("Anything else uncertain: " + (has(input && input.birthTimeConfidence) && /unknown|hr|approx/i.test(String(input.birthTimeConfidence)) ? "birth time is uncertain (" + input.birthTimeConfidence + ") — degree-sensitive points may shift" : "none flagged"));
     L.push("");
 
+    // ---------- §11 · EVENT-ON-A-DAY (Ashtakavarga day engine) ----------
+    var dayModel = null;
+    try { dayModel = vnAvDayEngine(chart, input, vnAvDayResolve(input)); } catch (e) { dayModel = null; }
+    try { vnAvDayBlockLines(chart, input, dayModel).forEach(function (line) { L.push(line); }); }
+    catch (e) { L.push("### §11 · EVENT-ON-A-DAY — the Ashtakavarga day engine  [C]"); L.push("Day engine failed: " + (e && e.message ? e.message : e)); L.push(""); }
+
     // ---------- chart.json ----------
     L.push("### chart.json — fill this and the tool runs");
     var cj = { name: (input && (input.nativeName || input.name)) || "Chart", sex: (input && input.gender) || "unknown", birth: birthLine === NS ? NS : (new Date(input.birthInstant.getTime() + tz * 3600000)).toISOString().slice(0, 16).replace("T", " "), place: (input && input.birthPlace) || NS };
@@ -23534,19 +23963,64 @@
     L.push("```");
     L.push("");
     L.push("_Generated by VedNetra — Intake Form (§17, Lahiri) — " + vnFmtFullDate(nowMs) + "_");
+    L.push("");
+    L.push("---");
+    L.push("");
+    L.push("## ⭐ ONE-LINER");
+    L.push("");
+    try { L.push("> " + vnIntakeOneLiner(chart, input, dayModel)); }
+    catch (e) { L.push("> One-liner unavailable."); }
     return L.join("\n");
   }
   function intakeFormSection(chart, input) {
     var md;
     try { md = vnIntakeFormMarkdown(chart, input); }
     catch (e) { md = "Could not build the intake form: " + (e && e.message ? e.message : e); }
-    return '<section id="viewA-intakeform" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Master Export</p><h3>Intake Form (§17)</h3></div><span class="small-pill">Lahiri · §1–§10 + chart.json</span></div>' +
-      '<p class="fine-print">The <strong>ashtakavarga-engine intake form</strong> (template “17 — THE INTAKE FORM”), filled by VedNetra from the computed chart: §1 birth data &amp; settings, §2 D-1 master table (degrees, dignity, combustion, graha-yuddha, navamsa, retro), §3 Ṣaḍbala rupas &amp; the 8-entry rank <em>including the Lagna</em>, §4 aspects onto each sign, §5 Navamsa spouse facts, §6 benefic/malefic split + the longevity validity gate + house-lords, §7 Ashtakavarga SAV/BAV, §8 transit block (positions, Jupiter/Saturn ingress, solar sankranti, Sade-Sati), §9 special points (Gulika/Mandi, upagrahas, 64th navamsa, 22nd drekkana), §10 the data-quality declaration — and the ready-to-run <code>chart.json</code>. Anything not computable reads <code>NOT SUPPLIED</code>.</p>' +
+    var day = vnAvDayResolve(input);
+    return '<section id="viewA-intakeform" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Master Export</p><h3>Intake Form (§17)</h3></div><span class="small-pill">Lahiri · §1–§11 + chart.json</span></div>' +
+      '<p class="fine-print">The <strong>ashtakavarga-engine intake form</strong> (template “17 — THE INTAKE FORM”), filled by VedNetra from the computed chart: §1 birth data &amp; settings, §2 D-1 master table (degrees, dignity, combustion, graha-yuddha, navamsa, retro), §3 Ṣaḍbala rupas &amp; the 8-entry rank <em>including the Lagna</em>, §4 aspects onto each sign, §5 Navamsa spouse facts, §6 benefic/malefic split + the longevity validity gate + house-lords, §7 Ashtakavarga SAV/BAV, §8 transit block (positions, Jupiter/Saturn ingress, solar sankranti, Sade-Sati), §9 special points (Gulika/Mandi, upagrahas, 64th navamsa, 22nd drekkana), §10 the data-quality declaration, <strong>§11 the event-on-a-day engine</strong> (what may have happened on any chosen day) — the ready-to-run <code>chart.json</code>, and a closing <strong>one-liner</strong>. Anything not computable reads <code>NOT SUPPLIED</code>.</p>' +
+      '<div class="panel-box" style="margin-bottom:10px"><p class="fine-print" style="margin:0 0 6px"><strong>§11 · Event-on-a-day.</strong> Pick <em>any</em> day of the native\'s life — past or future — and the engine reads that day\'s kakshya-transit bindus, BAV/SAV grading, gochara from Moon and Lagna, the Vimshottari MD–AD–PD–SD then running, and the Moon\'s contacts, then names the bhavas that were lit and what may have happened.</p>' +
+      '<div class="vn-tool-actions" style="gap:8px;flex-wrap:wrap"><label class="fine-print" for="vnIntakeDay">Day</label> <input type="date" id="vnIntakeDay" value="' + escapeHtml(day.iso) + '"> <label class="fine-print" for="vnIntakeDayTime">Time</label> <input type="time" id="vnIntakeDayTime" value="' + escapeHtml(day.time) + '"> <button type="button" id="vnIntakeDayGo" class="input-toggle-btn">Read this day</button> <button type="button" id="vnIntakeDayToday" class="input-toggle-btn">Today</button> <span id="vnIntakeDayStatus" class="fine-print"></span></div></div>' +
       '<div class="vn-tool-actions" style="margin-bottom:10px"><button type="button" id="vnIntakeMd" class="input-toggle-btn">Download Markdown</button> <button type="button" id="vnIntakeCopy" class="input-toggle-btn">Copy (Markdown)</button> <span id="vnIntakeCopyStatus" class="fine-print"></span></div>' +
-      '<div class="panel-box"><pre class="vn-native-pre">' + escapeHtml(md) + '</pre></div>' +
+      '<div class="panel-box"><pre class="vn-native-pre" id="vnIntakePre">' + escapeHtml(md) + '</pre></div>' +
       '</section>';
   }
   function wireIntakeFormControls(chart, input) {
+    // ---- §11 day picker: re-reads the export for whichever day is chosen ----
+    var dayIn = document.getElementById("vnIntakeDay");
+    var timeIn = document.getElementById("vnIntakeDayTime");
+    var goBtn = document.getElementById("vnIntakeDayGo");
+    var todayBtn = document.getElementById("vnIntakeDayToday");
+    var dayStatus = document.getElementById("vnIntakeDayStatus");
+    function rerenderDay() {
+      if (dayIn && dayIn.value) vnAvDayState.date = dayIn.value;
+      if (timeIn && timeIn.value) vnAvDayState.time = timeIn.value;
+      var pre = document.getElementById("vnIntakePre");
+      if (dayStatus) dayStatus.textContent = "Reading…";
+      try {
+        var md2 = vnIntakeFormMarkdown(chart, input);
+        if (pre) pre.textContent = md2;
+        if (dayStatus) {
+          var model = null;
+          try { model = vnAvDayEngine(chart, input, vnAvDayResolve(input)); } catch (e2) { model = null; }
+          dayStatus.textContent = model ? vnAvDayOneLiner(model, input).replace(/\*\*/g, "") : "";
+        }
+      } catch (e) {
+        if (dayStatus) dayStatus.textContent = "Could not read that day.";
+      }
+    }
+    if (goBtn) goBtn.addEventListener("click", rerenderDay);
+    if (dayIn) dayIn.addEventListener("change", rerenderDay);
+    if (timeIn) timeIn.addEventListener("change", rerenderDay);
+    if (todayBtn) todayBtn.addEventListener("click", function () {
+      var tz = Number(input && input.timezone) || 0;
+      vnAvDayState.date = new Date(Date.now() + tz * 3600000).toISOString().slice(0, 10);
+      vnAvDayState.time = "12:00";
+      if (dayIn) dayIn.value = vnAvDayState.date;
+      if (timeIn) timeIn.value = vnAvDayState.time;
+      rerenderDay();
+    });
+
     var mdBtn = document.getElementById("vnIntakeMd");
     if (mdBtn) mdBtn.addEventListener("click", function () {
       try { var md = vnIntakeFormMarkdown(chart, input); var blob = new Blob([md], { type: "text/markdown" }); var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "intake-form.md"; a.click(); } catch (e) {}
@@ -23841,7 +24315,7 @@
     L.push("Ayanamsa       : Krishnamurti (KP-Old)   value " + decimalToDms(kp.ayanamsa) + "   (= Lahiri Chitrapaksha − 6′00″; e.g. 2001 = 23°46′32″)");
     L.push("House system   : Placidus");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.115");
+    L.push("Software / ver : VedNetra 1.116");
     L.push("Native         : " + nm + "            Sex: " + ((input && input.gender) || "-"));
     L.push("DoB / ToB      : " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
@@ -24094,7 +24568,7 @@
     L.push("KP number      : " + hnum + " / 249");
     L.push("House system   : " + kp.houseSystem + "  (equal 30° cusps from the number-seed ascendant — VedNetra KP-horary convention)");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.115");
+    L.push("Software / ver : VedNetra 1.116");
     L.push("Question       : " + ((input && input.question) ? String(input.question) : "-"));
     L.push("Judgment moment: " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
@@ -24297,7 +24771,15 @@
     parseVedNetraTransitEntries: parseVedNetraTransitEntries,
     parseVedNetraDashaRanges: parseVedNetraDashaRanges,
     serializeChart: serializeChartForApi,
-    computePayload: computePayloadForApi
+    computePayload: computePayloadForApi,
+    // ---- Ashtakavarga day engine (event-on-a-day) ----
+    // setEventDay("2014-03-17", "18:30") then re-open / re-render the Intake
+    // Form, or call dayEngine(chart, input) directly for the raw model.
+    setEventDay: function (iso, time) { if (iso) vnAvDayState.date = String(iso); if (time) vnAvDayState.time = String(time); return { date: vnAvDayState.date, time: vnAvDayState.time }; },
+    getEventDay: function () { return { date: vnAvDayState.date, time: vnAvDayState.time }; },
+    dayEngine: function (chart, input) { return vnAvDayEngine(chart, input, vnAvDayResolve(input)); },
+    dayOneLiner: function (chart, input) { return vnAvDayOneLiner(vnAvDayEngine(chart, input, vnAvDayResolve(input)), input); },
+    intakeOneLiner: function (chart, input) { return vnIntakeOneLiner(chart, input, vnAvDayEngine(chart, input, vnAvDayResolve(input))); }
   };
   if (typeof window !== "undefined") window.VedicCore = coreApi;
   if (typeof globalThis !== "undefined") globalThis.VedicCore = coreApi;
