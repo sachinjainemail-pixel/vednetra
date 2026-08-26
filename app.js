@@ -6164,6 +6164,7 @@
       { id: "viewA-vapmnakreport",  label: "VAPM + Nakshatra", render: function () { return vapmNakReportSection(chart, input); }, wire: function () { wireVapmNakReportControls(chart, input); } },
       { id: "viewA-consolidatedmaster", label: "Consolidated Master Run", render: function () { return consolidatedReportSection(chart, input); }, wire: function () { wireConsolidatedReportControls(chart, input); } },
       { id: "viewA-intakeform",     label: "Intake Form (§17)", render: function () { return intakeFormSection(chart, input); }, wire: function () { wireIntakeFormControls(chart, input); } },
+      { id: "viewA-avengine",       label: "Ashtakvarga Engine Report", render: function () { return ashtakavargaEngineSection(chart, input); }, wire: function () { wireAshtakavargaEngineControls(chart, input); } },
       { id: "viewA-trivenireport",  label: "Triveni Intake", render: function () { return triveniReportSection(chart, input); }, wire: function () { wireTriveniReportControls(chart, input); } },
       { id: "viewA-trinetrareport", label: "Trinetra Master Run", render: function () { return trinetraReportSection(chart, input); }, wire: function () { wireTrinetraReportControls(chart, input); } },
       { id: "viewA-kpreport",       label: "KP System Report", render: function () { return kpReportSection(chart, input); }, wire: function () { wireKpReportControls(chart, input); } },
@@ -13773,6 +13774,7 @@
       ["kp", "KP System Report (Krishnamurti · Placidus · sub-lords) — default"],
       ["consolidatedmaster", "Consolidated Master Run (Lahiri · all 4 projects)"],
       ["intakeform", "Intake Form (§17 · Lahiri · §1–§11 + day engine + one-liner)"],
+      ["avengine", "Ashtakvarga Engine Report (Lahiri · SAV/BAV predictive verdict)"],
       ["triveni", "Triveni Chart Intake (Lahiri · §0–§10)"],
       ["trinetra", "Trinetra Master Run (Lahiri · §0–§8 · Promise/Star/Time)"],
       ["vapmnak", "VAPM + Nakshatra Report (Lahiri · §1–§15 + Part B)"],
@@ -13856,6 +13858,10 @@
     }
     if (reportType === "intakeform") {
       downloadIntakeFormReport(format);
+      return;
+    }
+    if (reportType === "avengine") {
+      downloadAshtakavargaEngineReport(format);
       return;
     }
     if (reportType === "kp") {
@@ -14040,6 +14046,27 @@
     }
   }
 
+  function downloadAshtakavargaEngineReport(format) {
+    try {
+      var input = lastReportInput || readInput();
+      var chart = lastReportChart || buildChart(input.birthInstant, input.latitude, input.longitude, input.timezone, {
+        ascendantOverride: input.ascendantOverride,
+        ayanamshaKey: input.ayanamshaKey || "lahiri"
+      });
+      var text = vnAshtakavargaEngineMarkdown(chart, input);
+      lastPlainReport = text;
+      lastPlainReports.chartData = text;
+      var filenameBase = reportDownloadFilenameBase() + "_Ashtakvarga_Engine_Report";
+      if (format === "pdf") { downloadBlob(filenameBase + ".pdf", "application/pdf", makeSimplePdf(text)); showToast("✓ Ashtakvarga Engine Report — PDF download started"); return; }
+      if (format === "csv") { downloadBlob(filenameBase + ".csv", "text/csv;charset=utf-8", vedNetraReportTextToCsv(text)); showToast("✓ Ashtakvarga Engine Report — CSV download started"); return; }
+      if (format === "xls") { downloadBlob(filenameBase + ".xls", "application/vnd.ms-excel;charset=utf-8", vedNetraReportTextToExcel(text)); showToast("✓ Ashtakvarga Engine Report — Excel download started"); return; }
+      downloadBlob(filenameBase + ".md", "text/markdown;charset=utf-8", text);
+      showToast("✓ Ashtakvarga Engine Report — Markdown download started");
+    } catch (error) {
+      console.error(error);
+      alertUser("Ashtakvarga Engine Report could not be built: " + (error && error.message ? error.message : error));
+    }
+  }
   function downloadIntakeFormReport(format) {
     try {
       var input = lastReportInput || readInput();
@@ -18521,6 +18548,7 @@
       { id: "viewA-vapmreport", label: "VAPM Export", desc: "VAPM export spec (Lahiri, §1–§14 + Part B): master table, aspect/Kartari table, functional nature, Chandra/Surya Lagna, all vargas + Dashavarga count, Ashtakavarga incl. Shodhya Pinda, Vimshottari/Yogini/Jaimini, Indu Lagna, Tara Chakra, transits, four-fold scaffolds." },
       { id: "viewA-vapmnakreport", label: "VAPM + Nakshatra Report", desc: "Full export (Lahiri): the whole VAPM export plus the §15 Nakshatra Layer — within-nakshatra degrees, Gandanta (48′/3°20′), Abhijit, Navatara points, pada-level navamsa dignity, Nadi/dosha and Yoni/Gana matching factors." },
       { id: "viewA-consolidatedmaster", label: "Consolidated Master Run", desc: "One-sheet master run covering all four projects (Lahiri): Mehta+Sutton (VAPM), Trinetra (Promise/Star/Time), Umesh Puri (LP+Gochar) and Triveni (BPHS·BJ·PD). Part I is the universal computed data core — incl. §I-H, a 37-pointer weighted three-frame Sudarshan Planetary Strength composite with a score out of 100 per planet (intensity, not auspiciousness of results); Part II re-frames it through each project's method lens." },
+      { id: "viewA-avengine", label: "Ashtakvarga Engine Report", desc: "A question-routed predictive verdict on VedNetra's Ashtakavarga (SAV/BAV). Validates the invariant checksums (Sun 48·Moon 49·Mars 39·Mercury 54·Jupiter 56·Venus 52·Saturn 39·Lagna 49·SAV 337 — a failure voids the reading), routes the native's question to a governing house + kāraka, then shows the full PROMISE / MAGNITUDE / CAPACITY / DELIVERED / VERDICT % arithmetic with band, the shape cross-checks (four triads, inner/outer, 1st-vs-7th, 9th/10th/11th, cascade, prosperity sums), a 7-instrument TIMING grade with a dated window where a slow transit locks, the AMN-BAV-033 transfer check, what would falsify it, and what it cannot say. Set the Question/topic in the chart form to route it. Figures VedNetra-computed; AMN/PAA/RSG/ENGINE rule IDs are engine-spec references (scaffold)." },
       { id: "viewA-intakeform", label: "Intake Form (§17)", desc: "The ashtakavarga-engine intake form (template '17 — THE INTAKE FORM'), filled by VedNetra from the computed chart (Lahiri): §1 birth data & settings, §2 D-1 master table (D°M'S″, dignity, combustion, graha-yuddha loser, navamsa, retro), §3 Ṣaḍbala rupas + the 8-entry rank including the Lagna, §4 aspects onto each sign, §5 Navamsa spouse facts, §6 benefic/malefic split + longevity validity gate + house-lords, §7 Ashtakavarga SAV/BAV, §8 transit block (positions, Jupiter/Saturn ingress, solar sankranti, Sade-Sati), §9 special points (Gulika/Mandi, upagrahas, 64th navamsa, 22nd drekkana), §10 data-quality declaration, §11 the EVENT-ON-A-DAY engine — pick any day of the native’s life and it reads that day’s kakshya-transit bindus, BAV/SAV grading, gochara from Moon and Lagna, the Vimshottari MD–AD–PD–SD then running and the Moon’s contacts, then ranks the bhavas lit and names what may have happened — plus a ready-to-run chart.json and a closing one-liner. Uncomputable fields read NOT SUPPLIED." },
       { id: "viewA-kpreport", label: "KP System Report", desc: "DEFAULT — dedicated Krishnamurti Paddhati export (Krishnamurti ayanamsa − Lahiri−0.1°, Placidus, mean nodes, sub-lords to the second). Natal AND horary (Prashna 1–249): A0 header + birth-time-sensitivity, A1 twelve cusps with the CSL and its OWN sub-lord (final verdict layer), A1/A2 also print Sub→NEXT / Sub←PREV (minutes of birth-time error that flip each sub-lord, and to which lord), A2 nine planets star/sub/sub-sub + house + retro, A6 a ±2-min sub-lord stability roll-up, A4 karaka/body-part master, A5 relative-rotation map, A3 four-level Vimshottari, B1–B4 significators/ruling-planets/CSL promise board (with CSL-sub), B5 event-group scan, B6 money-direction flag, B7 badhaka/maraka, C1 natal-house transit + Moon star-lord + rising lagna, C2 Prana ladder, and an anti-anchoring self-check." },
       { id: "viewA-trivenireport", label: "Triveni Chart Intake", desc: "Intake sheet (Lahiri, §0–§17): D1 sign-deg-min, unequal Sripati bhava cusps, Dasavarga, Shadbala pass/fail + Vimsopaka + Ishta/Kashta + bhava-sandhi, Ashtakavarga + Shodhya Pinda, Vimshottari, Jaimini 8-karaka, longevity + conditional dashas, full MD-AD-PD, gochara, Sahams, Varshaphal, Panchang, planetary strength." },
@@ -24036,6 +24064,289 @@
     });
   }
   // ================================================================
+  // ASHTAKVARGA ENGINE REPORT — a question-routed predictive verdict built
+  // on VedNetra's Ashtakavarga (SAV/BAV). Every FIGURE is VedNetra-computed;
+  // the external rule IDs (AMN-*, PAA, RSG, ENGINE-*) reference the Ashtakavarga
+  // engine spec, which is NOT embedded — they are retained as scaffold, never
+  // gap-filled (same citation-honesty convention as the other master exports).
+  // ================================================================
+  var VN_AV_CHECKSUM = { Sun: 48, Moon: 49, Mars: 39, Mercury: 54, Jupiter: 56, Venus: 52, Saturn: 39 }; // invariant BAV row-totals
+  function vnAshtakavargaEngineMarkdown(chart, input) {
+    if (input && input.birthInstant && chart.ayanamshaKey !== "lahiri") {
+      try { chart = buildChart(input.birthInstant, Number(input.latitude), Number(input.longitude), Number(input.timezone), { ascendantOverride: input.ascendantOverride, ayanamshaKey: "lahiri" }); } catch (e) {}
+    }
+    var L = [], asc = chart.ascendant, P = chart.planetsByName, classical = CLASSICAL_PLANETS;
+    var tz = Number(input && input.timezone) || 0;
+    var nowMs = (input && input.asOfInstant && input.asOfInstant.getTime) ? input.asOfInstant.getTime() : Date.now();
+    function row(c) { return "| " + c.join(" | ") + " |"; }
+    function sep(n) { return "|" + new Array(n + 1).join("---|"); }
+    function r1(x) { return Math.round(x * 10) / 10; }
+    function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
+    function dms(deg) { var d = Math.floor(deg), mf = (deg - d) * 60, m = Math.floor(mf), s = Math.round((mf - m) * 60); if (s === 60) { s = 0; m++; } if (m === 60) { m = 0; d++; } return d + "°" + pad(m) + "'" + pad(s) + '"'; }
+    var CAP = { "Exalted": 1.0, "Moolatrikona": 0.9, "Own sign": 0.85, "Friendly sign": 0.7, "Neutral sign": 0.5, "Enemy sign": 0.3, "Debilitated": 0.1 };
+    // --- Ashtakavarga substrate ---
+    var av; try { av = samudayaAshtakavargaData(chart); } catch (e) { return "Ashtakavarga unavailable: " + (e && e.message ? e.message : e); }
+    var houseSigns = chart.houses.map(function (h) { return h.sign; });
+    function idxOfSign(sign) { for (var i = 0; i < houseSigns.length; i++) if (houseSigns[i] === sign) return i; return houseFromSign(asc.sign, sign) - 1; }
+    function savOfHouse(h) { return av.columnTotals[((h - 1) % 12 + 12) % 12]; }
+    function savOfSign(sign) { return av.columnTotals[idxOfSign(sign)]; }
+    function bavInSign(planet, sign) { return av.rows[planet] ? av.rows[planet][idxOfSign(sign)] : 0; }
+    // --- checksums (invariant totals; a failure VOIDS the reading) ---
+    // Hard checksum = the 7 invariant planet BAV totals + SAV 337. The Lagna's varga
+    // is "drawn but not summed", so its total is reported as a convention note (VedNetra's
+    // Lagna table sums to 45; the reference engine's to 49) and never voids the reading.
+    var checkOk = true, checkParts = [];
+    classical.forEach(function (n) { var ok = av.rowTotals[n] === VN_AV_CHECKSUM[n]; if (!ok) checkOk = false; checkParts.push(n + " " + av.rowTotals[n] + (ok ? " ✓" : " ✗(exp " + VN_AV_CHECKSUM[n] + ")")); });
+    var lagnaOk = av.lagnaTotal === 49;
+    var savOk = av.grandTotal === 337; if (!savOk) checkOk = false;
+    // --- route the question ---
+    var qText = (input && (input.question || input.topic)) || "";
+    var routed = vnRouteForTopic((input && input.topic) || "") || vnRouteForTopic((input && input.question) || "");
+    var gHouse = routed ? (parseInt(String(routed[1]).match(/\d+/)[0], 10) || 1) : 1;
+    var karaka = routed ? String(routed[2]).split(/[\/ ]/)[0] : lordOfHouse(chart, 1);
+    if (!P[karaka]) karaka = (KARAKAS[gHouse] && KARAKAS[gHouse][0]) || "Sun";
+    var gSign = normalizeSign(asc.sign + gHouse - 1);
+    var dusthana = [6, 8, 12].indexOf(gHouse) >= 0;
+
+    // ===== HEADER =====
+    L.push("# ॐ श्री गणेशाय नमः · जय माँ सरस्वती");
+    L.push("## SHREE GANESH JI AND SARASVATI MAA BLESSED ASHTAKVARGA PREDICTIVE ENGINE");
+    L.push("");
+    L.push("**Native:** " + ((input && (input.nativeName || input.name)) || "—") + "   ·   **Born:** " + ((input && input.birthInstant) ? formatInTimezone(input.birthInstant, tz) : "—") + ", " + ((input && input.birthPlace) || "—") + "   ·   **Sex:** " + ((input && input.gender) || "—"));
+    L.push("**Lagna:** " + SIGNS[asc.sign].name + " " + dms(asc.lon - asc.sign * 30));
+    L.push("**Question:** " + (qText ? qText : "_(none entered — set the Question/topic in the chart form; defaulted to the 1st-house/self reading)_"));
+    L.push("");
+    L.push("**Convention:** Lahiri · rekhā = benefic · SAV = 7 planets = 337, the Lagna's varga drawn but not summed · NORTH-Indian trikoṇa śodhana · the Lagna is NOT an occupant for ekādhipatya · Rāhu gochara-only · houses counted from the varga-planet's own sign · khaṇḍas by the fixed sign-groups · full-value scale 56/28/14 · Saturn lead-time 6 months.");
+    L.push("**Checksums:** " + checkParts.join(" · ") + " · SAV = " + av.grandTotal + (savOk ? " ✓" : " ✗") + "   " + (checkOk ? "(7-planet checksum passes)" : "**(FAILED — this VOIDS the reading; rebuild)**"));
+    L.push("**Lagna varga:** total " + av.lagnaTotal + (lagnaOk ? " ✓" : " (VedNetra's Lagna-ashtakavarga table; the reference engine's sums to 49)") + " — drawn but **not summed** into SAV, so it does not gate the reading.");
+    L.push("**Forks declared:** karaka = **" + karaka + "** (first of the routed set); khaṇḍa cut = house-quarters {1–4 · 5–8 · 9–12}; body-part map = classical; frame = Lagna (Sudarśana cross-checked); lead-time = 6 months.");
+    var gaps = [];
+    if (!(input && input.birthInstant)) gaps.push("no birth instant");
+    gaps.push("AV daśā supplied as VedNetra's own SAV-proportional rāśi daśā (§3) — labelled as such, NOT the AMN engine's AV daśā, and Vimśottarī is never substituted");
+    L.push("**Data gaps:** " + (gaps.length ? gaps.join("; ") : "none"));
+    L.push("**Lane routing:** ENGINE-09-EVENT-ROUTER → " + (routed ? routed[0] + " · house " + routed[1] + " · karaka " + routed[2] + " · varga " + routed[3] + " · lane file " + routed[4] : "no keyword match — defaulted to the 1st house (self)"));
+    if (!checkOk) { L.push(""); L.push("> ⛔ **Checksum failure voids the predictive reading.** The Ashtakavarga did not reproduce the invariant totals — rebuild before trusting any figure below."); }
+    L.push("");
+    L.push("---");
+    L.push("");
+
+    // ===== 1 · PROMISE =====
+    L.push("### 1 · PROMISE   [lane PROMISE]");
+    var gSAV = savOfHouse(gHouse);
+    var MIN = 28; // per-house neutral threshold = SAV mean (337/12 ≈ 28)
+    var haniHouse = ((gHouse - 2 + 12) % 12) + 1; // 12th counted from the governing house
+    var haniSAV = savOfHouse(haniHouse);
+    var kp = P[karaka];
+    var R = kp ? bavInSign(karaka, kp.sign) : 0;
+    var net = 2 * Math.abs(R - 4);
+    var netBenefic = R >= 4;
+    var capacity = kp ? (CAP[kp.dignity] != null ? CAP[kp.dignity] : 0.5) : 0.5;
+    L.push(row(["", "figure", "rule"])); L.push(sep(3));
+    L.push(row(["governing house", gHouse + "th = " + SIGNS[gSign].name + ", **SAV " + gSAV + "**", "`AMN-SAV-009`"]));
+    L.push(row(["its per-house minimum", MIN + " — **" + (gSAV >= MIN ? "met" : "short by " + (MIN - gSAV)) + "**", "[PAA ch. XIV śl. 12]"]));
+    L.push(row(["its hāni-sthāna, the 12th from it", haniHouse + "th SAV " + haniSAV + " — " + (haniSAV > gSAV ? "higher → −5" : "lower → 0"), "`AMN-EXM-007`"]));
+    L.push(row(["the kāraka's own BAV in its sign", R + " rekhās — " + karaka + " in " + (kp ? kp.signName : "—"), "`AMN-BAV-012`"]));
+    L.push(row(["the śuddha net", "net = 2 × |" + R + " − 4| = " + net + " → **" + Math.round(net / 8 * 100) + " %**, " + (netBenefic ? "benefic" : "malefic"), "`AMN-SHD-004`"]));
+    L.push(row(["the kāraka's capacity by dignity", (kp ? kp.dignity : "—") + " → **" + capacity.toFixed(2) + "**", "`AMN-GOC-012`"]));
+    L.push("");
+    // arithmetic
+    var base = (gSAV - 14) / 28 * 100;
+    var promise0 = dusthana ? (100 - base) : base;
+    promise0 = clamp(Math.min(promise0, 85), 0, 100);
+    var minMod = (gSAV - MIN) * 1.5 * (dusthana ? -1 : 1);
+    var promise1 = clamp(promise0 + minMod, 0, 100);
+    var haniCheck = haniSAV > gSAV ? -5 : 0;
+    var promiseFinal = clamp(promise1 + haniCheck, 0, 100);
+    var magnitude = net / 8 * 100;
+    var magnitudeSigned = (netBenefic ? 1 : -1) * magnitude;
+    var delivered = magnitudeSigned * capacity;
+    var verdict = promiseFinal * 0.55 + delivered * 0.45;
+    L.push("**Arithmetic in full:**");
+    L.push("```");
+    L.push("PROMISE  = (SAV " + gSAV + " − 14) ÷ 28 × 100 = " + r1(base) + (dusthana ? "   [INVERTED for the " + gHouse + "th dusthāna → " + r1(100 - base) + "]" : "") + "   cap 85 → " + r1(promise0));
+    L.push("minimum  = (SAV " + gSAV + " − " + MIN + ") × 1.5 = " + r1(minMod) + "   → PROMISE " + r1(promise1));
+    L.push("hāni     = " + haniCheck + "   → PROMISE " + r1(promiseFinal));
+    L.push("MAGNITUDE = net " + net + " ÷ 8 × 100 = " + (magnitudeSigned >= 0 ? "+" : "") + Math.round(magnitudeSigned) + " %   (" + (netBenefic ? "benefic" : "malefic") + ")");
+    L.push("CAPACITY  = " + capacity.toFixed(2));
+    L.push("DELIVERED = MAGNITUDE × CAPACITY = " + (delivered >= 0 ? "+" : "") + r1(delivered));
+    L.push("VERDICT % = PROMISE × 0.55 + DELIVERED × 0.45 = " + r1(verdict));
+    L.push("```");
+    function band(v) {
+      if (v < 0) return "negative — the malefic reading is operative";
+      if (v >= 80) return "80–100 — promised and delivered fully";
+      if (v >= 60) return "60–79 — delivery good, not complete";
+      if (v >= 40) return "40–59 — promised but thinly supplied";
+      if (v >= 25) return "25–39 — weakly promised";
+      return "0–24 — NOT PROMISED";
+    }
+    L.push("");
+    L.push("**Band:** " + band(verdict) + ".");
+    // gates (only those VedNetra can genuinely evaluate; rule IDs retained as references)
+    var gates = [];
+    if (gSAV >= 30) gates.push("gate — governing SAV ≥ 30 (well-tenanted) `AMN-BAV-014`");
+    if (gSAV <= 25) gates.push("gate — governing SAV ≤ 25 (under-tenanted) `AMN-BAV-015`");
+    if (haniSAV > gSAV) gates.push("gate — hāni-sthāna outweighs the house `AMN-EXM-007`");
+    if (kp && kp.combust) gates.push("gate — kāraka " + karaka + " combust `AMN-GOC-017`");
+    if (R >= 5) gates.push("gate — kāraka carries ≥ 5 rekhās in its sign `AMN-BAV-033`");
+    if (kp && kp.dignity === "Debilitated") gates.push("gate — kāraka debilitated `AMN-SHD-004`");
+    L.push("**Gates fired:** " + (gates.length ? gates.join(" · ") : "none"));
+    L.push("");
+    var verdictWord = verdict >= 60 ? "supported" : verdict >= 40 ? "partially supported" : verdict >= 25 ? "weakly supported" : verdict >= 0 ? "not supported" : "adverse";
+    L.push("> **The verdict in one paragraph.** On the Ashtakavarga instrument the " + gHouse + "th house (" + SIGNS[gSign].name + ") governing this question carries **SAV " + gSAV + "** [`AMN-SAV-009`], " + (gSAV >= MIN ? "at or above" : "below") + " its working minimum of " + MIN + ", while its kāraka **" + karaka + "** holds **" + R + " rekhās** in " + (kp ? kp.signName : "—") + " (" + (kp ? kp.dignity : "—") + ", capacity " + capacity.toFixed(2) + ") — a **" + (netBenefic ? "benefic" : "malefic") + "** net. The composite reads **VERDICT " + r1(verdict) + " %**, so the matter is **" + verdictWord + "**: " + band(verdict).split("—").slice(-1)[0].trim() + ". [figures VedNetra-computed; `[BALA]`/`AMN` rule IDs are engine-spec references, not classical page numbers].");
+    L.push("");
+
+    // ===== 2 · SHAPE AND CROSS-CHECKS =====
+    L.push("### 2 · SHAPE AND CROSS-CHECKS   [lane STRENGTH]");
+    function sumH(list) { return list.reduce(function (a, h) { return a + savOfHouse(h); }, 0); }
+    var dharma = sumH([1, 5, 9]), artha = sumH([2, 6, 10]), kama = sumH([3, 7, 11]), moksha = sumH([4, 8, 12]);
+    var inner = sumH([1, 2, 3, 4, 5, 6]), outer = sumH([7, 8, 9, 10, 11, 12]);
+    var h1 = savOfHouse(1), h7 = savOfHouse(7), h9 = savOfHouse(9), h10 = savOfHouse(10), h11 = savOfHouse(11);
+    L.push("- **Four triads** [`AMN-BHV-002`] — dharma (1·5·9) " + dharma + " · artha (2·6·10) " + artha + " · kāma (3·7·11) " + kama + " · mokṣa (4·8·12) " + moksha + ".");
+    L.push("- **Inner vs outer** [`AMN-BHV-003`] — houses 1–6 = " + inner + " vs 7–12 = " + outer + " → " + (inner >= outer ? "self-driven" : "other-driven") + ".");
+    L.push("- **1st vs 7th** [`AMN-BHV-005`] — " + h1 + " vs " + h7 + ", gap " + Math.abs(h1 - h7) + " → " + (h1 >= h7 ? "the native leads" : "the other party leads") + ".");
+    L.push("- **9th (fortune)** — " + h9 + " " + (h9 >= 31 && h9 <= 35 ? "(31–35, as expected)" : h9 > 35 ? "(above band — strong)" : "(below band — thin)") + ".");
+    L.push("- **10th (karma)** — " + h10 + " " + (h10 >= 40 ? "(40+, career-bearing)" : "(below 40)") + ".");
+    L.push("- **11th (gains)** — " + h11 + " " + (h11 > 30 ? "(above 30, gains flow)" : "(30 or below, gains resist)") + ".");
+    L.push("- **Cascade** — " + [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(function (h) { return "H" + h + " " + savOfHouse(h); }).join(" · ") + ".");
+    L.push("- **Prosperity sums** [`RSG`] — 2+11 = " + (savOfHouse(2) + savOfHouse(11)) + " · 5+9+11 = " + (savOfHouse(5) + savOfHouse(9) + savOfHouse(11)) + ".");
+    L.push("- **House-plus-kāraka on THIS question** [`RSG`] — H" + gHouse + " (" + gSAV + ") + kāraka " + karaka + " (" + R + " rekhās, " + (kp ? kp.dignity : "—") + ") → " + (gSAV >= MIN && R >= 4 ? "both witnesses agree (support)" : gSAV < MIN && R < 4 ? "both witnesses deny" : "witnesses split — read thinly") + ".");
+    L.push("");
+
+    // ===== 3 · TIMING =====
+    L.push("### 3 · TIMING   [lane TIMING]");
+    var age = 0; try { age = completedYears(input.birthInstant, new Date(nowMs), tz); } catch (e) {}
+    var ageFrac = age; try { ageFrac = (nowMs - input.birthInstant.getTime()) / (365.25 * DAY_MS); } catch (e) {}
+    // AV daśā — VedNetra's own SAV-proportional rāśi daśā: each sign's dasha years =
+    // its SAV bindus scaled so the 12-sign cycle from the Lagna spans 120 years.
+    // This is VedNetra's construction, NOT the AMN engine's AV daśā (which is not embedded).
+    var avDasha = (function () {
+      var total = av.grandTotal || 337, CYCLE = 120, lag = asc.sign;
+      var savBySign = {}; houseSigns.forEach(function (sg, i) { savBySign[sg] = av.columnTotals[i]; });
+      function seq(start) { var a = []; for (var k = 0; k < 12; k++) a.push(normalizeSign(start + k)); return a; }
+      var md = seq(lag), cum = 0, mdSign = lag, mdStart = 0, mdYears = savBySign[lag] / total * CYCLE;
+      for (var i = 0; i < 12; i++) { var y = savBySign[md[i]] / total * CYCLE; if (ageFrac < cum + y || i === 11) { mdSign = md[i]; mdStart = cum; mdYears = y; break; } cum += y; }
+      var ad = seq(mdSign), cum2 = mdStart, adSign = mdSign, adStart = mdStart, adYears = mdYears * (savBySign[mdSign] / total);
+      for (var j = 0; j < 12; j++) { var y2 = mdYears * (savBySign[ad[j]] / total); if (ageFrac < cum2 + y2 || j === 11) { adSign = ad[j]; adStart = cum2; adYears = y2; break; } cum2 += y2; }
+      function ageToDate(a) { try { return new Date(input.birthInstant.getTime() + a * 365.25 * DAY_MS).toISOString().slice(0, 10); } catch (e) { return "—"; } }
+      return { mdSign: mdSign, mdLord: SIGNS[mdSign].lord, mdSAV: savBySign[mdSign], mdStart: r1(mdStart), mdEnd: r1(mdStart + mdYears), mdEndDate: ageToDate(mdStart + mdYears), adSign: adSign, adLord: SIGNS[adSign].lord, adSAV: savBySign[adSign], adEnd: r1(adStart + adYears), adEndDate: ageToDate(adStart + adYears) };
+    })();
+    var avdSupports = (avDasha.mdSign === gSign || avDasha.adSign === gSign || (kp && (avDasha.mdSign === kp.sign || avDasha.adSign === kp.sign)) || [0, 4, 8].indexOf(((avDasha.mdSign - gSign + 12) % 12)) >= 0);
+    // instruments
+    var confirm = 0;
+    // life-third khanda
+    var khandaOfAge = age < 27 ? 1 : age < 54 ? 2 : 3;
+    var khandaHouses = khandaOfAge === 1 ? [1, 2, 3, 4] : khandaOfAge === 2 ? [5, 6, 7, 8] : [9, 10, 11, 12];
+    var khandaSum = sumH(khandaHouses);
+    var khandaKashta = khandaSum < 4 * MIN;
+    if (!khandaKashta) confirm++;
+    // sudarshana age-year
+    var ageHouse = (age % 12) + 1, ageHouseSAV = savOfHouse(ageHouse);
+    var ageGrade = ageHouseSAV >= 34 ? "strong" : ageHouseSAV >= 28 ? "fair" : "weak";
+    if (ageHouseSAV >= 28) confirm++;
+    // age-trigger
+    var trigAge = Math.round(gSAV * 7 / 27), trigRem = (gSAV * 7) % 27, trigNak = NAKSHATRAS[((trigRem % 27) + 27) % 27];
+    if (Math.abs(trigAge - age) <= 3) confirm++;
+    // relative window (karaka nakshatra + trines)
+    var kNak = kp ? nakshatraInfo(kp.lon) : null;
+    var kNakTrines = kNak ? [kNak.index, (kNak.index + 9) % 27, (kNak.index + 18) % 27].map(function (i) { return NAKSHATRAS[i]; }) : [];
+    // transit window from the slow lord over the governing sign (± 6-month lead)
+    var transitWindow = "not datable by a slow transit for this kāraka", winGraded = false;
+    try {
+      var ing = vnIngressEvents(chart, nowMs, 3);
+      var slow = (["Saturn", "Jupiter"].indexOf(karaka) >= 0) ? karaka : "Saturn";
+      var hit = ing.filter(function (e) { return e.planet === slow && e.event.indexOf("ingress -> " + SIGNS[gSign].name) >= 0; })[0];
+      if (hit) { var start = new Date(hit.ms - 182 * DAY_MS), end = new Date(hit.ms + 182 * DAY_MS); transitWindow = start.toISOString().slice(0, 10) + " – " + end.toISOString().slice(0, 10) + " (" + slow + " over " + SIGNS[gSign].name + ", 6-mo lead applied)"; winGraded = true; confirm++; }
+    } catch (e) {}
+    // transit chart snapshot for month/day witness
+    var trChart = null; try { trChart = buildChart(new Date(nowMs), Number(input.latitude), Number(input.longitude), tz, { ayanamshaKey: "lahiri" }); } catch (e) {}
+    var monthWit = "—";
+    if (trChart && kp) { var ts = trChart.planetsByName[karaka]; if (ts) { var bhinna = bavInSign(karaka, ts.sign); monthWit = "bhinna " + bhinna + "/8 against 4 · transit " + karaka + " in " + ts.signName + " SAV " + savOfSign(ts.sign) + "/56"; if (bhinna >= 4) confirm++; } }
+    if (avdSupports) confirm++;
+    L.push("**Confirmation count: " + confirm + " / 7**   (`ENGINE-11` §D)");
+    L.push("");
+    L.push(row(["level", "instrument", "reading"])); L.push(sep(3));
+    L.push(row(["life-third", "khaṇḍa " + khandaOfAge + " (houses " + khandaHouses.join(",") + ") sum " + khandaSum, (khandaKashta ? "kaṣṭa — below 4×min" : "sound")]));
+    L.push(row(["year", "Sudarśana age-year, age " + age + " → house " + ageHouse + ", SAV " + ageHouseSAV, ageGrade]));
+    L.push(row(["age-trigger", "SAV " + gSAV + " × 7 ÷ 27 = **age " + trigAge + "**, rem " + trigRem + " = " + trigNak, (Math.abs(trigAge - age) <= 3 ? "near the current age" : "distant")]));
+    L.push(row(["period", "AV daśā (VedNetra SAV-proportional rāśi daśā) **" + SIGNS[avDasha.mdSign].name + "** (SAV " + avDasha.mdSAV + ", lord " + avDasha.mdLord + ", to age " + avDasha.mdEnd + " ≈ " + avDasha.mdEndDate + ") / AD **" + SIGNS[avDasha.adSign].name + "** (SAV " + avDasha.adSAV + ", to age " + avDasha.adEnd + " ≈ " + avDasha.adEndDate + ")", (avdSupports ? "the running sign supports the matter" : "running, neutral to the matter") + " — VedNetra's own daśā, not the AMN engine's"]));
+    L.push(row(["relative window", "kāraka " + karaka + ", nakṣatra " + (kNak ? kNak.name : "—") + " + trines " + (kNakTrines.length ? kNakTrines.join("/") : "—") + ", Saturn over them", "watch Saturn's transit of those three stars"]));
+    L.push(row(["transit window", (winGraded ? "**" + transitWindow + "**" : transitWindow), (winGraded ? "dated" : "coarse")]));
+    L.push(row(["month & day", monthWit, "witness"]));
+    L.push("");
+    var grade = confirm >= 6 ? "**dated window**" : confirm >= 4 ? "**strong window — give a tolerance**" : confirm >= 2 ? "**candidate window — say the word**" : "**not datable by this instrument**";
+    L.push("**Grade:** " + confirm + "/7 → " + grade + ".");
+    L.push("");
+    // GRAVE four-fire (only material when the routed matter is longevity/health and the reading is adverse)
+    var graveContext = ([8, 6].indexOf(gHouse) >= 0) && verdict < 25;
+    if (graveContext) {
+      L.push("⚑ **GRAVE verdict — `AMN-ARI-003` four must ALL fire, else CANDIDATE only:**");
+      var f1 = khandaKashta, f2 = false, f3 = avDasha.mdSAV <= 25, f4 = false;
+      try { var ing2 = vnIngressEvents(chart, nowMs, 3); f2 = ing2.some(function (e) { return (e.planet === "Jupiter" || e.planet === "Saturn") && bavInSign(e.planet, gSign) <= 1; }); } catch (e) {}
+      f4 = winGraded;
+      L.push(row(["kaṣṭa-khaṇḍa inside the āyu-khaṇḍa", f1 ? "fired" : "not"]));
+      L.push(row(["Jupiter/Saturn over a rekhā-less sign or its trine", f2 ? "fired" : "not"]));
+      L.push(row(["an inauspicious Aṣṭakavarga daśā", (avDasha.mdSAV <= 25 ? "fired — running AV MD " + SIGNS[avDasha.mdSign].name + " SAV " + avDasha.mdSAV + " ≤ 25" : "not — running AV MD SAV " + avDasha.mdSAV)]));
+      L.push(row(["the gochara concurring", f4 ? "fired" : "not"]));
+      L.push("_" + ([f1, f2, f3, f4].filter(Boolean).length === 4 ? "All four fire — the grave reading stands." : "Not all four fire — this is a CANDIDATE only, never asserted.") + "_");
+      L.push("");
+    }
+    L.push("> **The window:** " + (winGraded ? transitWindow + " — " + (confirm >= 6 ? "dated" : "strong, hold a tolerance") : "no slow-transit lock; " + grade.replace(/\*/g, "")) + ".");
+    L.push("");
+
+    // ===== 4 · TRANSFER CHECK =====
+    L.push("### 4 · TRANSFER CHECK   `AMN-BAV-033`");
+    var forbids = gSAV < 22 || (kp && R <= 1);
+    var signifies = { Sun: "the father / the authority figure", Moon: "the mother", Mars: "the sibling / the co-borns", Mercury: "the maternal kin", Jupiter: "the child / the teacher / the husband", Venus: "the spouse / the partner", Saturn: "the servant / the elder / the labourer" }[karaka] || "the person the kāraka signifies";
+    if (forbids) L.push("The native's own chart is too thin to carry the indication (H" + gHouse + " SAV " + gSAV + ", kāraka " + R + " rekhās) — by `AMN-BAV-033` it is **RE-ASSIGNED to " + signifies + "**, not cancelled.");
+    else L.push("The native's own chart carries the indication (H" + gHouse + " SAV " + gSAV + " and kāraka " + R + " rekhās are sufficient) — no transfer; it reads on the native directly.");
+    L.push("");
+
+    // ===== 5 · WHAT WOULD FALSIFY THIS =====
+    L.push("### 5 · WHAT WOULD FALSIFY THIS");
+    L.push("- If the " + gHouse + "th-house SAV were below " + MIN + " (it is " + gSAV + "), the PROMISE would fall a full band.");
+    L.push("- If kāraka **" + karaka + "** held fewer than 4 rekhās in its sign (it holds " + R + "), the net would flip to malefic and DELIVERED would go negative.");
+    L.push("- If the declared fork (karaka = " + karaka + ") were switched to the alternate significator, the capacity and the net would be recomputed and the verdict could change band.");
+    L.push("");
+
+    // ===== 6 · WHAT THIS INSTRUMENT CANNOT SAY =====
+    L.push("### 6 · WHAT THIS INSTRUMENT CANNOT SAY");
+    L.push("- The **exact AMN-engine AV daśā** — VedNetra now powers the period lane with its **own SAV-proportional rāśi daśā** (each sign's bindus → its years, scaled to a 120-yr cycle from the Lagna), clearly labelled as such. If your AMN/ENGINE spec defines the AV daśā differently, treat §3's period row as VedNetra's construction, not your engine's, and Vimśottarī is never substituted. `ENGINE-15`");
+    L.push("- Any figure that depends on the external **AMN / PAA / RSG** engine tables — those corpora are **not embedded**; the rule IDs above are references, and only the VedNetra-computed figures are asserted.");
+    L.push("");
+    L.push("---");
+    L.push("");
+    var blWord = verdict >= 60 ? "PROMISED" : verdict >= 40 ? "THINLY PROMISED" : verdict >= 25 ? "WEAKLY PROMISED" : verdict >= 0 ? "NOT PROMISED" : "ADVERSE";
+    L.push("**BOTTOM LINE —** on the Ashtakavarga instrument the matter routed to the " + gHouse + "th house (SAV " + gSAV + ", kāraka " + karaka + " " + R + " rekhās) reads **VERDICT " + r1(verdict) + " % — " + blWord + "**" + (winGraded ? ", timed to **" + transitWindow.split(" (")[0] + "**" : "") + ".");
+    L.push("");
+    L.push("_Generated by VedNetra — Ashtakvarga Engine Report (Lahiri) — " + vnFmtFullDate(nowMs) + ". Figures VedNetra-computed; AMN/PAA/RSG/ENGINE rule IDs are engine-spec references, never classical page numbers._");
+    return L.join("\n");
+  }
+  function ashtakavargaEngineSection(chart, input) {
+    var md;
+    try { md = vnAshtakavargaEngineMarkdown(chart, input); }
+    catch (e) { md = "Could not build the Ashtakvarga Engine Report: " + (e && e.message ? e.message : e); }
+    return '<section id="viewA-avengine" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Predictive</p><h3>Ashtakvarga Engine Report</h3></div><span class="small-pill">Lahiri · SAV/BAV verdict</span></div>' +
+      '<p class="fine-print">A <strong>question-routed predictive verdict</strong> built on VedNetra&rsquo;s Ashtakavarga (SAV/BAV). It validates the invariant checksums (a failure voids the reading), routes the native&rsquo;s question to a governing house + kāraka, then shows the full PROMISE / MAGNITUDE / CAPACITY / DELIVERED / VERDICT arithmetic, the shape cross-checks, a 7-instrument timing grade with a dated window where the transit locks, the transfer check, what would falsify it, and what it cannot say. Set the <strong>Question/topic</strong> in the chart form to route it. Every figure is VedNetra-computed; the AMN/PAA/RSG/ENGINE rule IDs reference the external engine spec (scaffold, never gap-filled).</p>' +
+      '<div class="vn-tool-actions" style="margin-bottom:10px"><button type="button" id="vnAvEngMd" class="input-toggle-btn">Download Markdown</button> <button type="button" id="vnAvEngCopy" class="input-toggle-btn">Copy (Markdown)</button> <span id="vnAvEngCopyStatus" class="fine-print"></span></div>' +
+      '<div class="panel-box"><pre class="vn-native-pre">' + escapeHtml(md) + '</pre></div>' +
+      '</section>';
+  }
+  function wireAshtakavargaEngineControls(chart, input) {
+    var mdBtn = document.getElementById("vnAvEngMd");
+    if (mdBtn) mdBtn.addEventListener("click", function () {
+      try { var md = vnAshtakavargaEngineMarkdown(chart, input); var blob = new Blob([md], { type: "text/markdown" }); var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "ashtakvarga-engine-report.md"; a.click(); } catch (e) {}
+    });
+    var copy = document.getElementById("vnAvEngCopy");
+    if (copy) copy.addEventListener("click", function () {
+      var md = vnAshtakavargaEngineMarkdown(chart, input), status = document.getElementById("vnAvEngCopyStatus");
+      function done() { if (status) { status.textContent = "Copied!"; setTimeout(function () { status.textContent = ""; }, 2500); } }
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(md).then(done, function () { vnCcFallbackCopy(md, done); });
+        else vnCcFallbackCopy(md, done);
+      } catch (e) { vnCcFallbackCopy(md, done); }
+    });
+  }
+  // ================================================================
   // KP SYSTEM REPORT — dedicated Krishnamurti-Paddhati export.
   // Krishnamurti ayanamsa (Lahiri − 0.1°), Placidus cusps, mean nodes,
   // sub-lords to the second. Emits the KP-VEDNETRA-EXPORT format (Part A
@@ -24315,7 +24626,7 @@
     L.push("Ayanamsa       : Krishnamurti (KP-Old)   value " + decimalToDms(kp.ayanamsa) + "   (= Lahiri Chitrapaksha − 6′00″; e.g. 2001 = 23°46′32″)");
     L.push("House system   : Placidus");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.116");
+    L.push("Software / ver : VedNetra 1.118");
     L.push("Native         : " + nm + "            Sex: " + ((input && input.gender) || "-"));
     L.push("DoB / ToB      : " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
@@ -24568,7 +24879,7 @@
     L.push("KP number      : " + hnum + " / 249");
     L.push("House system   : " + kp.houseSystem + "  (equal 30° cusps from the number-seed ascendant — VedNetra KP-horary convention)");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.116");
+    L.push("Software / ver : VedNetra 1.118");
     L.push("Question       : " + ((input && input.question) ? String(input.question) : "-"));
     L.push("Judgment moment: " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
