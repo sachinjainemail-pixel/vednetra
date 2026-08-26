@@ -23648,7 +23648,7 @@
     L.push("**Forks declared:** karaka = **" + karaka + "** (first of the routed set); khaṇḍa cut = house-quarters {1–4 · 5–8 · 9–12}; body-part map = classical; frame = Lagna (Sudarśana cross-checked); lead-time = 6 months.");
     var gaps = [];
     if (!(input && input.birthInstant)) gaps.push("no birth instant");
-    gaps.push("no Ṣaḍbala-based Ashtakavarga daśā in VedNetra → the AV daśā lane is UNAVAILABLE (Vimśottarī is NOT substituted)");
+    gaps.push("AV daśā supplied as VedNetra's own SAV-proportional rāśi daśā (§3) — labelled as such, NOT the AMN engine's AV daśā, and Vimśottarī is never substituted");
     L.push("**Data gaps:** " + (gaps.length ? gaps.join("; ") : "none"));
     L.push("**Lane routing:** ENGINE-09-EVENT-ROUTER → " + (routed ? routed[0] + " · house " + routed[1] + " · karaka " + routed[2] + " · varga " + routed[3] + " · lane file " + routed[4] : "no keyword match — defaulted to the 1st house (self)"));
     if (!checkOk) { L.push(""); L.push("> ⛔ **Checksum failure voids the predictive reading.** The Ashtakavarga did not reproduce the invariant totals — rebuild before trusting any figure below."); }
@@ -23741,6 +23741,22 @@
     // ===== 3 · TIMING =====
     L.push("### 3 · TIMING   [lane TIMING]");
     var age = 0; try { age = completedYears(input.birthInstant, new Date(nowMs), tz); } catch (e) {}
+    var ageFrac = age; try { ageFrac = (nowMs - input.birthInstant.getTime()) / (365.25 * DAY_MS); } catch (e) {}
+    // AV daśā — VedNetra's own SAV-proportional rāśi daśā: each sign's dasha years =
+    // its SAV bindus scaled so the 12-sign cycle from the Lagna spans 120 years.
+    // This is VedNetra's construction, NOT the AMN engine's AV daśā (which is not embedded).
+    var avDasha = (function () {
+      var total = av.grandTotal || 337, CYCLE = 120, lag = asc.sign;
+      var savBySign = {}; houseSigns.forEach(function (sg, i) { savBySign[sg] = av.columnTotals[i]; });
+      function seq(start) { var a = []; for (var k = 0; k < 12; k++) a.push(normalizeSign(start + k)); return a; }
+      var md = seq(lag), cum = 0, mdSign = lag, mdStart = 0, mdYears = savBySign[lag] / total * CYCLE;
+      for (var i = 0; i < 12; i++) { var y = savBySign[md[i]] / total * CYCLE; if (ageFrac < cum + y || i === 11) { mdSign = md[i]; mdStart = cum; mdYears = y; break; } cum += y; }
+      var ad = seq(mdSign), cum2 = mdStart, adSign = mdSign, adStart = mdStart, adYears = mdYears * (savBySign[mdSign] / total);
+      for (var j = 0; j < 12; j++) { var y2 = mdYears * (savBySign[ad[j]] / total); if (ageFrac < cum2 + y2 || j === 11) { adSign = ad[j]; adStart = cum2; adYears = y2; break; } cum2 += y2; }
+      function ageToDate(a) { try { return new Date(input.birthInstant.getTime() + a * 365.25 * DAY_MS).toISOString().slice(0, 10); } catch (e) { return "—"; } }
+      return { mdSign: mdSign, mdLord: SIGNS[mdSign].lord, mdSAV: savBySign[mdSign], mdStart: r1(mdStart), mdEnd: r1(mdStart + mdYears), mdEndDate: ageToDate(mdStart + mdYears), adSign: adSign, adLord: SIGNS[adSign].lord, adSAV: savBySign[adSign], adEnd: r1(adStart + adYears), adEndDate: ageToDate(adStart + adYears) };
+    })();
+    var avdSupports = (avDasha.mdSign === gSign || avDasha.adSign === gSign || (kp && (avDasha.mdSign === kp.sign || avDasha.adSign === kp.sign)) || [0, 4, 8].indexOf(((avDasha.mdSign - gSign + 12) % 12)) >= 0);
     // instruments
     var confirm = 0;
     // life-third khanda
@@ -23771,13 +23787,14 @@
     var trChart = null; try { trChart = buildChart(new Date(nowMs), Number(input.latitude), Number(input.longitude), tz, { ayanamshaKey: "lahiri" }); } catch (e) {}
     var monthWit = "—";
     if (trChart && kp) { var ts = trChart.planetsByName[karaka]; if (ts) { var bhinna = bavInSign(karaka, ts.sign); monthWit = "bhinna " + bhinna + "/8 against 4 · transit " + karaka + " in " + ts.signName + " SAV " + savOfSign(ts.sign) + "/56"; if (bhinna >= 4) confirm++; } }
+    if (avdSupports) confirm++;
     L.push("**Confirmation count: " + confirm + " / 7**   (`ENGINE-11` §D)");
     L.push("");
     L.push(row(["level", "instrument", "reading"])); L.push(sep(3));
     L.push(row(["life-third", "khaṇḍa " + khandaOfAge + " (houses " + khandaHouses.join(",") + ") sum " + khandaSum, (khandaKashta ? "kaṣṭa — below 4×min" : "sound")]));
     L.push(row(["year", "Sudarśana age-year, age " + age + " → house " + ageHouse + ", SAV " + ageHouseSAV, ageGrade]));
     L.push(row(["age-trigger", "SAV " + gSAV + " × 7 ÷ 27 = **age " + trigAge + "**, rem " + trigRem + " = " + trigNak, (Math.abs(trigAge - age) <= 3 ? "near the current age" : "distant")]));
-    L.push(row(["period", "AV daśā / antardaśā", "**UNAVAILABLE — VedNetra has no Ashtakavarga daśā; Vimśottarī not substituted**"]));
+    L.push(row(["period", "AV daśā (VedNetra SAV-proportional rāśi daśā) **" + SIGNS[avDasha.mdSign].name + "** (SAV " + avDasha.mdSAV + ", lord " + avDasha.mdLord + ", to age " + avDasha.mdEnd + " ≈ " + avDasha.mdEndDate + ") / AD **" + SIGNS[avDasha.adSign].name + "** (SAV " + avDasha.adSAV + ", to age " + avDasha.adEnd + " ≈ " + avDasha.adEndDate + ")", (avdSupports ? "the running sign supports the matter" : "running, neutral to the matter") + " — VedNetra's own daśā, not the AMN engine's"]));
     L.push(row(["relative window", "kāraka " + karaka + ", nakṣatra " + (kNak ? kNak.name : "—") + " + trines " + (kNakTrines.length ? kNakTrines.join("/") : "—") + ", Saturn over them", "watch Saturn's transit of those three stars"]));
     L.push(row(["transit window", (winGraded ? "**" + transitWindow + "**" : transitWindow), (winGraded ? "dated" : "coarse")]));
     L.push(row(["month & day", monthWit, "witness"]));
@@ -23789,14 +23806,14 @@
     var graveContext = ([8, 6].indexOf(gHouse) >= 0) && verdict < 25;
     if (graveContext) {
       L.push("⚑ **GRAVE verdict — `AMN-ARI-003` four must ALL fire, else CANDIDATE only:**");
-      var f1 = khandaKashta, f2 = false, f3 = false, f4 = false;
+      var f1 = khandaKashta, f2 = false, f3 = avDasha.mdSAV <= 25, f4 = false;
       try { var ing2 = vnIngressEvents(chart, nowMs, 3); f2 = ing2.some(function (e) { return (e.planet === "Jupiter" || e.planet === "Saturn") && bavInSign(e.planet, gSign) <= 1; }); } catch (e) {}
       f4 = winGraded;
       L.push(row(["kaṣṭa-khaṇḍa inside the āyu-khaṇḍa", f1 ? "fired" : "not"]));
       L.push(row(["Jupiter/Saturn over a rekhā-less sign or its trine", f2 ? "fired" : "not"]));
-      L.push(row(["an inauspicious Aṣṭakavarga daśā", "not (AV daśā UNAVAILABLE)"]));
+      L.push(row(["an inauspicious Aṣṭakavarga daśā", (avDasha.mdSAV <= 25 ? "fired — running AV MD " + SIGNS[avDasha.mdSign].name + " SAV " + avDasha.mdSAV + " ≤ 25" : "not — running AV MD SAV " + avDasha.mdSAV)]));
       L.push(row(["the gochara concurring", f4 ? "fired" : "not"]));
-      L.push("_" + ([f1, f2, false, f4].filter(Boolean).length === 4 ? "All four fire — the grave reading stands." : "Not all four fire — this is a CANDIDATE only, never asserted.") + "_");
+      L.push("_" + ([f1, f2, f3, f4].filter(Boolean).length === 4 ? "All four fire — the grave reading stands." : "Not all four fire — this is a CANDIDATE only, never asserted.") + "_");
       L.push("");
     }
     L.push("> **The window:** " + (winGraded ? transitWindow + " — " + (confirm >= 6 ? "dated" : "strong, hold a tolerance") : "no slow-transit lock; " + grade.replace(/\*/g, "")) + ".");
@@ -23819,7 +23836,7 @@
 
     // ===== 6 · WHAT THIS INSTRUMENT CANNOT SAY =====
     L.push("### 6 · WHAT THIS INSTRUMENT CANNOT SAY");
-    L.push("- The **AV daśā / antardaśā** period-lord timing — VedNetra does not compute an Ashtakavarga daśā, so that lane is genuinely out of reach (Vimśottarī is not a substitute here). `ENGINE-15`");
+    L.push("- The **exact AMN-engine AV daśā** — VedNetra now powers the period lane with its **own SAV-proportional rāśi daśā** (each sign's bindus → its years, scaled to a 120-yr cycle from the Lagna), clearly labelled as such. If your AMN/ENGINE spec defines the AV daśā differently, treat §3's period row as VedNetra's construction, not your engine's, and Vimśottarī is never substituted. `ENGINE-15`");
     L.push("- Any figure that depends on the external **AMN / PAA / RSG** engine tables — those corpora are **not embedded**; the rule IDs above are references, and only the VedNetra-computed figures are asserted.");
     L.push("");
     L.push("---");
@@ -24135,7 +24152,7 @@
     L.push("Ayanamsa       : Krishnamurti (KP-Old)   value " + decimalToDms(kp.ayanamsa) + "   (= Lahiri Chitrapaksha − 6′00″; e.g. 2001 = 23°46′32″)");
     L.push("House system   : Placidus");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.116");
+    L.push("Software / ver : VedNetra 1.117");
     L.push("Native         : " + nm + "            Sex: " + ((input && input.gender) || "-"));
     L.push("DoB / ToB      : " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
@@ -24388,7 +24405,7 @@
     L.push("KP number      : " + hnum + " / 249");
     L.push("House system   : " + kp.houseSystem + "  (equal 30° cusps from the number-seed ascendant — VedNetra KP-horary convention)");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.116");
+    L.push("Software / ver : VedNetra 1.117");
     L.push("Question       : " + ((input && input.question) ? String(input.question) : "-"));
     L.push("Judgment moment: " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
