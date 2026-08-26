@@ -1,6 +1,9 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <!-- SPA fallback: GitHub Pages serves this file for unknown paths, so pin
+       asset resolution to the site root instead of the missing path. -->
+  <base href="/vednetra/">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=yes, maximum-scale=5">
   <meta name="theme-color" content="#0f766e">
@@ -13,9 +16,29 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon.svg">
-  <link rel="stylesheet" href="styles.css?v=18">
+  <link rel="stylesheet" href="styles.css?v=118">
 </head>
 <body>
+  <div id="vnSplash" class="vn-splash" role="dialog" aria-label="Welcome to VedNetra">
+    <div class="vn-splash-inner">
+      <p class="vn-splash-bless">&#10023; With the divine blessings of &#10023;</p>
+      <div class="vn-deities">
+        <button type="button" class="vn-deity" style="--i:0" data-deity="ganesha" aria-label="Darshan of Shri Ganesha"><span class="vn-deity-glyph">&#2384;</span><span class="vn-deity-name">Shri Ganesha</span><span class="vn-deity-sub">&#2358;&#2381;&#2352;&#2368; &#2327;&#2339;&#2375;&#2358;</span></button>
+        <button type="button" class="vn-deity" style="--i:1" data-deity="shiva" aria-label="Darshan of Mahadeva Shiva"><span class="vn-deity-glyph">&#128305;</span><span class="vn-deity-name">Mahadeva Shiva</span><span class="vn-deity-sub">&#2350;&#2361;&#2366;&#2342;&#2375;&#2357;</span></button>
+        <button type="button" class="vn-deity" style="--i:2" data-deity="saraswati" aria-label="Darshan of Maa Saraswati"><span class="vn-deity-glyph">&#129719;</span><span class="vn-deity-name">Maa Saraswati</span><span class="vn-deity-sub">&#2350;&#2366;&#2305; &#2360;&#2352;&#2360;&#2381;&#2357;&#2340;&#2368;</span></button>
+        <button type="button" class="vn-deity" style="--i:3" data-deity="brihaspati" aria-label="Darshan of Guru Brihaspati"><span class="vn-deity-glyph">&#9795;</span><span class="vn-deity-name">Guru Brihaspati</span><span class="vn-deity-sub">&#2327;&#2369;&#2352;&#2369; &#2348;&#2371;&#2361;&#2360;&#2381;&#2346;&#2340;&#2367;</span></button>
+        <button type="button" class="vn-deity" style="--i:4" data-deity="budh" aria-label="Darshan of Budh Dev"><span class="vn-deity-glyph">&#9791;</span><span class="vn-deity-name">Budh Dev</span><span class="vn-deity-sub">&#2348;&#2369;&#2343; &#2342;&#2375;&#2357;</span></button>
+        <button type="button" class="vn-deity" style="--i:5" data-deity="ketu" aria-label="Darshan of Ketu Maharaj"><span class="vn-deity-glyph">&#9739;</span><span class="vn-deity-name">Ketu Maharaj</span><span class="vn-deity-sub">&#2325;&#2375;&#2340;&#2369;</span></button>
+      </div>
+      <div class="vn-splash-center">
+        <span class="vn-aura" aria-hidden="true"></span>
+        <img class="vn-splash-logo" src="icon.svg" alt="VedNetra logo">
+        <h1 class="vn-splash-title">VedNetra</h1>
+        <p class="vn-splash-tag">Vedic vision for every moment</p>
+      </div>
+      <button type="button" id="vnEnterBtn" class="vn-enter-btn">Enter &#9656;</button>
+    </div>
+  </div>
   <main class="shell">
     <div id="chartSetupDialog" class="chart-setup-dialog hidden" role="dialog" aria-modal="false" aria-labelledby="chartSetupDialogTitle">
       <div class="chart-setup-dialog-panel">
@@ -33,7 +56,7 @@
           <div>
             <h1 class="brand-title">VedNetra</h1>
           </div>
-          <span class="status-pill">v1.18</span>
+          <span class="status-pill" id="appVersionPill">v1.118</span>
         </div>
 
         <form id="birthForm" autocomplete="off">
@@ -44,6 +67,10 @@
               <button type="button" id="existingChartModeBtn">Select existing chart</button>
             </div>
             <div id="existingChartPanel" class="chart-mode-panel hidden">
+              <label>
+                Search saved charts
+                <input id="savedChartSearch" type="search" placeholder="Type a name, e.g. Ramesh" autocomplete="off">
+              </label>
               <label>
                 Saved chart
                 <select id="savedChartSelect" name="savedChartSelect">
@@ -82,6 +109,32 @@
                 <option value="female">Female chart</option>
               </select>
             </label>
+            <div class="grid-2">
+              <label>
+                Birth-time source
+                <select id="birthTimeSource" name="birthTimeSource">
+                  <option value="">Not stated</option>
+                  <option value="Birth certificate">Birth certificate</option>
+                  <option value="Hospital record">Hospital record</option>
+                  <option value="Family memory">Family memory</option>
+                  <option value="Rectified">Rectified</option>
+                </select>
+              </label>
+              <label>
+                Birth-time confidence
+                <select id="birthTimeConfidence" name="birthTimeConfidence">
+                  <option value="">Not stated</option>
+                  <option value="exact">Exact</option>
+                  <option value="±15 min">±15 min</option>
+                  <option value="±1 hr">±1 hr</option>
+                  <option value="unknown">Unknown</option>
+                </select>
+              </label>
+            </div>
+            <label>
+              Known life events (optional; one per line — e.g. "Marriage: 2011-05-14")
+              <textarea id="lifeEvents" name="lifeEvents" rows="3" placeholder="Marriage: 2011-05-14&#10;First job: 2004&#10;Child 1 (M): 2013-02-09"></textarea>
+            </label>
           </fieldset>
 
           <fieldset id="birthDetailsSection">
@@ -89,8 +142,8 @@
             <label>
               Ayanamsha
               <select id="ayanamsha" name="ayanamsha">
-                <option value="lahiri">Lahiri</option>
-                <option value="raman" selected>Raman</option>
+                <option value="lahiri" selected>Lahiri</option>
+                <option value="raman">Raman</option>
                 <option value="krishnamurti">Krishnamurti</option>
                 <option value="krishnamurtiNew">Krishnamurti (New)</option>
                 <option value="khullar">Khullar (KCIL)</option>
@@ -102,8 +155,8 @@
                 <input id="birthDate" name="birthDate" type="date" required>
               </label>
               <label>
-                Time (HH:MM:SS)
-                <input id="birthTime" name="birthTime" type="text" inputmode="numeric" pattern="[0-9]{2}:[0-9]{2}:[0-9]{2}" placeholder="HH:MM:SS" required>
+                Time of birth
+                <input id="birthTime" name="birthTime" type="text" inputmode="text" autocomplete="off" placeholder="e.g. 9:30 am · 930 · 14:30" required>
               </label>
             </div>
             <label>
@@ -111,6 +164,11 @@
               <input id="birthPlace" name="birthPlace" list="cityOptions" placeholder="Example: Chandigarh, India">
               <datalist id="cityOptions"></datalist>
             </label>
+            <label>
+              KP Horary number (1–249, optional)
+              <input id="kpHoraryNumber" name="kpHoraryNumber" type="number" min="1" max="249" step="1" placeholder="leave blank for a natal chart">
+            </label>
+            <p class="fine-print">For a <strong>KP Horary (Prashna)</strong> report, enter a number 1–249 here and put the <strong>moment &amp; place of judgment</strong> in the date/time/place fields above; the KP System Report then casts the horary chart (no birth data needed). Leave blank for a natal KP report.</p>
             <label class="button-label location-search-action">Internet location search
               <button type="button" id="lookupBirthPlaceBtn">Search and populate lat/long</button>
             </label>
@@ -185,7 +243,16 @@
               <label>
                 Report
                 <select id="reportDownloadType">
-                  <option value="standing" selected>Standing Natal Report (Chawdhri)</option>
+                  <option value="kp" selected>KP System Report (Krishnamurti · Placidus) — default</option>
+                  <option value="consolidatedmaster">Consolidated Master Run (Lahiri · all 4 projects)</option>
+                  <option value="intakeform">Intake Form (§17 · Lahiri · §1–§10 + chart.json)</option>
+                  <option value="avengine">Ashtakvarga Engine Report (Lahiri · SAV/BAV predictive verdict)</option>
+                  <option value="triveni">Triveni Chart Intake (Lahiri · §0–§10)</option>
+                  <option value="trinetra">Trinetra Master Run (Lahiri · §0–§8)</option>
+                  <option value="vapmnak">VAPM + Nakshatra Report (Lahiri · §1–§15)</option>
+                  <option value="native">Native Input Report (full §0–§16)</option>
+                  <option value="vapm">VAPM Export (Lahiri · §1–§14 + Part B)</option>
+                  <option value="standing">Standing Natal Report (Chawdhri)</option>
                   <option value="cc">Natal Report (Chamatkar Chintamani)</option>
                   <option value="vednetra">VedNetra Report</option>
                   <option value="detailed">Detailed Report</option>
@@ -233,9 +300,24 @@
           <div class="nav-category">
             <button type="button" class="nav-category-title" data-nav-category-toggle aria-expanded="false">Workspace</button>
             <div class="nav-category-actions">
+              <button type="button" data-view-a-target="viewA-consolidated">Consolidated View</button>
               <button type="button" data-view-a-target="viewA-output-library">Library</button>
               <button type="button" data-view-a-target="viewA-worksheets">Worksheets</button>
               <button type="button" data-view-a-target="viewA-summary">Summary</button>
+            </div>
+          </div>
+          <div class="nav-category">
+            <button type="button" class="nav-category-title" data-nav-category-toggle aria-expanded="false">Today &amp; Tools</button>
+            <div class="nav-category-actions">
+              <button type="button" data-view-a-target="viewA-today">Today</button>
+              <button type="button" data-view-a-target="viewA-muhurta">Muhurta &amp; Choghadiya</button>
+              <button type="button" data-view-a-target="viewA-lagna-timeline">Lagna Timeline</button>
+              <button type="button" data-view-a-target="viewA-numerology">Numerology</button>
+              <button type="button" data-view-a-target="viewA-verdict">Yes/No Verdict</button>
+              <button type="button" data-view-a-target="viewA-rectify">Rectify Birth Time</button>
+              <button type="button" data-view-a-target="viewA-reading">Reading</button>
+              <button type="button" data-view-a-target="viewA-num-compat">Numerology Match</button>
+              <button type="button" data-view-a-target="viewA-cards">Vedic Cards</button>
             </div>
           </div>
           <div class="nav-category">
@@ -244,6 +326,9 @@
               <button type="button" data-view-a-target="viewA-panchang">Birth Panchang</button>
               <button type="button" data-view-a-target="viewA-current-panchang">Current Panchang</button>
               <button type="button" data-view-a-target="viewA-d1-details">D-1 Details</button>
+              <button type="button" data-view-a-target="viewA-nakshatra">Nakshatra &amp; Pada</button>
+              <button type="button" data-view-a-target="viewA-appearance">Appearance</button>
+              <button type="button" data-view-a-target="viewA-nature">Nature</button>
               <button type="button" data-view-a-target="viewA-yogas">Yogas</button>
               <button type="button" data-view-a-target="viewA-vargas">Vargas</button>
             </div>
@@ -252,6 +337,9 @@
             <button type="button" class="nav-category-title" data-nav-category-toggle aria-expanded="false">Timing</button>
             <div class="nav-category-actions">
               <button type="button" data-view-a-target="viewA-varshfal">Varshfal</button>
+              <button type="button" data-view-a-target="viewA-sadesati">Sade Sati</button>
+              <button type="button" data-view-a-target="viewA-yogini">Yogini Dasha</button>
+              <button type="button" data-view-a-target="viewA-chardasha">Char Dasha</button>
               <button type="button" data-view-a-target="viewA-transit">Transit</button>
               <button type="button" data-view-a-target="viewA-ephemeris">Ephemeris</button>
               <button type="button" data-view-a-target="viewA-dasha">Dasha</button>
@@ -262,6 +350,9 @@
             <div class="nav-category-actions">
               <button type="button" data-view-a-target="viewA-references">Tables</button>
               <button type="button" data-view-a-target="viewA-shadbala">Shadbala</button>
+              <button type="button" data-view-a-target="viewA-planetstrength">Planetary Strength (37)</button>
+              <button type="button" data-view-a-target="viewA-trinetra">Trinetra (Promise/Star/Time)</button>
+              <button type="button" data-view-a-target="viewA-sahams">Sahams</button>
               <button type="button" data-view-a-target="viewA-jaimini">Jaimini</button>
               <button type="button" data-view-a-target="viewA-chakras">Chakras</button>
               <button type="button" data-view-a-target="viewA-sav">Ashtakavarga</button>
@@ -274,8 +365,34 @@
             <div class="nav-category-actions">
               <button type="button" data-view-a-target="viewA-compatibility">Compatibility</button>
               <button type="button" data-view-a-target="viewA-horary">Horary</button>
+              <button type="button" data-view-a-target="viewA-gochar">Gochar Predictions</button>
               <button type="button" data-view-a-target="viewA-faq-pillars">Query Pillars</button>
               <button type="button" data-view-a-target="viewA-predictive">Predictive</button>
+            </div>
+          </div>
+          <div class="nav-category">
+            <button type="button" class="nav-category-title" data-nav-category-toggle aria-expanded="false">Reports &amp; Remedies</button>
+            <div class="nav-category-actions">
+              <button type="button" data-view-a-target="viewA-persona">Native's Persona</button>
+              <button type="button" data-view-a-target="viewA-kpreport">KP System Report</button>
+              <button type="button" data-view-a-target="viewA-ccreport">Natal Report (CC)</button>
+              <button type="button" data-view-a-target="viewA-consolidatedmaster">Consolidated Master Run</button>
+              <button type="button" data-view-a-target="viewA-intakeform">Intake Form (§17)</button>
+              <button type="button" data-view-a-target="viewA-avengine">Ashtakvarga Engine Report</button>
+              <button type="button" data-view-a-target="viewA-trivenireport">Triveni Chart Intake</button>
+              <button type="button" data-view-a-target="viewA-trinetrareport">Trinetra Master Run</button>
+              <button type="button" data-view-a-target="viewA-vapmnakreport">VAPM + Nakshatra Report</button>
+              <button type="button" data-view-a-target="viewA-nativereport">Native Input Report</button>
+              <button type="button" data-view-a-target="viewA-vapmreport">VAPM Export</button>
+              <button type="button" data-view-a-target="viewA-lifereport">Life Report</button>
+              <button type="button" data-view-a-target="viewA-rashifal">Rashifal</button>
+              <button type="button" data-view-a-target="viewA-doshas">Doshas</button>
+              <button type="button" data-view-a-target="viewA-gems">Gemstones</button>
+              <button type="button" data-view-a-target="viewA-lalkitab">Lal Kitab</button>
+              <button type="button" data-view-a-target="viewA-loshu">Lo Shu Grid</button>
+              <button type="button" data-view-a-target="viewA-babynames">Baby Names</button>
+              <button type="button" data-view-a-target="viewA-vrat">Vrat &amp; Parva</button>
+              <button type="button" data-view-a-target="viewA-quickcalc">Quick Calculators</button>
             </div>
           </div>
           <button type="button" id="mobileHomeBtn" class="mobile-home-btn" aria-label="Back to start screen">&#x2302; Home</button>
@@ -290,19 +407,37 @@
                 <option value="__chartSetupDownload">Download Report</option>
               </optgroup>
               <optgroup label="Workspace">
+                <option value="viewA-consolidated">Consolidated View</option>
                 <option value="viewA-output-library">Library</option>
                 <option value="viewA-worksheets">Worksheets</option>
                 <option value="viewA-summary">Summary</option>
+              </optgroup>
+              <optgroup label="Today &amp; Tools">
+                <option value="viewA-today">Today</option>
+                <option value="viewA-muhurta">Muhurta &amp; Choghadiya</option>
+                <option value="viewA-lagna-timeline">Lagna Timeline</option>
+                <option value="viewA-numerology">Numerology</option>
+                <option value="viewA-verdict">Yes/No Verdict</option>
+                <option value="viewA-rectify">Rectify Birth Time</option>
+                <option value="viewA-reading">Reading</option>
+                <option value="viewA-num-compat">Numerology Match</option>
+                <option value="viewA-cards">Vedic Cards</option>
               </optgroup>
               <optgroup label="Birth Foundations">
                 <option value="viewA-panchang">Birth Panchang</option>
                 <option value="viewA-current-panchang">Current Panchang</option>
                 <option value="viewA-d1-details">D-1 Details</option>
+                <option value="viewA-nakshatra">Nakshatra &amp; Pada</option>
+                <option value="viewA-appearance">Appearance</option>
+                <option value="viewA-nature">Nature</option>
                 <option value="viewA-yogas">Yogas</option>
                 <option value="viewA-vargas">Vargas</option>
               </optgroup>
               <optgroup label="Timing">
                 <option value="viewA-varshfal">Varshfal</option>
+                <option value="viewA-sadesati">Sade Sati</option>
+                <option value="viewA-yogini">Yogini Dasha</option>
+                <option value="viewA-chardasha">Char Dasha</option>
                 <option value="viewA-transit">Transit</option>
                 <option value="viewA-ephemeris">Ephemeris</option>
                 <option value="viewA-dasha">Dasha</option>
@@ -310,6 +445,9 @@
               <optgroup label="Strengths &amp; Systems">
                 <option value="viewA-references">Tables</option>
                 <option value="viewA-shadbala">Shadbala</option>
+                <option value="viewA-planetstrength">Planetary Strength (37-pointer)</option>
+                <option value="viewA-trinetra">Trinetra (Promise/Star/Time)</option>
+                <option value="viewA-sahams">Sahams</option>
                 <option value="viewA-jaimini">Jaimini</option>
                 <option value="viewA-chakras">Chakras</option>
                 <option value="viewA-sav">Ashtakavarga</option>
@@ -319,16 +457,54 @@
               <optgroup label="Relationship &amp; Prediction">
                 <option value="viewA-compatibility">Compatibility</option>
                 <option value="viewA-horary">Horary</option>
+                <option value="viewA-gochar">Gochar Predictions</option>
                 <option value="viewA-faq-pillars">Query Pillars</option>
                 <option value="viewA-predictive">Predictive</option>
+              </optgroup>
+              <optgroup label="Reports &amp; Remedies">
+                <option value="viewA-persona">Native's Persona</option>
+                <option value="viewA-kpreport">KP System Report</option>
+                <option value="viewA-ccreport">Natal Report (CC)</option>
+                <option value="viewA-consolidatedmaster">Consolidated Master Run</option>
+                <option value="viewA-intakeform">Intake Form (§17)</option>
+                <option value="viewA-avengine">Ashtakvarga Engine Report</option>
+                <option value="viewA-trivenireport">Triveni Chart Intake</option>
+                <option value="viewA-trinetrareport">Trinetra Master Run</option>
+                <option value="viewA-vapmnakreport">VAPM + Nakshatra Report</option>
+                <option value="viewA-nativereport">Native Input Report</option>
+                <option value="viewA-vapmreport">VAPM Export</option>
+                <option value="viewA-lifereport">Life Report</option>
+                <option value="viewA-rashifal">Rashifal</option>
+                <option value="viewA-doshas">Doshas</option>
+                <option value="viewA-gems">Gemstones</option>
+                <option value="viewA-lalkitab">Lal Kitab</option>
+                <option value="viewA-loshu">Lo Shu Grid</option>
+                <option value="viewA-babynames">Baby Names</option>
+                <option value="viewA-vrat">Vrat &amp; Parva</option>
+                <option value="viewA-quickcalc">Quick Calculators</option>
               </optgroup>
             </select>
           </label>
         </div>
         <div id="chartInputLayoutBar" class="chart-input-layout-bar hidden">
+          <div id="vnUniversalSearch" class="vn-universal-search">
+            <span class="vn-search-icon" aria-hidden="true">&#128269;</span>
+            <input type="search" id="vnSearchInput" class="vn-search-input" placeholder="Search charts, sections, tools&hellip;" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="vnSearchResults" aria-autocomplete="list" aria-label="Universal search">
+            <button type="button" id="vnSearchClear" class="vn-search-clear hidden" aria-label="Clear search">&times;</button>
+            <div id="vnSearchResults" class="vn-search-results hidden" role="listbox" aria-label="Search results"></div>
+          </div>
           <button type="button" class="input-toggle-btn" data-chart-input-toggle aria-pressed="false">Hide input</button>
           <button type="button" class="input-toggle-btn time-tool-layout-btn" data-time-tool-open>Time Tool</button>
+          <button type="button" id="vnHomeBarBtn" class="input-toggle-btn vn-home-bar-btn">&#x2302; Home</button>
+          <button type="button" id="partAModifyBtn" class="input-toggle-btn">Modify Chart</button>
+          <button type="button" id="partASelectBtn" class="input-toggle-btn">Select Chart</button>
           <button type="button" id="partADownloadBtn" class="input-toggle-btn part-a-download-btn">Download Report</button>
+          <label class="vn-lang-toggle" aria-label="Language">
+            <select id="vnLangSelect">
+              <option value="en">English</option>
+              <option value="hi">à¤¹à¤¿à¤à¤¦à¥</option>
+            </select>
+          </label>
           <div id="partAIdentityStrip" class="part-a-identity-strip" aria-live="polite">
             <div class="part-a-brand-mini">
               <img src="icon.svg" alt="" aria-hidden="true">
@@ -343,16 +519,14 @@
             <img class="empty-state-logo" src="icon.svg" alt="VedNetra logo">
             <h1 class="empty-state-title">VedNetra</h1>
           </div>
-          <div class="empty-state-actions">
-            <button type="button" class="empty-state-btn empty-state-btn-primary" data-chart-setup-action="new">Create New Chart</button>
-            <button type="button" class="empty-state-btn" data-chart-setup-action="select">Select Existing Chart</button>
-          </div>
-          <p class="empty-state-tagline">Generate chart preparation, planetary details, vargas, transit chart and Vimshottari timing.</p>
-          <p class="empty-state-version" id="appVersionLabel">Version 1.18</p>
+          <p class="empty-state-tagline">A complete Vedic workbench: divisional charts (D-1 to D-60), Vimshottari dasha, Shadbala, Ashtakavarga, KP, Jaimini and Varshfal â plus a daily dashboard, muhurta windows, numerology, card readings and more. Pick anything below to jump straight in.</p>
+          <div id="vnHomeShowcase" class="vn-home-showcase"></div>
+          <p class="empty-state-version" id="appVersionLabel">Version 1.118</p>
         </div>
         <article id="report" class="report hidden"></article>
       </section>
     </section>
+    <button type="button" id="vnFloatingDownloadBtn" class="vn-floating-download" aria-label="Download report">&#8681; Download</button>
     <div id="focusModeRail" class="focus-mode-rail" aria-label="Multi view tools">
       <button type="button" class="focus-rail-tab" aria-label="Open multi view tools">Multi View</button>
       <div class="focus-rail-panel">
@@ -388,7 +562,14 @@
         <div class="focus-download-options">
           <label>Report
             <select id="railReportDownloadType">
-              <option value="standing" selected>Standing Natal Report (Chawdhri)</option>
+              <option value="kp" selected>KP System Report (Krishnamurti · Placidus) — default</option>
+              <option value="consolidatedmaster">Consolidated Master Run (Lahiri · all 4 projects)</option>
+                  <option value="intakeform">Intake Form (§17 · Lahiri · §1–§10 + chart.json)</option>
+                  <option value="avengine">Ashtakvarga Engine Report (Lahiri · SAV/BAV predictive verdict)</option>
+              <option value="native">Native Input Report (full §0–§16)</option>
+                  <option value="trinetra">Trinetra Master Run (Lahiri · §0–§8)</option>
+                  <option value="vapm">VAPM Export (Lahiri · §1–§14 + Part B)</option>
+                  <option value="standing">Standing Natal Report (Chawdhri)</option>
                   <option value="cc">Natal Report (Chamatkar Chintamani)</option>
               <option value="vednetra">VedNetra Report</option>
               <option value="detailed">Detailed Report</option>
@@ -456,6 +637,7 @@
       </div>
     </div>
   </main>
-  <script src="app.js?v=18"></script>
+  <script src="trinetra-rules.js?v=118"></script>
+  <script src="app.js?v=118"></script>
 </body>
 </html>
