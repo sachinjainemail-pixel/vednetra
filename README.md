@@ -10,7 +10,7 @@ Birth chart (D-1) + all divisional charts to D-60, Vimshottari dasha (down to Pr
 
 | File | Purpose |
 |---|---|
-| `index.html` | Main HTML shell (loads `styles.css?v=18`, `app.js?v=18`) |
+| `index.html` | Main HTML shell (loads `styles.css?v=118`, `app.js?v=118`) |
 | `app.js` | All application logic |
 | `styles.css` | All styles (mobile + compact desktop dialog + start screen) |
 | `service-worker.js` | Offline cache (network-first, auto-updating) |
@@ -19,13 +19,23 @@ Birth chart (D-1) + all divisional charts to D-60, Vimshottari dasha (down to Pr
 | `404.html` | SPA fallback (copy of index.html) |
 | `.nojekyll` | Tells GitHub Pages to serve files as-is (skip Jekyll) |
 | `.gitignore` | Ignores OS / editor junk |
-| `.github/workflows/deploy.yml` | Auto-deploys to GitHub Pages on every push to `main` |
+| `tools/av-timing-backtest.js` | Scores the AV Engine's timing windows against dated real events |
+| `tools/cases/` | Backtest input (`events.template.json` is the format) |
 
 ---
 
 ## Deploy to GitHub Pages
 
-### Option A - automatic (recommended; uses the included Actions workflow)
+### How this repo is actually deployed
+
+GitHub Pages is set to **Deploy from a branch → `main` / `(root)`**, so GitHub's
+built-in `pages build and deployment` job publishes the site on every push to
+`main`. There is no Actions workflow file in this repo — nothing to maintain.
+
+**After any edit, bump all three or clients keep the cached build:** `?v=N` on
+both assets in `index.html`, and `CACHE_NAME` in `service-worker.js`.
+
+### Option A - automatic (a custom Actions workflow, if you ever add one)
 
 1. Create a repository on GitHub (e.g. `vednetra`).
 2. Push these files to the `main` branch:
@@ -76,5 +86,5 @@ Open http://localhost:4173/
 
 ---
 
-Current build: cache `vednetra-v18`, assets `?v=18`. Default report download: Standing Natal Report (Chawdhri).
+Current build: cache `vednetra-v118`, assets `?v=118`. Default report download: KP System Report.
 
