@@ -23492,11 +23492,18 @@
     if (!tr) return null;
 
     var houses = {}; // 1..12 -> { pos, neg, why: [] }
-    for (var h = 1; h <= 12; h++) houses[h] = { house: h, pos: 0, neg: 0, why: [] };
-    function book(h, amount, why) {
-      if (!h || h < 1 || h > 12 || !amount) return;
-      if (amount > 0) houses[h].pos += amount; else houses[h].neg += -amount;
-      houses[h].why.push({ amount: Math.round(amount * 100) / 100, why: why });
+    for (var h = 1; h <= 12; h++) houses[h] = { house: h, pos: 0, neg: 0, act: 0, why: [] };
+    // Two different questions, previously conflated. ACTIVATION asks which
+    // bhavas are live at all; POLARITY asks how they go. Ranking by the signed
+    // magnitude meant a bhava activated by a neutral-toned lord scored near
+    // zero and sank to the bottom — so a running daśā lord could own the
+    // single most live topic of the period and still rank last. Activation is
+    // now booked separately and is never cancelled by a mild polarity.
+    function book(h, amount, why, activation) {
+      if (!h || h < 1 || h > 12) return;
+      if (amount > 0) houses[h].pos += amount; else if (amount < 0) houses[h].neg += -amount;
+      houses[h].act += (activation != null ? activation : Math.abs(amount));
+      if (amount) houses[h].why.push({ amount: Math.round(amount * 100) / 100, why: why });
     }
 
     // ---- layer 1+2+3 : kakshya transit, BAV/SAV context, gochara houses
@@ -23561,8 +23568,10 @@
       tone += kona * 0.2 - trik * 0.35;
       tone = Math.max(-1.6, Math.min(1.6, tone));
       var score = tone * w;
-      (np.lordships || []).forEach(function (oh) { book(oh, score, period.level + " lord " + name + " owns H" + oh); });
-      if (np.house) book(np.house, score * 0.8, period.level + " lord " + name + " sits in H" + np.house);
+      // A daśā lord's own bhavas are the period's live topics whatever its
+      // tone, so activation is driven by the level's weight, not by the sign.
+      (np.lordships || []).forEach(function (oh) { book(oh, score, period.level + " lord " + name + " owns H" + oh, w * 2.2); });
+      if (np.house) book(np.house, score * 0.8, period.level + " lord " + name + " sits in H" + np.house, w * 1.6);
       dashaRows.push({ level: period.level, lord: name, dignity: dig || "—", house: np.house, owns: (np.lordships || []).join(","), tone: Math.round(tone * 100) / 100, score: Math.round(score * 100) / 100 });
     });
 
@@ -23613,7 +23622,8 @@
     for (var h3 = 1; h3 <= 12; h3++) {
       var e = houses[h3];
       e.net = Math.round((e.pos - e.neg) * 100) / 100;
-      e.load = Math.round((e.pos + e.neg) * 100) / 100;
+      e.load = Math.round(e.act * 100) / 100;   // how LIVE the bhava is
+      e.swing = Math.round((e.pos + e.neg) * 100) / 100;
       e.pos = Math.round(e.pos * 100) / 100; e.neg = Math.round(e.neg * 100) / 100;
       list.push(e);
     }
@@ -25292,6 +25302,8 @@
         question: spec.question || "", topic: spec.question || "",
         asOfInstant: spec.asOfISO ? new Date(spec.asOfISO) : new Date()
       };
+      // "What happened on <date>" — aim the day engine at that day.
+      if (spec.eventDate) { vnAvDayState.date = String(spec.eventDate); if (spec.eventTime) vnAvDayState.time = String(spec.eventTime); }
       return { markdown: vnAshtakavargaEngineMarkdown(chart, input), chart: chart, input: input };
     },
     // Any of the markdown master exports, built straight from a spec with no
@@ -25303,14 +25315,25 @@
         avengine: vnAshtakavargaEngineMarkdown, intakeform: vnIntakeFormMarkdown,
         consolidated: vnConsolidatedMarkdown, triveni: vnTriveniMarkdown,
         trinetra: vnTrinetraMarkdown, kp: vnKpMarkdown, vapm: vnVapmMarkdown,
-        vapmnak: vnVapmNakshatraMarkdown, native: vnNativeMarkdown, cc: vnCcMarkdown
+        vapmnak: vnVapmNakshatraMarkdown, native: vnNativeMarkdown, cc: vnCcMarkdown,
+        // The day reading on its own, for "what happened on <date>" questions.
+        // It lived only inside the intake form, so asking the AV engine about a
+        // date never actually looked at that date.
+        dayevent: function (chart, input) {
+          var model = vnAvDayEngine(chart, input, vnAvDayResolve(input));
+          var L = ["# EVENT-ON-A-DAY — " + (input.nativeName || "Native"), ""];
+          vnAvDayBlockLines(chart, input, model).forEach(function (l) { L.push(l); });
+          L.push("---"); L.push("");
+          L.push("> " + vnAvDayOneLiner(model, input));
+          return L.join("\n");
+        }
       };
       var fn = BUILDERS[report || "avengine"];
       if (!fn) throw new Error("unknown report '" + report + "'; known: " + Object.keys(BUILDERS).join(", "));
       var built = coreApi.avEngineFor(spec);           // reuse the spec→chart/input path
       return { markdown: fn(built.chart, built.input) };
     },
-    reportKeys: ["avengine", "intakeform", "consolidated", "triveni", "trinetra", "kp", "vapm", "vapmnak", "native", "cc"]
+    reportKeys: ["avengine", "intakeform", "dayevent", "consolidated", "triveni", "trinetra", "kp", "vapm", "vapmnak", "native", "cc"]
   };
   if (typeof window !== "undefined") window.VedicCore = coreApi;
   if (typeof globalThis !== "undefined") globalThis.VedicCore = coreApi;

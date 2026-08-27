@@ -17,8 +17,10 @@
  *         lat, lon, place, question, report, outFile, appDir
  *
  * `date`/`time` are LOCAL clock time at the birth place; `tz` converts them.
- * `report` is one of: avengine (default), intakeform, consolidated, triveni,
- *         trinetra, kp, vapm, vapmnak, native, cc
+ * `report` is one of: avengine (default), intakeform, dayevent, consolidated,
+ *         triveni, trinetra, kp, vapm, vapmnak, native, cc
+ * `eventDate` (YYYY-MM-DD) + optional `eventTime` aim the day engine at one day,
+ *         for "what happened on <date>" questions. Use with report "dayevent".
  */
 const fs = require("fs");
 const path = require("path");
@@ -99,7 +101,8 @@ const spec = {
   name: cfg.name || "Native", gender: cfg.gender || "unspecified",
   birthISO: `${cfg.date}T${t}`, tz: Number(cfg.tz),
   lat: Number(cfg.lat), lon: Number(cfg.lon), place: cfg.place || "",
-  question: cfg.question || "", asOfISO: cfg.enquiryISO || undefined
+  question: cfg.question || "", asOfISO: cfg.enquiryISO || undefined,
+  eventDate: cfg.eventDate || undefined, eventTime: cfg.eventTime || undefined
 };
 let md;
 try { md = VC.reportFor(spec, cfg.report || "avengine").markdown; }
