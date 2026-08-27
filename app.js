@@ -25271,7 +25271,19 @@
     // page load instead of reloading the app per native, which is what
     // makes a backtest over dozens of dated events practical.
     avEngineFor: function (spec) {
-      var inst = new Date(spec.birthISO);
+      // birthISO is LOCAL clock time at the birth place, so it must be
+      // combined with spec.tz explicitly. Handing a bare "YYYY-MM-DDTHH:MM:SS"
+      // to new Date() resolves it against the HOST's timezone instead — the
+      // same call then yields a different instant in a browser in India than
+      // in a UTC container, silently cast the chart hours off, and moved the
+      // Lagna a whole sign.
+      var inst = (function () {
+        var m = String(spec.birthISO || "").match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?/);
+        if (!m) return new Date(spec.birthISO);        // already an instant (has Z or an offset)
+        if (/[Zz]|[+-]\d{2}:?\d{2}$/.test(spec.birthISO)) return new Date(spec.birthISO);
+        var utc = Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +(m[6] || 0));
+        return new Date(utc - Number(spec.tz || 0) * 3600000);
+      })();
       var chart = buildChart(inst, Number(spec.lat), Number(spec.lon), Number(spec.tz), { ayanamshaKey: "lahiri" });
       var input = {
         nativeName: spec.name || "Native", gender: spec.gender || "unspecified",
