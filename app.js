@@ -25292,8 +25292,25 @@
         question: spec.question || "", topic: spec.question || "",
         asOfInstant: spec.asOfISO ? new Date(spec.asOfISO) : new Date()
       };
-      return { markdown: vnAshtakavargaEngineMarkdown(chart, input) };
-    }
+      return { markdown: vnAshtakavargaEngineMarkdown(chart, input), chart: chart, input: input };
+    },
+    // Any of the markdown master exports, built straight from a spec with no
+    // DOM driving at all. This is the path that keeps the engine runnable in
+    // a container where a browser cannot be installed: the reports are pure
+    // string builders over the computed chart, so they need no page at all.
+    reportFor: function (spec, report) {
+      var BUILDERS = {
+        avengine: vnAshtakavargaEngineMarkdown, intakeform: vnIntakeFormMarkdown,
+        consolidated: vnConsolidatedMarkdown, triveni: vnTriveniMarkdown,
+        trinetra: vnTrinetraMarkdown, kp: vnKpMarkdown, vapm: vnVapmMarkdown,
+        vapmnak: vnVapmNakshatraMarkdown, native: vnNativeMarkdown, cc: vnCcMarkdown
+      };
+      var fn = BUILDERS[report || "avengine"];
+      if (!fn) throw new Error("unknown report '" + report + "'; known: " + Object.keys(BUILDERS).join(", "));
+      var built = coreApi.avEngineFor(spec);           // reuse the spec→chart/input path
+      return { markdown: fn(built.chart, built.input) };
+    },
+    reportKeys: ["avengine", "intakeform", "consolidated", "triveni", "trinetra", "kp", "vapm", "vapmnak", "native", "cc"]
   };
   if (typeof window !== "undefined") window.VedicCore = coreApi;
   if (typeof globalThis !== "undefined") globalThis.VedicCore = coreApi;
