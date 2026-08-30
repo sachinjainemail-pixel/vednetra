@@ -6167,6 +6167,7 @@
       { id: "viewA-avengine",       label: "Ashtakvarga Engine Report", render: function () { return ashtakavargaEngineSection(chart, input); }, wire: function () { wireAshtakavargaEngineControls(chart, input); } },
       { id: "viewA-avexport",       label: "Ashtakavarga Export (JSON)", render: function () { return avExportSection(chart, input); }, wire: function () { wireAvExportControls(chart, input); } },
       { id: "viewA-bnnexport",      label: "BNN Chart Export", render: function () { return bnnExportSection(chart, input); }, wire: function () { wireBnnExportControls(chart, input); } },
+      { id: "viewA-medastro",       label: "Medical Astrology Deep Analysis", render: function () { return medAstroSection(chart, input); }, wire: function () { wireMedAstroControls(chart, input); } },
       { id: "viewA-trivenireport",  label: "Triveni Intake", render: function () { return triveniReportSection(chart, input); }, wire: function () { wireTriveniReportControls(chart, input); } },
       { id: "viewA-trinetrareport", label: "Trinetra Master Run", render: function () { return trinetraReportSection(chart, input); }, wire: function () { wireTrinetraReportControls(chart, input); } },
       { id: "viewA-kpreport",       label: "KP System Report", render: function () { return kpReportSection(chart, input); }, wire: function () { wireKpReportControls(chart, input); } },
@@ -13779,6 +13780,7 @@
       ["avengine", "Ashtakvarga Engine Report (Lahiri · SAV/BAV predictive verdict)"],
       ["avexport", "Ashtakavarga Export — JSON (schema vednetra.ashtakavarga.v1)"],
       ["bnnexport", "BNN Chart Export (Bhrigu Nandi Nadi · karaka/transit)"],
+      ["medastro", "Medical Astrology Deep Analysis (Lahiri · Parashari · §1–§15)"],
       ["triveni", "Triveni Chart Intake (Lahiri · §0–§10)"],
       ["trinetra", "Trinetra Master Run (Lahiri · §0–§8 · Promise/Star/Time)"],
       ["vapmnak", "VAPM + Nakshatra Report (Lahiri · §1–§15 + Part B)"],
@@ -13874,6 +13876,10 @@
     }
     if (reportType === "bnnexport") {
       downloadBnnExport(format);
+      return;
+    }
+    if (reportType === "medastro") {
+      downloadMedAstroReport(format);
       return;
     }
     if (reportType === "kp") {
@@ -14058,6 +14064,18 @@
     }
   }
 
+  function downloadMedAstroReport(format) {
+    try {
+      var input = lastReportInput || readInput();
+      var chart = lastReportChart || buildChart(input.birthInstant, input.latitude, input.longitude, input.timezone, { ascendantOverride: input.ascendantOverride, ayanamshaKey: input.ayanamshaKey || "lahiri" });
+      var text = vnMedAstroMarkdown(chart, input);
+      lastPlainReport = text; lastPlainReports.chartData = text;
+      var filenameBase = reportDownloadFilenameBase() + "_Medical_Astrology_Deep_Analysis";
+      if (format === "pdf") { downloadBlob(filenameBase + ".pdf", "application/pdf", makeSimplePdf(text)); showToast("✓ Medical Astrology export — PDF download started"); return; }
+      downloadBlob(filenameBase + ".md", "text/markdown;charset=utf-8", text);
+      showToast("✓ Medical Astrology export — Markdown download started");
+    } catch (error) { console.error(error); alertUser("Medical Astrology export could not be built: " + (error && error.message ? error.message : error)); }
+  }
   function downloadBnnExport(format) {
     try {
       var input = lastReportInput || readInput();
@@ -18587,6 +18605,7 @@
       { id: "viewA-vapmreport", label: "VAPM Export", desc: "VAPM export spec (Lahiri, §1–§14 + Part B): master table, aspect/Kartari table, functional nature, Chandra/Surya Lagna, all vargas + Dashavarga count, Ashtakavarga incl. Shodhya Pinda, Vimshottari/Yogini/Jaimini, Indu Lagna, Tara Chakra, transits, four-fold scaffolds." },
       { id: "viewA-vapmnakreport", label: "VAPM + Nakshatra Report", desc: "Full export (Lahiri): the whole VAPM export plus the §15 Nakshatra Layer — within-nakshatra degrees, Gandanta (48′/3°20′), Abhijit, Navatara points, pada-level navamsa dignity, Nadi/dosha and Yoni/Gana matching factors." },
       { id: "viewA-consolidatedmaster", label: "Consolidated Master Run", desc: "One-sheet master run covering all four projects (Lahiri): Mehta+Sutton (VAPM), Trinetra (Promise/Star/Time), Umesh Puri (LP+Gochar) and Triveni (BPHS·BJ·PD). Part I is the universal computed data core — incl. §I-H, a 37-pointer weighted three-frame Sudarshan Planetary Strength composite with a score out of 100 per planet (intensity, not auspiciousness of results); Part II re-frames it through each project's method lens." },
+      { id: "viewA-medastro", label: "Medical Astrology Deep Analysis", desc: "The Medical-Astrology export (Lahiri · sidereal · Parashari) per the VedNetra Export Guide: birth details; Lagna with nakshatra/pada, lord and KP sub-lord; all 9 grahas with sign, house, degree, total zodiac°, nakshatra/pada/lord, KP sub-lord, retrograde, combustion, dignity, daily motion and dispositor; Gulika/Mandi and the bhava madhya of 6/8/12; Placidus house cusps; house lords; the four divisional charts D-9, D-3, D-30, D-6; Vimshottari (running MD/AD/PD + full sequence); Shadbala rupas; full Ashtakavarga (Bhinnashtakavarga per planet + Sarvashtakavarga); yogas; and current transits with house-from-Moon and house-from-Lagna. Download Markdown." },
       { id: "viewA-bnnexport", label: "BNN Chart Export", desc: "The Bhrigu Nandi Nadi chart export (spec 1.0) — a deliberately karaka/transit-only contract: NO dasha, divisional charts, Ashtakavarga, house cusps/lords or strength scores (sending them drifts the reading out of system). §A native (sex mandatory — it swaps karakas) · §B natal positions to the arc-second with Abs°, nakshatra/pada, retrograde, dignity, combustion and direction, plus last/first-degree, rasi-sandhi and graha-yuddha flags · §C1 exchanges (parivartana) with the effective chart, §C2 sign contents in degree order, §C3 direction groups, §C4 nodal arc (inside/outside + degree phase), §C5 per-planet connections, §C6 graded isolation, §C7 BNN aspects (direct 2/5/7/9, retro variant), §C8 chains, §C9 pairs · §D transit positions with on-natal hits · §E1 ingresses, §E2 exact crossings with pass numbers (every retro-loop hit), §E3 stations, §E4 windows, §E5 fine Sun/Moon triggers (90-day window) · §F the Jupiter clock · §H the full Vimshottari clock (running MD/AD/PD/SD + each lord's natal position, the 120-year MD sequence, antardashas, pratyantar+sookshma, forward dasha calendar — the second timing lane: Vimshottari WHEN, BNN WHAT) · §G the prashna hora block when a Question is set. Spec 2.0. Facts only, no interpretation, no dasha-phala. Download Markdown." },
       { id: "viewA-avexport", label: "Ashtakavarga Export (JSON)", desc: "The full machine export (schema vednetra.ashtakavarga.v1) that feeds the 859-rule Ashtakavarga corpus — far more than the twelve SAV numbers and seven BAV rows. §01 chart & provenance (ayanamsa value, chart_basis=rasi, sunrise/sunset, paksha/tithi/weekday); §02 grahas + Lagna + Mandi with kakṣyā, house-from-lagna AND from-moon, rāśi AND navāṃśa dignity, retro/combust, Ṣaḍbala rūpas + 6 components; §03 the PRASTĀRA (full 8-donor × 12-sign grid per varga, not column sums); §04 three reduction states (raw · trikoṇa · ekādhipatya) with rāśi/graha/śodhya piṇḍas and the disputed policies; §05 SAV on both bases (337 & 386), the karaṇa complement (56/64), and every aggregate (vittāya, tīrtha, inner/outer, the four trikoṇas, life-third khaṇḍas, directions); §06 daśā; §07 transits (Saturn/Jupiter ingresses, sankranti, madhya-guru); §08 promise layer (house-lords, yogas, aspects, D9/D10/D12, special points); §09 checksums VedNetra asserts itself. Download JSON; a readable summary + checksum panel shows on screen." },
       { id: "viewA-avengine", label: "Ashtakvarga Engine Report", desc: "A question-routed predictive verdict on VedNetra's Ashtakavarga (SAV/BAV). Validates the invariant checksums (Sun 48·Moon 49·Mars 39·Mercury 54·Jupiter 56·Venus 52·Saturn 39·Lagna 49·SAV 337 — a failure voids the reading), routes the native's question to a governing house + kāraka, then shows the full PROMISE / MAGNITUDE / CAPACITY / DELIVERED / VERDICT % arithmetic with band, the shape cross-checks (four triads, inner/outer, 1st-vs-7th, 9th/10th/11th, cascade, prosperity sums), a 7-instrument TIMING grade with a dated window where a slow transit locks, the AMN-BAV-033 transfer check, what would falsify it, and what it cannot say. Set the Question/topic in the chart form to route it. Figures VedNetra-computed; AMN/PAA/RSG/ENGINE rule IDs are engine-spec references (scaffold)." },
@@ -25230,6 +25249,174 @@
     });
   }
   // ================================================================
+  // MEDICAL ASTROLOGY DEEP ANALYSIS export — the "VedNetra Export Guide for
+  // Medical Astrology" §1–§15: birth, lagna (with KP sub-lord), all 9 grahas
+  // (KP sub-lord, dignity, motion, dispositor), Gulika/Mandi + bhava madhya of
+  // 6/8/12, Placidus house cusps, house lords, D-9/D-3/D-30/D-6, Vimshottari,
+  // Shadbala rupas, Ashtakavarga (BAV + SAV), yogas, and current transits.
+  // Lahiri · sidereal · Parashari. Sub-lords computed on the Lahiri longitudes.
+  // ================================================================
+  function vnMedAstroMarkdown(chart, input) {
+    if (input && input.birthInstant && chart.ayanamshaKey !== "lahiri") {
+      try { chart = buildChart(input.birthInstant, Number(input.latitude), Number(input.longitude), Number(input.timezone), { ascendantOverride: input.ascendantOverride, ayanamshaKey: "lahiri" }); } catch (e) {}
+    }
+    var asc = chart.ascendant, P = chart.planetsByName, order = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"], classical = CLASSICAL_PLANETS;
+    var tz = Number(input && input.timezone) || 0, lat = Number(input && input.latitude), lon = Number(input && input.longitude);
+    var nowMs = (input && input.asOfInstant && input.asOfInstant.getTime) ? input.asOfInstant.getTime() : Date.now();
+    var L = [];
+    function row(c) { return "| " + c.join(" | ") + " |"; }
+    function sep(n) { return "|" + new Array(n + 1).join("---|"); }
+    function dms(deg) { var d = Math.floor(deg), mf = (deg - d) * 60, m = Math.floor(mf), s = Math.round((mf - m) * 60); if (s === 60) { s = 0; m++; } if (m === 60) { m = 0; d++; } return d + ":" + pad(m) + ":" + pad(s); }
+    var DIGN = { "Exalted": "Exalted", "Moolatrikona": "Moolatrikona", "Own sign": "Own Sign", "Friendly sign": "Friend", "Neutral sign": "Neutral", "Enemy sign": "Enemy", "Debilitated": "Debilitated" };
+    var moonSign = P.Moon ? P.Moon.sign : asc.sign;
+
+    L.push("# MEDICAL ASTROLOGY DEEP ANALYSIS — VedNetra Export");
+    L.push("");
+    L.push("_Ayanamsa **Lahiri/Chitrapaksha** · **Sidereal** zodiac · **Parashari** system · whole-sign rasi with Placidus bhava cusps · nodes: **Mean** (VedNetra build; True node not available — flagged per guide). Sub-lords (KP) computed on the Lahiri longitudes for one-ayanamsa consistency. Generated " + new Date(nowMs).toISOString().slice(0, 19).replace("T", " ") + "._");
+    L.push("");
+
+    // ---- SECTION 1 ----
+    L.push("## SECTION 1: Birth Details");
+    L.push("- **Name:** " + ((input && (input.nativeName || input.name)) || "—") + "   **Gender:** " + ((input && input.gender) || "—"));
+    L.push("- **Date of birth:** " + (input && input.birthInstant ? new Date(input.birthInstant.getTime() + tz * 3600000).toISOString().slice(0, 10).split("-").reverse().join("-") : "—"));
+    L.push("- **Time of birth:** " + (input && input.birthInstant ? new Date(input.birthInstant.getTime() + tz * 3600000).toISOString().slice(11, 19) : "—"));
+    L.push("- **Place:** " + ((input && input.birthPlace) || "—") + "   **Lat:** " + (Number.isFinite(lat) ? lat : "—") + "   **Lon:** " + (Number.isFinite(lon) ? lon : "—") + "   **TZ:** " + tz);
+    L.push("");
+
+    // ---- SECTION 2 ----
+    var ascKp = kpLordInfo(asc.lon), ascNak = nakshatraInfo(asc.lon);
+    L.push("## SECTION 2: Ascendant (Lagna)");
+    L.push("- **Sign / degree:** " + SIGNS[asc.sign].name + " " + dms(asc.lon - asc.sign * 30));
+    L.push("- **Nakshatra + Pada:** " + NAKSHATRAS[ascNak.index] + " Pada " + ascNak.pada);
+    L.push("- **Nakshatra Lord:** " + NAK_LORDS[ascNak.index]);
+    L.push("- **Sub-Lord (KP):** " + ascKp.subLord);
+    L.push("");
+
+    // ---- SECTION 3 ----
+    L.push("## SECTION 3: Planetary Positions (All 9 Grahas)");
+    L.push(row(["Planet", "Sign", "House", "Deg in sign", "Total°", "Nakshatra", "Pada", "Nak Lord", "Sub-Lord", "Retro", "Comb", "Dignity", "Daily motion", "Sign Lord"])); L.push(sep(14));
+    order.forEach(function (n) {
+      var p = P[n]; if (!p) return; var isNode = (n === "Rahu" || n === "Ketu");
+      var nk = nakshatraInfo(p.lon), kp = kpLordInfo(p.lon), motion = vnCcDailyMotion(n, chart.jd);
+      L.push(row([n, p.signName, "H" + p.house, dms(p.deg), (Math.round(p.lon * 1000) / 1000).toFixed(3), NAKSHATRAS[nk.index], nk.pada, NAK_LORDS[nk.index], kp.subLord, p.retrograde ? "Yes" : "No", isNode ? "—" : (p.combust ? "Yes" : "No"), isNode ? "—" : (DIGN[p.dignity] || p.dignity || "—"), (motion >= 0 ? "+" : "") + motion.toFixed(4) + "°/day", SIGNS[p.sign].lord]));
+    });
+    L.push("");
+
+    // ---- SECTION 4 + 5 : cusps ----
+    var cusps = null; try { cusps = kpCusps(chart, chart.ayanamsa); } catch (e) {}
+    L.push("## SECTION 4: Special Sensitive Points");
+    try { var gul = standingGulika(chart, input, {}); L.push("- **Gulika:** " + (gul ? gul.signName + ", H" + gul.house + ", " + dms(gul.deg) : "—")); } catch (e) { L.push("- **Gulika:** —"); }
+    try { var man = standingGulika(chart, input, { atEnd: true }); L.push("- **Mandi:** " + (man ? man.signName + ", H" + man.house + ", " + dms(man.deg) : "—")); } catch (e) { L.push("- **Mandi:** —"); }
+    if (cusps) {
+      function madhya(h) { var c = cusps[h - 1]; return SIGNS[c.sign].name + " " + dms(c.deg); }
+      L.push("- **Bhava Madhya (Placidus cusp) — 6th:** " + madhya(6) + "   **8th:** " + madhya(8) + "   **12th:** " + madhya(12));
+    } else { L.push("- **Bhava Madhya (6/8/12):** cusps unavailable for this latitude"); }
+    L.push("");
+    L.push("## SECTION 5: House Cusps (Bhava Chart — Placidus)");
+    L.push(row(["House", "Cusp sign", "Exact degree", "Cusp sign-lord", "Sub-Lord (KP)"])); L.push(sep(5));
+    if (cusps) cusps.forEach(function (c) { L.push(row(["H" + c.house, SIGNS[c.sign].name, dms(c.deg), c.signLord, c.kp.subLord])); });
+    else L.push("_Placidus cusps unavailable for this latitude; whole-sign houses in §3 stand._");
+    L.push("");
+
+    // ---- SECTION 6 ----
+    L.push("## SECTION 6: House Lords Table (whole-sign)");
+    var hl = []; for (var h = 1; h <= 12; h++) hl.push("H" + h + " = " + SIGNS[normalizeSign(asc.sign + h - 1)].lord);
+    L.push(hl.join(" · "));
+    L.push("");
+
+    // ---- SECTION 7-10 : divisional charts ----
+    function vargaBlock(title, dvara, wantHouse) {
+      L.push(title);
+      var head = wantHouse ? ["Body", "Sign", "House"] : ["Body", "Sign"];
+      L.push(row(head)); L.push(sep(head.length));
+      var lagVarga = vargaSign(asc.lon, dvara);
+      if (wantHouse) L.push(row(["Ascendant", SIGNS[lagVarga].name, "H1"]));
+      else L.push(row(["Ascendant", SIGNS[lagVarga].name]));
+      order.forEach(function (n) { var p = P[n]; if (!p) return; var vs = vargaSign(p.lon, dvara); if (wantHouse) L.push(row([n, SIGNS[vs].name, "H" + houseFromSign(lagVarga, vs)])); else L.push(row([n, SIGNS[vs].name])); });
+      L.push("");
+    }
+    vargaBlock("## SECTION 7: Navamsa Chart (D-9)", 9, true);
+    vargaBlock("## SECTION 8: Drekkana Chart (D-3)", 3, true);
+    vargaBlock("## SECTION 9: Trimsamsa Chart (D-30)", 30, false);
+    vargaBlock("## SECTION 10: Shashthamsa Chart (D-6)", 6, false);
+
+    // ---- SECTION 11 : Vimshottari ----
+    L.push("## SECTION 11: Vimshottari Dasha");
+    try {
+      var vim = chart.vimshottari, stack = findDashaStack(vim.timeline, new Date(nowMs));
+      var lvl = ["Mahadasha", "Antardasha", "Pratyantardasha"];
+      L.push("**Currently running:**");
+      for (var i = 0; i < 3; i++) { var pr = stack[i]; L.push("- **" + lvl[i] + ":** " + (pr ? pr.lord + "  (" + new Date(pr.start.getTime()).toISOString().slice(0, 10) + " → " + new Date(pr.end.getTime()).toISOString().slice(0, 10) + ")" : "—")); }
+      L.push("");
+      L.push("**Full Mahadasha sequence:**");
+      L.push(row(["#", "Lord", "From", "To"])); L.push(sep(4));
+      vim.timeline.slice(0, 9).forEach(function (md, k) { L.push(row([k + 1, md.lord, new Date(md.start.getTime()).toISOString().slice(0, 10), new Date(md.end.getTime()).toISOString().slice(0, 10)])); });
+    } catch (e) { L.push("_Vimshottari unavailable._"); }
+    L.push("");
+
+    // ---- SECTION 12 : Shadbala ----
+    L.push("## SECTION 12: Shadbala (Six-Fold Strength)");
+    L.push(row(["Planet", "Total Shadbala (Rupas)"])); L.push(sep(2));
+    try { var sbrows = {}; shadbalaRows(chart).forEach(function (r) { sbrows[r.planet] = r; }); classical.forEach(function (n) { L.push(row([n, sbrows[n] ? sbrows[n].rupas.toFixed(2) : "—"])); }); } catch (e) { L.push("_Shadbala unavailable._"); }
+    L.push("");
+
+    // ---- SECTION 13 : Ashtakavarga ----
+    L.push("## SECTION 13: Ashtakavarga");
+    try {
+      var bySign = sarvashtakavargaBySign(chart);
+      var signNames = SIGNS.map(function (s) { return s.name.slice(0, 3); });
+      L.push("**Bhinnashtakavarga (bindus per sign, Aries→Pisces):**");
+      L.push(row(["Planet"].concat(signNames).concat(["Total"]))); L.push(sep(14));
+      classical.forEach(function (n) { var vals = SIGNS.map(function (_, s) { return bySign[s].bav[n]; }); L.push(row([n].concat(vals).concat([vals.reduce(function (a, b) { return a + b; }, 0)]))); });
+      L.push("");
+      var sav = SIGNS.map(function (_, s) { return bySign[s].sav; });
+      L.push("**Sarvashtakavarga (total bindus per sign):**");
+      L.push(row(["SAV"].concat(signNames).concat(["Grand"]))); L.push(sep(14));
+      L.push(row(["Bindus"].concat(sav).concat([sav.reduce(function (a, b) { return a + b; }, 0)])));
+    } catch (e) { L.push("_Ashtakavarga unavailable._"); }
+    L.push("");
+
+    // ---- SECTION 14 : Yogas ----
+    L.push("## SECTION 14: Yogas Present");
+    try {
+      var yogas = scanYogas(chart);
+      if (yogas.length) { L.push(row(["Yoga", "Planets", "Category/Strength"])); L.push(sep(3)); yogas.forEach(function (y) { L.push(row([y.name, (y.planets || []).join(", ") || "—", y.category || y.strength || "—"])); }); }
+      else L.push("_No named yogas detected by VedNetra's scanner._");
+    } catch (e) { L.push("_Yoga scan unavailable._"); }
+    L.push("");
+
+    // ---- SECTION 15 : Current transits ----
+    L.push("## SECTION 15: Current Transits (as of " + new Date(nowMs).toISOString().slice(0, 10) + ")");
+    L.push(row(["Planet", "Transit sign", "House from Moon", "House from Lagna"])); L.push(sep(4));
+    try {
+      var tr = buildChart(new Date(nowMs), lat, lon, tz, { ayanamshaKey: "lahiri" });
+      order.forEach(function (n) { var p = tr.planetsByName[n]; if (!p) return; L.push(row([n, p.signName, "H" + houseFromSign(moonSign, p.sign), "H" + houseFromSign(asc.sign, p.sign)])); });
+    } catch (e) { L.push("_Transit chart unavailable._"); }
+    L.push("");
+    L.push("_Notes: Combustion auto-calculated (Moon 12° · Mars 17° · Mercury 14° · Jupiter 11° · Venus 10° · Saturn 15°). House cusps are Placidus on the Lahiri chart; §3 houses are whole-sign from the Lagna. Dignity friendship uses VedNetra's natural-relationship table. Nodes are Mean (True node not offered by this build)._");
+    return L.join("\n");
+  }
+  function medAstroSection(chart, input) {
+    var md;
+    try { md = vnMedAstroMarkdown(chart, input); }
+    catch (e) { md = "Could not build the Medical Astrology export: " + (e && e.message ? e.message : e); }
+    return '<section id="viewA-medastro" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Master Export</p><h3>Medical Astrology Deep Analysis</h3></div><span class="small-pill">Lahiri · Parashari</span></div>' +
+      '<p class="fine-print">The <strong>“Medical Astrology Deep Analysis”</strong> export (Lahiri · sidereal · Parashari) — §1 birth details · §2 Lagna with nakshatra, lord &amp; KP sub-lord · §3 all nine grahas (sign, house, degree, total°, nakshatra/pada/lord, <strong>KP sub-lord</strong>, retro, combust, dignity, daily motion, dispositor) · §4 Gulika/Mandi + <strong>bhava madhya of 6/8/12</strong> · §5 <strong>Placidus house cusps</strong> · §6 house lords · §7–§10 the four divisionals <strong>D-9, D-3, D-30, D-6</strong> · §11 Vimshottari (running MD/AD/PD + full sequence) · §12 Shadbala rūpas · §13 <strong>Ashtakavarga</strong> (BAV per planet + SAV) · §14 yogas · §15 current transits (house from Moon &amp; Lagna). Sub-lords computed on the Lahiri longitudes; nodes Mean.</p>' +
+      '<div class="vn-tool-actions" style="margin:10px 0"><button type="button" id="vnMedMd" class="primary-action vn-generate-btn">Download Markdown</button> <button type="button" id="vnMedCopy" class="input-toggle-btn">Copy</button> <span id="vnMedStatus" class="fine-print"></span></div>' +
+      '<div class="panel-box"><pre class="vn-native-pre" style="max-height:560px;overflow:auto">' + escapeHtml(md) + '</pre></div>' +
+      '</section>';
+  }
+  function wireMedAstroControls(chart, input) {
+    var mdBtn = document.getElementById("vnMedMd");
+    if (mdBtn) mdBtn.addEventListener("click", function () { try { var md = vnMedAstroMarkdown(chart, input); var blob = new Blob([md], { type: "text/markdown" }); var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "medical-astrology-deep-analysis.md"; a.click(); } catch (e) {} });
+    var copy = document.getElementById("vnMedCopy");
+    if (copy) copy.addEventListener("click", function () {
+      var md = vnMedAstroMarkdown(chart, input), status = document.getElementById("vnMedStatus");
+      function done() { if (status) { status.textContent = "Copied!"; setTimeout(function () { status.textContent = ""; }, 2500); } }
+      try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(md).then(done, function () { vnCcFallbackCopy(md, done); }); else vnCcFallbackCopy(md, done); } catch (e) { vnCcFallbackCopy(md, done); }
+    });
+  }
+  // ================================================================
   // KP SYSTEM REPORT — dedicated Krishnamurti-Paddhati export.
   // Krishnamurti ayanamsa (Lahiri − 0.1°), Placidus cusps, mean nodes,
   // sub-lords to the second. Emits the KP-VEDNETRA-EXPORT format (Part A
@@ -25509,7 +25696,7 @@
     L.push("Ayanamsa       : Krishnamurti (KP-Old)   value " + decimalToDms(kp.ayanamsa) + "   (= Lahiri Chitrapaksha − 6′00″; e.g. 2001 = 23°46′32″)");
     L.push("House system   : Placidus");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.121");
+    L.push("Software / ver : VedNetra 1.122");
     L.push("Native         : " + nm + "            Sex: " + ((input && input.gender) || "-"));
     L.push("DoB / ToB      : " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
@@ -25762,7 +25949,7 @@
     L.push("KP number      : " + hnum + " / 249");
     L.push("House system   : " + kp.houseSystem + "  (equal 30° cusps from the number-seed ascendant — VedNetra KP-horary convention)");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.121");
+    L.push("Software / ver : VedNetra 1.122");
     L.push("Question       : " + ((input && input.question) ? String(input.question) : "-"));
     L.push("Judgment moment: " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
