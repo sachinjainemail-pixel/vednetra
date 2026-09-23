@@ -6170,6 +6170,7 @@
       { id: "viewA-medastro",       label: "Medical Astrology Deep Analysis", render: function () { return medAstroSection(chart, input); }, wire: function () { wireMedAstroControls(chart, input); } },
       { id: "viewA-ududaya",        label: "UduDaya Report (Udu)", render: function () { return uduDaySection(chart, input); }, wire: function () { wireUduDayaControls(chart, input); } },
       { id: "viewA-ukn",            label: "Udu Kaal Nirnay Report (UKN)", render: function () { return uknSection(chart, input); }, wire: function () { wireUknControls(chart, input); } },
+      { id: "viewA-ganesha5",       label: "SHRI GANESHA 5 IN ONE Report", render: function () { return ganesha5Section(chart, input); }, wire: function () { wireGanesha5Controls(chart, input); } },
       { id: "viewA-trivenireport",  label: "Triveni Intake", render: function () { return triveniReportSection(chart, input); }, wire: function () { wireTriveniReportControls(chart, input); } },
       { id: "viewA-trinetrareport", label: "Trinetra Master Run", render: function () { return trinetraReportSection(chart, input); }, wire: function () { wireTrinetraReportControls(chart, input); } },
       { id: "viewA-kpreport",       label: "KP System Report", render: function () { return kpReportSection(chart, input); }, wire: function () { wireKpReportControls(chart, input); } },
@@ -13785,6 +13786,7 @@
       ["medastro", "Medical Astrology Deep Analysis (Lahiri · Parashari · §1–§15)"],
       ["ududaya", "UduDaya Report (Udu · nakshatra-first · §1–§13)"],
       ["ukn", "Udu Kaal Nirnay Report (UKN · Udu+KN merged · §0–§25)"],
+      ["ganesha5", "SHRI GANESHA 5 IN ONE Report (Lahiri · Placidus · JSON)"],
       ["triveni", "Triveni Chart Intake (Lahiri · §0–§10)"],
       ["trinetra", "Trinetra Master Run (Lahiri · §0–§8 · Promise/Star/Time)"],
       ["vapmnak", "VAPM + Nakshatra Report (Lahiri · §1–§15 + Part B)"],
@@ -13892,6 +13894,10 @@
     }
     if (reportType === "ukn") {
       downloadUknReport(format);
+      return;
+    }
+    if (reportType === "ganesha5") {
+      downloadGanesha5Report(format);
       return;
     }
     if (reportType === "kp") {
@@ -14099,6 +14105,18 @@
       downloadBlob(filenameBase + ".txt", "text/plain;charset=utf-8", text);
       showToast("✓ UduDaya export — Text download started");
     } catch (error) { console.error(error); alertUser("UduDaya export could not be built: " + (error && error.message ? error.message : error)); }
+  }
+  function downloadGanesha5Report(format) {
+    try {
+      var input = lastReportInput || readInput();
+      var chart = lastReportChart || buildChart(input.birthInstant, input.latitude, input.longitude, input.timezone, { ascendantOverride: input.ascendantOverride, ayanamshaKey: input.ayanamshaKey || "lahiri" });
+      var text = vnGanesha5Json(chart, input);
+      lastPlainReport = text; lastPlainReports.chartData = text;
+      var filenameBase = reportDownloadFilenameBase() + "_Shri_Ganesha_5_in_1";
+      if (format === "pdf") { downloadBlob(filenameBase + ".pdf", "application/pdf", makeSimplePdf(text)); showToast("✓ Shri Ganesha 5-in-1 — PDF download started"); return; }
+      downloadBlob(filenameBase + ".json", "application/json;charset=utf-8", text);
+      showToast("✓ Shri Ganesha 5-in-1 — JSON download started");
+    } catch (error) { console.error(error); alertUser("Shri Ganesha 5-in-1 export could not be built: " + (error && error.message ? error.message : error)); }
   }
   function downloadUknReport(format) {
     try {
@@ -18644,6 +18662,7 @@
       { id: "viewA-medastro", label: "Medical Astrology Deep Analysis", desc: "The Medical-Astrology export (Lahiri · sidereal · Parashari) per the VedNetra Export Guide: birth details; Lagna with nakshatra/pada, lord and KP sub-lord; all 9 grahas with sign, house, degree, total zodiac°, nakshatra/pada/lord, KP sub-lord, retrograde, combustion, dignity, daily motion and dispositor; Gulika/Mandi and the bhava madhya of 6/8/12; Placidus house cusps; house lords; the four divisional charts D-9, D-3, D-30, D-6; Vimshottari (running MD/AD/PD + full sequence); Shadbala rupas; full Ashtakavarga (Bhinnashtakavarga per planet + Sarvashtakavarga); yogas; and current transits with house-from-Moon and house-from-Lagna. Download Markdown." },
       { id: "viewA-ududaya", label: "UduDaya Report (Udu)", desc: "The UduDaya nakshatra-first export (Lahiri · sidereal), a fixed-width plain-ASCII block with pada carried throughout: §1 birth data (sunrise/sunset, weekday, LMT correction) · §2 Lagna with nakshatra/pada, navamsa and lagna-lord placement · §3 all nine grahas — longitude, sign, house, nakshatra/pada/lord, navamsa/lord, retrograde, combustion, dignity, vargottama, pushkara (navamsa/bhaga) and gandanta flags · §4 nakshatra occupancy map (all 27) · §5 house lords with cusp nakshatra and lord nakshatra · §6 Vimshottari — Moon nakshatra, balance, the nine-mahadasha sequence with each lord's natal nakshatra and dignity, antardashas of the current and next MD, and pratyantardashas of the current AD · §7 the full age-activation grid 0→100 (all 101 rows, MD/AD per year) · §8 Navatara / Tara Bala from the Moon with grahas per tara · §9 gandanta, gandmula occupancy and panchak · §10 attributes of occupied nakshatras (deity, shakti, symbol, gana, yoni, varna, guna, tattva, nadi, direction, body part, lord, lunar month, tithi) · §11 compatibility (on match request) · §12 transit snapshot with Sade Sati and Kantak Shani · §13 metadata. Download Text." },
       { id: "viewA-ukn", label: "Udu Kaal Nirnay Report (UKN)", desc: "The Udu Kaal Nirnay (UKN) merged export (Lahiri) — the single input contract carrying everything both the promise (Udu) and timing (Kaal-Nirnay) layers need, §0–§25, and it produces DATA, never a reading: §0 intake &amp; 14-event ledger with clock grade · §1 birth data with day/night, hora lord of Lagna, paksha · §2 Lagna with sub-lord, vargottama window, rising mode, badhaka, Moon/Sun/Hora Lagna · §3 the nine grahas — nakshatra/pada/lord plus sub-lord, rasi-lord (dispositor), drekkana, functional nature, degree-zone and speed · §4 nakshatra occupancy · §5 house lords by nakshatra · §6 the six-route influence matrix (lordship/occupation/aspect/via-star-lord/via-rasi-lord/indirect) with the inverse house index · §7 inter-planet distance matrices in D-1 and D-9 (6/8/12 flagged) · §8 aspect table · §9 functional classification (yogakaraka, kendra/trikona/dusthana lords, ranked marakas, 22nd-drekkana lord, separative, Gulika/Mandi) · §10 longevity band by the three pairs with the scaled-family cross-check · §11 ten divisional charts D-2/3/4/7/9/10/12/20/24/30 · §12 Shadbala with rank · §13 Ashtakavarga BAV+SAV with the 28 neutral line · §14 Vimshottari to Pratyantardasha with each lord's nakshatra, dignity and functional nature · §15 the conditional-dasha qualification tests (pass/fail with the deciding value) · §16 corroborating dasha chains · §17 age-activation grid 0→100 · §18 Navatara/Tara Bala · §19 gandanta/mula/panchak · §20 nakshatra attributes · §21 transit snapshot + forward crossing calendar (Saturn/Jupiter ingresses, next aspect to the 7th lord, Sun ingresses, progress Lagna) · §22 trigger sensitive points (sahams, returns, sensitive zones) · §23 compatibility on request · §24 derived-house map for relatives · §25 metadata. Honest gaps (rasi-based dashas, eclipse ephemeris, entry chart) are flagged in-line. Download Text." },
+      { id: "viewA-ganesha5", label: "SHRI GANESHA 5 IN ONE Report", desc: "The Shri Ganesha 5-in-1 export — a validated JSON input contract for the four-school predictive engine (BNN swaps karaka by sex; KP layer; Vimshottari to age 90; optional vargas), cast on Lahiri ayanamsa with Placidus cusps. Emits: the source/ayanamsa/house-system header with the ayanamsa value; the native block (name, sex, place, birth civil time, tz, lat, lon); the Lagna with nakshatra, pada, star-lord and sub-lord; all twelve Placidus cusps as sidereal longitudes with per-cusp sub-lords, star-lords and house lords; all nine grahas (sidereal longitude to 4 decimals, sign with index and lord, degree-in-sign, Placidus house, nakshatra, pada, star-lord, sub-lord, sub-sub-lord, retrograde, combust and dignity); the complete Vimshottari Mahadasha/Antardasha/Pratyantardasha chain from birth to age 90 with the first row anchored to the birth date; the optional KP-ayanamsa cusp sub-lord frame; and the six divisional charts D-9, D-7, D-10, D-4, D-24 and D-30. Download JSON." },
       { id: "viewA-bnnexport", label: "BNN Chart Export", desc: "The Bhrigu Nandi Nadi chart export (spec 1.0) — a deliberately karaka/transit-only contract: NO dasha, divisional charts, Ashtakavarga, house cusps/lords or strength scores (sending them drifts the reading out of system). §A native (sex mandatory — it swaps karakas) · §B natal positions to the arc-second with Abs°, nakshatra/pada, retrograde, dignity, combustion and direction, plus last/first-degree, rasi-sandhi and graha-yuddha flags · §C1 exchanges (parivartana) with the effective chart, §C2 sign contents in degree order, §C3 direction groups, §C4 nodal arc (inside/outside + degree phase), §C5 per-planet connections, §C6 graded isolation, §C7 BNN aspects (direct 2/5/7/9, retro variant), §C8 chains, §C9 pairs · §D transit positions with on-natal hits · §E1 ingresses, §E2 exact crossings with pass numbers (every retro-loop hit), §E3 stations, §E4 windows, §E5 fine Sun/Moon triggers (90-day window) · §F the Jupiter clock · §H the full Vimshottari clock (running MD/AD/PD/SD + each lord's natal position, the 120-year MD sequence, antardashas, pratyantar+sookshma, forward dasha calendar — the second timing lane: Vimshottari WHEN, BNN WHAT) · §G the prashna hora block when a Question is set. Spec 2.0. Facts only, no interpretation, no dasha-phala. Download Markdown." },
       { id: "viewA-avexport", label: "Ashtakavarga Export (JSON)", desc: "The full machine export (schema vednetra.ashtakavarga.v1) that feeds the 859-rule Ashtakavarga corpus — far more than the twelve SAV numbers and seven BAV rows. §01 chart & provenance (ayanamsa value, chart_basis=rasi, sunrise/sunset, paksha/tithi/weekday); §02 grahas + Lagna + Mandi with kakṣyā, house-from-lagna AND from-moon, rāśi AND navāṃśa dignity, retro/combust, Ṣaḍbala rūpas + 6 components; §03 the PRASTĀRA (full 8-donor × 12-sign grid per varga, not column sums); §04 three reduction states (raw · trikoṇa · ekādhipatya) with rāśi/graha/śodhya piṇḍas and the disputed policies; §05 SAV on both bases (337 & 386), the karaṇa complement (56/64), and every aggregate (vittāya, tīrtha, inner/outer, the four trikoṇas, life-third khaṇḍas, directions); §06 daśā; §07 transits (Saturn/Jupiter ingresses, sankranti, madhya-guru); §08 promise layer (house-lords, yogas, aspects, D9/D10/D12, special points); §09 checksums VedNetra asserts itself. Download JSON; a readable summary + checksum panel shows on screen." },
       { id: "viewA-avengine", label: "Ashtakvarga Engine Report", desc: "A question-routed predictive verdict on VedNetra's Ashtakavarga (SAV/BAV). Validates the invariant checksums (Sun 48·Moon 49·Mars 39·Mercury 54·Jupiter 56·Venus 52·Saturn 39·Lagna 49·SAV 337 — a failure voids the reading), routes the native's question to a governing house + kāraka, then shows the full PROMISE / MAGNITUDE / CAPACITY / DELIVERED / VERDICT % arithmetic with band, the shape cross-checks (four triads, inner/outer, 1st-vs-7th, 9th/10th/11th, cascade, prosperity sums), a 7-instrument TIMING grade with a dated window where a slow transit locks, the AMN-BAV-033 transfer check, what would falsify it, and what it cannot say. Set the Question/topic in the chart form to route it. Figures VedNetra-computed; AMN/PAA/RSG/ENGINE rule IDs are engine-spec references (scaffold)." },
@@ -26336,7 +26355,7 @@
 
     // ============================================================ §25 METADATA
     L.push("§25  METADATA"); line();
-    L.push("VedNetra build    : v1.124");
+    L.push("VedNetra build    : v1.125");
     L.push("Section           : viewA-ukn");
     L.push("Spec version      : UKN spec v1.0  (supersedes UduDaya §1-§13)");
     L.push("Ayanamsa          : Lahiri  " + dms2(chart.ayanamsa));
@@ -26364,6 +26383,138 @@
       var txt = vnUknText(chart, input), status = document.getElementById("vnUknStatus");
       function done() { if (status) { status.textContent = "Copied!"; setTimeout(function () { status.textContent = ""; }, 2500); } }
       try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, function () { vnCcFallbackCopy(txt, done); }); else vnCcFallbackCopy(txt, done); } catch (e) { vnCcFallbackCopy(txt, done); }
+    });
+  }
+  // ================================================================
+  // SHRI GANESHA 5-IN-ONE REPORT — the JSON input contract for the
+  // four-school predictive engine (BNN swaps karaka by sex, KP layer,
+  // Vimshottari to age 90, optional vargas). Lahiri + Placidus cusps.
+  // Emits a validated JSON object, not a text block.
+  // ================================================================
+  var VN_G5_CODE = { Sun: "SU", Moon: "MO", Mars: "MA", Mercury: "ME", Jupiter: "JU", Venus: "VE", Saturn: "SA", Rahu: "RA", Ketu: "KE" };
+  function vnG5DignityWord(planet, sign) {
+    if (EXALTATION[planet] === sign) return "exalted";
+    if (DEBILITATION[planet] === sign) return "debilitated";
+    if (VN_SB_MT_SIGN[planet] === sign) return "moolatrikona";
+    if (SIGNS[sign].lord === planet) return "own sign";
+    var rel = vnNaturalRel(planet, SIGNS[sign].lord);
+    return rel === "friend" ? "friendly" : rel === "enemy" ? "enemy" : "neutral";
+  }
+  function vnGanesha5Data(chart, input) {
+    if (input && input.birthInstant && chart.ayanamshaKey !== "lahiri") {
+      try { chart = buildChart(input.birthInstant, Number(input.latitude), Number(input.longitude), Number(input.timezone), { ascendantOverride: input.ascendantOverride, ayanamshaKey: "lahiri" }); } catch (e) {}
+    }
+    var asc = chart.ascendant, P = chart.planetsByName;
+    var order = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
+    var tz = Number(input && input.timezone) || 0, lat = Number(input && input.latitude), lon = Number(input && input.longitude);
+    function code(name) { return VN_G5_CODE[name] || name; }
+    function r4(x) { return Math.round(x * 10000) / 10000; }
+    function fmtDay(d) { return new Date((d.getTime ? d.getTime() : d) + tz * 3600000).toISOString().slice(0, 10); }
+    // Lahiri Placidus cusps
+    var cuspArr = null; try { cuspArr = kpCusps(chart, chart.ayanamsa); } catch (e) {}
+    function placidusHouse(l) { if (cuspArr) { var h = kpHouseFromCusps(normalize(l), cuspArr); if (h) return h; } return houseFromSign(asc.sign, signIndex(l)); }
+    // KP-ayanamsa frame (optional block)
+    var kpChart = null; try { kpChart = buildKpChart(chart); } catch (e) {}
+    var genderRaw = String((input && input.gender) || "").trim().toLowerCase();
+    var sex = (genderRaw === "m" || genderRaw === "male") ? "M" : (genderRaw === "f" || genderRaw === "female") ? "F" : "";
+    var localBirth = (input && input.birthInstant) ? new Date(input.birthInstant.getTime() + tz * 3600000).toISOString().slice(0, 19) : null;
+
+    var out = {
+      source: "VedNetra 1.125",
+      ayanamsa: "Lahiri",
+      ayanamsa_value: r4(chart.ayanamsa),
+      house_system: "Placidus",
+      native: {
+        name: (input && (input.nativeName || input.name)) || "Native",
+        sex: sex,
+        place: (input && input.birthPlace) || "",
+        birth: localBirth,
+        tz: tz,
+        lat: Number.isFinite(lat) ? lat : null,
+        lon: Number.isFinite(lon) ? lon : null
+      },
+      lagna: (function () {
+        var nk = nakshatraInfo(asc.lon), kp = kpLordInfo(asc.lon);
+        return { lon: r4(asc.lon), sign: SIGNS[asc.sign].name, nakshatra: NAKSHATRAS[nk.index], pada: nk.pada, star_lord: code(nk.lord), sub_lord: code(kp.subLord) };
+      })(),
+      cusps: {}, cusp_sub_lords: {}, cusp_star_lords: {}, house_lords: {},
+      planets: {}, dasha: [], kp_ayanamsa_cusp_sub_lords: {},
+      vargas: { D9: {}, D7: {}, D10: {}, D4: {}, D24: {}, D30: {} }
+    };
+
+    // cusps + sub/star lords + house lords (Lahiri Placidus)
+    for (var h = 1; h <= 12; h++) {
+      var cLon, cSign;
+      if (cuspArr) { cLon = cuspArr[h - 1].lon; cSign = cuspArr[h - 1].sign; }
+      else { cLon = normalize(asc.lon + (h - 1) * 30); cSign = signIndex(cLon); }
+      var ckp = kpLordInfo(cLon);
+      out.cusps[h] = r4(cLon);
+      out.cusp_sub_lords[h] = code(ckp.subLord);
+      out.cusp_star_lords[h] = code(ckp.starLord);
+      out.house_lords[h] = code(SIGNS[cSign].lord);
+      if (kpChart && kpChart.cusps && kpChart.cusps[h - 1]) out.kp_ayanamsa_cusp_sub_lords[h] = code(kpChart.cusps[h - 1].kp.subLord);
+    }
+
+    // planets
+    order.forEach(function (n) {
+      var p = P[n]; if (!p) return; var nk = nakshatraInfo(p.lon), kp = kpLordInfo(p.lon), isNode = (n === "Rahu" || n === "Ketu");
+      var comb = false; if (!isNode && n !== "Sun" && P.Sun && COMBUST_ORB[n]) comb = angleDistance(p.lon, P.Sun.lon) <= COMBUST_ORB[n];
+      out.planets[code(n)] = {
+        lon: r4(p.lon), sign: SIGNS[p.sign].name, sign_index: p.sign, sign_lord: code(SIGNS[p.sign].lord),
+        degree_in_sign: r4(p.lon - p.sign * 30), house: placidusHouse(p.lon),
+        nakshatra: NAKSHATRAS[nk.index], pada: nk.pada, star_lord: code(nk.lord), sub_lord: code(kp.subLord), sub_sub_lord: code(kp.subSubLord),
+        retrograde: !!p.retrograde, combust: !!comb, dignity: vnG5DignityWord(n, p.sign)
+      };
+    });
+
+    // dasha MD/AD/PD from birth to age 90
+    try {
+      var timeline = chart.vimshottari.timeline, birthMs = input.birthInstant.getTime(), cutoff = birthMs + 90 * 365.2425 * DAY_MS;
+      function pushRow(level, lords, start, end) { var s = Math.max(start, birthMs); out.dasha.push({ level: level, lords: lords.map(code), lord: code(lords[lords.length - 1]), start: fmtDay(new Date(s)), end: fmtDay(new Date(end)), years: Math.round((end - s) / (365.2425 * DAY_MS) * 1000) / 1000 }); }
+      timeline.forEach(function (md) {
+        if (md.end.getTime() <= birthMs || md.start.getTime() >= cutoff) return;
+        pushRow(1, [md.lord], md.start.getTime(), md.end.getTime());
+        subPeriods(md, "AD").forEach(function (ad) {
+          if (ad.end.getTime() <= birthMs || ad.start.getTime() >= cutoff) return;
+          pushRow(2, [md.lord, ad.lord], ad.start.getTime(), ad.end.getTime());
+          subPeriods(ad, "PD").forEach(function (pd) {
+            if (pd.end.getTime() <= birthMs || pd.start.getTime() >= cutoff) return;
+            pushRow(3, [md.lord, ad.lord, pd.lord], pd.start.getTime(), pd.end.getTime());
+          });
+        });
+      });
+    } catch (e) {}
+
+    // vargas (optional; populated)
+    var vmap = { D9: 9, D7: 7, D10: 10, D4: 4, D24: 24, D30: 30 };
+    Object.keys(vmap).forEach(function (vk) {
+      try {
+        var vc = makeVargaChart(chart, vmap[vk]);
+        order.forEach(function (n) { var vp = vc.planetsByName[n]; if (vp) out.vargas[vk][code(n)] = { sign: SIGNS[vp.sign].name, sign_index: vp.sign, house: vp.house }; });
+      } catch (e) {}
+    });
+    return out;
+  }
+  function vnGanesha5Json(chart, input) { return JSON.stringify(vnGanesha5Data(chart, input), null, 1); }
+  function ganesha5Section(chart, input) {
+    var json;
+    try { json = vnGanesha5Json(chart, input); }
+    catch (e) { json = "Could not build the Shri Ganesha 5-in-1 export: " + (e && e.message ? e.message : e); }
+    var dashaCount = 0; try { dashaCount = vnGanesha5Data(chart, input).dasha.length; } catch (e) {}
+    return '<section id="viewA-ganesha5" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Master Export</p><h3>SHRI GANESHA 5 IN ONE Report</h3></div><span class="small-pill">Lahiri · Placidus · JSON</span></div>' +
+      '<p class="fine-print">The <strong>“Shri Ganesha 5-in-1”</strong> export — the JSON input contract for the four-school predictive engine (BNN swaps karaka by <strong>sex</strong>, KP layer, Vimshottari to age 90, optional vargas). Lahiri ayanamsa with <strong>Placidus cusps</strong>: native block · Lagna with nakshatra/pada, star-lord &amp; sub-lord · all 12 <strong>Placidus cusps</strong> with cusp sub-lords, cusp star-lords and house lords · all nine grahas (sidereal longitude, sign/index/lord, degree-in-sign, Placidus house, nakshatra/pada, <strong>star-lord, sub-lord, sub-sub-lord</strong>, retrograde, combust, dignity) · the full <strong>Vimshottari MD/AD/PD chain from birth to age 90</strong> (' + dashaCount + ' rows) · the optional <strong>KP-ayanamsa cusp sub-lord frame</strong> · and the six divisional charts D-9/7/10/4/24/30. Validate with engine/validate_chart.py.</p>' +
+      '<div class="vn-tool-actions" style="margin:10px 0"><button type="button" id="vnG5Json" class="primary-action vn-generate-btn">Download JSON</button> <button type="button" id="vnG5Copy" class="input-toggle-btn">Copy</button> <span id="vnG5Status" class="fine-print"></span></div>' +
+      '<div class="panel-box"><pre class="vn-native-pre" style="max-height:560px;overflow:auto">' + escapeHtml(json) + '</pre></div>' +
+      '</section>';
+  }
+  function wireGanesha5Controls(chart, input) {
+    var jsonBtn = document.getElementById("vnG5Json");
+    if (jsonBtn) jsonBtn.addEventListener("click", function () { try { var json = vnGanesha5Json(chart, input); var blob = new Blob([json], { type: "application/json" }); var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "shri-ganesha-5-in-1.json"; a.click(); } catch (e) {} });
+    var copy = document.getElementById("vnG5Copy");
+    if (copy) copy.addEventListener("click", function () {
+      var json = vnGanesha5Json(chart, input), status = document.getElementById("vnG5Status");
+      function done() { if (status) { status.textContent = "Copied!"; setTimeout(function () { status.textContent = ""; }, 2500); } }
+      try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(json).then(done, function () { vnCcFallbackCopy(json, done); }); else vnCcFallbackCopy(json, done); } catch (e) { vnCcFallbackCopy(json, done); }
     });
   }
   // ================================================================
@@ -26646,7 +26797,7 @@
     L.push("Ayanamsa       : Krishnamurti (KP-Old)   value " + decimalToDms(kp.ayanamsa) + "   (= Lahiri Chitrapaksha − 6′00″; e.g. 2001 = 23°46′32″)");
     L.push("House system   : Placidus");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.124");
+    L.push("Software / ver : VedNetra 1.125");
     L.push("Native         : " + nm + "            Sex: " + ((input && input.gender) || "-"));
     L.push("DoB / ToB      : " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
@@ -26899,7 +27050,7 @@
     L.push("KP number      : " + hnum + " / 249");
     L.push("House system   : " + kp.houseSystem + "  (equal 30° cusps from the number-seed ascendant — VedNetra KP-horary convention)");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.124");
+    L.push("Software / ver : VedNetra 1.125");
     L.push("Question       : " + ((input && input.question) ? String(input.question) : "-"));
     L.push("Judgment moment: " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
