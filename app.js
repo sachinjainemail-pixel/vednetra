@@ -22414,18 +22414,40 @@
   // so their citation columns are left as a scaffold rather than gap-filled.
   // ================================================================
   var VN_TRI_HOUSE_KARAKA = { 1: "Sun", 2: "Jupiter", 3: "Mars", 4: "Moon", 5: "Jupiter", 6: "Mars", 7: "Venus", 8: "Saturn", 9: "Jupiter", 10: "Sun", 11: "Jupiter", 12: "Saturn" };
-  // Kaal Chakra (Kalachakra) dasha — the rasi/deha-rasi dasha. The deha-rasi
-  // walk is seeded from the Moon's navamsa sign (= its nakshatra-pada) and runs
-  // Savya (forward, padas 1/3) or Apasavya (reverse, padas 2/4). In this build
-  // the PERIOD LENGTHS are aligned to Vimshottari (same MD/AD/PD boundaries) so
-  // the two dashas can be read on one timeline, per configuration.
-  function vnKaalChakraRasis(moonLon) {
-    var nak = nakshatraInfo(moonLon), startSign = vargaSign(moonLon, 9);
-    var savya = (nak.pada === 1 || nak.pada === 3), step = savya ? 1 : -1, rasis = [];
-    for (var i = 0; i < 12; i++) rasis.push(((startSign + step * i) % 12 + 12) % 12);
-    return { startSign: startSign, savya: savya, pada: nak.pada, step: step, rasis: rasis };
+  // Kaala Chakra Dasha (Shakti Mohan Singh / BPHS Ch. 50) — GENUINE deha-rasi
+  // dasha with its own classical variable spans, NOT aligned to Vimshottari.
+  // Each nakshatra is divided into 9 amsas; the deha-rasi chain tiles the zodiac
+  // as a Savya block [Ar..Sg] (100y) then an Apasavya block [Pi Aq Cp Sg Sc Li
+  // Vi Le Cn] (86y), continuing across nakshatra boundaries. Per-sign years are
+  // the classical Kaala Chakra ayur. Antardashas proportion the MD by those years.
+  var VN_KCD_YEARS = [7, 16, 9, 21, 5, 9, 16, 7, 10, 4, 4, 10]; // Aries..Pisces
+  var VN_KCD_SAVYA = [0, 1, 2, 3, 4, 5, 6, 7, 8];                 // Ar Ta Ge Cn Le Vi Li Sc Sg
+  var VN_KCD_APASAVYA = [11, 10, 9, 8, 7, 6, 5, 4, 3];            // Pi Aq Cp Sg Sc Li Vi Le Cn
+  function vnKcdDehaForAmsa(g) { var r = ((g % 18) + 18) % 18; return r < 9 ? VN_KCD_SAVYA[r] : VN_KCD_APASAVYA[r - 9]; }
+  function vnKcdIsSavyaAmsa(g) { return (((g % 18) + 18) % 18) < 9; }
+  function vnKaalChakraDasha(chart, nowMs) {
+    var SOURA = 365.25 * DAY_MS, moon = chart.planetsByName.Moon, nak = nakshatraInfo(moon.lon);
+    var amsaSize = NAK_SIZE / 9, within = normalize(moon.lon) - nak.index * NAK_SIZE;
+    var amsaIndex = Math.min(8, Math.floor(within / amsaSize));
+    var frac = (within - amsaIndex * amsaSize) / amsaSize;
+    var g0 = nak.index * 9 + amsaIndex;
+    var dehaSign = vnKcdDehaForAmsa(g0), firstSavya = vnKcdIsSavyaAmsa(g0), jeevaSign = (dehaSign + 6) % 12;
+    var birthMs = chart.date.getTime();
+    var mds = [], cursor = birthMs, g = g0, first = true;
+    while (cursor < birthMs + 120 * SOURA && mds.length < 60) {
+      var sign = vnKcdDehaForAmsa(g), full = VN_KCD_YEARS[sign] * SOURA, span = first ? full * (1 - frac) : full;
+      mds.push({ sign: sign, startMs: cursor, endMs: cursor + span, years: span / SOURA }); cursor += span; g += 1; first = false;
+    }
+    mds.forEach(function (md, i) {
+      if (!(md.startMs <= nowMs && nowMs < md.endMs)) return;
+      var gg = g0 + i, isSav = vnKcdIsSavyaAmsa(gg), seq = isSav ? VN_KCD_SAVYA : VN_KCD_APASAVYA;
+      var paryayaTotal = seq.reduce(function (a, s) { return a + VN_KCD_YEARS[s]; }, 0), ads = [], c2 = md.startMs, spanMs = md.endMs - md.startMs;
+      seq.forEach(function (s) { var adSpan = spanMs * VN_KCD_YEARS[s] / paryayaTotal; ads.push({ sign: s, startMs: c2, endMs: c2 + adSpan, years: adSpan / SOURA }); c2 += adSpan; });
+      md.ads = ads;
+    });
+    var balMs = mds[0].endMs - birthMs, balY = Math.floor(balMs / SOURA), balRem = balMs - balY * SOURA, balMo = Math.floor(balRem / (30.4375 * DAY_MS)), balD = Math.round((balRem - balMo * 30.4375 * DAY_MS) / DAY_MS);
+    return { amsaIndex: amsaIndex, firstSavya: firstSavya, dehaSign: dehaSign, jeevaSign: jeevaSign, mds: mds, balanceLabel: balY + "y " + balMo + "m " + balD + "d" };
   }
-  function vnKcWalk(baseSign, j, step) { return ((baseSign + step * j) % 12 + 12) % 12; }
   function vnTrinetraMarkdown(chart, input) {
     if (input && input.birthInstant && chart.ayanamshaKey !== "lahiri") {
       try { chart = buildChart(input.birthInstant, Number(input.latitude), Number(input.longitude), Number(input.timezone), { ascendantOverride: input.ascendantOverride, ayanamshaKey: "lahiri" }); } catch (e) {}
@@ -22520,42 +22542,35 @@
       } catch (e) {}
     }
     L.push("");
-    // ---- Kaal Chakra Dasha — rasi/deha dasha, periods aligned to Vimshottari ----
+    // ---- Kaala Chakra Dasha (Shakti Mohan Singh) — GENUINE deha-rasi dasha ----
+    // Its own variable sign-year spans (Savya 100y / Apasavya 86y), NOT Vimshottari.
     try {
-      var kc = vnKaalChakraRasis(moon.lon);
-      function kcLabel(sgn) { return SIGNS[sgn].name + " (" + SIGNS[sgn].lord + ")"; }
-      L.push("**Kaal Chakra Dasha — rasi (deha) dasha, periods aligned to Vimshottari (MD → AD → PD):**");
-      L.push(row(["Level", "Rasi (lord)", "From", "To", "Now"])); L.push(sep(5));
-      var tl = d.timeline || [];
-      var cmIdx = -1;
-      tl.forEach(function (md, i) {
-        var cur = md.start.getTime() <= nowMs && nowMs < md.end.getTime();
-        if (cur) cmIdx = i;
-        L.push(row(["MD", kcLabel(kc.rasis[i % 12]), vnFmtFullDate(md.start.getTime()), vnFmtFullDate(md.end.getTime()), cur ? "◄ MD" : ""]));
-      });
-      var mdRasi = cmIdx >= 0 ? kc.rasis[cmIdx % 12] : kc.startSign;
-      var adRasi = mdRasi, adIdx = -1;
-      if (d.stack[0]) {
-        try {
-          var ads = subPeriods(d.stack[0], "AD");
-          ads.forEach(function (ad, j) {
-            var cur = ad.start.getTime() <= nowMs && nowMs < ad.end.getTime();
-            if (cur) { adIdx = j; adRasi = vnKcWalk(mdRasi, j, kc.step); }
-            L.push(row([" AD", kcLabel(vnKcWalk(mdRasi, j, kc.step)), vnFmtFullDate(ad.start.getTime()), vnFmtFullDate(ad.end.getTime()), cur ? "◄ AD" : ""]));
-          });
-        } catch (e) {}
-      }
-      if (d.stack[1]) {
-        try {
-          subPeriods(d.stack[1], "PD").forEach(function (pd, k) {
-            var cur = pd.start.getTime() <= nowMs && nowMs < pd.end.getTime();
-            L.push(row(["  PD", kcLabel(vnKcWalk(adRasi, k, kc.step)), vnFmtFullDate(pd.start.getTime()), vnFmtFullDate(pd.end.getTime()), cur ? "◄ PD" : ""]));
-          });
-        } catch (e) {}
-      }
-      L.push("_Deha-rasi seeded from the Moon's navamsa sign " + SIGNS[kc.startSign].name + " (nakshatra " + NAKSHATRAS[moonNak.index] + "-" + moonNak.pada + "), running " + (kc.savya ? "Savya (forward)" : "Apasavya (reverse)") + ". Period boundaries are the Vimshottari MD/AD/PD windows (120-year frame) per configuration, so Kaal Chakra and Vimshottari share one timeline; only the lords differ (rasi lords vs planetary lords)._");
+      var kcd = vnKaalChakraDasha(chart, nowMs);
+      L.push("## §I-9b · Kaala Chakra Dasha (Shakti Mohan Singh)");
+      L.push("_Genuine Kaala Chakra Dasha — deha-rasi (sign) dasha with its own classical spans (Savya paryaya 100y, Apasavya 86y), **not** aligned to Vimshottari. Deha = the dasha rasi; its lord shown in brackets._");
+      L.push(row(["Field", "Value"])); L.push(sep(2));
+      L.push(row(["Moon nakshatra · pada", NAKSHATRAS[moonNak.index] + "-" + moonNak.pada + " (amsa " + (kcd.amsaIndex + 1) + "/9 of the nakshatra)"]));
+      L.push(row(["Gati (direction)", kcd.firstSavya ? "Savya (forward) at birth" : "Apasavya (reverse) at birth"]));
+      L.push(row(["Birth Deha rasi", SIGNS[kcd.dehaSign].name + " (" + SIGNS[kcd.dehaSign].lord + ")"]));
+      L.push(row(["Birth Jeeva rasi", SIGNS[kcd.jeevaSign].name + " (" + SIGNS[kcd.jeevaSign].lord + ")"]));
+      L.push(row(["Balance at birth", SIGNS[kcd.dehaSign].name + "  " + kcd.balanceLabel]));
       L.push("");
-    } catch (e) { L.push("_Kaal Chakra Dasha unavailable._"); L.push(""); }
+      L.push("**Mahadasha sequence (deha rasi · MD → AD):**");
+      L.push(row(["Level", "Deha rasi (lord)", "From", "To", "Yrs", "Now"])); L.push(sep(6));
+      kcd.mds.forEach(function (md) {
+        var cur = md.startMs <= nowMs && nowMs < md.endMs;
+        L.push(row(["MD", SIGNS[md.sign].name + " (" + SIGNS[md.sign].lord + ")", vnFmtFullDate(md.startMs), vnFmtFullDate(md.endMs), md.years.toFixed(2), cur ? "◄ MD" : ""]));
+        if (cur && md.ads) {
+          md.ads.forEach(function (ad) {
+            var curAd = ad.startMs <= nowMs && nowMs < ad.endMs;
+            L.push(row([" AD", SIGNS[ad.sign].name + " (" + SIGNS[ad.sign].lord + ")", vnFmtFullDate(ad.startMs), vnFmtFullDate(ad.endMs), ad.years.toFixed(2), curAd ? "◄ AD" : ""]));
+          });
+        }
+      });
+      L.push("");
+      L.push("_Method (VedNetra 1.128): nakshatra divided into 9 amsas (1°28'53\"); deha-rasi chain = Savya block [Ar Ta Ge Cn Le Vi Li Sc Sg] then Apasavya block [Pi Aq Cp Sg Sc Li Vi Le Cn], continuing across nakshatra boundaries; per-sign years Ar7 Ta16 Ge9 Cn21 Le5 Vi9 Li16 Sc7 Sg10 Cp4 Aq4 Pi10; antardashas proportion the MD span by the paryaya sign-years. Verify the deha/jeeva and spans against the Shakti Mohan Singh KCD corpus; 1 minute of birth time shifts KCD dates ~2–4.5 months, so trust to dasha level unless the time is certain to the second._");
+      L.push("");
+    } catch (e) { L.push("## §I-9b · Kaala Chakra Dasha (Shakti Mohan Singh)"); L.push("_Kaala Chakra Dasha could not be computed: " + (e && e.message ? e.message : e) + "._"); L.push(""); }
     L.push("**Eye-specific data — PROMISE divisionals (area charts):**");
     var vg = [["D3", 3], ["D4", 4], ["D7", 7], ["D9", 9], ["D10", 10], ["D24", 24], ["D30", 30]];
     var vch = vg.map(function (v) { return makeVargaChart(chart, v[1]); });
@@ -22760,7 +22775,7 @@
     try { md = vnTrinetraMarkdown(chart, input); }
     catch (e) { md = "Could not build the report: " + (e && e.message ? e.message : e); }
     return '<section id="viewA-trinetrareport" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Master Export · Trinetra</p><h3>Trinetra Master Run</h3></div><span class="small-pill">Lahiri · §0–§8</span></div>' +
-      '<p class="fine-print">The three-eye worksheet — <strong>Promise → Star → Time</strong>, never blended — always cast on <strong>Lahiri (Chitrapaksha)</strong>. §0 intake &amp; ayanamsa gate (birth-time confidence, nine grahas, D9, full Vimshottari MD→AD→PD, <strong>Kaal Chakra Dasha (rasi/deha, periods aligned to Vimshottari)</strong>, area divisionals, Ashtakavarga, Jaimini karakas), §1 Eye 1 Promise (eight-factor engine, longevity ordinal, yogas + bhanga, RULES-APPLIED / CONTRARY scaffolds), §2 Eye 2 Star (nakshatra-pada + pada-vs-sign dignity, Navatara from Moon &amp; Lagna, the one-way override), §3 Eye 3 Time (functional nature, maraka danger, per-bhavesha firing test + gochara), §4 grade &amp; resolve, §5 output contract, §6 guardrails, §7 self-check, §8 Hindi summary. The external RBPM / Sutton / UPT rule corpora are not embedded — their citation columns are scaffolded, never gap-filled.</p>' +
+      '<p class="fine-print">The three-eye worksheet — <strong>Promise → Star → Time</strong>, never blended — always cast on <strong>Lahiri (Chitrapaksha)</strong>. §0 intake &amp; ayanamsa gate (birth-time confidence, nine grahas, D9, full Vimshottari MD→AD→PD, <strong>genuine Kaala Chakra Dasha (Shakti Mohan Singh, own classical spans)</strong>, area divisionals, Ashtakavarga, Jaimini karakas), §1 Eye 1 Promise (eight-factor engine, longevity ordinal, yogas + bhanga, RULES-APPLIED / CONTRARY scaffolds), §2 Eye 2 Star (nakshatra-pada + pada-vs-sign dignity, Navatara from Moon &amp; Lagna, the one-way override), §3 Eye 3 Time (functional nature, maraka danger, per-bhavesha firing test + gochara), §4 grade &amp; resolve, §5 output contract, §6 guardrails, §7 self-check, §8 Hindi summary. The external RBPM / Sutton / UPT rule corpora are not embedded — their citation columns are scaffolded, never gap-filled.</p>' +
       '<div class="vn-tool-actions" style="margin-bottom:10px"><button type="button" id="vnTrinetraPdf" class="primary-action vn-generate-btn">Save as PDF</button> <button type="button" id="vnTrinetraMd" class="input-toggle-btn">Download Markdown</button> <button type="button" id="vnTrinetraCopy" class="input-toggle-btn">Copy (Markdown)</button> <span id="vnTrinetraCopyStatus" class="fine-print"></span></div>' +
       '<div class="panel-box"><pre class="vn-native-pre">' + escapeHtml(md) + '</pre></div>' +
       '</section>';
@@ -26487,7 +26502,7 @@
     var localBirth = (input && input.birthInstant) ? new Date(input.birthInstant.getTime() + tz * 3600000).toISOString().slice(0, 19) : null;
 
     var out = {
-      source: "VedNetra 1.127",
+      source: "VedNetra 1.128",
       ayanamsa: "Lahiri",
       ayanamsa_value: r4(chart.ayanamsa),
       house_system: "Placidus",
@@ -26698,7 +26713,7 @@
     L.push("Nutation       : APPLIED  (Dpsi " + (snap.dpsi >= 0 ? "+" : "-") + dms3(Math.abs(snap.dpsi)) + ")");
     L.push("Node type      : TRUE node   (Ketu = Rahu + 180 deg)");
     L.push("Subdivision    : Sign / Star / Sub / Sub-Sub / Sub-Sub-Sub / Sub-Sub-Sub-Sub");
-    L.push("Software / ver : VedNetra 1.127");
+    L.push("Software / ver : VedNetra 1.128");
     L.push("Native         : " + ((input && (input.nativeName || input.name)) || "Native") + "              Sex: " + sex);
     L.push("DoB / ToB      : " + bLoc.toISOString().slice(0, 10) + " / " + bLoc.toISOString().slice(11, 19) + "    TZ UTC" + (tz >= 0 ? "+" : "-") + pad(Math.floor(Math.abs(tz))) + ":" + pad(Math.round((Math.abs(tz) % 1) * 60)));
     L.push("Place          : " + ((input && input.birthPlace) || "—") + "   Long " + dms3(Math.abs(lon)) + " " + (lon >= 0 ? "E" : "W") + "   Lat " + dms3(Math.abs(lat)) + " " + (lat >= 0 ? "N" : "S"));
@@ -27007,7 +27022,7 @@
     }
     L.push("");
     L.push("---");
-    L.push("_KCIL settings: Khullar (hourly) ayanamsa · Placidus cusps · TRUE node (Meeus periodic series) · Geocentric latitude · nutation in longitude applied · subdivision to Sub-Sub-Sub-Sub (Prana). True-node and nutation are computed series (arc-minute class), not full-ephemeris; flagged for transparency. VedNetra 1.127._");
+    L.push("_KCIL settings: Khullar (hourly) ayanamsa · Placidus cusps · TRUE node (Meeus periodic series) · Geocentric latitude · nutation in longitude applied · subdivision to Sub-Sub-Sub-Sub (Prana). True-node and nutation are computed series (arc-minute class), not full-ephemeris; flagged for transparency. VedNetra 1.128._");
     return L.join("\n");
   }
   function kcilSection(chart, input) {
@@ -27310,7 +27325,7 @@
     L.push("Ayanamsa       : Krishnamurti (KP-Old)   value " + decimalToDms(kp.ayanamsa) + "   (= Lahiri Chitrapaksha − 6′00″; e.g. 2001 = 23°46′32″)");
     L.push("House system   : Placidus");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.127");
+    L.push("Software / ver : VedNetra 1.128");
     L.push("Native         : " + nm + "            Sex: " + ((input && input.gender) || "-"));
     L.push("DoB / ToB      : " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
@@ -27563,7 +27578,7 @@
     L.push("KP number      : " + hnum + " / 249");
     L.push("House system   : " + kp.houseSystem + "  (equal 30° cusps from the number-seed ascendant — VedNetra KP-horary convention)");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.127");
+    L.push("Software / ver : VedNetra 1.128");
     L.push("Question       : " + ((input && input.question) ? String(input.question) : "-"));
     L.push("Judgment moment: " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
