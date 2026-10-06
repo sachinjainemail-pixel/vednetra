@@ -22568,7 +22568,7 @@
         }
       });
       L.push("");
-      L.push("_Method (VedNetra 1.128): nakshatra divided into 9 amsas (1°28'53\"); deha-rasi chain = Savya block [Ar Ta Ge Cn Le Vi Li Sc Sg] then Apasavya block [Pi Aq Cp Sg Sc Li Vi Le Cn], continuing across nakshatra boundaries; per-sign years Ar7 Ta16 Ge9 Cn21 Le5 Vi9 Li16 Sc7 Sg10 Cp4 Aq4 Pi10; antardashas proportion the MD span by the paryaya sign-years. Verify the deha/jeeva and spans against the Shakti Mohan Singh KCD corpus; 1 minute of birth time shifts KCD dates ~2–4.5 months, so trust to dasha level unless the time is certain to the second._");
+      L.push("_Method (VedNetra 1.129): nakshatra divided into 9 amsas (1°28'53\"); deha-rasi chain = Savya block [Ar Ta Ge Cn Le Vi Li Sc Sg] then Apasavya block [Pi Aq Cp Sg Sc Li Vi Le Cn], continuing across nakshatra boundaries; per-sign years Ar7 Ta16 Ge9 Cn21 Le5 Vi9 Li16 Sc7 Sg10 Cp4 Aq4 Pi10; antardashas proportion the MD span by the paryaya sign-years. Verify the deha/jeeva and spans against the Shakti Mohan Singh KCD corpus; 1 minute of birth time shifts KCD dates ~2–4.5 months, so trust to dasha level unless the time is certain to the second._");
       L.push("");
     } catch (e) { L.push("## §I-9b · Kaala Chakra Dasha (Shakti Mohan Singh)"); L.push("_Kaala Chakra Dasha could not be computed: " + (e && e.message ? e.message : e) + "._"); L.push(""); }
     L.push("**Eye-specific data — PROMISE divisionals (area charts):**");
@@ -26502,7 +26502,7 @@
     var localBirth = (input && input.birthInstant) ? new Date(input.birthInstant.getTime() + tz * 3600000).toISOString().slice(0, 19) : null;
 
     var out = {
-      source: "VedNetra 1.128",
+      source: "VedNetra 1.129",
       ayanamsa: "Lahiri",
       ayanamsa_value: r4(chart.ayanamsa),
       house_system: "Placidus",
@@ -26713,7 +26713,7 @@
     L.push("Nutation       : APPLIED  (Dpsi " + (snap.dpsi >= 0 ? "+" : "-") + dms3(Math.abs(snap.dpsi)) + ")");
     L.push("Node type      : TRUE node   (Ketu = Rahu + 180 deg)");
     L.push("Subdivision    : Sign / Star / Sub / Sub-Sub / Sub-Sub-Sub / Sub-Sub-Sub-Sub");
-    L.push("Software / ver : VedNetra 1.128");
+    L.push("Software / ver : VedNetra 1.129");
     L.push("Native         : " + ((input && (input.nativeName || input.name)) || "Native") + "              Sex: " + sex);
     L.push("DoB / ToB      : " + bLoc.toISOString().slice(0, 10) + " / " + bLoc.toISOString().slice(11, 19) + "    TZ UTC" + (tz >= 0 ? "+" : "-") + pad(Math.floor(Math.abs(tz))) + ":" + pad(Math.round((Math.abs(tz) % 1) * 60)));
     L.push("Place          : " + ((input && input.birthPlace) || "—") + "   Long " + dms3(Math.abs(lon)) + " " + (lon >= 0 ? "E" : "W") + "   Lat " + dms3(Math.abs(lat)) + " " + (lat >= 0 ? "N" : "S"));
@@ -27022,7 +27022,7 @@
     }
     L.push("");
     L.push("---");
-    L.push("_KCIL settings: Khullar (hourly) ayanamsa · Placidus cusps · TRUE node (Meeus periodic series) · Geocentric latitude · nutation in longitude applied · subdivision to Sub-Sub-Sub-Sub (Prana). True-node and nutation are computed series (arc-minute class), not full-ephemeris; flagged for transparency. VedNetra 1.128._");
+    L.push("_KCIL settings: Khullar (hourly) ayanamsa · Placidus cusps · TRUE node (Meeus periodic series) · Geocentric latitude · nutation in longitude applied · subdivision to Sub-Sub-Sub-Sub (Prana). True-node and nutation are computed series (arc-minute class), not full-ephemeris; flagged for transparency. VedNetra 1.129._");
     return L.join("\n");
   }
   function kcilSection(chart, input) {
@@ -27325,7 +27325,7 @@
     L.push("Ayanamsa       : Krishnamurti (KP-Old)   value " + decimalToDms(kp.ayanamsa) + "   (= Lahiri Chitrapaksha − 6′00″; e.g. 2001 = 23°46′32″)");
     L.push("House system   : Placidus");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.128");
+    L.push("Software / ver : VedNetra 1.129");
     L.push("Native         : " + nm + "            Sex: " + ((input && input.gender) || "-"));
     L.push("DoB / ToB      : " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
@@ -27578,7 +27578,7 @@
     L.push("KP number      : " + hnum + " / 249");
     L.push("House system   : " + kp.houseSystem + "  (equal 30° cusps from the number-seed ascendant — VedNetra KP-horary convention)");
     L.push("Node type      : Mean node  (Ketu = Rahu + 180°)");
-    L.push("Software / ver : VedNetra 1.128");
+    L.push("Software / ver : VedNetra 1.129");
     L.push("Question       : " + ((input && input.question) ? String(input.question) : "-"));
     L.push("Judgment moment: " + String((input && input.birthDate) || "-") + " / " + String((input && input.birthTime) || "-") + "   TZ UTC" + (tz >= 0 ? "+" : "") + tz);
     L.push("Place / Lat,Lon: " + String((input && input.birthPlace) || "-") + " / " + String((input && input.latitude) || "-") + ", " + String((input && input.longitude) || "-"));
@@ -27829,6 +27829,7 @@
         avengine: vnAshtakavargaEngineMarkdown, intakeform: vnIntakeFormMarkdown,
         consolidated: vnConsolidatedMarkdown, triveni: vnTriveniMarkdown,
         trinetra: vnTrinetraMarkdown, kp: vnKpMarkdown, vapm: vnVapmMarkdown,
+        kcil: vnKcilText,
         vapmnak: vnVapmNakshatraMarkdown, native: vnNativeMarkdown, cc: vnCcMarkdown,
         // The day reading on its own, for "what happened on <date>" questions.
         // It lived only inside the intake form, so asking the AV engine about a
@@ -27847,7 +27848,27 @@
       var built = coreApi.avEngineFor(spec);           // reuse the spec→chart/input path
       return { markdown: fn(built.chart, built.input) };
     },
-    reportKeys: ["avengine", "intakeform", "dayevent", "consolidated", "triveni", "trinetra", "kp", "vapm", "vapmnak", "native", "cc"]
+    reportKeys: ["avengine", "intakeform", "dayevent", "consolidated", "triveni", "trinetra", "kp", "kcil", "vapm", "vapmnak", "native", "cc"],
+    // KP HORARY / Prashna (a 1–249 number + the moment & place of judgment) —
+    // the browser-free counterpart of the natal path. The date/time/tz/lat/lon in
+    // the spec are the JUDGMENT moment, not a birth. Returns the same markdown the
+    // UI's horary report emits, so the skill never needs a page.
+    kpHoraryFor: function (spec, hnum) {
+      var inst = (function () {
+        var m = String(spec.birthISO || spec.judgmentISO || "").match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?/);
+        if (!m) return new Date(spec.birthISO || spec.judgmentISO);
+        if (/[Zz]|[+-]\d{2}:?\d{2}$/.test(spec.birthISO || spec.judgmentISO)) return new Date(spec.birthISO || spec.judgmentISO);
+        var utc = Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +(m[6] || 0));
+        return new Date(utc - Number(spec.tz || 0) * 3600000);
+      })();
+      var input = {
+        nativeName: spec.name || "Horary", gender: spec.gender || "unspecified",
+        birthInstant: inst, latitude: Number(spec.lat), longitude: Number(spec.lon),
+        timezone: Number(spec.tz), birthPlace: spec.place || "",
+        question: spec.question || ""
+      };
+      return { markdown: vnKpHoraryMarkdown(input, Number(hnum)) };
+    }
   };
   if (typeof window !== "undefined") window.VedicCore = coreApi;
   if (typeof globalThis !== "undefined") globalThis.VedicCore = coreApi;
