@@ -2399,6 +2399,57 @@ function bphsReport2(C, R) {
         return [n, bphsSignDeg(T[n]), bphsHouseFrom(ascSign, s), bphsHouseFrom(C.P.Moon.sign, s), v,
                 v > 30 ? "favourable" : v >= 25 ? "medium" : "adverse"];
       }));
+    /* ---- the three derived frames a timing engine needs from a transit ---- */
+
+    /* (a) Bhavat Bhavam. BB(h) = the h-th house counted from the h-th = 2h-1.
+       The pair is what a two-of-four fructification gate tests against. */
+    bphsTable(L, "Bhavat Bhavam — each bhava and the house that carries it (BB(h) = 2h−1), with the lord of each and where that lord sits. A gate on a matter tests the house, its lord, the BB house and ITS lord.",
+      ["Bhava", "Sign", "Lord", "Lord in", "BB house", "BB sign", "BB lord", "BB lord in"],
+      [1,2,3,4,5,6,7,8,9,10,11,12].map(function (h) {
+        var bb = ((2 * h - 2) % 12) + 1;
+        var hs = bphsSignAt(ascSign, h), bs = bphsSignAt(ascSign, bb);
+        var hl = BPHS_SIGN_LORD[hs], bl = BPHS_SIGN_LORD[bs];
+        return [bphsOrd(h), BPHS_SIGN_NAME[hs], hl,
+                C.P[hl] ? bphsOrd(bphsHouseFrom(ascSign, C.P[hl].sign)) : "—",
+                bphsOrd(bb), BPHS_SIGN_NAME[bs], bl,
+                C.P[bl] ? bphsOrd(bphsHouseFrom(ascSign, C.P[bl].sign)) : "—"];
+      }));
+
+    /* (b) The Jupiter-Saturn separation. Their conjunction recurs about every
+       20 years and is the extreme case of the dual-transit influence. */
+    if (T.Jupiter != null && T.Saturn != null) {
+      var jsSep = Math.abs(bphsSignedDelta(T.Jupiter, T.Saturn));
+      bphsTable(L, "Jupiter and Saturn — the dual-transit pair", ["Quantity", "Value"], [
+        ["Jupiter", bphsSignDeg(T.Jupiter) + "  (" + bphsOrd(bphsHouseFrom(ascSign, bphsSignOf(T.Jupiter))) + " from Lagna, " + bphsOrd(bphsHouseFrom(C.P.Moon.sign, bphsSignOf(T.Jupiter))) + " from Moon)"],
+        ["Saturn", bphsSignDeg(T.Saturn) + "  (" + bphsOrd(bphsHouseFrom(ascSign, bphsSignOf(T.Saturn))) + " from Lagna, " + bphsOrd(bphsHouseFrom(C.P.Moon.sign, bphsSignOf(T.Saturn))) + " from Moon)"],
+        ["Separation", bphsNum(jsSep, 2) + "°" + (jsSep < 15 ? "  — **CONJUNCTION** (within 15°; recurs about every 20 years)" : jsSep > 165 ? "  — opposition" : "")],
+        ["Same sign?", bphsSignOf(T.Jupiter) === bphsSignOf(T.Saturn) ? "**yes**" : "no"]
+      ]);
+    }
+
+    /* (c) The functional 9th and 10th lords. Their mutual contact is the
+       Dharmadhipati-Karmadhipati yoga; read natally and in transit. */
+    var d9l = BPHS_SIGN_LORD[bphsSignAt(ascSign, 9)];
+    var d10l = BPHS_SIGN_LORD[bphsSignAt(ascSign, 10)];
+    var dkRows = [
+      ["9th lord (Dharmadhipati)", d9l,
+       C.P[d9l] ? bphsSignDeg(C.P[d9l].lon) + " (" + bphsOrd(bphsHouseFrom(ascSign, C.P[d9l].sign)) + ")" : "—",
+       T[d9l] != null ? bphsSignDeg(T[d9l]) + " (" + bphsOrd(bphsHouseFrom(ascSign, bphsSignOf(T[d9l]))) + " from Lagna)" : "—"],
+      ["10th lord (Karmadhipati)", d10l,
+       C.P[d10l] ? bphsSignDeg(C.P[d10l].lon) + " (" + bphsOrd(bphsHouseFrom(ascSign, C.P[d10l].sign)) + ")" : "—",
+       T[d10l] != null ? bphsSignDeg(T[d10l]) + " (" + bphsOrd(bphsHouseFrom(ascSign, bphsSignOf(T[d10l]))) + " from Lagna)" : "—"]
+    ];
+    bphsTable(L, "The functional 9th and 10th lords (Dharmadhipati and Karmadhipati) — natally and in transit",
+      ["Role", "Graha", "Natal", "In transit"], dkRows);
+    if (C.P[d9l] && C.P[d10l]) {
+      var natalSame = C.P[d9l].sign === C.P[d10l].sign;
+      var transitSame = (T[d9l] != null && T[d10l] != null) && bphsSignOf(T[d9l]) === bphsSignOf(T[d10l]);
+      L.push("- Dharmadhipati–Karmadhipati yoga: **" +
+        (natalSame ? "formed natally (same sign)" : "not formed natally") + "**; in transit it is **" +
+        (transitSame ? "formed (both in " + BPHS_SIGN_NAME[bphsSignOf(T[d9l])] + ")" : "not formed") + "**.");
+      L.push("");
+    }
+
     var satSign = bphsSignOf(T.Saturn), satNak = bphsNak(T.Saturn);
     L.push("- **Saturn now transits " + BPHS_SIGN_NAME[satSign] + ", nakshatra " + satNak.name +
       "** — compare against the §17 dating table; a match there is a live window.");
