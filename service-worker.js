@@ -1,9 +1,11 @@
-const CACHE_NAME = "vednetra-v129";
+const CACHE_NAME = "vednetra-v130";
 const APP_ASSETS = [
   "./",
   "index.html",
   "styles.css",
   "app.js",
+  "bphs_core.js",
+  "trinetra-rules.js",
   "manifest.webmanifest",
   "icon.svg",
   "assets/ganesha-mantra.mp3"

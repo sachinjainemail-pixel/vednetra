@@ -11,6 +11,8 @@
   var KP2_LAHIRI_OFFSET_DEG = -0.1;
   var MAX_FOCUS_SECTIONS = 8;
   var pinnedFocusSections = [];
+  /* The report shown first when a chart is generated. */
+  var VN_DEFAULT_SECTION = "viewA-bphsreport";
   var activeChartDataSectionId = "viewA-output-library";
   var AYANAMSHA_OPTIONS = {
     lahiri: { label: "Lahiri", offset: 0 },
@@ -2726,7 +2728,7 @@
       if (vnPendingHomeTarget) { var t = vnPendingHomeTarget; vnPendingHomeTarget = null; showSingleChartDataSection(t, { skipScroll: false }); return; }
       // Land on the Native's Persona (the life portrait) by default whenever a
       // chart is generated or selected.
-      showSingleChartDataSection("viewA-persona", { skipScroll: false });
+      showSingleChartDataSection(VN_DEFAULT_SECTION, { skipScroll: false });
     }, 0);
   }
 
@@ -3997,7 +3999,7 @@
 
   function generate(options) {
     var opts = options || {};
-    var nextActiveSection = opts.preserveActiveSection ? (activeChartDataSectionId || "viewA-persona") : "viewA-persona";
+    var nextActiveSection = opts.preserveActiveSection ? (activeChartDataSectionId || VN_DEFAULT_SECTION) : VN_DEFAULT_SECTION;
     if (opts.preserveInteractiveState) opts.interactiveState = collectReportInteractiveState();
     try {
       clearMemoCaches();
@@ -6123,7 +6125,7 @@
     // -------------------------------------------------------------------------
     pendingSectionRenders.clear();
     navAliasToPendingId.clear();
-    if (!opts.preserveActiveSection) activeChartDataSectionId = "viewA-persona";
+    if (!opts.preserveActiveSection) activeChartDataSectionId = VN_DEFAULT_SECTION;
 
     var sections = [
       // ---- immediate (above the fold) ----
@@ -6160,6 +6162,7 @@
       { id: "viewA-vrat",           label: "Vrat calendar", render: function () { return vratCalendarSection(chart, input); } },
       { id: "viewA-ccreport",       label: "Natal report", render: function () { return ccReportSection(chart, input); }, wire: function () { wireCcReportControls(chart, input); } },
       { id: "viewA-nativereport",   label: "Native report", render: function () { return nativeReportSection(chart, input); }, wire: function () { wireNativeReportControls(chart, input); } },
+      { id: "viewA-bphsreport",     label: "BPHS report", render: function () { return bphsReportSection(chart, input); }, wire: function () { wireBphsReportControls(chart, input); } },
       { id: "viewA-vapmreport",     label: "VAPM export", render: function () { return vapmReportSection(chart, input); }, wire: function () { wireVapmReportControls(chart, input); } },
       { id: "viewA-vapmnakreport",  label: "VAPM + Nakshatra", render: function () { return vapmNakReportSection(chart, input); }, wire: function () { wireVapmNakReportControls(chart, input); } },
       { id: "viewA-consolidatedmaster", label: "Consolidated Master Run", render: function () { return consolidatedReportSection(chart, input); }, wire: function () { wireConsolidatedReportControls(chart, input); } },
@@ -18672,6 +18675,7 @@
     ] },
     { title: "Reports & Remedies", items: [
       { id: "viewA-persona", label: "Native's Persona", desc: "DEFAULT view on chart load — the native's personality, traits and life portrait, synthesized entirely from the Trinetra classical rules that fully fire for the chart (Promise life-area dictums + Sutton nakshatra readings for the occupied stars + running dasha/transits). Every line is the result of a rule whose conditions are all met." },
+      { id: "viewA-bphsreport", label: "BPHS System Report", desc: "DEFAULT on chart load — the SHREE GANESH JI BLESSED BPHS SYSTEM export (Brihat Parasara Hora Sastra, tr. Santhanam/Kapoor). 25 sections on Lahiri + whole-sign bhavas: sunrise block, Lagna and the time-Lagnas, nine grahas to the arc-second, bhava viability, sixteen vargas, Vimsopaka, Shadbala, Ishta/Kashta, avasthas, arudha padas and Upapada, cara karakas, Pindayu and the marakas, Vimsottari to MD/AD/PD, the ten conditional dasa gates, Ashtakavarga, Sudarshana, transit with Gochara Vedha, honest gaps. DATA, not a reading." },
       { id: "viewA-ccreport", label: "Natal Report (CC)", desc: "Full Chamatkār Chintāmaṇi data export — PDF & Markdown." },
       { id: "viewA-nativereport", label: "Native Input Report", desc: "Full v3 native export (§0–§16): fragility flags, guna, sphutas, sahams, rupa Ṣaḍbala, prastarāṣṭakavarga, D16, Parivritti-D10, full-life dashas, ingress + natal-return transits." },
       { id: "viewA-vapmreport", label: "VAPM Export", desc: "VAPM export spec (Lahiri, §1–§14 + Part B): master table, aspect/Kartari table, functional nature, Chandra/Surya Lagna, all vargas + Dashavarga count, Ashtakavarga incl. Shodhya Pinda, Vimshottari/Yogini/Jaimini, Indu Lagna, Tara Chakra, transits, four-fold scaffolds." },
@@ -22343,6 +22347,66 @@
         if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(md).then(done, function () { vnCcFallbackCopy(md, done); });
         else vnCcFallbackCopy(md, done);
       } catch (e) { vnCcFallbackCopy(md, done); }
+    });
+  }
+  /* ---------------- SHREE GANESH JI BLESSED BPHS SYSTEM REPORT ------------- */
+  function vnBphsCfg(chart, input) {
+    var tz = Number(input.timezone);
+    var inst = input.birthInstant;
+    var loc = new Date(inst.getTime() + tz * 3600000);   /* local civil clock */
+    function p2(n) { return n < 10 ? "0" + n : String(n); }
+    return {
+      api: coreApi,
+      build: (typeof APP_VERSION !== "undefined" ? APP_VERSION : "in-app"),
+      name: (input.nativeName || input.name || "Native"),
+      gender: (input.gender || ""),
+      date: loc.getUTCFullYear() + "-" + p2(loc.getUTCMonth() + 1) + "-" + p2(loc.getUTCDate()),
+      time: p2(loc.getUTCHours()) + ":" + p2(loc.getUTCMinutes()) + ":" + p2(loc.getUTCSeconds()),
+      tz: tz,
+      lat: Number(input.latitude),
+      lon: Number(input.longitude),
+      place: input.birthPlace || "",
+      ayanamsa: "lahiri",
+      asOf: input.asOfInstant || null
+    };
+  }
+  function vnBphsMarkdown(chart, input) {
+    if (!window.BPHS_CORE || !window.BPHS_CORE.buildReport)
+      throw new Error("bphs_core.js is not loaded");
+    return window.BPHS_CORE.buildReport(vnBphsCfg(chart, input)).markdown;
+  }
+  function bphsReportSection(chart, input) {
+    var md;
+    try { md = vnBphsMarkdown(chart, input); }
+    catch (e) { md = "Could not build the BPHS report: " + (e && e.message ? e.message : e); }
+    return '<section id="viewA-bphsreport" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Master Export</p><h3>BPHS System Report</h3></div></div>' +
+      '<p class="fine-print">The <strong>SHREE GANESH JI BLESSED BPHS SYSTEM REPORT</strong> — the Parasari export from <em>Brihat Parasara Hora Sastra</em> (tr. Santhanam / Kapoor), 25 sections, always cast on <strong>Lahiri</strong> with <strong>whole-sign</strong> bhavas and mean nodes: the sunrise block, Lagna and the time-Lagnas, the nine grahas to the arc-second, the bhava viability test, sixteen vargas, Vimsopaka, Shadbala, Ishta/Kashta, the avasthas, arudha padas and Upapada, cara karakas, Pindayu and the marakas, <strong>Vimsottari to Mahadasa, Antardasa and Pratyantardasa</strong>, the ten conditional dasa gates, Ashtakavarga, Sudarshana, transit with Gochara Vedha, and an honest statement of the gaps. It is DATA, not a reading.</p>' +
+      '<div class="vn-tool-actions" style="margin-bottom:10px"><button type="button" id="vnBphsMd" class="secondary-action vn-generate-btn">Download .md</button> <button type="button" id="vnBphsCopy" class="secondary-action vn-generate-btn">Copy</button> <span id="vnBphsCopyStatus" class="fine-print"></span></div>' +
+      '<div class="panel-box"><pre class="vn-native-pre">' + escapeHtml(md) + '</pre></div>' +
+      '</section>';
+  }
+  function wireBphsReportControls(chart, input) {
+    var mdBtn = document.getElementById("vnBphsMd");
+    if (mdBtn) mdBtn.addEventListener("click", function () {
+      try {
+        var md = vnBphsMarkdown(chart, input);
+        var blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+        var a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = (input.nativeName || input.name || "native").replace(/[^\w.-]+/g, "_") + "_bphs.md";
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+      } catch (e) {}
+    });
+    var copy = document.getElementById("vnBphsCopy");
+    if (copy) copy.addEventListener("click", function () {
+      var status = document.getElementById("vnBphsCopyStatus");
+      function done() { if (status) { status.textContent = "Copied!"; setTimeout(function () { status.textContent = ""; }, 2500); } }
+      try {
+        var md = vnBphsMarkdown(chart, input);
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(md).then(done, function () { vnCcFallbackCopy(md, done); });
+        else vnCcFallbackCopy(md, done);
+      } catch (e) {}
     });
   }
   function vapmReportSection(chart, input) {
@@ -27872,4 +27936,13 @@
   };
   if (typeof window !== "undefined") window.VedicCore = coreApi;
   if (typeof globalThis !== "undefined") globalThis.VedicCore = coreApi;
+  /* Primitives the BPHS report module needs. The headless loader injects these
+     same six names after this line; defining them here makes the in-app BPHS
+     report possible without a sandbox. */
+  coreApi.__planets   = (typeof computePlanets    === "function") ? computePlanets    : null;
+  coreApi.__ascTrop   = (typeof ascendantTropical === "function") ? ascendantTropical : null;
+  coreApi.__sunTimes  = (typeof sunTimesForDate   === "function") ? sunTimesForDate   : null;
+  coreApi.__ayanamsa  = (typeof ayanamshaValue    === "function") ? ayanamshaValue    : null;
+  coreApi.__julianDay = (typeof julianDay         === "function") ? julianDay         : null;
+  coreApi.__obliquity = (typeof obliquity         === "function") ? obliquity         : null;
 }());
