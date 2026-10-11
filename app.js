@@ -6172,6 +6172,7 @@
       { id: "viewA-ukn",            label: "Udu Kaal Nirnay Report (UKN)", render: function () { return uknSection(chart, input); }, wire: function () { wireUknControls(chart, input); } },
       { id: "viewA-ganesha5",       label: "SHRI GANESHA 5 IN ONE Report", render: function () { return ganesha5Section(chart, input); }, wire: function () { wireGanesha5Controls(chart, input); } },
       { id: "viewA-kcil",           label: "SHRI GANESHA BLESSED KCIL", render: function () { return kcilSection(chart, input); }, wire: function () { wireKcilControls(chart, input); } },
+      { id: "viewA-quaddasha",      label: "QUAD DASHA Export", render: function () { return quadDashaSection(chart, input); }, wire: function () { wireQuadDashaControls(chart, input); } },
       { id: "viewA-trivenireport",  label: "Triveni Intake", render: function () { return triveniReportSection(chart, input); }, wire: function () { wireTriveniReportControls(chart, input); } },
       { id: "viewA-trinetrareport", label: "Trinetra Master Run", render: function () { return trinetraReportSection(chart, input); }, wire: function () { wireTrinetraReportControls(chart, input); } },
       { id: "viewA-kpreport",       label: "KP System Report", render: function () { return kpReportSection(chart, input); }, wire: function () { wireKpReportControls(chart, input); } },
@@ -18682,6 +18683,7 @@
       { id: "viewA-ukn", label: "Udu Kaal Nirnay Report (UKN)", desc: "The Udu Kaal Nirnay (UKN) merged export (Lahiri) — the single input contract carrying everything both the promise (Udu) and timing (Kaal-Nirnay) layers need, §0–§25, and it produces DATA, never a reading: §0 intake &amp; 14-event ledger with clock grade · §1 birth data with day/night, hora lord of Lagna, paksha · §2 Lagna with sub-lord, vargottama window, rising mode, badhaka, Moon/Sun/Hora Lagna · §3 the nine grahas — nakshatra/pada/lord plus sub-lord, rasi-lord (dispositor), drekkana, functional nature, degree-zone and speed · §4 nakshatra occupancy · §5 house lords by nakshatra · §6 the six-route influence matrix (lordship/occupation/aspect/via-star-lord/via-rasi-lord/indirect) with the inverse house index · §7 inter-planet distance matrices in D-1 and D-9 (6/8/12 flagged) · §8 aspect table · §9 functional classification (yogakaraka, kendra/trikona/dusthana lords, ranked marakas, 22nd-drekkana lord, separative, Gulika/Mandi) · §10 longevity band by the three pairs with the scaled-family cross-check · §11 ten divisional charts D-2/3/4/7/9/10/12/20/24/30 · §12 Shadbala with rank · §13 Ashtakavarga BAV+SAV with the 28 neutral line · §14 Vimshottari to Pratyantardasha with each lord's nakshatra, dignity and functional nature · §15 the conditional-dasha qualification tests (pass/fail with the deciding value) · §16 corroborating dasha chains · §17 age-activation grid 0→100 · §18 Navatara/Tara Bala · §19 gandanta/mula/panchak · §20 nakshatra attributes · §21 transit snapshot + forward crossing calendar (Saturn/Jupiter ingresses, next aspect to the 7th lord, Sun ingresses, progress Lagna) · §22 trigger sensitive points (sahams, returns, sensitive zones) · §23 compatibility on request · §24 derived-house map for relatives · §25 metadata. Honest gaps (rasi-based dashas, eclipse ephemeris, entry chart) are flagged in-line. Download Text." },
       { id: "viewA-ganesha5", label: "SHRI GANESHA 5 IN ONE Report", desc: "The Shri Ganesha 5-in-1 export — a validated JSON input contract for the four-school predictive engine (BNN swaps karaka by sex; KP layer; Vimshottari to age 90; optional vargas), cast on Lahiri ayanamsa with Placidus cusps. Emits: the source/ayanamsa/house-system header with the ayanamsa value; the native block (name, sex, place, birth civil time, tz, lat, lon); the Lagna with nakshatra, pada, star-lord and sub-lord; all twelve Placidus cusps as sidereal longitudes with per-cusp sub-lords, star-lords and house lords; all nine grahas (sidereal longitude to 4 decimals, sign with index and lord, degree-in-sign, Placidus house, nakshatra, pada, star-lord, sub-lord, sub-sub-lord, retrograde, combust and dignity); the complete Vimshottari Mahadasha/Antardasha/Pratyantardasha chain from birth to age 90 with the first row anchored to the birth date; the optional KP-ayanamsa cusp sub-lord frame; and the six divisional charts D-9, D-7, D-10, D-4, D-24 and D-30. Download JSON." },
       { id: "viewA-kcil", label: "SHRI GANESHA BLESSED KCIL", desc: "The Shree Ganesh Ji Blessed KCIL export (Khullar Cuspal-Interlinks) — a Markdown report deliberately distinct from both the Raman default and the KP report, cast on KCIL's four closed settings: Khullar hourly ayanamsa, TRUE node (Ketu = Rahu + 180), geocentric latitude and nutation applied, judged to Sub-Sub-Sub-Sub (Prana). It prints the A0 casting header with the literal KCIL-VALID banner and the stability flag; A1 the twelve Placidus cusps with the promise-deciding sub-sub lord, the SS-arc %, and the SSL's own star/sub/sub-sub plus SSS and SSSS; A1b the cusp linkage rows under the occupation clause; A2 the nine planets to all six subdivision levels with the Bhava (Placidus) house; A3 the Bhava and Rashi charts and the house-lordship allotment; A4 the positional-status board with the reason for every PS; A5 the linkage matrix (star = nature, sub = qualification, sub-sub = end) with strength marks; A6 the sub-sub sensitivity columns in ±seconds with the roll-up; A7 Vimshottari MD→AD→PD→SD→PrD with dates and times; A8 the node-representation table with the three identities; B1 the gate board; B2 fruitful significators; B3 ruling planets to Prana; B4 the event-group scan with Maraka/Badhaka and the relative-rotation map; B5 the rectification worksheet (six Ascendant tests, the sex test, and the genetic/past-event blocks); C1 transit, C1b the Prana ladder, C2 the progressed chart, and C3 horary mode. True-node and nutation are computed series. Download Markdown." },
+      { id: "viewA-quaddasha", label: "QUAD DASHA Export", desc: "The Shree Ganesha Ji Shri Saraswati Ji Blessed QUAD DASHA export — all FOUR dasha systems from one chart, computed in quad-dasha.js, which takes only the ephemeris and the Ascendant from this app. §0 casting header with the QUAD-DASHA-VALID banner, the self-test count, the seven non-negotiable corrections and the measured divergence from this app's own Char Dasha and Yogini cards; §1 the nine grahas with nakshatra, pada, arcminutes elapsed in the pada, nakshatra lord and D-9/D-7/D-3; §2 the SEVEN Chara karakas with Karakamsa, DKN, the arudha padas (AL, UL, A7, A5, A10), the ten Jaimini rajayogas counted in D-1 and again in D-9 under Rao's navamsa filter, the AmK career board and the rashi-drishti table; §3 the Laghu Parashari functional classification by lordship with Yogakaraka and Kendradhipatya-dosha flags, the Ojha score, the ten-rank maraka hierarchy, the longevity class and the Venus–Saturn inversion test; §4 the full sambandha matrix with Sadharmi and Atmasambandhi; §5 Pachaka/Bodhaka/Karaka/Vedhaka with the positional test; §6 Vimshottari MD→AD for the whole life with dates; §7 Chara with sub-periods, the groups-of-three counting direction and Rao's karaka placement test per sector; §8 Kaal Chakra with the package, purnayus, deha/jeeva, balance against the WHOLE span, the repeating sequence, the three gaits marked, house activation from both the lagna and the deha sign, the energy ranking, the NINE antardasas of the running dasha and the eight maraka conditions; §9 Yogini with the progressed lagna, the progression nakshatra and Goel's three reference points resolved; §10 the period in question with a BIRTH-TIME STABILITY GATE at ±1/±5/±15 minutes, the sector board and the Laghu Parashari delivery read; §11 level discipline; §12 promise gates timing; §13 the base-rate appendix; §14 limits. Periods only — 52 pre-registered tests of the interpretive rules of all four systems came out at chance, and the report states it. Download Markdown." },
       { id: "viewA-bnnexport", label: "BNN Chart Export", desc: "The Bhrigu Nandi Nadi chart export (spec 1.0) — a deliberately karaka/transit-only contract: NO dasha, divisional charts, Ashtakavarga, house cusps/lords or strength scores (sending them drifts the reading out of system). §A native (sex mandatory — it swaps karakas) · §B natal positions to the arc-second with Abs°, nakshatra/pada, retrograde, dignity, combustion and direction, plus last/first-degree, rasi-sandhi and graha-yuddha flags · §C1 exchanges (parivartana) with the effective chart, §C2 sign contents in degree order, §C3 direction groups, §C4 nodal arc (inside/outside + degree phase), §C5 per-planet connections, §C6 graded isolation, §C7 BNN aspects (direct 2/5/7/9, retro variant), §C8 chains, §C9 pairs · §D transit positions with on-natal hits · §E1 ingresses, §E2 exact crossings with pass numbers (every retro-loop hit), §E3 stations, §E4 windows, §E5 fine Sun/Moon triggers (90-day window) · §F the Jupiter clock · §H the full Vimshottari clock (running MD/AD/PD/SD + each lord's natal position, the 120-year MD sequence, antardashas, pratyantar+sookshma, forward dasha calendar — the second timing lane: Vimshottari WHEN, BNN WHAT) · §G the prashna hora block when a Question is set. Spec 2.0. Facts only, no interpretation, no dasha-phala. Download Markdown." },
       { id: "viewA-avexport", label: "Ashtakavarga Export (JSON)", desc: "The full machine export (schema vednetra.ashtakavarga.v1) that feeds the 859-rule Ashtakavarga corpus — far more than the twelve SAV numbers and seven BAV rows. §01 chart & provenance (ayanamsa value, chart_basis=rasi, sunrise/sunset, paksha/tithi/weekday); §02 grahas + Lagna + Mandi with kakṣyā, house-from-lagna AND from-moon, rāśi AND navāṃśa dignity, retro/combust, Ṣaḍbala rūpas + 6 components; §03 the PRASTĀRA (full 8-donor × 12-sign grid per varga, not column sums); §04 three reduction states (raw · trikoṇa · ekādhipatya) with rāśi/graha/śodhya piṇḍas and the disputed policies; §05 SAV on both bases (337 & 386), the karaṇa complement (56/64), and every aggregate (vittāya, tīrtha, inner/outer, the four trikoṇas, life-third khaṇḍas, directions); §06 daśā; §07 transits (Saturn/Jupiter ingresses, sankranti, madhya-guru); §08 promise layer (house-lords, yogas, aspects, D9/D10/D12, special points); §09 checksums VedNetra asserts itself. Download JSON; a readable summary + checksum panel shows on screen." },
       { id: "viewA-avengine", label: "Ashtakvarga Engine Report", desc: "A question-routed predictive verdict on VedNetra's Ashtakavarga (SAV/BAV). Validates the invariant checksums (Sun 48·Moon 49·Mars 39·Mercury 54·Jupiter 56·Venus 52·Saturn 39·Lagna 49·SAV 337 — a failure voids the reading), routes the native's question to a governing house + kāraka, then shows the full PROMISE / MAGNITUDE / CAPACITY / DELIVERED / VERDICT % arithmetic with band, the shape cross-checks (four triads, inner/outer, 1st-vs-7th, 9th/10th/11th, cascade, prosperity sums), a 7-instrument TIMING grade with a dated window where a slow transit locks, the AMN-BAV-033 transfer check, what would falsify it, and what it cannot say. Set the Question/topic in the chart form to route it. Figures VedNetra-computed; AMN/PAA/RSG/ENGINE rule IDs are engine-spec references (scaffold)." },
@@ -27046,6 +27048,69 @@
     });
   }
   // ================================================================
+  // QUAD DASHA EXPORT — dedicated four-dasha export for the
+  // "Shree Ganesha Ji Shri Saraswati Ji Blessed Quad Dasha" project.
+  // Vimshottari + Chara + Kaal Chakra + Yogini, with the chart-derived
+  // reading frames of all four schools, a birth-time stability gate and the
+  // base-rate appendix.
+  //
+  // The whole engine lives in quad-dasha.js, which takes from this app ONLY
+  // the ephemeris and the Ascendant. That is deliberate: it keeps the seven
+  // computational corrections that project settled against primary text in
+  // one reviewable file, and it means a change here cannot silently move a
+  // dasha boundary. See quad-dasha.js's header.
+  //
+  // NOTE for anyone comparing with this app's own cards: the "Char Dasha"
+  // card takes its counting direction from sign parity and ignores the
+  // Scorpio/Aquarius co-lordships, and scores 8/12 against the sequence
+  // K.N. Rao prints for Queen Elizabeth II, where quad-dasha.js scores 12/12.
+  // The "Yogini Dasha" card has no progressed lagna, and there is no Kaal
+  // Chakra card at all. Prefer this export for all four systems.
+  // ================================================================
+  function vnQuadDashaText(chart, input) {
+    if (!globalThis.VNQuadDasha || !globalThis.VNQuadDasha.markdown) {
+      return "QUAD DASHA could not be built: quad-dasha.js is not loaded.\n" +
+             "Add <script src=\"quad-dasha.js\"></script> before app.js, or pass it to the\n" +
+             "no-browser runner's file list.";
+    }
+    return globalThis.VNQuadDasha.markdown(chart, input);
+  }
+  function quadDashaSection(chart, input) {
+    var md;
+    try { md = vnQuadDashaText(chart, input); }
+    catch (e) { md = "Could not build the QUAD DASHA export: " + (e && e.message ? e.message : e) + (e && e.stack ? "\n" + e.stack : ""); }
+    var st = "";
+    try {
+      var r = globalThis.VNQuadDasha.selftest();
+      st = '<span class="small-pill">self-test ' + r.pass + '/' + r.total + '</span>';
+    } catch (e) {}
+    return '<section id="viewA-quaddasha" class="section vn-section"><div class="section-head"><div><p class="eyebrow">Master Export</p><h3>QUAD DASHA Export</h3></div>' + st + '</div>' +
+      '<p class="fine-print">All <strong>four</strong> dasha systems from one chart — <strong>Vimshottari</strong> (120y, nakshatra), <strong>Chara</strong> (Jaimini rashi, K.N. Rao’s method), <strong>Kaal Chakra</strong> (BPHS Ch.46/51/64) and <strong>Yogini</strong> (36y with V.P. Goel’s progressed lagna) — plus the chart-derived reading frames each school needs: Laghu Parashari functional classification and maraka hierarchy, the sambandha matrix, Pachaka/Bodhaka/Karaka/Vedhaka, longevity class, the seven Chara karakas with Karakamsa, the arudha padas, the ten Jaimini rajayogas under Rao’s navamsa filter, the AmK career board, Kaal Chakra house activation from both the lagna and the deha sign with the three gaits marked, Goel’s three reference points, a <strong>birth-time stability gate at ±1/±5/±15 minutes</strong>, the level-discipline table, and the base-rate appendix. Computed in <code>quad-dasha.js</code>, which takes only the ephemeris and the Ascendant from this app. <strong>Periods only — every interpretive rule of all four systems tested at chance over 52 pre-registered tests, and the report says so.</strong> Download Markdown.</p>' +
+      '<div class="vn-tool-actions" style="margin:10px 0"><button type="button" id="vnQuadDashaMd" class="primary-action vn-generate-btn">Download Markdown</button> <button type="button" id="vnQuadDashaCopy" class="input-toggle-btn">Copy</button> <span id="vnQuadDashaStatus" class="fine-print"></span></div>' +
+      '<div class="panel-box"><pre class="vn-native-pre" style="max-height:560px;overflow:auto">' + escapeHtml(md) + '</pre></div>' +
+      '</section>';
+  }
+  function wireQuadDashaControls(chart, input) {
+    var mdBtn = document.getElementById("vnQuadDashaMd");
+    if (mdBtn) mdBtn.addEventListener("click", function () {
+      try {
+        var md = vnQuadDashaText(chart, input);
+        var blob = new Blob([md], { type: "text/markdown" });
+        var a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "quad-dasha-export.md";
+        a.click();
+      } catch (e) {}
+    });
+    var copy = document.getElementById("vnQuadDashaCopy");
+    if (copy) copy.addEventListener("click", function () {
+      var md = vnQuadDashaText(chart, input), status = document.getElementById("vnQuadDashaStatus");
+      function done() { if (status) { status.textContent = "Copied!"; setTimeout(function () { status.textContent = ""; }, 2500); } }
+      try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(md).then(done, function () { vnCcFallbackCopy(md, done); }); else vnCcFallbackCopy(md, done); } catch (e) { vnCcFallbackCopy(md, done); }
+    });
+  }
+
+  // ================================================================
   // KP SYSTEM REPORT — dedicated Krishnamurti-Paddhati export.
   // Krishnamurti ayanamsa (Lahiri − 0.1°), Placidus cusps, mean nodes,
   // sub-lords to the second. Emits the KP-VEDNETRA-EXPORT format (Part A
@@ -27830,6 +27895,7 @@
         consolidated: vnConsolidatedMarkdown, triveni: vnTriveniMarkdown,
         trinetra: vnTrinetraMarkdown, kp: vnKpMarkdown, vapm: vnVapmMarkdown,
         kcil: vnKcilText,
+        quaddasha: vnQuadDashaText,
         vapmnak: vnVapmNakshatraMarkdown, native: vnNativeMarkdown, cc: vnCcMarkdown,
         // The day reading on its own, for "what happened on <date>" questions.
         // It lived only inside the intake form, so asking the AV engine about a
@@ -27848,7 +27914,15 @@
       var built = coreApi.avEngineFor(spec);           // reuse the spec→chart/input path
       return { markdown: fn(built.chart, built.input) };
     },
-    reportKeys: ["avengine", "intakeform", "dayevent", "consolidated", "triveni", "trinetra", "kp", "kcil", "vapm", "vapmnak", "native", "cc"],
+    reportKeys: ["avengine", "intakeform", "dayevent", "consolidated", "triveni", "trinetra", "kp", "kcil", "quaddasha", "vapm", "vapmnak", "native", "cc"],
+    // The QUAD DASHA self-test, exposed so a harness can assert 8/8 before
+    // trusting a reading. Returns {pass, total, rows}.
+    quadDashaSelftest: function () {
+      if (!globalThis.VNQuadDasha || !globalThis.VNQuadDasha.selftest) {
+        throw new Error("quad-dasha.js is not loaded");
+      }
+      return globalThis.VNQuadDasha.selftest();
+    },
     // KP HORARY / Prashna (a 1–249 number + the moment & place of judgment) —
     // the browser-free counterpart of the natal path. The date/time/tz/lat/lon in
     // the spec are the JUDGMENT moment, not a birth. Returns the same markdown the

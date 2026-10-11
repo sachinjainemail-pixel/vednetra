@@ -18,7 +18,7 @@
  *
  * `date`/`time` are LOCAL clock time at the birth place; `tz` converts them.
  * `report` is one of: avengine (default), intakeform, dayevent, consolidated,
- *         triveni, trinetra, kp, vapm, vapmnak, native, cc
+ *         triveni, trinetra, kp, kcil, quaddasha, vapm, vapmnak, native, cc
  * `eventDate` (YYYY-MM-DD) + optional `eventTime` aim the day engine at one day,
  *         for "what happened on <date>" questions. Use with report "dayevent".
  */
@@ -83,7 +83,7 @@ const appDir = cfg.appDir
       .find(d => fs.existsSync(path.join(d, "app.js")));
 if (!appDir) { console.error("Could not locate app.js — pass appDir."); process.exit(1); }
 
-for (const f of ["trinetra-rules.js", "app.js"]) {
+for (const f of ["trinetra-rules.js", "quad-dasha.js", "app.js"]) {
   const p = path.join(appDir, f);
   if (!fs.existsSync(p)) continue;
   try { require(p); }
