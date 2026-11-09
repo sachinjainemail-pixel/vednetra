@@ -24,6 +24,8 @@ S7. TRANSIT VALIDATION
     Saturn, Jupiter, Rahu, Ketu and Sun during the selected periods.
 S8. RECONCILIATION OF SECTIONS
     Which sections agreed, which differed, and why the chosen answer wins.
+    Must contain one line starting COUNTER READING with the best alternative that follows the afflictions,
+    rejected only by naming two weightage steps, never by base rate. See LEARNINGS.md lesson L6.
 S9. SUMMARY
     Short analysis recap by section, then a line starting FINAL ANSWER with one concrete answer, then 2 or 3
     bullet lines. The last bullet starts with "Final answer".

@@ -11,6 +11,7 @@ project. Before answering anything under it, read these files in order:
 1. suj_engine/ENGINE_CONTRACT.md for the binding requirements
 2. suj_engine/METHODOLOGY.md for the full step by step methodology
 3. suj_engine/STATUS.md for what is built and what is pending
+4. suj_engine/LEARNINGS.md for lessons from checked cases, apply them in every reading
 
 Non negotiable points
 

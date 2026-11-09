@@ -61,6 +61,16 @@
 - Activation in a new session needs these commits on the main branch, or the session opened on the working
   branch. At the end of this round they are on claude/pensive-albattani-a7wsss only.
 
+## Round 5. Calibration case Patrika 890 and learnings (done)
+
+- Owner supplied the true results for Patrika 890. The engine scored 2 of 6, right on education and
+  residence, wrong on career, marriage, parents and siblings.
+- Case saved in suj_engine/cases/patrika_890.json. Lessons saved in suj_engine/LEARNINGS.md as proposals
+  awaiting owner confirmation. CLAUDE.md now points to it so every new session reads it.
+- ANSWER_TEMPLATE.md S8 now asks for a COUNTER READING line, and answer_guard.js warns when it is missing.
+  METHODOLOGY.md is untouched.
+- Lessons rest on one case. More cases are needed before any of them is treated as a rule.
+
 ## Next phases (waiting for the owner's further instructions)
 
 - Phase 1. Question intake and event mapping (question to house, karaka, divisional chart, Nth house).

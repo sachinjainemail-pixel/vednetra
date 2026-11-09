@@ -82,6 +82,9 @@ function check(text, opts) {
     }
   } else if (finalLine != null && finalLine.trim().length < 3) errors.push("FINAL ANSWER is empty");
 
+  // counter reading line in S8 (LEARNINGS.md L6), warning only
+  if (!lines.some(l => /^COUNTER READING\b/.test(l))) warnings.push("S8 has no line starting COUNTER READING (see LEARNINGS.md lesson L6)");
+
   // owner style characters
   const bad = (text.match(STYLE_CHARS) || []);
   if (bad.length) {
