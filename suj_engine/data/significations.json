@@ -1,0 +1,33 @@
+{
+  "_note": "Working table for SUJ engine knowledge base 1 (dominant house). Standard Parashari bhava and karaka significations plus the Laghu Parashari house keywords from rule LP-020-3. Editable by the owner. The engine reads this file, so adding or correcting an entry changes every future reading.",
+  "houses": {
+    "1": { "names": ["Tanu", "Lagna", "Kendra", "Trikona"], "themes": "self, body, health, vitality, appearance, temperament, identity, general direction of life, honour" },
+    "2": { "names": ["Dhana", "Panapara", "Maraka"], "themes": "wealth, savings, family of origin, speech, food, face and eyes, values, early childhood, accumulated assets" },
+    "3": { "names": ["Bhratri", "Sahaja", "Apoklima", "Upachaya"], "themes": "siblings, courage, effort, skills, communication, short travel, writing, media, initiative, hands and shoulders" },
+    "4": { "names": ["Sukha", "Patala", "Kendra"], "themes": "mother, home, homemaking, property, land, vehicles, domestic peace, inner contentment, schooling and early education, heart, native soil, tuition and nurturing work" },
+    "5": { "names": ["Putra", "Vidya", "Trikona", "Panapara"], "themes": "children, intelligence, education, creativity, speculation, mantra, romance, past life merit, advice and teaching" },
+    "6": { "names": ["Shatru", "Roga", "Upachaya", "Apoklima"], "themes": "enemies, disease, debt, litigation, service, daily work, competition, maternal relatives, obstacles overcome by effort" },
+    "7": { "names": ["Kalatra", "Jaya", "Kendra", "Maraka"], "themes": "spouse, marriage, partnerships, business partners, public dealings, contracts, foreign settlement, open enemies" },
+    "8": { "names": ["Ayu", "Mrityu", "Trika", "Panapara"], "themes": "longevity, transformation, sudden events, inheritance, hidden matters, occult, research, chronic illness, in laws money, obstacles" },
+    "9": { "names": ["Dharma", "Bhagya", "Trikona"], "themes": "fortune, father, dharma, guru, higher education, long journeys, pilgrimage, religion, law, grace of past merit" },
+    "10": { "names": ["Karma", "Rajya", "Kendra", "Upachaya"], "themes": "profession, career, status, authority, public standing, government, action, achievement, father as source of karma" },
+    "11": { "names": ["Labha", "Aya", "Upachaya", "Panapara"], "themes": "gains, income, fulfilment of desires, elder siblings, friends, networks, social circle, ambitions realised" },
+    "12": { "names": ["Vyaya", "Trika", "Apoklima"], "themes": "expenses, losses, foreign lands, isolation, hospitals, prisons, sleep, bed pleasures, spirituality, moksha, hidden enemies" }
+  },
+  "planets": {
+    "Sun":     { "natural": "soul, father, authority, government, vitality, status, confidence, leadership, bones, heart" },
+    "Moon":    { "natural": "mind, mother, emotions, public, nourishment, fluids, comfort, memory, home feeling" },
+    "Mars":    { "natural": "courage, action, land and property, engineering, surgery, police and army, competition, conflict, younger siblings, blood" },
+    "Mercury": { "natural": "intellect, speech, trade, writing, learning, accounts, analytics, communication, skills, maternal uncle" },
+    "Jupiter": { "natural": "wisdom, dharma, children, teachers, counsel, wealth expansion, grace, law, faith, elders" },
+    "Venus":   { "natural": "spouse, relationships, art, luxury, vehicles, comforts, pleasure, agreements, beauty, women" },
+    "Saturn":  { "natural": "karma, work, employment, job, service, discipline, delay, endurance, structure, masses, labour, old age" },
+    "Rahu":    { "natural": "foreignness, ambition, technology, obsession, sudden rise, unconventional paths, material hunger, illusion" },
+    "Ketu":    { "natural": "detachment, moksha, breaks, research, intuition, hidden work, sharp separation, past life skill" }
+  },
+  "ownSigns": {
+    "Sun": [4], "Moon": [3], "Mars": [0, 7], "Mercury": [2, 5], "Jupiter": [8, 11],
+    "Venus": [1, 6], "Saturn": [9, 10], "Rahu": [], "Ketu": []
+  },
+  "_signIndexNote": "Sign index 0 = Aries ... 11 = Pisces, same as Vednetra."
+}
