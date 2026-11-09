@@ -551,3 +551,30 @@ planet and to zero for a combust planet, and if both apply, combust is applied; 
 lower longitude because Vednetra produces no latitude, so it is provisional; (c) subject links are counted one
 point each, with no weights; (d) the subject presets in data/topics.json marked proposed are the engine
 author's, not the owner's.
+
+
+---
+
+## 6. ANSWER RULES HARD CODED BY THE OWNER (fourth instruction round)
+
+Owner's words, lightly cleaned:
+
+The engine must never say that it is not able to differentiate between options to find the final option. It
+must always be able to find the most suitable option. This is for questions where multiple options are given to
+select from. If the question has no options, the answer must be very, very concrete and clear, as if selecting
+an option from multiple options. At the end of the analysis, always give a 2 to 3 bulleted one liner summary of
+all the analysis and the final answer. Hard code this instruction in the engine.
+
+How the engine enforces it:
+
+1. Contract requirements 12 to 14 and CLAUDE.md state the rule as non negotiable.
+2. ANSWER_TEMPLATE.md fixes the section order S0 to S9, the TIME STATUS line, the FINAL ANSWER line and the
+   closing bullets.
+3. suj_engine/tools/answer_guard.js checks a drafted answer and fails it on hedging language, on missing or
+   misordered sections, on a missing TIME STATUS, on a final answer that is not one of the given options, and on
+   closing bullets that are not 2 or 3 one liners at the very end.
+4. planet_strength.js can never return an undecided result. After the votes and the step tie break order it
+   applies further fixed deciders and records which one decided: subject links without dasha, owner adjusted
+   Shadbala percent, Vimshopaka Dashavarga, total Shadbala rupa and finally the Naisargika order of the planets.
+5. Where evidence is close, that closeness appears only as evidence inside the analysis sections, such as the
+   vote margin and the counter point. The final answer itself is always one definite answer.

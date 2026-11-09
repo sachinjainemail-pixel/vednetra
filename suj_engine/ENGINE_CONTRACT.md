@@ -45,7 +45,20 @@ Claude Code session recognise any reference to "SUJ engine" as this engine.
     method in METHODOLOGY.md section 5, using Vednetra figures. The answer must show the planets compared, the
     strength evidence for each step, the winner and the reason.
 
+12. ALWAYS DECIDE. The engine never says it cannot differentiate, decide or determine, and never calls options
+    equal. With options given it selects the most suitable single option. Without options it gives one concrete
+    answer, as clear as a choice from options.
+13. CLOSING BULLETS. Every answer ends with 2 or 3 bulleted one liners that summarise the analysis and give the
+    final answer. The last bullet starts with Final answer. Nothing follows them.
+14. GUARD. Every answer is checked with suj_engine/tools/answer_guard.js before it is sent. See ANSWER_TEMPLATE.md.
+
 ## Engine tools
+
+Answer guard, run before sending any answer:
+
+    node suj_engine/tools/answer_guard.js answer.txt --options "Option A|Option B"
+
+Leave out --options when the question gave no options.
 
 Planet strength and conflict resolution, run it whenever candidate planets conflict:
 

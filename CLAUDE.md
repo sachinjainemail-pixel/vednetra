@@ -29,8 +29,20 @@ Non negotiable points
 - When more than one planet can deliver the result of an event and the results conflict, the more powerful
   planet enforces its result. Judge power only by the owner's six step method, METHODOLOGY.md section 5, and run
   node suj_engine/tools/planet_strength.js with the candidate planets, the topic and the as-of date.
+- ALWAYS DECIDE. Never say the engine cannot differentiate, decide or determine, and never call options equal.
+  With options, select the single most suitable option. Without options, give one concrete answer as clear as a
+  choice from options.
+- Use the section layout in suj_engine/ANSWER_TEMPLATE.md. End every answer with 2 or 3 bulleted one liners that
+  summarise the analysis and give the final answer, the last one starting with Final answer, and nothing after
+  them. Write the draft to a file and run node suj_engine/tools/answer_guard.js on it before sending.
 - Rule library: suj_engine/rules/rules_index.json (1,561 rules from Komilla Sutton The Nakshatras and Umesh
   Puri Laghu Parashari).
+
+## What the engine needs from the owner for a reading
+
+Native name, gender, date of birth, time of birth, place of birth (the latitude, longitude and time zone can be
+looked up), the question, and the answer options if there are any. If birth data is missing, ask for it in one
+short message and then proceed. The as-of date is the system date.
 
 The owner is building this engine in rounds and will give further instructions. Update STATUS.md after each
 round.

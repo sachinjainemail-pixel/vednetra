@@ -302,33 +302,52 @@ function resolve(cands, rows, P, sbRows, topic, rankings) {
   const detail = [];
   steps.forEach(s => {
     const vals = cands.map(c => ({ c, v: val(c, s) })).filter(x => x.v != null);
+    if (!vals.length) return;                                  // nobody can be scored on this step, it casts no vote
     const best = Math.max.apply(null, vals.map(x => x.v));
     const winners = vals.filter(x => x.v === best).map(x => x.c);
     winners.forEach(w => { votes[w] += 1 / winners.length; });
     detail.push({ step: s, values: vals.map(x => x.c + " " + r2(x.v)).concat(cands.filter(c => rows[c].isNode && s !== 6).map(c => c + " no vote, node")), winner: winners.join(" and ") + (winners.length > 1 ? " (tie, vote shared)" : "") });
   });
   const order = [6, 1, 3, 2].filter(s => steps.indexOf(s) >= 0);
-  const sorted = cands.slice().sort((a, b) => {
+  // Owner rule, hard coded: the engine must always name one winner and never report an undecided result.
+  // If votes and the four step tie break order still leave a tie, these further deciders are applied in this
+  // fixed order. The decider that finally separated the planets is recorded in decidedBy.
+  const sunSideOf = c => rows[c].isNode ? rows[P[c].dispositor] : rows[c];   // a node borrows its sign lord ONLY here
+  const NAISARGIKA_ORDER = ["Sun", "Moon", "Venus", "Jupiter", "Mercury", "Mars", "Saturn", "Rahu", "Ketu"];
+  const finalDeciders = [
+    { name: "subject links without dasha", f: c => rows[c].step6 ? rows[c].step6.subjectOnlyCount : null },
+    { name: "owner adjusted Shadbala percent", f: c => { const x = sunSideOf(c); return x.step4.ownerAdjusted ? x.step4.ownerAdjusted.percent : null; } },
+    { name: "Vimshopaka Dashavarga", f: c => { const x = sunSideOf(c); return x.step3.vimshopaka ? x.step3.vimshopaka.dashavarga : null; } },
+    { name: "total Shadbala rupa", f: c => { const x = sunSideOf(c); return x.step1 ? x.step1.totalRupa : null; } },
+    { name: "Naisargika order of the planets", f: c => -NAISARGIKA_ORDER.indexOf(c) }
+  ];
+  let decidedBy = "votes";
+  const cmp = (a, b) => {
     if (votes[b] !== votes[a]) return votes[b] - votes[a];
-    for (const s of order) { const va = val(a, s), vb = val(b, s); if (va != null && vb != null && va !== vb) return vb - va; }
+    for (const s of order) { const va = val(a, s), vb = val(b, s); if (va != null && vb != null && va !== vb) { decidedBy = "tie break on step " + s; return vb - va; } }
+    for (const d of finalDeciders) { const va = d.f(a), vb = d.f(b); if (va != null && vb != null && va !== vb) { decidedBy = d.name; return vb - va; } }
     return 0;
-  });
+  };
+  const sorted = cands.slice().sort(cmp);
+  if (votes[sorted[0]] !== votes[sorted[1]]) decidedBy = "votes";
+  else { decidedBy = "votes"; cmp(sorted[0], sorted[1]); }
   const winner = sorted[0];
   const w = rows[winner];
   const flags = [];
-  if (w.isNode) flags.push(winner + " is a node with no Shadbala, it won on the subject and dasha test, so confidence is lower");
+  if (w.isNode) flags.push(winner + " is a node with no Shadbala, the decision rests on the subject and dasha test and the sign lord");
   if (w.step4.combustVednetraFlag) flags.push(winner + " is combust, its result is delivered with damage");
   if (w.step4.grahaYuddha === "in war, provisional loser") flags.push(winner + " lost a planetary war (provisional)");
   if (w.step4.retrograde) flags.push(winner + " is retrograde, results come with delay and review");
   if (w.step2.dignity === "Debilitated") flags.push(winner + " is debilitated" + (w.step2.neechaBhanga.present ? " with cancellation" : " without cancellation"));
   const adj = cands.filter(c => !rows[c].isNode && rows[c].step4.ownerAdjusted).sort((a, b) => rows[b].step4.ownerAdjusted.percent - rows[a].step4.ownerAdjusted.percent)[0];
   return {
-    candidates: cands, winner, votes, stepDetail: detail,
+    candidates: cands, winner, votes, stepDetail: detail, decidedBy,
+    margin: votes[sorted[0]] - votes[sorted[1]],
     tieBreakOrder: order,
     ownerAdjustedRankingLeader: adj || null,
     adjustedRankingAgrees: adj ? adj === winner : null,
     flagsOnWinner: flags,
-    note: "Procedure is provisional and awaits owner confirmation. Votes are one per step, tie shared."
+    note: "Procedure is provisional and awaits owner confirmation. Votes are one per step, tie shared. The engine always names one winner."
   };
 }
 
@@ -370,7 +389,7 @@ function toMarkdown(res) {
     x.stepDetail.forEach(d => L.push("- Step " + d.step + ": " + d.values.join(", ") + " -> " + d.winner));
     L.push("Votes: " + Object.keys(x.votes).map(k => k + " " + r2(x.votes[k])).join(", ") + ". Tie break order: steps " + x.tieBreakOrder.join(", ") + ".");
     L.push("RESULT: " + x.winner + " is the more powerful planet and enforces its result.");
-    L.push("Owner adjusted ranking leader " + x.ownerAdjustedRankingLeader + ", " + (x.adjustedRankingAgrees ? "agrees with the result." : "differs from the result, so this is a lower confidence call."));
+    L.push("Decided by " + x.decidedBy + ", vote margin " + r2(x.margin) + "." + (x.ownerAdjustedRankingLeader ? " Owner adjusted ranking leader " + x.ownerAdjustedRankingLeader + ", " + (x.adjustedRankingAgrees ? "agrees with the result." : "leans to a different planet, noted as a counter point, the result stands.") : ""));
     if (x.flagsOnWinner.length) L.push("Flags on the winner: " + x.flagsOnWinner.join("; ") + ".");
     L.push(x.note);
   }

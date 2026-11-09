@@ -48,6 +48,19 @@
   session. Its ephemeris is a built in analytic one with about one arc minute typical precision.
 - Provisional items awaiting owner confirmation are listed in METHODOLOGY.md section 5.4.
 
+## Round 4. Answer rules hard coded (done)
+
+- METHODOLOGY.md section 6, contract requirements 12 to 14 and CLAUDE.md now carry the rules: always decide,
+  concrete answer when no options, 2 or 3 bulleted one liners at the end.
+- ANSWER_TEMPLATE.md fixes the section order S0 to S9. Version 1, built from the order of the methodology, and
+  open to the owner's changes.
+- answer_guard.js built and tested on one good draft and five bad ones (hedging, wrong bullet count, answer not
+  in the options, bad time status, style characters). It passes the good draft and fails each bad one.
+- planet_strength.js can no longer end undecided. Extra fixed deciders were added and tested on a node against
+  node case with no topic.
+- Activation in a new session needs these commits on the main branch, or the session opened on the working
+  branch. At the end of this round they are on claude/pensive-albattani-a7wsss only.
+
 ## Next phases (waiting for the owner's further instructions)
 
 - Phase 1. Question intake and event mapping (question to house, karaka, divisional chart, Nth house).
