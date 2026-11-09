@@ -29,6 +29,25 @@
 - Moon benefic test now follows the owner's rule, Shukla 6th tithi to Krishna 10th tithi. Vednetra's own
   naturalNature uses a different Moon brightness test, so the two can differ for a Moon near those limits.
 
+## Round 3. Knowledge base 2, planet strength and conflict resolution (done)
+
+- Owner's rule and the six step Hindi method saved word for word in METHODOLOGY.md section 5, with an English
+  rendering and the engine's resolution procedure.
+- Tool built: suj_engine/tools/planet_strength.js with data/topics.json. For the seven planets it gives Shadbala
+  percent against the Santhanam minimums with all six parts, D1 dignity and sign lord condition and neecha bhanga,
+  D9 and vargottama and four Vimshopaka schemes and the subject varga, retrograde and combust and graha yuddha,
+  aspects and conjunctions and yogas as notes only, the subject and dasha count at any as-of date, and a
+  separate node assessment. It prints the mathematical and the owner adjusted rankings side by side and resolves
+  candidate planets to one winner.
+- app.js received nine added lines that expose Vednetra's own Shadbala, Vimshopaka, dignity, yoga and aspect
+  functions as VedicCore.sujInternals. Nothing else changed. Vednetra's self test still prints 8 of 8. The cache
+  version numbers were not bumped because no screen or behaviour changed.
+- Tested on one chart. Venus against Saturn for career resolves to Saturn on a two to two vote broken by step 6.
+  A node candidate and a bad topic name were also tested.
+- Not verified: Vednetra's Shadbala was not compared with a reference program such as Parashara's Light in this
+  session. Its ephemeris is a built in analytic one with about one arc minute typical precision.
+- Provisional items awaiting owner confirmation are listed in METHODOLOGY.md section 5.4.
+
 ## Next phases (waiting for the owner's further instructions)
 
 - Phase 1. Question intake and event mapping (question to house, karaka, divisional chart, Nth house).

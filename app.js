@@ -27944,6 +27944,15 @@
       return { markdown: vnKpHoraryMarkdown(input, Number(hnum)) };
     }
   };
+  // SUJ engine hooks: read-only handles on existing internals, added so a harness can reuse
+  // Vednetra's own Shadbala, Vimsopaka, dignity and yoga code. Nothing here changes any app behaviour.
+  coreApi.sujInternals = {
+    shadbalaRows: shadbalaRows, vimScheme: vnVimScheme, vimSchemes: VN_VIM_SCHEMES,
+    vargaDignity: vargaDignity, neechabhanga: neechabhanga, neechabhangaReport: neechabhangaReport,
+    scanYogas: scanYogas, planetsAspectingPlanet: planetsAspectingPlanet,
+    aspectNameToHouse: aspectNameToHouse, isD9Vargottama: isD9Vargottama,
+    vargaSign: vargaSign, vargaDivisions: vargaDivisions
+  };
   if (typeof window !== "undefined") window.VedicCore = coreApi;
   if (typeof globalThis !== "undefined") globalThis.VedicCore = coreApi;
 }());

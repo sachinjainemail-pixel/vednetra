@@ -1,0 +1,15 @@
+{
+  "_note": "Topic presets used by planet_strength.js for step 6 (subject relationship and dasha activity). Each field carries a source tag. owner means the owner stated it in the methodology. proposed means the engine author filled it from standard Parashari practice and the owner should confirm or correct it. Any preset can be overridden on the command line with houses, karakas and varga.",
+  "career":        { "houses": [10], "karakas": ["Saturn"], "varga": 10, "source": "owner for house 10, Saturn and D10", "proposedExtras": "Sun, Mercury and Jupiter as secondary career karakas" },
+  "marriage_male": { "houses": [7], "karakas": ["Venus"], "varga": 9, "source": "owner" },
+  "marriage_female": { "houses": [7], "karakas": ["Venus", "Jupiter"], "varga": 9, "source": "owner" },
+  "children":      { "houses": [5], "karakas": ["Jupiter"], "varga": 7, "source": "owner" },
+  "education":     { "houses": [4, 5], "karakas": ["Mercury", "Jupiter"], "varga": 24, "source": "owner for D24, houses and karakas proposed" },
+  "father":        { "houses": [9], "karakas": ["Sun"], "varga": 12, "source": "owner for Sun and D12, house 9 proposed" },
+  "mother":        { "houses": [4], "karakas": ["Moon"], "varga": 12, "source": "owner for Moon and D12, house 4 proposed" },
+  "siblings":      { "houses": [3], "karakas": ["Mars"], "varga": 3, "source": "owner for Mars and D3, house 3 proposed" },
+  "health":        { "houses": [1, 6], "karakas": ["Saturn"], "varga": 30, "source": "owner for D30 and Saturn, houses proposed" },
+  "wealth":        { "houses": [2, 11], "karakas": ["Jupiter"], "varga": 2, "source": "proposed" },
+  "property":      { "houses": [4], "karakas": ["Mars"], "varga": 4, "source": "proposed" },
+  "foreign":       { "houses": [12, 9], "karakas": ["Rahu"], "varga": 9, "source": "proposed" }
+}

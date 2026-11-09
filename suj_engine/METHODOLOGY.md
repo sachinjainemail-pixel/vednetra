@@ -456,3 +456,98 @@ For any dasha planet, judge:
 
 (The owner's text on transit validation of SAT, JUP, RAH, KET and SUN during the selected dasha periods
 appears in section 0 pillar c. Detailed transit rules are expected in a later instruction round.)
+
+
+---
+
+## 5. KNOWLEDGE BASE 2. CONFLICT BETWEEN PLANETS AND HOW PLANET STRENGTH DECIDES
+
+Added by the owner in the third instruction round. The owner called it a very important and critical
+instruction.
+
+### 5.1 The rule (owner's words)
+
+If for any life event there is more than one planet capable of delivering the results, and these results are
+conflicting with each other, that is, not the same, then out of the involved planets the planet which is
+POWERFUL shall be enforcing its result.
+
+To decide planet strength, follow the method in 5.2.
+
+### 5.2 The strength method (owner's text, in Hindi, exactly as given)
+
+ग्रहों की तुलना में पहले जन्मकुंडली का सामान्य ग्रहबल देखें। फिर जिस विषय का फल जानना है, उसमें उस ग्रह की भूमिका और सक्रियता देखें। कुंडली का सर्वाधिक बलवान ग्रह और करियर, विवाह या संतान के लिए सबसे प्रभावी ग्रह अलग हो सकते हैं।
+
+1. षड्बल प्रतिशत। सात ग्रहों की सामान्य तुलना का पहला आधार षड्बल है। इसके छह घटक हैं स्थानबल, दिग्बल, कालबल, चेष्टाबल, नैसर्गिक बल और दृग्बल। हर ग्रह का प्राप्त षड्बल उसके अपने निर्धारित न्यूनतम से भाग देकर 100 से गुणा करें। आर. संथानम् के बृहत् पाराशर होरा शास्त्र संस्करण में न्यूनतम बल सूर्य के लिए 6.5, चंद्र के लिए 6, मंगल के लिए 5, बुध के लिए 7, गुरु के लिए 6.5, शुक्र के लिए 5.5 और शनि के लिए 5 रूप है। उदाहरण के लिए, बुध के 7.2 रूप लगभग 103% हैं, जबकि शनि के 6 रूप 120% हैं। इसलिए कुल रूप कम होने पर भी शनि अपने न्यूनतम के सापेक्ष ऊपर है। 100% का अर्थ निर्धारित न्यूनतम की पूर्ति है। छह घटकों को अलग देखने से पता चलता है कि ग्रह की बढ़त किस प्रकार के बल से आई है।
+
+2. D1 में राशि और भाव की स्थिति। देखें कि ग्रह उच्च, मूलत्रिकोण, स्वराशि, मित्र राशि, शत्रु राशि या नीच राशि में है। साथ में उसके राशि-स्वामी की स्थिति और, जहाँ लागू हो, नीचभंग देखें। राशि की गरिमा ग्रह की स्थिति बताती है, जबकि भाव, भावेशत्व और योग बताते हैं कि उसका प्रभाव किन विषयों पर पड़ेगा।
+
+3. D9 और विषय-संबंधी वर्ग। नवांश में ग्रह की गरिमा देखें। ग्रह वर्गोत्तम है तो जिस राशि में वह D1 और D9 दोनों में है, उसकी गुणवत्ता भी देखें। विंशोपक बल कई वर्गों में ग्रह की स्थिति का 20-अंकीय आकलन देता है। किसी खास विषय के लिए संबंधित वर्ग में ग्रह और भाव का संबंध भी देखें, जैसे करियर के लिए D10, संतान के लिए D7 और शिक्षा के लिए D24।
+
+4. वक्री, अस्त और ग्रहयुद्ध। हर ग्रह की वक्री और अस्त स्थिति अलग दर्ज करें। वक्रता का असर चेष्टाबल में देखें, अस्तता के लिए सूर्य से वास्तविक अंश-दूरी देखें, और जहाँ ग्रहयुद्ध लागू हो वहाँ उसका परिणाम दर्ज करें। आपकी पद्धति में वक्री को अधिकतम और अस्त को शून्य मानने वाला समायोजन गणितीय षड्बल प्रतिशत से अलग रखें। इससे दोनों आधारों पर बनी रैंकिंग स्पष्ट रहेगी।
+
+5. दृष्टि, युति और योग। देखें कि ग्रह को किन ग्रहों का समर्थन या पीड़ा मिल रही है, युति कितनी निकट है और ग्रह किस योग में भाग ले रहा है। दृग्बल षड्बल का एक घटक है, जबकि विशिष्ट युति या योग फल की प्रकृति समझने में मदद करता है। उच्चता, वर्ग-स्थिति, वक्रता और दृष्टि का जो हिस्सा षड्बल में पहले से शामिल है, उसे कुल स्कोर में दोबारा जोड़ने के बजाय स्कोर की व्याख्या में इस्तेमाल करें।
+
+6. विषय से संबंध और दशा में सक्रियता। किसी खास फल के लिए लग्न और चंद्र से संबंधित भाव, भावेश और कारक देखें। फिर संबंधित वर्ग में पुष्टि और दशा–अंतरदशा में उनकी सक्रियता देखें। उदाहरण के लिए, करियर की रैंकिंग में दशम भाव और दशमेश से जुड़ा ग्रह, जिसकी भूमिका D10 में भी पुष्ट हो और जिसकी दशा सक्रिय हो, सामान्य षड्बल सूची में नीचे रहते हुए भी उस अवधि में अधिक प्रभावी हो सकता है।
+
+राहु–केतु का आकलन अलग करें। पाराशरी षड्बल की यह गणना सूर्य से शनि तक सात ग्रहों के लिए है। राहु–केतु के लिए उनके राशि-स्वामी, भाव, युति, दृष्टि और दशा में सक्रियता देखें।
+
+### 5.3 English rendering by the transcriber (for reference, the Hindi above is the authority)
+
+First look at the general strength of the planets in the birth chart. Then look at the role and activity of
+the planet in the subject whose result is wanted. The strongest planet of the chart and the most effective
+planet for career, marriage or children can be different.
+
+1. Shadbala percent. Shadbala is the first basis for comparing the seven planets. Its six parts are Sthana,
+   Dig, Kala, Cheshta, Naisargika and Drik bala. Divide each planet's Shadbala by its own prescribed minimum and
+   multiply by 100. In R. Santhanam's edition of Brihat Parashara Hora Shastra the minimum is Sun 6.5, Moon 6,
+   Mars 5, Mercury 7, Jupiter 6.5, Venus 5.5 and Saturn 5 rupa. Example: Mercury with 7.2 rupa is about 103
+   percent while Saturn with 6 rupa is 120 percent, so Saturn is higher relative to its minimum even though its
+   total is lower. 100 percent means the minimum is met. Viewing the six parts separately shows what kind of
+   strength gave the lead.
+2. Sign and house condition in D1. Exalted, Moolatrikona, own, friendly, enemy or debilitated sign, the
+   condition of the sign lord, and neecha bhanga where it applies. Sign dignity tells the planet's condition.
+   House, lordship and yogas tell which subjects its influence falls on.
+3. D9 and the subject varga. Dignity in Navamsha. If vargottama, also see the quality of the sign it holds in
+   both D1 and D9. Vimshopaka bala is a 20 point assessment across many vargas. For a specific subject see the
+   planet and house relation in the relevant varga, D10 for career, D7 for children, D24 for education.
+4. Retrograde, combust and planetary war. Record each separately. See the effect of retrogression in Cheshta
+   bala, use the actual degree distance from the Sun for combustion, and record the result of planetary war
+   where it applies. The owner's adjustment that treats a retrograde planet as maximum and a combust planet as
+   zero must be kept apart from the mathematical Shadbala percent, so both rankings stay visible.
+5. Aspect, conjunction and yoga. See which planets support or afflict, how close the conjunction is, and
+   which yoga the planet joins. Drik bala is already a part of Shadbala. A conjunction or yoga helps to
+   understand the nature of the result. Whatever part of exaltation, varga position, retrogression and aspect is
+   already inside Shadbala must be used to explain the score and must not be added again to the total.
+6. Relation to the subject and activity in dasha. For a specific result see the houses, house lords and
+   karakas from Lagna and from Moon, then confirmation in the relevant varga, then their activity in dasha and
+   antardasha. Example: for career, a planet tied to the 10th house and 10th lord, confirmed in D10 and with its
+   dasha active, can be more effective in that period even if it ranks low in the general Shadbala list.
+
+Rahu and Ketu are assessed separately. The Parashari Shadbala calculation is for the seven planets Sun to
+Saturn. For Rahu and Ketu look at their sign lord, house, conjunction, aspect and activity in dasha.
+
+### 5.4 How the engine runs it
+
+Tool: suj_engine/tools/planet_strength.js (data/topics.json holds the subject presets).
+All figures come from Vednetra: Shadbala in virupas with the Santhanam minimums, Vimshopaka, dignity, aspects,
+yogas, divisional charts and the dasha stack at the as-of date.
+
+Provisional resolution procedure, built by the engine author from the six steps above. It awaits the owner's
+confirmation or correction:
+1. Each candidate planet is compared on four steps. Step 1 Shadbala percent. Step 2 D1 sign dignity, where a
+   debilitation with neecha bhanga counts as a neutral sign. Step 3 Vimshopaka Shadvarga. Step 6 the count of
+   links to the subject and dasha activity at the as-of date.
+2. The highest value wins that step and gets one vote. A tie shares the vote.
+3. Steps 4 and 5 do not vote. Step 4 produces the owner adjusted ranking that is shown beside the mathematical
+   one, and a check on whether the two agree. Steps 4 and 5 also produce flags such as combust, retrograde or
+   lost planetary war on the winner.
+4. Most votes wins. A tie in votes is broken by step 6, then step 1, then step 3, then step 2.
+5. Rahu and Ketu vote only on step 6, since they have no Shadbala. A node winner is flagged as lower confidence.
+6. The planet that wins enforces its result. The answer must state the winner, the vote detail, the adjusted
+   ranking check and the flags.
+
+Other proposals to confirm: (a) the owner adjustment is read as Cheshta bala set to 60 virupa for a retrograde
+planet and to zero for a combust planet, and if both apply, combust is applied; (b) graha yuddha winner is by
+lower longitude because Vednetra produces no latitude, so it is provisional; (c) subject links are counted one
+point each, with no weights; (d) the subject presets in data/topics.json marked proposed are the engine
+author's, not the owner's.

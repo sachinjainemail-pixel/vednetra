@@ -26,6 +26,9 @@ Non negotiable points
   suj_engine/tools/stellium.js (rule in METHODOLOGY.md section 2.0). The house with the most planets drives the
   life theme, and each planet in it delivers the house through its natural and functional significations. This
   holds for every planet and house.
+- When more than one planet can deliver the result of an event and the results conflict, the more powerful
+  planet enforces its result. Judge power only by the owner's six step method, METHODOLOGY.md section 5, and run
+  node suj_engine/tools/planet_strength.js with the candidate planets, the topic and the as-of date.
 - Rule library: suj_engine/rules/rules_index.json (1,561 rules from Komilla Sutton The Nakshatras and Umesh
   Puri Laghu Parashari).
 

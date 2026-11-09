@@ -40,7 +40,19 @@ Claude Code session recognise any reference to "SUJ engine" as this engine.
     and repeat the finding in the closing summary. See METHODOLOGY.md section 2.0. It applies to every planet and
     every house, never to Saturn or the fourth house alone.
 
+11. KNOWLEDGE BASE 2, PLANET STRENGTH. Whenever more than one planet can deliver the result of an event and the
+    results conflict, the more powerful planet enforces its result. Power is judged only by the owner's six step
+    method in METHODOLOGY.md section 5, using Vednetra figures. The answer must show the planets compared, the
+    strength evidence for each step, the winner and the reason.
+
 ## Engine tools
+
+Planet strength and conflict resolution, run it whenever candidate planets conflict:
+
+    node suj_engine/tools/planet_strength.js '{"date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0,"topic":"career","candidates":["Venus","Saturn"],"asOf":"2026-11-09"}'
+
+topic is a key of suj_engine/data/topics.json, or pass houses, karakas and varga. asOf is the date for which dasha
+activity is tested, so past and future windows can be examined by changing it. Add --json for structured output.
 
 Dominant house scan, run it for every native and question:
 
