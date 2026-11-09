@@ -50,6 +50,67 @@ MALEFICNESS OBSERVED DUE TO VARIOUS MALEFIC FACTORS.
 
 ## 2. DETAILED RULES FOR ANALYSIS FOR EVERY QUESTION
 
+### 2.0 KNOWLEDGE BASE 1. DOMINANT HOUSE (STELLIUM) RULE
+
+Added by the owner in the second instruction round. This runs FIRST in the D1 analysis, for every question,
+before section 2.1, and its finding is carried through every later step and into the closing summary.
+
+OWNER'S RULE (own words, lightly cleaned):
+
+In the D1 chart, always look for the house where many planets are together, two or three or four planets or
+more in the same house. If that is the case, the native will have the biggest impact of that house and its
+significations in his or her life. For example, if a native has three planets in the fourth house, the life
+will carry the most impact from the fourth house significations.
+
+What kind of impact it has is decided by the planets posited in it. The results of that house's significations
+are delivered THROUGH the planets posited in it, by BOTH their natural significations AND their functional
+significations based on the chart (the houses they lord for this ascendant).
+
+WORKED EXAMPLE FROM THE OWNER (an illustration only, the rule is NOT limited to Saturn or to the fourth house):
+Three planets sit in the fourth house and Saturn is one of them. Saturn is the natural significator of
+employment, job, work and karma, so the native does mostly fourth house related activities during life, as per
+Saturn's natural signification. That means work such as home tuitions or a homemaker kind of role. If the
+native is also the functional lord of the ninth and tenth houses, the native will be doing the karmas or works
+related to the father or the father's work, or the native's recognition will come with delay in life.
+
+GENERALISATION (explicit instruction from the owner): the above applies to ANY planet in ANY house, and
+especially to houses holding several planets. If Mars, Sun, Moon and Venus sit in one house, that house carries
+the natural and functional significations of ALL four planets, the native's life revolves around that house's
+significations, and the results of those significations are delivered through those four planets. Always
+analyse the chart by asking which house has the most planets, what that house signifies, and what the natural
+and functional significations of each planet inside it are.
+
+HOW THE ENGINE APPLIES IT (operational steps):
+
+1. Count planets by house in the D1 chart. A stellium is any house with two or more planets. The house (or
+   houses) with the highest count is the DOMINANT house. A house with fewer planets but still two or more is a
+   secondary stellium house and is also reported.
+2. For each planet in a stellium house, list (a) its natural significations, (b) its functional significations,
+   meaning the houses it lords and what those houses signify, (c) its functional role for this ascendant,
+   (d) its condition, which means dignity, retrogression, combustion, degree, nakshatra and pada, and
+   Navamsha placement. Condition decides whether the delivery is strengthened or damaged, using the
+   positive first then discount approach from section 1.
+3. Combine house significations with planet significations. The house gives the AREA of life and the planets
+   give the MODE and the QUALITY of delivery. Write this as a plain life theme statement, as in the owner's
+   example, for every planet in the house.
+4. Carry the dominant house into the question. If the question's house is the dominant house, or the dominant
+   house planets lord the question's house, or the question's house lord sits in the dominant house, the finding
+   is a major weight for the promise. Otherwise the dominant house still colours how the event will be
+   experienced and must be stated.
+5. Check the same finding in the Moon chart and the Sun chart (Sudarshan). A dominant house that holds in more
+   than one chart is a stronger finding.
+6. The finding must be reflected in the closing summary section of the answer.
+
+PROPOSALS NOT YET CONFIRMED BY THE OWNER (flagged, to be confirmed in the next round):
+a. Rahu and Ketu are counted as planets in the count. They are treated as acting through their dispositor and
+   their nakshatra lord.
+b. If two houses tie for the highest count, both are dominant and ranked for display only.
+c. The dasha, antardasha and pratyantardasha of the planets inside the dominant house are treated as primary
+   carriers of the dominant house results during timing analysis.
+d. Houses are whole sign houses counted from the reference sign, matching Vednetra's house field.
+
+Tool: suj_engine/tools/stellium.js (details in ENGINE_CONTRACT.md). Data: suj_engine/data/significations.json.
+
 ### 2.1 ANALYSIS OF D1 CHART
 
 D1 CHART ANALYSIS IS THE KEY TO FIND ANSWER TO ANY QUESTION. D1 CHART SHALL BE ANALYSED PER SUDARSHAN PADDHATI

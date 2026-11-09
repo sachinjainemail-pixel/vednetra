@@ -13,6 +13,22 @@
   for a test chart.
 - CLAUDE.md at the repository root makes new sessions recognise the SUJ engine.
 
+## Round 2. Knowledge base 1, dominant house (done)
+
+- Rule written into METHODOLOGY.md section 2.0 and ENGINE_CONTRACT.md requirement 10.
+- Tool built: suj_engine/tools/stellium.js with the Vednetra loader and data/significations.json.
+  It scans the Lagna, Moon and Sun charts, finds every house with two or more planets, marks the dominant
+  house, and lists for each planet the natural significations, the functional significations from the houses it
+  lords, functional role, dignity, retrograde, combust, nakshatra and Navamsha. It also links the result to the
+  question house.
+- Tested on two charts. Positions agree with Vednetra's own report for the same chart. One test chart has a four
+  planet house and one has only two planet houses, and both are handled.
+- Four assumptions are recorded as proposals in METHODOLOGY.md section 2.0, awaiting owner confirmation.
+- The significations table is a working table written for this engine and is editable. It is not yet reviewed
+  by the owner.
+- Moon benefic test now follows the owner's rule, Shukla 6th tithi to Krishna 10th tithi. Vednetra's own
+  naturalNature uses a different Moon brightness test, so the two can differ for a Moon near those limits.
+
 ## Next phases (waiting for the owner's further instructions)
 
 - Phase 1. Question intake and event mapping (question to house, karaka, divisional chart, Nth house).

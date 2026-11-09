@@ -22,6 +22,10 @@ Non negotiable points
   due in the future, using the current system date as the as-of date.
 - Produce every chart, dasha, divisional chart and transit with the Vednetra tool in this repository
   (node tools/run-nobrowser.js, or VedicCore in app.js). Never compute them by hand or from memory.
+- At the start of the D1 analysis of every question run the dominant house scan, node
+  suj_engine/tools/stellium.js (rule in METHODOLOGY.md section 2.0). The house with the most planets drives the
+  life theme, and each planet in it delivers the house through its natural and functional significations. This
+  holds for every planet and house.
 - Rule library: suj_engine/rules/rules_index.json (1,561 rules from Komilla Sutton The Nakshatras and Umesh
   Puri Laghu Parashari).
 

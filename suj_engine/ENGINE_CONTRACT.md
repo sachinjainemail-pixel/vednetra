@@ -34,6 +34,21 @@ Claude Code session recognise any reference to "SUJ engine" as this engine.
    (identity of the astrologer), plus the attached rule library of 1,561 rules from Komilla Sutton, The
    Nakshatras (1,083 rules) and Umesh Puri Gyaneshwar, Laghu Parashari (478 rules). See suj_engine/rules.
 
+10. KNOWLEDGE BASE 1, DOMINANT HOUSE. At the start of the D1 analysis of every question the engine must run
+    the dominant house (stellium) scan, state which house holds the most planets, give the natural and
+    functional significations of every planet in it, state the resulting life theme, link it to the question,
+    and repeat the finding in the closing summary. See METHODOLOGY.md section 2.0. It applies to every planet and
+    every house, never to Saturn or the fourth house alone.
+
+## Engine tools
+
+Dominant house scan, run it for every native and question:
+
+    node suj_engine/tools/stellium.js '{"name":"X","date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0,"focusHouse":10}'
+
+Add --json for structured output. focusHouse is the house the question is about. The tool reads the chart from
+Vednetra through suj_engine/tools/vednetra_loader.js and scans the Lagna, Moon and Sun charts.
+
 ## How to use VEDNETRA from Claude Code
 
 Vednetra is this repository. It is a pure JavaScript application and runs without a browser.
