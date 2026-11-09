@@ -578,3 +578,12 @@ How the engine enforces it:
    Shadbala percent, Vimshopaka Dashavarga, total Shadbala rupa and finally the Naisargika order of the planets.
 5. Where evidence is close, that closeness appears only as evidence inside the analysis sections, such as the
    vote margin and the counter point. The final answer itself is always one definite answer.
+
+### 6.1 Language of the summary (fifth instruction round)
+
+Owner's instruction: give the summary at the end in Hindi instead of English. The engine reads this as section S9
+SUMMARY in full, meaning the recap lines, the final answer line and the 2 or 3 closing bullets, all in Hindi in
+Devanagari script. The marker for the final answer becomes अंतिम उत्तर, on the final answer line and on the last
+bullet. Sections S0 to S8 stay in English. The heading S9. SUMMARY and the line TIME STATUS stay in English so the
+guard can read them. Option texts, if given, are quoted as given. Every other rule of this section 6 is unchanged,
+including always deciding, the single definite answer and the 2 or 3 one liner bullets at the very end.

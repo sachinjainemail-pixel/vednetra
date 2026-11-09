@@ -25,8 +25,11 @@ S7. TRANSIT VALIDATION
 S8. RECONCILIATION OF SECTIONS
     Which sections agreed, which differed, and why the chosen answer wins.
 S9. SUMMARY
-    Short analysis recap by section, then a line starting FINAL ANSWER with one concrete answer, then 2 or 3
-    bullet lines. The last bullet starts with "Final answer".
+    Written in HINDI in Devanagari script, from the first recap line to the last bullet. Short analysis recap by
+    section, then one line starting अंतिम उत्तर (Hindi for Final answer) with one concrete answer, then 2 or 3
+    bullet lines. The last bullet starts with अंतिम उत्तर. The heading stays "S9. SUMMARY" in English. If
+    options were given, the chosen option is quoted exactly as given inside the Hindi line. The recap must carry
+    the dominant house finding and the confidence grade, as in every earlier version of the template.
 
 ## Hard coded rules for every answer
 
@@ -37,5 +40,8 @@ S9. SUMMARY
    are equal. Where the evidence is close it applies the tie break order of METHODOLOGY.md section 5.4 and picks.
 4. The answer ends with 2 or 3 bulleted one liners that summarise the analysis and give the final answer.
 5. Nothing is written after those bullets.
+5a. Section S9, the recap, the final answer line and the closing bullets, is in Hindi. Sections S0 to S8 are in
+    English. The guard fails an English S9, a missing अंतिम उत्तर line, Hindi hedging language, and a summary whose
+    Devanagari share is below 70 percent.
 6. Before sending an answer run: node suj_engine/tools/answer_guard.js answer.txt [--options "A|B|C"]
    and fix every error it reports.

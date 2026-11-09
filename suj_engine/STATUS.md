@@ -61,6 +61,21 @@
 - Activation in a new session needs these commits on the main branch, or the session opened on the working
   branch. At the end of this round they are on claude/pensive-albattani-a7wsss only.
 
+## Round 5. Summary in Hindi (done)
+
+- Owner's instruction: give the summary at the end in Hindi instead of English.
+- Applied to section S9 SUMMARY as a whole: recap lines, final answer line and the 2 or 3 closing bullets, in
+  Devanagari. The final answer marker is now अंतिम उत्तर. S0 to S8 stay in English. Written into CLAUDE.md,
+  ENGINE_CONTRACT.md requirements 13 and 15, ANSWER_TEMPLATE.md S9 and rule 5a, and METHODOLOGY.md section 6.1.
+- answer_guard.js updated. It now requires the अंतिम उत्तर line and last bullet, requires at least 70 percent of the
+  letters in S9 to be Devanagari, fails any S9 line with no Hindi, fails Hindi hedging phrases such as कुछ कहा नहीं
+  जा सकता and निर्भर करता है, and allows closing bullets up to 300 characters because Hindi runs longer.
+- Tested. A Hindi S9 passes. An English S9, a Hindi hedging final line, a last bullet without the Hindi marker, and
+  a single English line inside S9 each fail. With options, a Hindi final line quoting the chosen English option
+  passes and a line naming a non listed option fails.
+- Assumptions to confirm with the owner. First, only S9 is Hindi, not the whole answer. Second, the headings and the
+  TIME STATUS line stay English. Third, the hedging phrase list in Hindi is the engine author's.
+
 ## Next phases (waiting for the owner's further instructions)
 
 - Phase 1. Question intake and event mapping (question to house, karaka, divisional chart, Nth house).

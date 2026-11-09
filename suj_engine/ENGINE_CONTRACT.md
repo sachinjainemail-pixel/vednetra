@@ -49,7 +49,10 @@ Claude Code session recognise any reference to "SUJ engine" as this engine.
     equal. With options given it selects the most suitable single option. Without options it gives one concrete
     answer, as clear as a choice from options.
 13. CLOSING BULLETS. Every answer ends with 2 or 3 bulleted one liners that summarise the analysis and give the
-    final answer. The last bullet starts with Final answer. Nothing follows them.
+    final answer. The last bullet starts with अंतिम उत्तर, which is Hindi for Final answer. Nothing follows them.
+15. HINDI SUMMARY. The summary at the end of every answer, section S9 with its recap, final answer line and
+    closing bullets, is written in Hindi in Devanagari script instead of English. Sections S0 to S8 stay in
+    English. Added by the owner in the fifth instruction round.
 14. GUARD. Every answer is checked with suj_engine/tools/answer_guard.js before it is sent. See ANSWER_TEMPLATE.md.
 
 ## Engine tools

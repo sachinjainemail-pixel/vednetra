@@ -33,8 +33,13 @@ Non negotiable points
   With options, select the single most suitable option. Without options, give one concrete answer as clear as a
   choice from options.
 - Use the section layout in suj_engine/ANSWER_TEMPLATE.md. End every answer with 2 or 3 bulleted one liners that
-  summarise the analysis and give the final answer, the last one starting with Final answer, and nothing after
+  summarise the analysis and give the final answer, the last one starting with अंतिम उत्तर, and nothing after
   them. Write the draft to a file and run node suj_engine/tools/answer_guard.js on it before sending.
+- LANGUAGE OF THE SUMMARY. Section S9 SUMMARY is written in Hindi in Devanagari script instead of English. That
+  covers the recap lines, the final answer line, which starts with अंतिम उत्तर, and the 2 or 3 closing bullets,
+  the last of which starts with अंतिम उत्तर. Sections S0 to S8 stay in English. The heading S9. SUMMARY and the
+  line TIME STATUS stay in English so the guard can read them. If options were given, quote the chosen option
+  exactly as given inside the Hindi final answer line.
 - Rule library: suj_engine/rules/rules_index.json (1,561 rules from Komilla Sutton The Nakshatras and Umesh
   Puri Laghu Parashari).
 
