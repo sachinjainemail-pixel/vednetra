@@ -1,0 +1,29 @@
+{
+  "_note": "Real outcomes supplied by the owner, used to test and correct the engine. Each case records what the engine answered, what happened and what was changed. Add new cases at the end.",
+  "cases": [
+    {
+      "id": "CAL-001",
+      "date_logged": "2026-11-10",
+      "native": { "gender": "male", "date": "2006-02-14", "time": "05:27:00", "tz": 5.5, "lat": 31.326, "lon": 75.576, "place": "Jalandhar Punjab" },
+      "birth_time_note": "Lagna 29.07 deg Sagittarius, crosses into Capricorn about 3.5 minutes after the given time. D10 Lagna Virgo and D24 Lagna Cancer unchanged on either side.",
+      "chart_facts": "Lagna Sagittarius. Sun and Mercury (combust, 13.62 deg) in house 3, the only stellium, same in Moon and Sun charts. Mars (5L, 12L) in 6. Venus (6L, 11L) in Lagna in exchange with Jupiter (1L, 4L) in 11. Saturn (2L, 3L) retrograde in 8, aspects 2 and 10. Rahu in 4, Ketu in 10. Houses 5 and 9 in paap kartari. D24 house 9 holds Moon, Jupiter, exalted Venus. Running at as of date, Venus MD, Ketu AD, Venus PD.",
+      "engine_answer": { "q1": "Higher education strongly promised, running now, postgraduate entry in Sun MD Moon AD from 26 March 2028", "q2": "Job, first window Jupiter AD 25 Dec 2029 to 14 Oct 2030", "q2_margin": "thin, decided by Shadbala tie break on a house 10 only career preset" },
+      "outcome": { "q1": "Dropped engineering, then started BCA, shows no interest in further or higher education", "q2": "Supports father in the family business of money lending and is settling in it" },
+      "verdict": { "q1": "Partly right. Degree level education is happening, but the strong postgraduate promise was wrong and the break from engineering was under-called as delay.", "q2": "Wrong. Business, specifically the family money lending business, was the answer." },
+      "causes": [
+        "Sun with the 10th lord (Dharma Karmadhipati in house 3) was not carried into the decision, although the owner's section 2.0 example gives father's work for this pattern.",
+        "Combust 10th lord was read as work under an outside organisation, not under the father.",
+        "6th house and 6th lord were read as service only, loans and recovery were missed. Saturn in the 8th aspecting the 2nd, Mars in the 6th, Jupiter in the 11th form a lending signature.",
+        "Career preset used house 10 only, so the 2nd, 6th, 7th and 11th links were not counted.",
+        "D24 strength was read as inclination. It shows capacity only."
+      ],
+      "changes_made": [
+        "METHODOLOGY.md section 7 added (rules 7.1 to 7.7)",
+        "topics.json career widened, job_or_business added, education given house 9",
+        "significations.json house 6 and house 8 given loans, interest and usury",
+        "ANSWER_TEMPLATE.md checklist for livelihood and education questions"
+      ],
+      "rerun_after_change": "planet_strength with houses 2, 6, 7, 10, 11 and karakas Mercury, Saturn, Jupiter, candidates Venus, Saturn, Mercury, Jupiter, Sun, Mars. Mercury wins on votes (1.83 against Venus 1.33), margin 0.5."
+    }
+  ]
+}

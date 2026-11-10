@@ -39,3 +39,16 @@ S9. SUMMARY
 5. Nothing is written after those bullets.
 6. Before sending an answer run: node suj_engine/tools/answer_guard.js answer.txt [--options "A|B|C"]
    and fix every error it reports.
+
+## Checklists added in round 5 (calibration case 1)
+
+Livelihood questions, job or business or kind of work. S2 and S5 must show, in this order, (1) whether the Sun
+joins the 10th lord or the 9th lord and 10th lord are linked, and so whether the father's work or the family
+occupation is the first candidate (METHODOLOGY.md 7.1), (2) the kind of work through the 6th, 8th, 2nd and 11th
+including loans and interest (7.2), (3) only then service against independent trade through the 6th and 7th.
+Use the planet_strength topic job_or_business or career, which cover the houses 10, 6, 7, 2 and 11.
+
+Education questions. S2 and S4 must state capacity (D24, 4th, 5th, 9th houses, karakas) and continuity
+(5th lord placement, kartari on the 5th and 9th, nodes in the 4th, running and next dasha lords) as separate
+findings. A postgraduate or further step is promised only when both support it (7.5). A break or change of
+stream is stated as a possible outcome when continuity is damaged (7.6).

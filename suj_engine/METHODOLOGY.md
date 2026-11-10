@@ -578,3 +578,54 @@ How the engine enforces it:
    Shadbala percent, Vimshopaka Dashavarga, total Shadbala rupa and finally the Naisargika order of the planets.
 5. Where evidence is close, that closeness appears only as evidence inside the analysis sections, such as the
    vote margin and the counter point. The final answer itself is always one definite answer.
+
+
+---
+
+## 7. CALIBRATION RULES FROM OUTCOME FEEDBACK (fifth instruction round)
+
+Added after calibration case 1 (see suj_engine/data/calibration_cases.json). The owner supplied the real
+outcome of a native for whom the engine had answered job and strong higher education, and instructed that the
+engine be updated with the learnings. These are the rules that came out of that comparison. Rules 7.1 and 7.2
+extend the owner's section 2.0 worked example and are applied as the owner's. Rules 7.3 to 7.6 are the engine
+author's reading of the same case and stay open to the owner's correction.
+
+7.1 SUN OR FATHER'S WORK RULE. The owner's section 2.0 example says that planets in a house deliver through
+their natural and functional significations, and gives the case of a native who does the karmas or work of the
+father. Operationally: when the 9th lord and the 10th lord are together, or the Sun joins the 10th lord, or the
+9th lord sits in the house of the 10th lord, the engine must test father's work or the family occupation as the
+first candidate for livelihood. A combust 10th lord with the Sun is read as work under the father or the family
+authority, and not as a job under an outside organisation, unless the family occupation is ruled out by other
+evidence in the chart.
+
+7.2 SIXTH HOUSE RULE. The 6th house is service and also debt, loans given and taken, interest and recovery of
+dues. The 8th house adds other people's money, interest and usury. The 2nd and 11th are money held and gains.
+For a livelihood question the engine must read the 6th, 8th, 2nd and 11th for the kind of work, and must not
+treat a strong 6th house or a strong 6th lord as a job indicator by itself. Money lending, finance, loans,
+recovery and credit trades show as a 6th lord, Saturn in the 8th or aspecting the 2nd, Mars in the 6th and a
+strong Jupiter or Mercury.
+
+7.3 JOB OR BUSINESS DECISION ORDER (author proposal). Step one, test the family occupation (7.1). Step two,
+read the kind of work through the 6th, 8th, 2nd and 11th (7.2). Step three, only then compare service against
+independent trade using the 6th and 7th houses and their lords. A hemmed or weak 7th house reduces independent
+partnership business. It does not rule out an inherited or family business, which runs on the 9th, 10th and
+the Sun, and not on the 7th.
+
+7.4 TOPIC PRESETS. The planet strength tool must never judge a livelihood question on the 10th house alone. Use
+the topics career or job_or_business in data/topics.json, which cover the houses 10, 6, 7, 2 and 11. In
+calibration case 1 the 10th house only preset gave a win to a planet through the Shadbala tie break, and the
+wider preset gave a win to a different planet on votes.
+
+7.5 EDUCATION RULE. Capacity and continuity are separate findings. Capacity is read from D24, the 4th, 5th and
+9th houses and the karakas Mercury and Jupiter. Continuity and inclination are read from the 5th lord and its
+house, paap kartari on the 5th and 9th, nodes in the 4th, and the nature of the running and next dasha lords.
+A 5th lord in the 6th, 8th or 12th, or kartari on the 5th and 9th, means a break, a change of stream or an early
+stop is a live outcome. A running Ketu period means detachment from formal study. The engine may promise a
+degree level on capacity but must not promise a further postgraduate step unless continuity also supports it.
+
+7.6 DISRUPTION WORDING. When the damage found is a kartari or a malefic hold on the education houses, the
+engine states a break or change of stream as a possible outcome, and not only delay.
+
+7.7 LIMITS. Calibration case 1 is one native and the outcome was known when the weights were changed, so it
+shows an error in weighting and does not prove the new weighting. More cases must be logged in
+calibration_cases.json and tested before these weights are treated as settled.

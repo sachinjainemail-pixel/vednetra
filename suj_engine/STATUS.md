@@ -61,6 +61,25 @@
 - Activation in a new session needs these commits on the main branch, or the session opened on the working
   branch. At the end of this round they are on claude/pensive-albattani-a7wsss only.
 
+## Round 5. Calibration from a real outcome (done)
+
+- First native read end to end under the engine, male born 14 February 2006, Jalandhar. The owner then gave the
+  real outcome. The engine had answered job and strong higher education with a postgraduate step. The real
+  outcome is family money lending business and BCA after dropping engineering, with no interest in further
+  study. Q2 was wrong and Q1 was half wrong.
+- The case is logged in data/calibration_cases.json as CAL-001 with the chart facts, the engine answer, the
+  outcome, the causes and the changes.
+- METHODOLOGY.md section 7 added. 7.1 Sun or father's work rule and 7.2 sixth house covers loans follow the
+  owner's section 2.0 example and are applied as the owner's. 7.3 to 7.7 are the engine author's reading and
+  await correction.
+- topics.json. career widened to houses 10, 6, 7, 2 and 11 with Saturn and Mercury. New job_or_business preset.
+  education gets house 9. significations.json house 6 and house 8 now name loans, interest and usury.
+- ANSWER_TEMPLATE.md has checklists for livelihood and education questions.
+- Tested. planet_strength.js runs with the job_or_business and career presets. Result for the case now favours
+  Mercury on votes. Not changed, answer_guard.js and stellium.js.
+- Limit. One case, outcome known when weights were changed, so this fixes an error and does not prove the new
+  weights. More cases are needed in calibration_cases.json.
+
 ## Next phases (waiting for the owner's further instructions)
 
 - Phase 1. Question intake and event mapping (question to house, karaka, divisional chart, Nth house).
