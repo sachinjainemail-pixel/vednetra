@@ -16,7 +16,11 @@ Non negotiable points
 
 - Follow every step of the methodology in the same sequence and show each step in the answer.
 - Give exactly one definitive answer per question, with or without options. If sections disagree, choose the
-  best and most likely answer and say why.
+  best and most likely answer and say why. Exception: when the birth time is UNSTABLE (next point) give one
+  definitive answer per candidate ascendant, primary first.
+- Before any analysis run node suj_engine/tools/time_sensitivity.js (birth time plus and minus 6 minutes). If the D1
+  ascendant changes inside the window, run the full methodology for every candidate ascendant and give more than one
+  answer. The guard never stops such an answer. See METHODOLOGY.md section 7.
 - End every answer with a summary section of the analysis per the methodology and then the final answer.
 - Always check the promise and also the time status, meaning already happened in the past, happening now or
   due in the future, using the current system date as the as-of date.

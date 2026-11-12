@@ -578,3 +578,41 @@ How the engine enforces it:
    Shadbala percent, Vimshopaka Dashavarga, total Shadbala rupa and finally the Naisargika order of the planets.
 5. Where evidence is close, that closeness appears only as evidence inside the analysis sections, such as the
    vote margin and the counter point. The final answer itself is always one definite answer.
+
+
+---
+
+## 7. BIRTH TIME STABILITY AND MORE THAN ONE ANSWER (fifth instruction round)
+
+Owner's instruction, lightly cleaned:
+
+The D1 ascendant can change within one or two minutes of the birth time, so the answers can change with it. The
+engine must test the birth time over a window of 6 minutes plus and minus, not 10. If the D1 ascendant changes
+inside that window, the answer must not be held back or reduced to one guess. The engine gives more than one
+answer in that situation, one per candidate ascendant.
+
+How the engine enforces it:
+
+1. Before any analysis the engine runs suj_engine/tools/time_sensitivity.js with windowMinutes 6 (the default).
+   It reports the D1 ascendant at every 30 seconds from minus 6 to plus 6 minutes, the candidate ascendants and the
+   time range of each, a run time for each candidate, notes on divisional ascendants, Moon pada and the running
+   dasha, and a verdict STABLE or UNSTABLE.
+2. STABLE means one D1 ascendant holds for the whole window. The engine proceeds as before and gives one answer.
+3. UNSTABLE means the D1 ascendant changes inside the window. The engine runs the complete methodology, sections
+   2.0 to 6, separately for every candidate ascendant, using the run time of that candidate for the Vednetra tools
+   (stellium.js and planet_strength.js). The Moon chart and the Sun chart do not depend on the ascendant, so their
+   findings are common to all candidates and are reported once.
+4. The answer then has one FINAL ANSWER line per candidate. The primary answer is the candidate that holds the
+   given birth time. The other candidates follow in order of how far their time range is from the given time.
+   Each line names its ascendant. Each line is still one concrete answer, and for questions with options it names
+   exactly one option. If every candidate gives the same answer the engine says so in S8 and one line is enough.
+5. S8 compares the candidates, says which findings are common to all of them and which differ, and states the
+   reason for the order of the answers.
+6. Divisional ascendants (D3, D7, D9, D10, D12, D24, D30) change faster than D1. The scan lists them as notes.
+   For a question that depends on a divisional chart, the config option splitVargas can be used to split the
+   candidates by that divisional ascendant as well.
+7. The guard never stops an unstable chart for having more than one answer. It only checks that each answer line is
+   a valid one.
+
+Open point for the owner: when the engine is given known past events, a later round can use them to rank the
+candidate times (birth time rectification). That is not built yet.

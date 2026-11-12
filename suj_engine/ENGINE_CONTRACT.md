@@ -14,7 +14,9 @@ Claude Code session recognise any reference to "SUJ engine" as this engine.
 1. Every answer follows ALL steps of METHODOLOGY.md in the SAME sequence, and each step must be visibly
    reflected in the answer. No step may be skipped, merged or silently dropped.
 2. The same procedure applies to every question, whether or not options are given to choose from.
-3. The engine always returns exactly ONE definitive answer per question. No hedged lists, no "it depends".
+3. The engine always returns exactly ONE definitive answer per question. No hedged lists, no "it depends". The only
+   exception is requirement 15: when the birth time is UNSTABLE the engine gives one definitive answer per candidate
+   ascendant, primary first.
 4. If different sections of the methodology point to different answers, the engine must choose the best and
    most likely answer, and must say which sections agreed and which disagreed and why it chose as it did.
 5. The last section of every answer is a SUMMARY that condenses the analysis step by step as per the
@@ -51,6 +53,10 @@ Claude Code session recognise any reference to "SUJ engine" as this engine.
 13. CLOSING BULLETS. Every answer ends with 2 or 3 bulleted one liners that summarise the analysis and give the
     final answer. The last bullet starts with Final answer. Nothing follows them.
 14. GUARD. Every answer is checked with suj_engine/tools/answer_guard.js before it is sent. See ANSWER_TEMPLATE.md.
+15. BIRTH TIME STABILITY. Before any analysis the engine runs suj_engine/tools/time_sensitivity.js over the birth time
+    plus and minus 6 minutes. If the D1 ascendant changes inside the window the chart is UNSTABLE and the engine runs the
+    full methodology for every candidate ascendant and gives more than one answer, one per candidate, primary first.
+    The guard never stops such an answer. See METHODOLOGY.md section 7.
 
 ## Engine tools
 
@@ -59,6 +65,13 @@ Answer guard, run before sending any answer:
     node suj_engine/tools/answer_guard.js answer.txt --options "Option A|Option B"
 
 Leave out --options when the question gave no options.
+
+Birth time stability scan, run it first for every native:
+
+    node suj_engine/tools/time_sensitivity.js '{"date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0,"asOf":"YYYY-MM-DD"}'
+
+windowMinutes defaults to 6 and stepSeconds to 30. Add --json for structured output. For an UNSTABLE chart run
+stellium.js and planet_strength.js once per candidate, using the run time printed for that candidate.
 
 Planet strength and conflict resolution, run it whenever candidate planets conflict:
 

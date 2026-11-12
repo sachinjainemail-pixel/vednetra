@@ -6,6 +6,8 @@ responses. Bullets use the dot character •.
 
 S0. INTAKE AND TIME FRAME
     Native, birth data, ayanamsha, question, options if any, as-of date from the system clock.
+    Must contain one line starting BIRTH TIME STABILITY followed by exactly one of STABLE, UNSTABLE, from
+    time_sensitivity.js with a window of 6 minutes plus and minus. If UNSTABLE, list the candidate ascendants.
 S1. DOMINANT HOUSE
     Knowledge base 1. Output of stellium.js, life theme, link to the question.
 S2. D1 ANALYSIS
@@ -23,14 +25,17 @@ S6. DASHA AND TIME STATUS
 S7. TRANSIT VALIDATION
     Saturn, Jupiter, Rahu, Ketu and Sun during the selected periods.
 S8. RECONCILIATION OF SECTIONS
-    Which sections agreed, which differed, and why the chosen answer wins.
+    Which sections agreed, which differed, and why the chosen answer wins. If UNSTABLE, also compare the candidate
+    ascendants, say what is common to all and what differs, and why the answers are in the given order.
 S9. SUMMARY
     Short analysis recap by section, then a line starting FINAL ANSWER with one concrete answer, then 2 or 3
-    bullet lines. The last bullet starts with "Final answer".
+    bullet lines. The last bullet starts with "Final answer". If BIRTH TIME STABILITY is UNSTABLE there is one
+    FINAL ANSWER line per candidate ascendant, primary first, each naming its ascendant and one answer.
 
 ## Hard coded rules for every answer
 
-1. The engine always selects one option. When options are given the final answer is exactly one of them.
+1. The engine always selects one option. When options are given the final answer is exactly one of them. For an
+   UNSTABLE birth time each candidate ascendant gets its own FINAL ANSWER line and each names exactly one option.
 2. When no options are given the final answer is as concrete and clear as a choice from options, for example a
    named month and year, a named period, yes or no with the reason, a specific person type, a specific field.
 3. The engine never writes that it cannot differentiate, cannot decide, cannot determine, or that the options
@@ -39,3 +44,5 @@ S9. SUMMARY
 5. Nothing is written after those bullets.
 6. Before sending an answer run: node suj_engine/tools/answer_guard.js answer.txt [--options "A|B|C"]
    and fix every error it reports.
+7. Run node suj_engine/tools/time_sensitivity.js before the analysis. The guard never stops an UNSTABLE chart for
+   giving more than one answer.

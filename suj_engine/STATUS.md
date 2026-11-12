@@ -61,6 +61,30 @@
 - Activation in a new session needs these commits on the main branch, or the session opened on the working
   branch. At the end of this round they are on claude/pensive-albattani-a7wsss only.
 
+## Round 5. Birth time stability and more than one answer (done)
+
+- Owner instruction saved as METHODOLOGY.md section 7, contract requirement 15, ANSWER_TEMPLATE.md and CLAUDE.md.
+- Window is 6 minutes plus and minus, as the owner set it, in 30 second steps.
+- Tool built: suj_engine/tools/time_sensitivity.js. It scans the window with Vednetra, reports the D1 ascendant at each
+  step, the candidate ascendants with their time ranges and a run time for each, notes on D3, D7, D9, D10, D12, D24
+  and D30 ascendants, Moon pada and the running dasha, and a verdict STABLE or UNSTABLE. Option splitVargas can split
+  candidates by a divisional ascendant.
+- answer_guard.js now requires a BIRTH TIME STABILITY line in S0. STABLE needs exactly one FINAL ANSWER line. UNSTABLE
+  allows one FINAL ANSWER line per candidate and never stops an answer for that. Tested on six drafts, a stable one,
+  an unstable one with two answers, a stable one with two answers (fails), a missing stability line (fails), an unstable
+  one with an answer outside the options (fails) and an unstable one with one answer (passes with a warning).
+- First live test. One native whose D1 ascendant sits 51 seconds before the next sign. At the given time the scan says
+  UNSTABLE with two candidates, one on each side of the boundary. The first reading, run with the earlier ascendant only,
+  missed all three known answers (profession, marital status, children), and the engine author also found method
+  problems unrelated to the birth time, listed below. Running the later ascendant gave a marriage direction that fits
+  the known answer, but the engine's planet strength step still gave the wrong profession and children results.
+- Method problems found in that test and not yet fixed, awaiting the owner. A favourable dasha and transit window was
+  taken as proof that the event happened. Afflictions of the planets sitting in the house and of their Navamsha were
+  discounted too early. Children were judged on the assumption that the marriage question had been answered correctly,
+  so one error carried into the next. Profession required the running dasha lord to match, which removed planets that
+  shape the work through their natal position.
+- Not built yet. Birth time rectification from known past events.
+
 ## Next phases (waiting for the owner's further instructions)
 
 - Phase 1. Question intake and event mapping (question to house, karaka, divisional chart, Nth house).

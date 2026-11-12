@@ -4,9 +4,13 @@
  *
  *   node suj_engine/tools/answer_guard.js answer.txt [--options "Option A|Option B"] [--strict-style]
  *
- * Errors (exit code 1): hedging or undecided language, missing or misordered sections S0 to S9, no TIME STATUS
- * line with one of the three allowed values, no FINAL ANSWER line, final answer not one of the given options,
- * closing bullets not 2 or 3 one liners at the very end, last bullet not starting with Final answer.
+ * Errors (exit code 1): hedging or undecided language, missing or misordered sections S0 to S9, no BIRTH TIME
+ * STABILITY line in S0, no TIME STATUS line with one of the three allowed values, no FINAL ANSWER line, a final
+ * answer that is not one of the given options, closing bullets not 2 or 3 one liners at the very end, last bullet
+ * not starting with Final answer.
+ * Birth time stability (fifth round). S0 carries one line BIRTH TIME STABILITY STABLE or BIRTH TIME STABILITY
+ * UNSTABLE, from time_sensitivity.js. STABLE needs exactly one FINAL ANSWER line. UNSTABLE never stops the answer
+ * and allows one FINAL ANSWER line per candidate ascendant, primary first, each naming one option.
  * Warnings: characters the owner does not want in responses. They become errors with --strict-style.
  */
 const fs = require("fs");
@@ -41,7 +45,21 @@ function check(text, opts) {
   }
   const order = heads.map(h => h.n);
   for (let i = 1; i < order.length; i++) if (order[i] <= order[i - 1]) { errors.push("Sections are out of order near S" + order[i]); break; }
+  const s0 = heads.find(h => h.n === 0), s1 = heads.find(h => h.n === 1);
   const s6 = heads.find(h => h.n === 6), s7 = heads.find(h => h.n === 7), s9 = heads.find(h => h.n === 9);
+
+  // birth time stability line inside S0
+  let unstable = false;
+  if (s0) {
+    const body = lines.slice(s0.line, s1 ? s1.line : lines.length);
+    const bs = body.filter(l => /^BIRTH TIME STABILITY\b/.test(l));
+    if (bs.length !== 1) errors.push("S0 must contain exactly one line starting BIRTH TIME STABILITY, found " + bs.length);
+    else {
+      const u = /\bUNSTABLE\b/.test(bs[0].toUpperCase()), st = /\bSTABLE\b/.test(bs[0].toUpperCase());
+      if (u === st) errors.push("The BIRTH TIME STABILITY line must contain exactly one of STABLE, UNSTABLE");
+      unstable = u;
+    }
+  }
 
   // time status inside S6
   if (s6) {
@@ -55,13 +73,16 @@ function check(text, opts) {
     }
   }
 
-  // S9: final answer and closing bullets
-  let finalLine = null;
+  // S9: final answers and closing bullets
+  let finalLines = [];
   if (s9) {
     const body = lines.slice(s9.line + 1);
     const fa = body.filter(l => /^FINAL ANSWER\b/.test(l));
-    if (fa.length !== 1) errors.push("S9 must contain exactly one line starting FINAL ANSWER, found " + fa.length);
-    else finalLine = fa[0].replace(/^FINAL ANSWER\s*/i, "");
+    if (unstable) {
+      if (fa.length < 1) errors.push("S9 must contain at least one line starting FINAL ANSWER, found 0");
+      else if (fa.length < 2) warnings.push("BIRTH TIME STABILITY is UNSTABLE but only one FINAL ANSWER line is given. S8 must then state that every candidate ascendant gives the same answer");
+    } else if (fa.length !== 1) errors.push("S9 must contain exactly one line starting FINAL ANSWER, found " + fa.length);
+    finalLines = fa.map(l => l.replace(/^FINAL ANSWER\s*/i, ""));
     let end = lines.length - 1;
     while (end >= 0 && lines[end].trim() === "") end--;
     const bullets = [];
@@ -69,18 +90,18 @@ function check(text, opts) {
     if (bullets.length < 2 || bullets.length > 3) errors.push("The answer must end with 2 or 3 bullet lines starting with the dot character, found " + bullets.length + " at the end");
     bullets.forEach(b => { if (b.length > 240) errors.push("A closing bullet is longer than a one liner: \"" + b.slice(0, 40) + "...\""); });
     if (bullets.length && !/^•\s+Final answer\b/i.test(bullets[bullets.length - 1])) errors.push("The last bullet must start with Final answer");
-    if (bullets.length && fa.length === 1 && lines.indexOf(fa[0]) > end - bullets.length) errors.push("FINAL ANSWER line must come before the closing bullets");
+    if (bullets.length && fa.some(l => lines.indexOf(l) > end - bullets.length)) errors.push("FINAL ANSWER lines must come before the closing bullets");
   }
 
-  // options
+  // options, checked for every FINAL ANSWER line
   if (opts.options && opts.options.length) {
-    if (finalLine == null) errors.push("No FINAL ANSWER line to check against the options");
-    else {
-      const hit = opts.options.filter(o => finalLine.toLowerCase().indexOf(o.toLowerCase()) >= 0);
+    if (!finalLines.length) errors.push("No FINAL ANSWER line to check against the options");
+    finalLines.forEach((fl, i) => {
+      const hit = opts.options.filter(o => fl.toLowerCase().indexOf(o.toLowerCase()) >= 0);
       const longest = hit.filter(o => !hit.some(p => p !== o && p.toLowerCase().indexOf(o.toLowerCase()) >= 0));
-      if (longest.length !== 1) errors.push("FINAL ANSWER must name exactly one of the given options, it names " + longest.length);
-    }
-  } else if (finalLine != null && finalLine.trim().length < 3) errors.push("FINAL ANSWER is empty");
+      if (longest.length !== 1) errors.push("FINAL ANSWER line " + (i + 1) + " must name exactly one of the given options, it names " + longest.length);
+    });
+  } else finalLines.forEach((fl, i) => { if (fl.trim().length < 3) errors.push("FINAL ANSWER line " + (i + 1) + " is empty"); });
 
   // owner style characters
   const bad = (text.match(STYLE_CHARS) || []);
@@ -88,7 +109,7 @@ function check(text, opts) {
     const uniq = Array.from(new Set(bad)).join(" ");
     (opts.strictStyle ? errors : warnings).push("Characters the owner does not want in responses appear " + bad.length + " times: " + uniq);
   }
-  return { ok: errors.length === 0, errors, warnings, finalAnswer: finalLine };
+  return { ok: errors.length === 0, errors, warnings, finalAnswer: finalLines[0] || null, finalAnswers: finalLines, unstable };
 }
 
 if (require.main === module) {
