@@ -61,6 +61,24 @@
 - Activation in a new session needs these commits on the main branch, or the session opened on the working
   branch. At the end of this round they are on claude/pensive-albattani-a7wsss only.
 
+## Confirmed readings log
+
+Birth data is deliberately not stored here.
+
+- Case 1, female native, two questions with four options each, as-of date 10 November 2026. The owner confirmed
+  both engine answers as correct.
+  - Children. Answer: two daughters, time status ALREADY HAPPENED. Drivers: 5th lord in the dominant house 1 with
+    neecha bhanga for both the 5th lord and Jupiter, Saturn as KB2 winner among subject linked planets, a monthly
+    scan showing the Jupiter plus Saturn double transit with a children linked dasha only in two past clusters and
+    none from April 2025 to December 2029, and nine even signs against one odd sign for gender, with Moon ahead of
+    Mars in the male against female KB2 contest.
+  - Career. Answer: medical field, time status HAPPENING NOW. Drivers: the same three planet group sitting in
+    houses 1, 6 and 12 of the Lagna, Moon and Sun charts, 10th lord inside it, Saturn as KB2 winner with Ketu
+    conjunction, Saturn Mahadasha running.
+  - Caveats. One case only, so it does not change the chance level result in README.md. The monthly transit scan
+    and the gender sign count were ad hoc helper steps used in this reading, not yet part of a tool. The male
+    against female candidate set in KB2 was chosen by the engine author.
+
 ## Next phases (waiting for the owner's further instructions)
 
 - Phase 1. Question intake and event mapping (question to house, karaka, divisional chart, Nth house).
