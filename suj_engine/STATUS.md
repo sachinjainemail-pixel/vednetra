@@ -84,6 +84,17 @@
   so one error carried into the next. Profession required the running dasha lord to match, which removed planets that
   shape the work through their natal position.
 - Not built yet. Birth time rectification from known past events.
+- Guard update. When the chart is UNSTABLE S6 may carry one TIME STATUS line per candidate ascendant.
+- First run of the full method on both candidate ascendants for the test native. Results, profession teacher in both,
+  marital status unmarried in both, children none in both. Profession is still wrong against the known answer, marital
+  status and children now agree. The method was changed after the known answers were seen, so this is not a fair test.
+- Weakness found. The planet strength winner depends on which planets are put in the candidate list. Adding Saturn
+  changed the marriage winner from Moon to Saturn. Proposal awaiting the owner, a fixed rule for the list. It takes the
+  occupants of the subject house, the house lord, the karakas, the planets that fully aspect the house and the running
+  Mahadasha, Antardasha and Pratyantardasha lords. The proposal was used in the run above.
+- Proposal awaiting the owner. For questions about what is true now, a favourable dasha and transit window in the past
+  counts as a possibility, and the event is taken as happened only if the promise is not afflicted and the winning planet
+  does not give delay.
 
 ## Next phases (waiting for the owner's further instructions)
 

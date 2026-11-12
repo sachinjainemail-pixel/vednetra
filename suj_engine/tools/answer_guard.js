@@ -61,16 +61,16 @@ function check(text, opts) {
     }
   }
 
-  // time status inside S6
+  // time status inside S6. One line when STABLE. When UNSTABLE one line per candidate ascendant is allowed.
   if (s6) {
     const end = s7 ? s7.line : lines.length;
     const body = lines.slice(s6.line, end);
     const ts = body.filter(l => /^TIME STATUS\b/.test(l));
-    if (ts.length !== 1) errors.push("S6 must contain exactly one line starting TIME STATUS, found " + ts.length);
-    else {
-      const hits = ["ALREADY HAPPENED", "HAPPENING NOW", "WILL HAPPEN"].filter(v => ts[0].toUpperCase().indexOf(v) >= 0);
-      if (hits.length !== 1) errors.push("The TIME STATUS line must contain exactly one of ALREADY HAPPENED, HAPPENING NOW, WILL HAPPEN");
-    }
+    if (ts.length < 1 || (!unstable && ts.length !== 1)) errors.push("S6 must contain " + (unstable ? "at least one" : "exactly one") + " line starting TIME STATUS, found " + ts.length);
+    ts.forEach(l => {
+      const hits = ["ALREADY HAPPENED", "HAPPENING NOW", "WILL HAPPEN"].filter(v => l.toUpperCase().indexOf(v) >= 0);
+      if (hits.length !== 1) errors.push("Each TIME STATUS line must contain exactly one of ALREADY HAPPENED, HAPPENING NOW, WILL HAPPEN");
+    });
   }
 
   // S9: final answers and closing bullets
