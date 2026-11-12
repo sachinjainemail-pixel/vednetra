@@ -86,3 +86,11 @@
 6. The README of this repository records that 52 pre registered tests of classical interpretation rules came
    out at chance level. The engine will always give one definitive answer as required. A confidence grade
    inside the closing summary is proposed so the definitive answer is not mistaken for a proven one.
+
+## Test case log
+
+- Kundali 891, male, 3 Oct 1996 15:43, Patti Pratapgarh. Five questions answered, all five confirmed correct by the owner
+  (LLB, married, business, marriage on 5 Feb 2026, heavy fine for industrial electricity theft on 3 Nov 2026).
+  Questions 1 to 3 were decided by the chart alone. Questions 4 and 5 had narrow chart margins and the owner's hint
+  that all answers share one letter helped the decision. So this case shows the method and hint together work, it
+  does not show the chart alone would have settled questions 4 and 5. One case is not a statistical test.
