@@ -149,6 +149,9 @@ H5 Not working with a strong tenth house. The chart had Saturn in the 2nd, the t
   same sign, exchange or aspect either way, the library's four sambandha types are not all coded. Rahu and Ketu are not classified.
 - strength_tally.js weighs the planets for and against each option by their real strength, the owner's rule of rounds 6 and 7.
   It cannot decide which side or type a planet belongs to, that stays with the analysis. Self test in tests/strength_selftest.js.
+- window_scan.js, from round 12, adds Rahu and Ketu as significators by the Laghu Parashari sloka 13 rules. On Kundali 892 this raised the
+  strict windows to 8 to 29 per event, the mother's loss had 29 of 29 at grade A, and the mother is alive. With nodes the scan separates
+  even less. Use nodes false to see the view without them and treat both lists as candidates only.
 - window_scan.js, from round 11, goes down to Sookshma and lists the Sookshma significators inside each window. Prana is left out.
   It lists candidate dasha and double transit windows. On this chart the wide view gave 72 to 142 windows
   per event, so it separates nothing. The strict view gives 5 to 18 and is usable, but the same period, 2010 and

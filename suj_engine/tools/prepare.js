@@ -41,7 +41,7 @@ try {
 m.events.forEach(ev => {
   out.push("", render(scan(Object.assign({}, cfg, { event: ev, strict: true }))));
   const wide = scan(Object.assign({}, cfg, { event: ev, strict: false })).windows;
-  out.push("", "Wide view for " + ev + " found " + wide.length + " windows, past " + wide.filter(w => w.timeStatus === "PAST").length + ", grade A " + wide.filter(w => w.grade === "A").length + ". Too many to separate events, use the strict list above and run window_scan.js without strict only to look at a specific period.");
+  out.push("", "Wide view for " + ev + " found " + wide.length + " windows, past " + wide.filter(w => w.timeStatus === "PAST").length + ", grade A " + wide.filter(w => w.grade === "A").length + ". Too many to separate events, use the strict list above, and nodes false in window_scan.js to see it without Rahu and Ketu and run window_scan.js without strict only to look at a specific period.");
 });
 out.push("", renderRules(lookup(Object.assign({}, cfg, { event: m.tag })), 3));
 out.push("", renderNature(nature(cfg)));

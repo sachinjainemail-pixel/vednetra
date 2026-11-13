@@ -18,6 +18,13 @@
  * preset only (the primary house of the event). Strict mode is the narrow view. The default is the wide view.
  * Add --json for structured output.
  *
+ * Rahu and Ketu as significators, round 12, by the direct rules of Laghu Parashari sloka 13. The nodes own no sign, LP-060-2, so a node
+ * is a significator of the event only when
+ *   it occupies an event house, the node then becomes the lord of that house, LP-062-1, or
+ *   it is conjoined with a significator planet other than the Sun or the Moon, and follows that planet, LP-056-6, LP-057-1, LP-058-3, or
+ *   the lord of the sign it occupies is a significator, because the node doubles the result of that lord, LP-057-2.
+ * Conjunction only, never aspect, LP-057-4. Each node that enters is listed with its reason. nodes false switches this off.
+ *
  * Levels. The scan goes down to SOOKSHMA, the fourth level, round 11. Prana, the fifth, is left out by the owner's choice. The
  * grade and the window are still fixed by Mahadasha, Antardasha and Pratyantardasha. Inside each window the tool lists the
  * Sookshma periods in which the Sookshma lord is also a significator, because those are the sharpest days of the window.
@@ -55,6 +62,19 @@ function scan(cfg) {
   const sig = new Set(karakas);
   allSigns.forEach(s => { sig.add(signLord(s)); });
   chart.planets.forEach(p => { if (allSigns.indexOf(p.sign) >= 0) sig.add(p.name); });
+  // Rahu and Ketu by Laghu Parashari sloka 13
+  const nodeReasons = {};
+  if (cfg.nodes !== false) {
+    ["Rahu", "Ketu"].forEach(n => {
+      const why = [];
+      if (allSigns.indexOf(P[n].sign) >= 0) why.push("occupies an event house, so it becomes the lord of that house, LP-062-1");
+      const comp = chart.planets.filter(q => q.name !== n && q.name !== "Rahu" && q.name !== "Ketu" && q.sign === P[n].sign && sig.has(q.name) && q.name !== "Sun" && q.name !== "Moon").map(q => q.name);
+      if (comp.length) why.push("conjoined with " + comp.join(" and ") + ", follows the companion, LP-056-6");
+      const lord = signLord(P[n].sign);
+      if (lord && sig.has(lord)) why.push("sits in the sign of " + lord + ", a significator, and doubles its result, LP-057-2");
+      if (why.length) { nodeReasons[n] = why; sig.add(n); }
+    });
+  }
   const sigList = Array.from(sig);
 
   const birth = new Date(chart.vimshottari.timeline[0].start); // dasha spans from before birth, scan from birth date
@@ -110,7 +130,7 @@ function scan(cfg) {
   });
   return {
     event: cfg.event || "custom", strict: !!cfg.strict, houses, targetSigns: targetSigns.map(s => SIGN_NAMES[s]), significators: sigList, karakas,
-    lagna: SIGN_NAMES[lagna], asOf: iso(asOf), from: iso(from), to: iso(to), windows
+    nodeReasons, lagna: SIGN_NAMES[lagna], asOf: iso(asOf), from: iso(from), to: iso(to), windows
   };
 }
 
@@ -118,6 +138,7 @@ function render(r) {
   const L = [];
   L.push("# SUJ WINDOW SCAN, event " + r.event + (r.strict ? ", strict view" : ", wide view"));
   L.push("Lagna " + r.lagna + ". Event houses " + r.houses.join(", ") + " = signs " + r.targetSigns.join(", ") + ". Dasha significators " + r.significators.join(", ") + ".");
+  Object.keys(r.nodeReasons || {}).forEach(n => L.push(n + " is a significator, " + r.nodeReasons[n].join("; ") + "."));
   L.push("Levels Mahadasha, Antardasha, Pratyantardasha and Sookshma. Prana is not scanned.");
   L.push("Scan " + r.from + " to " + r.to + ", as of " + r.asOf + ". Windows found " + r.windows.length + ". Grades A or B only, see the header of the tool.");
   for (const status of ["PAST", "RUNNING", "FUTURE"]) {

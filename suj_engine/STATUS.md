@@ -104,6 +104,12 @@
   lords, with the library's rule ids. answer_guard.js requires a DASHA LORDS line in S6, prepare.js runs the new tool. Self tests
   15 of 15 and strength 13 of 13. Question 1 of Kundali 892 retried with typed evidence in
   suj_engine/experiments/q1_evidence_round8.json, Graduation 63, Post graduation 43, so the answer is still Graduation.
+- Round 12, owner asked to add the node verdicts to the window scan. window_scan.js now takes Rahu or Ketu as a significator only by the
+  direct Laghu Parashari rules, occupying an event house, being conjoined with a significator other than the Sun or Moon, or sitting in
+  the sign of a significator whose result it doubles, LP-062-1, LP-056-6, LP-057-2, never by aspect. Each node that enters is listed with
+  its reason. Cost, on Kundali 892 the strict windows grew, marriage 9 to 13, father 11 to 17, mother 13 to 29 with all 29 at grade A,
+  education 7 to 13, siblings 5 to 8, job unchanged at 18. A node in the list makes the whole Rahu Mahadasha, 2002 to 2020, a
+  significator level, so grade A is easy to reach and the scan separates less. nodes false gives the earlier view.
 - Round 11, owner asked to go down to Sookshma and leave Prana. window_scan.js now reads Mahadasha, Antardasha, Pratyantardasha and
   Sookshma, day by day. The window and its grade are still fixed at Pratyantardasha level and each window lists the Sookshma
   periods whose lord is a significator, the sharpest days. Prana is not scanned. Self test tests/window_selftest.js prints 6 of 6.
