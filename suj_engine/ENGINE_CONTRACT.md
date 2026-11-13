@@ -52,6 +52,21 @@ Claude Code session recognise any reference to "SUJ engine" as this engine.
     final answer. The last bullet starts with Final answer. Nothing follows them.
 14. GUARD. Every answer is checked with suj_engine/tools/answer_guard.js before it is sent. See ANSWER_TEMPLATE.md.
 
+Round 5 additions, from the first tested chart. Added by the engine author after the owner reported results. They keep the
+engine inside the owner's methodology and are open to the owner's change. See LEARNINGS.md.
+
+15. COUNTED EVIDENCE. The answer rests on counted chart evidence only. Typicality, base rates and the safe choice are not
+    evidence. With options, S8 carries an EVIDENCE TALLY with a whole number per option and the final answer is the option
+    with the highest number. Every flag against the final answer is named on the COUNTER EVIDENCE line.
+16. STATUS NEEDS WINDOWS AND STATUS INDICATORS. A natal promise is capacity. Whether an event has happened, is
+    happening or is due needs the strict window scan, window_scan.js, and status indicators counted separately.
+17. NO INVENTED RULES. Only the owner's methodology, the rule library and cited classical texts may enter the tally. Any
+    other idea is marked proposed and kept out of the tally.
+18. RULE LIBRARY. Run rules_lookup.js for every question and put the ids on the RULES CITED line, or write that the
+    library holds nothing for the event.
+19. CASE LOG. After every owner reported result add the case to suj_engine/cases/cases.json, run cases_report.js and update
+    LEARNINGS.md.
+
 ## Engine tools
 
 Answer guard, run before sending any answer:
@@ -73,6 +88,23 @@ Dominant house scan, run it for every native and question:
 
 Add --json for structured output. focusHouse is the house the question is about. The tool reads the chart from
 Vednetra through suj_engine/tools/vednetra_loader.js and scans the Lagna, Moon and Sun charts.
+
+Window scan, candidate dasha and double transit windows for an event, past and future:
+
+    node suj_engine/tools/window_scan.js '{"gender":"female","date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0,"event":"father_loss","strict":true}'
+
+Rule library lookup for the chart placements and an event tag:
+
+    node suj_engine/tools/rules_lookup.js '{"gender":"female","date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0,"event":"Education"}'
+
+Dossier for a question, runs the dominant house scan, the strict windows and the rule lookup together:
+
+    node suj_engine/tools/prepare.js '{"gender":"female","date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0,"topic":"parents"}'
+
+Scoreboard of tested charts and guard self test:
+
+    node suj_engine/tools/cases_report.js [--windows]
+    node suj_engine/tests/guard_selftest.js
 
 ## How to use VEDNETRA from Claude Code
 

@@ -61,6 +61,27 @@
 - Activation in a new session needs these commits on the main branch, or the session opened on the working
   branch. At the end of this round they are on claude/pensive-albattani-a7wsss only.
 
+## Round 5. First tested chart and learnings (done)
+
+- Owner reported the true answers for Kundali 892. Engine score was 1 of 5, Married right, Education, Work type, Siblings
+  and Parents wrong. Recorded in suj_engine/cases/cases.json and suj_engine/LEARNINGS.md with error tags.
+- The misses had a shared pattern. The engine overrode its own indicators by typicality, read a natal promise as proof
+  of status, used a rule it had made up for sibling counts, and attached a result to the planet strength winner by feel.
+- Built suj_engine/tools/window_scan.js with data/events.json, a dasha and double transit window finder for past and
+  future. Built rules_lookup.js for the rule library, prepare.js to run the mandatory tools in one go, cases_report.js
+  for the scoreboard.
+- answer_guard.js version 2 now fails answers without RULES CITED, WINDOW SCAN, EVIDENCE TALLY and COUNTER EVIDENCE lines,
+  with a tally whose leader differs from the final answer, a tie without TIE BREAK, or typicality wording. Self test in
+  suj_engine/tests/guard_selftest.js prints 11 of 11. ANSWER_TEMPLATE.md is version 2, ENGINE_CONTRACT.md has
+  requirements 15 to 19, CLAUDE.md points to the new steps.
+- Not shown. None of this has been shown to raise accuracy. The window scan gives candidates only, 5 to 18 strict windows
+  per event on this chart and the same period appeared for several events. The library has nothing on sibling counts or
+  parents' longevity. One chart is too few to calibrate anything. The old answers for this chart do not pass guard
+  version 2 and are kept only as history in the case notes.
+- Needs the owner. Confirm or correct guardrails G4 to G7 in LEARNINGS.md, give the dates of events with true answers
+  for future charts, and say how a planet strength winner should map to an event result, which is an open question
+  in section 5.4 of the methodology.
+
 ## Next phases (waiting for the owner's further instructions)
 
 - Phase 1. Question intake and event mapping (question to house, karaka, divisional chart, Nth house).

@@ -11,6 +11,7 @@ project. Before answering anything under it, read these files in order:
 1. suj_engine/ENGINE_CONTRACT.md for the binding requirements
 2. suj_engine/METHODOLOGY.md for the full step by step methodology
 3. suj_engine/STATUS.md for what is built and what is pending
+4. suj_engine/LEARNINGS.md for the guardrails learned from tested charts, which apply to every question
 
 Non negotiable points
 
@@ -35,6 +36,13 @@ Non negotiable points
 - Use the section layout in suj_engine/ANSWER_TEMPLATE.md. End every answer with 2 or 3 bulleted one liners that
   summarise the analysis and give the final answer, the last one starting with Final answer, and nothing after
   them. Write the draft to a file and run node suj_engine/tools/answer_guard.js on it before sending.
+- Start every question with node suj_engine/tools/prepare.js, which runs the dominant house scan, the strict window scan
+  and the rule lookup. Decide only on counted chart evidence. Put an EVIDENCE TALLY with a number per option and a
+  COUNTER EVIDENCE line in S8, a RULES CITED line in S2 and a WINDOW SCAN line in S6. Never decide by typicality, base
+  rates or the safe choice, never by a rule that is not in the methodology, the library or a cited text. A natal promise
+  is capacity and not proof of status. See LEARNINGS.md.
+- After the owner reports true answers for a chart, add the case to suj_engine/cases/cases.json, run
+  node suj_engine/tools/cases_report.js and update LEARNINGS.md and STATUS.md.
 - Rule library: suj_engine/rules/rules_index.json (1,561 rules from Komilla Sutton The Nakshatras and Umesh
   Puri Laghu Parashari).
 
