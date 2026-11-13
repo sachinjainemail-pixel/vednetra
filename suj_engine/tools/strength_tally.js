@@ -16,6 +16,18 @@
  *        m4 Vimshopaka Shadvarga out of 20 as a share of 100
  *        m5 the subject varga, only when a varga number is given, house good or not and dignity, equal halves
  *      This composite and its equal weights are the engine author's reading of the owner's six steps and await the owner.
+ *   2a. OWNER'S RULE OF ROUND 8. An ASPECT always works by the planet's NATURAL significations, a natural benefic aspect is for,
+ *      a natural malefic aspect is against, whatever house the planet lords for this ascendant. HOUSE OWNERSHIP works by the
+ *      houses owned, most beneficial for a trine lord, somewhat beneficial for a kendra lord, harmful for a trik lord. So a
+ *      planet that lords a house and also aspects is two separate pieces of evidence that can point in different directions.
+ *      The tool therefore takes two typed entries and works out the side itself.
+ *        type lordship  give planet, house, and ref lagna or moon. The tool checks that the planet really lords that house.
+ *                       Trine houses 1 5 9 are for with factor 1.0, kendra houses 4 7 10 are for with factor 0.5, trik houses
+ *                       6 8 12 are against with factor 1.0. Houses 2 3 11 are not covered by the owner's rule, factor 0 and
+ *                       they are reported. The factors 1.0 and 0.5 are the engine author's reading of most and somewhat.
+ *        type aspect    give planet. Side from the natural nature, Jupiter and Venus benefic, Sun Mars Saturn Rahu Ketu malefic,
+ *                       Moon benefic from Shukla 6th tithi to Krishna 10th tithi, Mercury benefic unless it shares a sign with a
+ *                       malefic. Weight S.
  *   3. The TYPE decides which weight a piece of evidence carries.
  *        role      the planet carries something favourable, lordship, karaka, placement, benefic aspect. Weight S.
  *        harm      the planet damages the subject from outside, a malefic aspect or conjunction. Weight S, a strong malefic
@@ -45,7 +57,27 @@
  * for side for and harm for side against.
  * kind is ordered or choice. Prints a ready EVIDENCE TALLY line for the answer.
  */
+const fs = require("fs");
+const path = require("path");
 const { analyse } = require("./planet_strength");
+const { loadVedicCore } = require("./vednetra_loader");
+const KB = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "data", "significations.json"), "utf8"));
+const signLord = sg => { for (const p of Object.keys(KB.ownSigns)) if (KB.ownSigns[p].indexOf(sg) >= 0) return p; return null; };
+const LORD_CLASS = { 1: ["trine", "for", 1], 5: ["trine", "for", 1], 9: ["trine", "for", 1], 4: ["kendra", "for", 0.5], 7: ["kendra", "for", 0.5], 10: ["kendra", "for", 0.5],
+  6: ["trik", "against", 1], 8: ["trik", "against", 1], 12: ["trik", "against", 1], 2: ["not covered", null, 0], 3: ["not covered", null, 0], 11: ["not covered", null, 0] };
+
+// natural nature by the owner's rules, Moon by tithi, Mercury by company
+function naturalNature(cfg) {
+  const VC = loadVedicCore(cfg.appDir);
+  const t = String(cfg.time).length === 5 ? cfg.time + ":00" : cfg.time;
+  const ch = VC.avEngineFor({ name: "x", gender: cfg.gender || "unspecified", birthISO: cfg.date + "T" + t, tz: Number(cfg.tz), lat: Number(cfg.lat), lon: Number(cfg.lon), place: "" }).chart;
+  const P = ch.planetsByName, nat = { Sun: "malefic", Mars: "malefic", Saturn: "malefic", Rahu: "malefic", Ketu: "malefic", Jupiter: "benefic", Venus: "benefic" };
+  const tithi = Math.floor(ch.moonPhaseAngle / 12) + 1;
+  nat.Moon = tithi >= 6 && tithi <= 25 ? "benefic" : "malefic";
+  const withMal = ["Sun", "Mars", "Saturn", "Rahu", "Ketu"].some(m => P[m].sign === P.Mercury.sign);
+  nat.Mercury = withMal ? "malefic" : "benefic";
+  return { nat, lagna: ch.ascendant.sign, moon: P.Moon.sign, tithi };
+}
 
 const DIGNITY = { "Exalted": 6, "Moolatrikona": 5, "Mulatrikona": 5, "Own": 4, "Own sign": 4, "Friendly sign": 3, "Friend": 3, "Neutral": 2, "Neutral sign": 2, "Enemy": 1, "Enemy sign": 1, "Debilitated": 0 };
 const dig = d => (DIGNITY[d] != null ? DIGNITY[d] : 2) / 6 * 100;
@@ -81,15 +113,31 @@ function tally(cfg) {
   const st = strengths(cfg);
   const weight = (e, which) => {
     const s = st.S[which][e.planet];
-    return e.type === "weakness" ? 100 - s : s;
+    return (e.type === "weakness" ? 100 - s : s) * (e.mult == null ? 1 : e.mult);
   };
   const opts = cfg.options, ordered = cfg.kind === "ordered";
   const ev = cfg.evidence || [];
+  const ctx = naturalNature(cfg), notCovered = [];
   ev.forEach(e => {
-    e.type = e.type || (e.side === "for" ? "role" : "harm");
+    if (e.type === "lordship") {
+      const ref = e.ref === "moon" ? ctx.moon : ctx.lagna;
+      const lord = signLord((ref + Number(e.house) - 1) % 12);
+      if (lord !== e.planet) throw new Error(e.planet + " does not lord house " + e.house + " from the " + (e.ref || "lagna") + ", the lord is " + lord);
+      const c = LORD_CLASS[Number(e.house)];
+      e.klass = c[0]; e.side = c[1] || "for"; e.factor = c[2];
+      if (!c[1]) notCovered.push(e.planet + " lords house " + e.house);
+      e.factor_text = e.factor_text || (e.planet + " lords house " + e.house + " from the " + (e.ref || "lagna") + ", " + c[0] + " lord");
+      e.factor = e.factor_text; e.mult = c[2];
+    } else if (e.type === "aspect") {
+      e.klass = ctx.nat[e.planet]; e.side = e.klass === "benefic" ? "for" : "against"; e.mult = 1;
+      e.factor = e.factor || (e.planet + " aspect, natural " + e.klass);
+    } else e.mult = 1;
+  });
+  ev.forEach(e => {
+    if (e.type !== "lordship" && e.type !== "aspect") e.type = e.type || (e.side === "for" ? "role" : "harm");
     if (opts.indexOf(e.option) < 0) throw new Error("Evidence names an unknown option " + e.option);
     if (st.S.math[e.planet] == null) throw new Error("Unknown planet " + e.planet);
-    if (["role", "harm", "weakness"].indexOf(e.type) < 0) throw new Error("Unknown type " + e.type);
+    if (["role", "harm", "weakness", "lordship", "aspect"].indexOf(e.type) < 0) throw new Error("Unknown type " + e.type);
     if (e.type === "weakness" && e.side !== "against") throw new Error("A weakness is evidence against, not for");
     if (e.type === "role" && e.side !== "for") throw new Error("A role is evidence for, give the type harm or weakness for evidence against");
   });
@@ -98,7 +146,7 @@ function tally(cfg) {
     ev.forEach(e => {
       const j = opts.indexOf(e.option);
       const apply = e.side === "for" ? (ordered ? j >= i : j === i) : (ordered ? j <= i : j === i);
-      if (!apply) return;
+      if (!apply || e.mult === 0) return;
       const tgt = e.side === "for" ? [forW, forWa] : [agW, agWa];
       tgt[0][e.planet] = Math.max(tgt[0][e.planet] || 0, weight(e, "math"));
       tgt[1][e.planet] = Math.max(tgt[1][e.planet] || 0, weight(e, "adj"));
@@ -115,7 +163,7 @@ function tally(cfg) {
     return rows.filter(r => r[key] === mx).sort((a, b) => b.favour - a.favour)[0].option;
   };
   return { kind: cfg.kind, options: opts, weights: { strength: Object.fromEntries(Object.keys(st.S.math).map(p => [p, r1(st.S.math[p])])), strengthOwnerAdjusted: Object.fromEntries(Object.keys(st.S.adj).map(p => [p, r1(st.S.adj[p])])), parts: st.parts, flags: st.flag }, evidence: ev, rows,
-    winner: pick("score"), winnerOwnerAdjusted: pick("scoreOwnerAdjusted"),
+    notCovered, winner: pick("score"), winnerOwnerAdjusted: pick("scoreOwnerAdjusted"),
     tallyLine: "EVIDENCE TALLY " + rows.map(r => r.option + " " + r.score).join(", ") };
 }
 
@@ -127,10 +175,11 @@ function render(r) {
     L.push("- " + p.padEnd(8) + "S " + String(r.weights.strength[p]).padEnd(6) + (x.proxy ? "node, takes " + x.proxy : "Shadbala " + x.shadbalaPercent + ", D1 " + x.d1 + ", D9 " + x.d9 + ", Vimshopaka " + x.vimshopaka + (x.subjectVarga != null ? ", varga " + x.subjectVarga : "")));
   });
   L.push("", "Evidence table. Check every placement and type.");
-  r.evidence.forEach(e => { const s = r.weights.strength[e.planet]; L.push("- " + e.side.toUpperCase() + " " + e.option + " | " + e.planet + " " + e.type + " weight " + r1(e.type === "weakness" ? 100 - s : s) + (r.weights.flags[e.planet] ? " " + r.weights.flags[e.planet] : "") + " | " + e.factor); });
+  r.evidence.forEach(e => { const s = r.weights.strength[e.planet]; const m = e.mult == null ? 1 : e.mult; L.push("- " + e.side.toUpperCase() + " " + e.option + " | " + e.planet + " " + e.type + (e.klass ? " " + e.klass : "") + " weight " + r1((e.type === "weakness" ? 100 - s : s) * m) + (m !== 1 ? " factor " + m : "") + (r.weights.flags[e.planet] ? " " + r.weights.flags[e.planet] : "") + " | " + e.factor); });
   L.push("", "Per option");
   r.rows.forEach(x => L.push("- " + x.option + ", favour " + x.favour + " from " + (x.forPlanets.join(", ") || "none") + ", against " + x.against + " from " + (x.againstPlanets.join(", ") || "none") + ", score " + x.score + ", owner adjusted score " + x.scoreOwnerAdjusted));
   L.push("", "Winner " + r.winner + ". Winner on the owner adjusted weights " + r.winnerOwnerAdjusted + (r.winner === r.winnerOwnerAdjusted ? ", the two agree." : ", the two differ, state it as a counter point."));
+  if (r.notCovered.length) L.push("", "Not covered by the owner's rule, weight zero, " + r.notCovered.join(", ") + ". Laghu Parashari calls the 3rd and 11th lords doshi, and the 2nd and 12th lords sama.");
   L.push("", r.tallyLine);
   return L.join("\n");
 }

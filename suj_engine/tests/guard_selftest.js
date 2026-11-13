@@ -6,7 +6,7 @@ const OPTS = ["Graduation", "Post graduation", "Intermediate", "High school"];
 const base = (over) => {
   const o = Object.assign({
     rules: "RULES CITED S-N04-009 for Moon in Rohini, the library holds no rule on the event itself",
-    scan: "WINDOW SCAN strict view found 6 past windows, 2 grade A, weighed against the dasha chain",
+    scan: "WINDOW SCAN strict view found 6 past windows, 2 grade A, weighed against the dasha chain\nDASHA LORDS MD Jupiter promoter with dosha triggered, AD Mercury neutral marakesha, PD Rahu node",
     tally: "EVIDENCE TALLY Graduation 4, Post graduation 7, Intermediate 1, High school 0",
     counter: "COUNTER EVIDENCE Mars the fifth lord is retrograde in an enemy sign and the D24 lagna lord is in the 12th house",
     tie: "", final: "FINAL ANSWER Post graduation", extra: ""
@@ -27,7 +27,8 @@ const cases = [
   ["tie with tie break passes", base({ tally: "EVIDENCE TALLY Graduation 7, Post graduation 7, Intermediate 1, High school 0", tie: "TIE BREAK step 6 dasha activity favours the higher level" }), true],
   ["typicality reasoning", base({ extra: "Graduation is the most common outcome so it is the safe choice" }), false, /typicality/],
   ["missing rules cited", base({ rules: "plain" }), false, /RULES CITED/],
-  ["missing window scan", base({ scan: "plain" }), false, /WINDOW SCAN/],
+  ["missing window scan", base({ scan: "DASHA LORDS ok" }), false, /WINDOW SCAN/],
+  ["missing dasha lords", base({ scan: "WINDOW SCAN ok" }), false, /DASHA LORDS/],
   ["hedging still fails", base({ extra: "this cannot be determined" }), false, /Hedging/]
 ];
 const ORD = ["High school", "Intermediate", "Graduation", "Post graduation"];

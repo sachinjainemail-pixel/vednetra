@@ -1,0 +1,22 @@
+{"gender":"female","date":"1993-01-06","time":"07:10:00","tz":5.5,"lat":27.1333,"lon":81.9667,"asOf":"2026-11-13",
+ "varga":24,"kind":"ordered","options":["High school","Intermediate","Graduation","Post graduation"],
+ "evidence":[
+  {"option":"Post graduation","type":"lordship","planet":"Sun","house":9,"factor":"9th lord, higher education"},
+  {"option":"Post graduation","type":"lordship","planet":"Mars","house":5,"factor":"5th lord"},
+  {"option":"Post graduation","type":"lordship","planet":"Mercury","house":5,"ref":"moon","factor":"5th lord from Moon"},
+  {"option":"Post graduation","type":"lordship","planet":"Saturn","house":9,"ref":"moon","factor":"9th lord from Moon"},
+  {"option":"Post graduation","type":"role","side":"for","planet":"Jupiter","factor":"karaka of learning, in the 5th from Moon"},
+  {"option":"Post graduation","type":"role","side":"for","planet":"Mercury","factor":"karaka of learning, D24 house 2"},
+  {"option":"Graduation","type":"lordship","planet":"Jupiter","house":4,"factor":"4th lord"},
+  {"option":"Graduation","type":"role","side":"for","planet":"Moon","factor":"4th lord of D24 in house 7"},
+  {"option":"Graduation","type":"aspect","planet":"Jupiter","factor":"aspect on the 4th house, natural benefic"},
+  {"option":"Post graduation","type":"aspect","planet":"Venus","factor":"aspect on the 9th house, natural benefic"},
+  {"option":"Post graduation","type":"lordship","planet":"Mars","house":12,"factor":"12th lord, trik, lords the 5th too"},
+  {"option":"Post graduation","type":"weakness","side":"against","planet":"Mars","factor":"5th lord retrograde in enemy sign, D24 lagna lord in 12th"},
+  {"option":"Post graduation","type":"weakness","side":"against","planet":"Sun","factor":"9th lord debilitated in D9 house 12"},
+  {"option":"Post graduation","type":"weakness","side":"against","planet":"Mercury","factor":"karaka combust"},
+  {"option":"Graduation","type":"lordship","planet":"Moon","house":8,"factor":"8th lord, trik"},
+  {"option":"Graduation","type":"weakness","side":"against","planet":"Jupiter","factor":"D24 house 8, its 4th sign in D24 house 12"},
+  {"option":"Graduation","type":"aspect","planet":"Saturn","factor":"aspect on the 4th house, natural malefic"},
+  {"option":"Graduation","type":"aspect","planet":"Rahu","factor":"aspect on the 4th house, natural malefic"}
+ ]}

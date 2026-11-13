@@ -55,13 +55,35 @@ G2 OWNER DECISION, rounds 6 and 7. Evidence for and against an option is weighed
       placement, bad varga house. Weight 100 minus S. A strong planet has little weakness to count and a weak one a lot.
    5. A planet that is both carrier and weak counts S for and 100 minus S against. S below 50 turns it against, as in the
       owner's Sun. S above 50 keeps it for.
-   6. Planet that is carrier and also a harm, such as Saturn lording the 9th from the Moon and aspecting the 4th, counts S on
-      both sides and cancels, because the same strength delivers both results.
+   6. OWNER'S RULE OF ROUND 8. An ASPECT always works by the planet's NATURAL significations, whatever houses it lords for this
+      ascendant. HOUSE OWNERSHIP works by the houses owned, most beneficial for a trine lord, somewhat beneficial for a kendra
+      lord, harmful for a trik lord. A planet that lords a house and also aspects, such as Saturn, is therefore two separate pieces
+      of evidence that may point opposite ways. Saturn in the Lagna chart of Kundali 892 lords the 2nd and 3rd, which the owner's
+      three classes do not cover, while its aspect is a natural malefic aspect against. It is not the same strength delivering
+      both results, which was the engine author's earlier wording and was wrong. strength_tally.js now takes the types lordship
+      and aspect and works out the side itself. For lordship it checks that the planet really lords the house, from the Lagna or
+      from the Moon. Trine houses 1 5 9 weigh S times 1.0 for, kendra 4 7 10 weigh S times 0.5 for, trik 6 8 12 weigh S times 1.0
+      against. The factors 1.0 and 0.5 are the engine author's reading of most and somewhat. Houses 2 3 11 are outside the owner's
+      three classes and carry no weight until the owner says. Natural nature for aspects, Jupiter and Venus benefic, Sun Mars
+      Saturn Rahu Ketu malefic, the Moon benefic from Shukla 6th tithi to Krishna 10th tithi, Mercury benefic unless it shares a
+      sign with a malefic.
    7. Rahu and Ketu take the S of their sign lord and are flagged. This proxy is the engine author's proposal.
    The score of an option is the share of strength in its favour, 0 to 100. Use node suj_engine/tools/strength_tally.js, which
    prints the S table, the evidence table and the EVIDENCE TALLY line. Options with no order, the highest score wins and a tie
    goes to the larger favour weight. The guard checks the line against the final answer. Which planet stands on which side
    and of which type is the analyst's judgement and shows in the evidence table so that it can be corrected.
+G12 DASHA RESULTS. The owner said to take dasha results from the Laghu Parashari rules. A dasha lord gives the results of the houses
+   it owns, not its natural nature. Run node suj_engine/tools/functional_nature.js, which prints for the Lagna the class of each
+   planet, trikonesha, kendresha, trishadayesha, the sama lords of 2 and 12, the marakesha, the yogakaraka by the library's own
+   test LP-085-5, the kendradhipatya dosha and whether it is triggered, LP-023-16 and LP-054-3, and the role of the running
+   Mahadasha, Antardasha and Pratyantardasha lords. In dasha a benefic promotes and a malefic obstructs, LP-085-3, unless a
+   malefic is connected to a yogakaraka, LP-086-1, when it gives the yoga's fruit in proportion to its own strength and keeps its
+   marakatva, LP-086-2. A maraka's dasha gives auspicious fruit first and inauspicious later, LP-085-8. The answer states these on
+   a DASHA LORDS line in S6, which the guard requires.
+   Differences between the owner's three classes and Laghu Parashari, for the owner to settle. The library puts the 3rd and 11th
+   lords among the doshi, LP-023-16, the 2nd and 12th lords among the sama, LP-024-18, and the 8th lord among the doshi too. The
+   owner's classes put 6 8 12 as harmful and say nothing of 2 3 11.
+
 G3 Every flag against the leading option appears on the COUNTER EVIDENCE line and is counted in the tally. A flag may
    be answered by a protective factor only if that factor is counted on the other side. The guard requires the line.
 G4 A natal promise is capacity. For status questions, working or not, married or not, parent alive or not, tally the
@@ -110,6 +132,8 @@ H5 Not working with a strong tenth house. The chart had Saturn in the 2nd, the t
 
 ## What the new tools do and do not do
 
+- functional_nature.js gives the Laghu Parashari class of each planet for dasha results. Connections to the yogakarakas are shown only as
+  same sign, exchange or aspect either way, the library's four sambandha types are not all coded. Rahu and Ketu are not classified.
 - strength_tally.js weighs the planets for and against each option by their real strength, the owner's rule of rounds 6 and 7.
   It cannot decide which side or type a planet belongs to, that stays with the analysis. Self test in tests/strength_selftest.js.
 - window_scan.js lists candidate dasha and double transit windows. On this chart the wide view gave 72 to 142 windows

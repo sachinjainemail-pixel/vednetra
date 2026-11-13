@@ -9,7 +9,7 @@
  * strength_tally.js, whole numbers from 0 to 100, the share of planet strength that stands in favour of the option.
  *
  * Version 2 (round 5, from the first tested chart) adds process checks. Use --v1 to run only the older checks.
- *   RULES CITED line in the answer, WINDOW SCAN line in S6, EVIDENCE TALLY and COUNTER EVIDENCE lines in S8.
+ *   RULES CITED line in the answer, WINDOW SCAN and DASHA LORDS lines in S6, EVIDENCE TALLY and COUNTER EVIDENCE lines in S8.
  *   With options, the EVIDENCE TALLY line must give a whole number for every option, and the final answer must hold
  *   the highest number. A tie for the highest number needs a TIE BREAK line that names the deciding step.
  *   Reasoning from typicality, base rates or the safe choice is an error. A choice must rest on counted chart evidence.
@@ -110,6 +110,7 @@ function check(text, opts) {
     const has = (arr, re) => arr.filter(l => re.test(l));
     if (s2 && has(inRange(s2, s3), /^RULES CITED\b/).length !== 1) errors.push("S2 must contain exactly one line starting RULES CITED. Run rules_lookup.js and list the rule ids used, or write that the library holds no rule");
     if (s6 && has(inRange(s6, s7), /^WINDOW SCAN\b/).length !== 1) errors.push("S6 must contain exactly one line starting WINDOW SCAN. Run window_scan.js and state the windows found and which were weighed");
+    if (s6 && has(inRange(s6, s7), /^DASHA LORDS\b/).length !== 1) errors.push("S6 must contain exactly one line starting DASHA LORDS giving the Laghu Parashari role of the running Mahadasha, Antardasha and Pratyantardasha lords from functional_nature.js");
     let tallyLine = "";
     if (s8) {
       const r8 = inRange(s8, s9);

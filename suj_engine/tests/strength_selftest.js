@@ -28,5 +28,17 @@ let threw = 0;
 try { tally(Object.assign({}, C, { kind: "choice", options: ["A", "B"], evidence: [{ option: "A", side: "for", type: "weakness", planet: "Sun", factor: "z" }] })); } catch (e) { threw++; }
 try { tally(Object.assign({}, C, { kind: "choice", options: ["A", "B"], evidence: [{ option: "A", side: "against", type: "role", planet: "Sun", factor: "z" }] })); } catch (e) { threw++; }
 ok("wrong type for a side is refused", threw === 2);
+// owner's rule of round 8, aspect by natural nature and ownership by the houses owned
+const E = ev => tally(Object.assign({}, C, { kind: "choice", options: ["A", "B"], evidence: ev })).evidence;
+const a1 = E([{ option: "A", type: "aspect", planet: "Saturn" }, { option: "A", type: "aspect", planet: "Jupiter" }]);
+ok("a Saturn aspect is against and a Jupiter aspect is for, whatever they lord", a1[0].side === "against" && a1[1].side === "for");
+const l1 = E([{ option: "A", type: "lordship", planet: "Mars", house: 5 }, { option: "A", type: "lordship", planet: "Mars", house: 12 }, { option: "A", type: "lordship", planet: "Mercury", house: 10 }]);
+ok("trine lord is for at factor 1, trik lord is against, kendra lord is for at factor 0.5", l1[0].side === "for" && l1[0].mult === 1 && l1[1].side === "against" && l1[2].side === "for" && l1[2].mult === 0.5);
+const l2 = tally(Object.assign({}, C, { kind: "choice", options: ["A", "B"], evidence: [{ option: "A", type: "lordship", planet: "Saturn", house: 3 }] }));
+ok("a house outside the owner's three classes carries no weight and is reported", l2.notCovered.length === 1 && l2.rows[0].favour === 0);
+let bad = false; try { E([{ option: "A", type: "lordship", planet: "Venus", house: 5 }]); } catch (e) { bad = /does not lord/.test(e.message); }
+ok("a lordship the planet does not hold is refused", bad);
+const l3 = E([{ option: "A", type: "lordship", planet: "Saturn", house: 9, ref: "moon" }]);
+ok("lordship from the Moon chart is checked against the Moon sign", l3[0].side === "for" && l3[0].klass === "trine");
 console.log(pass + " of " + n + " passed");
 process.exit(pass === n ? 0 : 1);

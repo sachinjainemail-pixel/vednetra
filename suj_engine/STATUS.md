@@ -97,6 +97,15 @@
   of owner adjusted Shadbala, D1 dignity, D9 dignity, Vimshopaka and the subject varga. Evidence types are role, harm and
   weakness, weights S, S and 100 minus S. Self test tests/strength_selftest.js prints 8 of 8. LEARNINGS.md G2 rewritten.
   The composite and its equal weights are the engine author's proposal and await the owner.
+- Round 8, owner correction. An aspect works by the planet's natural nature and house ownership by the houses owned, trine most
+  beneficial, kendra somewhat, trik harmful. My earlier statement that one strength delivers both results for Saturn was wrong.
+  strength_tally.js now has the types lordship and aspect, which work out their own side. For dasha results the owner pointed to
+  the Laghu Parashari rules. Built functional_nature.js, the Laghu Parashari class of every planet and of the running dasha
+  lords, with the library's rule ids. answer_guard.js requires a DASHA LORDS line in S6, prepare.js runs the new tool. Self tests
+  15 of 15 and strength 13 of 13. Question 1 of Kundali 892 retried with typed evidence in
+  suj_engine/experiments/q1_evidence_round8.json, Graduation 63, Post graduation 43, so the answer is still Graduation.
+- Open for the owner. Houses 2 3 11 carry no weight in the tally, Laghu Parashari calls the 3rd and 11th lords doshi and the 2nd and
+  12th sama. The factors 1.0 for trine and 0.5 for kendra are the engine author's reading.
 - Question 1 of Kundali 892 under the new rule with the evidence listed by the analyst, Graduation 65, Post graduation 39. Result
   is Graduation, so the true answer is still missed. The owner is asked to check the placement of the planets in the evidence table.
 - Still open, planet strength winner to event result mapping, the sibling brother and sister split, employed or not, and

@@ -13,6 +13,7 @@ const path = require("path");
 const { execFileSync } = require("child_process");
 const { scan, render } = require("./window_scan");
 const { lookup, render: renderRules } = require("./rules_lookup");
+const { nature, render: renderNature } = require("./functional_nature");
 
 const MAP = {
   education: { events: ["education_step"], tag: "Education", focus: 4, strength: "education" },
@@ -43,9 +44,11 @@ m.events.forEach(ev => {
   out.push("", "Wide view for " + ev + " found " + wide.length + " windows, past " + wide.filter(w => w.timeStatus === "PAST").length + ", grade A " + wide.filter(w => w.grade === "A").length + ". Too many to separate events, use the strict list above and run window_scan.js without strict only to look at a specific period.");
 });
 out.push("", renderRules(lookup(Object.assign({}, cfg, { event: m.tag })), 3));
+out.push("", renderNature(nature(cfg)));
 out.push("", "## CHECKLIST for the answer, enforced by answer_guard.js version 2",
   "1. Run planet_strength.js for the planets whose results conflict. Topics " + m.strength + ".",
-  "2. S2 has a RULES CITED line. S6 has a WINDOW SCAN line and weighs the strict windows first.",
+  "2. S2 has a RULES CITED line. S6 has a WINDOW SCAN line, weighing the strict windows first, and a DASHA LORDS line from the functional nature table.",
+  "2a. An aspect works by the planet's NATURAL nature. House ownership works by the houses owned, trine most beneficial, kendra somewhat, trik harmful. In strength_tally.js give lordship and aspect as separate typed entries.",
   "3. Write down every flag that points against your leading option. They go on the COUNTER EVIDENCE line or into the tally.",
   "4. Weigh the evidence with strength_tally.js, planets for and against each option by Shadbala percent. S8 has its EVIDENCE TALLY line. The final answer is the option with the highest number, or for ordered options the highest above 50, guard flag --ordinal.",
   "5. No typicality, no base rate, no safe choice. No rule that is not in the methodology, the library or a cited text.",

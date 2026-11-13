@@ -67,6 +67,9 @@ engine inside the owner's methodology and are open to the owner's change. See LE
     other idea is marked proposed and kept out of the tally.
 18. RULE LIBRARY. Run rules_lookup.js for every question and put the ids on the RULES CITED line, or write that the
     library holds nothing for the event.
+20. ASPECT AND OWNERSHIP. An aspect works by the planet's natural nature. House ownership works by the houses owned, trine most
+    beneficial, kendra somewhat, trik harmful. Dasha results follow the Laghu Parashari rules, run functional_nature.js and give the
+    DASHA LORDS line in S6.
 19. CASE LOG. After every owner reported result add the case to suj_engine/cases/cases.json, run cases_report.js and update
     LEARNINGS.md.
 
@@ -103,6 +106,10 @@ Rule library lookup for the chart placements and an event tag:
 Dossier for a question, runs the dominant house scan, the strict windows and the rule lookup together:
 
     node suj_engine/tools/prepare.js '{"gender":"female","date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0,"topic":"parents"}'
+
+Functional nature of the planets and of the running dasha lords by Laghu Parashari:
+
+    node suj_engine/tools/functional_nature.js '{"gender":"female","date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0,"asOf":"YYYY-MM-DD"}'
 
 Strength tally, the planets for and against each option weighed by Shadbala percent:
 

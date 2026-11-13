@@ -1,0 +1,120 @@
+#!/usr/bin/env node
+/*
+ * SUJ engine, FUNCTIONAL NATURE FOR DASHA RESULTS. The owner said to take dasha results from the Laghu Parashari rules in the
+ * library, because a planet gives the results of the houses it owns, and that is separate from its natural nature, which governs
+ * its aspects. This tool prints, for the Lagna of the native, the Laghu Parashari class of every planet and the role of the
+ * running Mahadasha, Antardasha and Pratyantardasha lords. Houses and positions come from Vednetra.
+ *
+ * Rules used, all from suj_engine/rules/rules_index.json
+ *   LP-023-9, 023-13, 023-15  kendresha 1 4 7 10, trikonesha 5 9, trishadayesha 3 6 11
+ *   LP-023-16   dosha type 1 is owning 3 6 8 or 11. Dosha type 2 is kendradhipatya dosha, a benefic owning a kendra. The benefics
+ *               are Jupiter, Venus, Mercury only when it shares a sign with a malefic, and the Moon.
+ *   LP-024-13   yogakaraka, the planet that gives exceedingly auspicious results, a kendresha and a trikonesha in mutual relation
+ *   LP-024-18   houses 2 and 12 and their lords are sama, neither auspicious nor inauspicious
+ *   LP-024-7, 8 the 2nd and the 7th are maraka houses and their lords are marakesha
+ *   LP-052-4    the kendradhipatya dosha is strongest for Jupiter and Venus
+ *   LP-054-3    the dosha is triggered only when the planet owns a kendra AND stands in a kendra in a sign not its own, order
+ *               Jupiter and Venus, then Mercury, then Moon, the 7th is the most dangerous kendra
+ *   LP-085-5    yogakaraka test used in the library's own table, a trikonesha whose other sign is not the 3rd, 6th or 11th
+ *   LP-085-3, 085-2, 086-1, 086-2  in dasha, benefic planets are promoters, malefic planets are obstructers, but a malefic
+ *               connected to the yogakarakas gives the yoga's fruit in proportion to its own strength, and does not lose its
+ *               marakatva. LP-085-8, a maraka's dasha gives auspicious fruit first and inauspicious later.
+ * Differences from the owner's three classes, which govern the strength tally. The owner says trine most beneficial, kendra
+ * somewhat, trik 6 8 12 harmful. Laghu Parashari puts the 3rd and 11th lords among the doshi, and the 2nd and 12th lords among
+ * the sama. The tool prints both so that the owner can settle them.
+ * Connection, sambandha, is shown only as sharing a sign, a sign exchange, or an aspect either way. Rahu and Ketu follow
+ * LP-057-2 and LP-062-2 and are not classified here.
+ *
+ *   node suj_engine/tools/functional_nature.js '{"gender":"female","date":"1993-01-06","time":"07:10:00","tz":5.5,"lat":27.1333,"lon":81.9667,"asOf":"2026-11-13"}'
+ */
+const fs = require("fs");
+const path = require("path");
+const { loadVedicCore } = require("./vednetra_loader");
+const KB = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "data", "significations.json"), "utf8"));
+const SEVEN = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
+const ASPECT = { Sun: [7], Moon: [7], Mercury: [7], Venus: [7], Mars: [4, 7, 8], Jupiter: [5, 7, 9], Saturn: [3, 7, 10] };
+const houseFrom = (sign, ref) => ((sign - ref + 12) % 12) + 1;
+const owned = p => KB.ownSigns[p] || [];
+
+function nature(cfg) {
+  const VC = loadVedicCore(cfg.appDir);
+  const t = String(cfg.time).length === 5 ? cfg.time + ":00" : cfg.time;
+  const chart = VC.avEngineFor({ name: "x", gender: cfg.gender || "unspecified", birthISO: cfg.date + "T" + t, tz: Number(cfg.tz), lat: Number(cfg.lat), lon: Number(cfg.lon), place: "" }).chart;
+  const P = chart.planetsByName, lagna = chart.ascendant.sign;
+  const asOf = cfg.asOf ? new Date(cfg.asOf) : new Date();
+  const stack = VC.findDashaStack(chart.vimshottari.timeline, asOf);
+  const malefics = ["Sun", "Mars", "Saturn", "Rahu", "Ketu"];
+  const mercuryPapa = malefics.some(m => P[m].sign === P.Mercury.sign);
+  const rows = {};
+  SEVEN.forEach(pl => {
+    const houses = owned(pl).map(s => houseFrom(s, lagna)).sort((a, b) => a - b);
+    const kendresha = houses.filter(h => [1, 4, 7, 10].indexOf(h) >= 0), trikonesha = houses.filter(h => [5, 9].indexOf(h) >= 0 || h === 1);
+    const trishaday = houses.filter(h => [3, 6, 11].indexOf(h) >= 0), sama = houses.filter(h => [2, 12].indexOf(h) >= 0), eighth = houses.indexOf(8) >= 0;
+    const marakaLord = houses.filter(h => [2, 7].indexOf(h) >= 0);
+    const benefic = pl === "Jupiter" || pl === "Venus" || pl === "Moon" || (pl === "Mercury" && mercuryPapa);
+    const trik = houses.filter(h => [6, 8, 12].indexOf(h) >= 0);
+    // yogakaraka by LP-085-5, a trikonesha 5 or 9 whose other sign is not in 3 6 11. A lagna lord that is also a trikonesha counts the same way.
+    const trik59 = houses.filter(h => h === 5 || h === 9);
+    const yogakaraka = trik59.length > 0 && trishaday.length === 0;
+    const ownKendraAndTrikona = kendresha.some(h => h !== 1) && trik59.length > 0;
+    const dosha1 = houses.filter(h => [3, 6, 8, 11].indexOf(h) >= 0);
+    const kendraOwner = kendresha.length > 0;
+    const posHouse = P[pl].house, inKendra = [1, 4, 7, 10].indexOf(posHouse) >= 0, ownSign = owned(pl).indexOf(P[pl].sign) >= 0;
+    const dosha2 = benefic && kendraOwner;
+    const triggered = dosha2 && inKendra && !ownSign;
+    const order = { Jupiter: 1, Venus: 1, Mercury: 2, Moon: 3 }[pl];
+    let role = "neutral";
+    if (yogakaraka || ownKendraAndTrikona) role = "sadhaka, promoter, yogakaraka";
+    else if (trikonesha.length && trishaday.length === 0) role = "sadhaka, promoter";
+    else if (trishaday.length || eighth) role = "badhaka, obstructer unless connected to a yogakaraka";
+    rows[pl] = { houses, kendresha, trikonesha, trishaday, sama, eighth, marakaLord, trik, owner: (() => { const c = []; if (trikonesha.length) c.push("most beneficial, trine " + trikonesha.join(" ")); if (kendresha.some(h => h !== 1)) c.push("somewhat beneficial, kendra " + kendresha.filter(h => h !== 1).join(" ")); if (trik.length) c.push("harmful, trik " + trik.join(" ")); return c.length ? c.join(" and ") : "not covered"; })(),
+      yogakaraka: yogakaraka || ownKendraAndTrikona, dosha1, dosha2, triggered, doshaOrder: order, in: posHouse + " in " + P[pl].signName + (ownSign ? ", own sign" : ""), role };
+  });
+  // connections among yogakarakas and the planet
+  const yk = SEVEN.filter(p => rows[p].yogakaraka);
+  const conn = (a, b) => {
+    const out = [];
+    if (P[a].sign === P[b].sign) out.push("same sign");
+    if (owned(a).indexOf(P[b].sign) >= 0 && owned(b).indexOf(P[a].sign) >= 0) out.push("sign exchange");
+    if ((ASPECT[a] || []).indexOf(houseFrom(P[b].sign, P[a].sign)) >= 0) out.push(a + " aspects " + b);
+    if ((ASPECT[b] || []).indexOf(houseFrom(P[a].sign, P[b].sign)) >= 0) out.push(b + " aspects " + a);
+    return out;
+  };
+  const connections = {};
+  SEVEN.forEach(p => { connections[p] = yk.filter(y => y !== p).map(y => ({ with: y, how: conn(p, y) })).filter(x => x.how.length); });
+  return { lagna: VC.SIGNS[lagna].name, asOf: asOf.toISOString().slice(0, 10), dasha: stack.slice(0, 3).map(x => ({ level: x.level, lord: x.lord, from: x.start.toISOString().slice(0, 10), to: x.end.toISOString().slice(0, 10) })), rows, yogakarakas: yk, connections, mercuryPapaYuta: mercuryPapa };
+}
+
+function render(r) {
+  const L = ["# SUJ FUNCTIONAL NATURE by Laghu Parashari, Lagna " + r.lagna + ", as of " + r.asOf, ""];
+  L.push("Yogakarakas by the library's own test, LP-085-5 " + (r.yogakarakas.join(", ") || "none") + ". Mercury " + (r.mercuryPapaYuta ? "shares a sign with a malefic, so it counts as a benefic for the dosha" : "does not share a sign with a malefic"));
+  L.push("");
+  SEVEN.forEach(p => {
+    const x = r.rows[p];
+    const bits = [];
+    if (x.trikonesha.length) bits.push("trikonesha " + x.trikonesha.join(" "));
+    if (x.kendresha.length) bits.push("kendresha " + x.kendresha.join(" "));
+    if (x.trishaday.length) bits.push("trishadayesha " + x.trishaday.join(" "));
+    if (x.eighth) bits.push("ashtamesha");
+    if (x.sama.length) bits.push("sama lord " + x.sama.join(" "));
+    if (x.marakaLord.length) bits.push("marakesha " + x.marakaLord.join(" "));
+    if (x.dosha1.length) bits.push("dosha type 1 for " + x.dosha1.join(" "));
+    if (x.dosha2) bits.push("kendradhipatya dosha" + (x.triggered ? " TRIGGERED, placed in a kendra not in its own sign, strength order " + x.doshaOrder : ", not triggered"));
+    L.push("- " + p.padEnd(8) + "owns " + x.houses.join(" ") + ", stands in " + x.in + ". " + bits.join("; ") + ". Owner's class " + x.owner + ". Dasha role " + x.role + ".");
+  });
+  L.push("", "Connections of each planet with the yogakarakas, shown as same sign, exchange or aspect either way");
+  SEVEN.forEach(p => { if (r.connections[p].length) L.push("- " + p + " " + r.connections[p].map(c => c.with + " by " + c.how.join(", ")).join("; ")); });
+  L.push("", "Running dasha at the as of date");
+  r.dasha.forEach(d => { const x = r.rows[d.lord]; L.push("- " + d.level + " " + d.lord + " " + d.from + " to " + d.to + (x ? ", " + x.role + (x.triggered ? ", kendradhipatya dosha triggered" : "") + (x.marakaLord.length ? ", marakesha" : "") : ", node, see LP-057-2 and LP-062-2")); });
+  L.push("", "Reading rules. A malefic dasha obstructs, LP-085-3, unless the planet is connected to a yogakaraka, then it gives the yoga's fruit in proportion to its own strength, LP-086-1, and its marakatva stays, LP-086-2. A maraka's dasha gives auspicious fruit first and inauspicious later, LP-085-8.");
+  return L.join("\n");
+}
+
+if (require.main === module) {
+  const argv = process.argv.slice(2);
+  const arg = argv.find(a => a.trim().startsWith("{"));
+  if (!arg) { console.error("Usage: functional_nature.js '{json}' [--json]"); process.exit(2); }
+  const res = nature(JSON.parse(arg));
+  console.log(argv.indexOf("--json") >= 0 ? JSON.stringify(res, null, 1) : render(res));
+}
+module.exports = { nature, render };
