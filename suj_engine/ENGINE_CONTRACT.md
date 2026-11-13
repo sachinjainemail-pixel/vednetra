@@ -56,7 +56,8 @@ Round 5 additions, from the first tested chart. Added by the engine author after
 engine inside the owner's methodology and are open to the owner's change. See LEARNINGS.md.
 
 15. WEIGHED EVIDENCE. The answer rests on chart evidence only. Typicality, base rates and the safe choice are not evidence.
-    Where evidence is both for and against, the side with the stronger planets decides, the owner's rule of round 6. With
+    Where evidence is both for and against, the side with the stronger planets decides, the owner's rule of rounds 6 and 7. A
+    planet counts by its real strength in the role it plays, a debilitated 9th lord is a weak 9th lord. With
     options, S8 carries an EVIDENCE TALLY from strength_tally.js with a whole number per option and the final answer is the
     option with the highest number, or for ordered options the highest above 50. Every flag against the final answer is named
     on the COUNTER EVIDENCE line.

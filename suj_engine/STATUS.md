@@ -92,6 +92,11 @@
   and the score is the share of strength in favour, 0 to 100. Ordered options take the highest level above 50.
   answer_guard.js has a new --ordinal flag. Self test prints 14 of 14. LEARNINGS.md G2 and G5, ANSWER_TEMPLATE.md and
   ENGINE_CONTRACT.md requirement 15 updated.
+- Round 7, refinement by the owner. A planet's weight is its REAL strength in the role it plays. The owner's example, a debilitated Sun
+  is a weak 9th lord, so its weight for is below its weight against. Built into strength_tally.js. Real strength S is the mean
+  of owner adjusted Shadbala, D1 dignity, D9 dignity, Vimshopaka and the subject varga. Evidence types are role, harm and
+  weakness, weights S, S and 100 minus S. Self test tests/strength_selftest.js prints 8 of 8. LEARNINGS.md G2 rewritten.
+  The composite and its equal weights are the engine author's proposal and await the owner.
 - Question 1 of Kundali 892 under the new rule with the evidence listed by the analyst, Graduation 65, Post graduation 39. Result
   is Graduation, so the true answer is still missed. The owner is asked to check the placement of the planets in the evidence table.
 - Still open, planet strength winner to event result mapping, the sibling brother and sister split, employed or not, and

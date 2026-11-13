@@ -38,14 +38,30 @@ of it. What the case does show is how the engine went wrong, and that is what is
 
 G1 Decide only on counted chart evidence. Typicality, base rates, what is common and the safe choice are not
    evidence. answer_guard.js version 2 fails an answer that uses such wording.
-G2 OWNER DECISION, round 6. Evidence for and against an option is weighed by the STRENGTH OF THE PLANETS on each side,
-   not by counting factors. Each piece of evidence names one planet, a side and an option. A planet counts once per side. Its
-   weight is its Shadbala percent against the Santhanam minimum, with the owner adjusted figure shown beside it. Rahu and Ketu
-   take the weight of their sign lord, flagged, which is the engine author's proposal. The score of an option is the share of
-   planet strength in its favour, 0 to 100. Use node suj_engine/tools/strength_tally.js, which prints the evidence table and the
-   EVIDENCE TALLY line. Options with no order, the highest score wins and a tie goes to the larger favour weight. The guard
-   checks the line against the final answer. Which planet stands on which side is the analyst's judgement and is shown in the
-   evidence table so that it can be corrected.
+G2 OWNER DECISION, rounds 6 and 7. Evidence for and against an option is weighed by the REAL STRENGTH of the planets on each side,
+   not by counting factors. Each piece of evidence names one planet, a side, a type and an option. A planet counts once per
+   side, with its largest weight. Owner's example of round 7. The Sun is the 9th lord, which speaks for the option, but the
+   Sun is debilitated in D9, so it is a weak 9th lord. Its weight for is weaker than its weight against. The rule built from
+   it, applied to every case.
+   1. Real strength S of a planet, 0 to 100, is the mean of the owner adjusted Shadbala percent halved and cut at 100, the D1
+      sign dignity, the D9 dignity, the Vimshopaka Shadvarga share, and the subject varga when there is one, the house good
+      or not and the dignity. The parts and the equal weights are the engine author's reading of the owner's six steps and
+      await the owner.
+   2. role. The planet carries something favourable, a lordship, karaka, placement, benefic aspect. Weight S. A weak planet is
+      a weak carrier, so a debilitated 9th lord helps little.
+   3. harm. The planet damages the subject from outside, a malefic aspect or conjunction. Weight S. A strong malefic harms
+      more and a weak malefic harms less.
+   4. weakness. The planet's own condition damages the role it carries, debilitation, combustion, enemy sign, 6 8 12
+      placement, bad varga house. Weight 100 minus S. A strong planet has little weakness to count and a weak one a lot.
+   5. A planet that is both carrier and weak counts S for and 100 minus S against. S below 50 turns it against, as in the
+      owner's Sun. S above 50 keeps it for.
+   6. Planet that is carrier and also a harm, such as Saturn lording the 9th from the Moon and aspecting the 4th, counts S on
+      both sides and cancels, because the same strength delivers both results.
+   7. Rahu and Ketu take the S of their sign lord and are flagged. This proxy is the engine author's proposal.
+   The score of an option is the share of strength in its favour, 0 to 100. Use node suj_engine/tools/strength_tally.js, which
+   prints the S table, the evidence table and the EVIDENCE TALLY line. Options with no order, the highest score wins and a tie
+   goes to the larger favour weight. The guard checks the line against the final answer. Which planet stands on which side
+   and of which type is the analyst's judgement and shows in the evidence table so that it can be corrected.
 G3 Every flag against the leading option appears on the COUNTER EVIDENCE line and is counted in the tally. A flag may
    be answered by a protective factor only if that factor is counted on the other side. The guard requires the line.
 G4 A natal promise is capacity. For status questions, working or not, married or not, parent alive or not, tally the
@@ -78,9 +94,9 @@ G11 After every owner reported result, add the case to cases.json, run cases_rep
 
 H1 In case 1 every miss had the true answer on the side of the engine's own flags. If the next charts show the same,
    the tally rule G2 should become the main decider and the planet strength winner a tie breaker only.
-H2 Ordinal. The true level was the highest level whose chain was supported. Under the owner's strength rule and the
-   evidence listed for Kundali 892, Graduation scores 65 and Post graduation 39, so the rule gives Graduation again. The
-   result did not change when Rahu was removed from both sides, Post graduation 44. Whether the planets were placed on the
+H2 Ordinal. The true level was the highest level whose chain was supported. Under the owner's real strength rule and the
+   evidence listed for Kundali 892, Graduation scores 65 and Post graduation 39, so the rule gives Graduation again. With the
+   earlier Shadbala only weights the scores were the same, 65 and 39. The result did not change when Rahu was removed from both sides. Whether the planets were placed on the
    right sides is for the owner to check in the evidence table.
 H3 Counts. The larger family coincided with a very high Ashtakavarga on the 11th house, 38 against an average of
    about 28, and the karaka Mars in a dual sign. Record Ashtakavarga and karaka sign in each sibling case.
@@ -94,8 +110,8 @@ H5 Not working with a strong tenth house. The chart had Saturn in the 2nd, the t
 
 ## What the new tools do and do not do
 
-- strength_tally.js weighs the planets for and against each option by Shadbala percent, the owner's rule of round 6. It
-  cannot decide which side a planet belongs on, that stays with the analysis.
+- strength_tally.js weighs the planets for and against each option by their real strength, the owner's rule of rounds 6 and 7.
+  It cannot decide which side or type a planet belongs to, that stays with the analysis. Self test in tests/strength_selftest.js.
 - window_scan.js lists candidate dasha and double transit windows. On this chart the wide view gave 72 to 142 windows
   per event, so it separates nothing. The strict view gives 5 to 18 and is usable, but the same period, 2010 and
   2011, showed up for the father, for marriage, for a job and for education. It finds candidates. It does not
