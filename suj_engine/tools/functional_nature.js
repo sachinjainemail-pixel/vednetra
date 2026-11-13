@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /*
- * SUJ engine, FUNCTIONAL NATURE FOR DASHA RESULTS. The owner said to take dasha results from the Laghu Parashari rules in the
- * library, because a planet gives the results of the houses it owns, and that is separate from its natural nature, which governs
- * its aspects. This tool prints, for the Lagna of the native, the Laghu Parashari class of every planet and the role of the
+ * SUJ engine, FUNCTIONAL NATURE FOR DASHA RESULTS. The owner said, round 9, that Laghu Parashari is for dasha results ONLY, for the
+ * planet concerned, in its own Mahadasha, Antardasha, Pratyantardasha, Sookshma or Prana. It does not feed the natal strength
+ * tally, where the owner's own classes govern. A planet gives the results of the houses it owns in its dasha, and that is separate
+ * from its natural nature, which governs its aspects. This tool prints, for the Lagna of the native, the Laghu Parashari class of every planet and the role of the
  * running Mahadasha, Antardasha and Pratyantardasha lords. Houses and positions come from Vednetra.
  *
  * Rules used, all from suj_engine/rules/rules_index.json
@@ -21,7 +22,8 @@
  *               marakatva. LP-085-8, a maraka's dasha gives auspicious fruit first and inauspicious later.
  * Differences from the owner's three classes, which govern the strength tally. The owner says trine most beneficial, kendra
  * somewhat, trik 6 8 12 harmful. Laghu Parashari puts the 3rd and 11th lords among the doshi, and the 2nd and 12th lords among
- * the sama. The tool prints both so that the owner can settle them.
+ * the sama. The owner has settled it, round 9. The owner's classes are for the natal tally and Laghu Parashari is for the dasha
+ * of the planet concerned. The tool prints both columns only so that they can be seen side by side.
  * Connection, sambandha, is shown only as sharing a sign, a sign exchange, or an aspect either way. Rahu and Ketu follow
  * LP-057-2 and LP-062-2 and are not classified here.
  *
@@ -82,7 +84,7 @@ function nature(cfg) {
   };
   const connections = {};
   SEVEN.forEach(p => { connections[p] = yk.filter(y => y !== p).map(y => ({ with: y, how: conn(p, y) })).filter(x => x.how.length); });
-  return { lagna: VC.SIGNS[lagna].name, asOf: asOf.toISOString().slice(0, 10), dasha: stack.slice(0, 3).map(x => ({ level: x.level, lord: x.lord, from: x.start.toISOString().slice(0, 10), to: x.end.toISOString().slice(0, 10) })), rows, yogakarakas: yk, connections, mercuryPapaYuta: mercuryPapa };
+  return { lagna: VC.SIGNS[lagna].name, asOf: asOf.toISOString().slice(0, 10), dasha: stack.map(x => ({ level: x.level, lord: x.lord, from: x.start.toISOString().slice(0, 10), to: x.end.toISOString().slice(0, 10) })), rows, yogakarakas: yk, connections, mercuryPapaYuta: mercuryPapa };
 }
 
 function render(r) {
@@ -104,8 +106,9 @@ function render(r) {
   });
   L.push("", "Connections of each planet with the yogakarakas, shown as same sign, exchange or aspect either way");
   SEVEN.forEach(p => { if (r.connections[p].length) L.push("- " + p + " " + r.connections[p].map(c => c.with + " by " + c.how.join(", ")).join("; ")); });
-  L.push("", "Running dasha at the as of date");
-  r.dasha.forEach(d => { const x = r.rows[d.lord]; L.push("- " + d.level + " " + d.lord + " " + d.from + " to " + d.to + (x ? ", " + x.role + (x.triggered ? ", kendradhipatya dosha triggered" : "") + (x.marakaLord.length ? ", marakesha" : "") : ", node, see LP-057-2 and LP-062-2")); });
+  L.push("", "Running dasha at the as of date, all five levels");
+  const LEVEL = { MD: "Mahadasha", AD: "Antardasha", PD: "Pratyantardasha", SD: "Sookshma", PR: "Prana" };
+  r.dasha.forEach(d => { const x = r.rows[d.lord]; L.push("- " + (LEVEL[d.level] || d.level) + " " + d.lord + " " + d.from + " to " + d.to + (x ? ", " + x.role + (x.triggered ? ", kendradhipatya dosha triggered" : "") + (x.marakaLord.length ? ", marakesha" : "") : ", node, see LP-057-2 and LP-062-2")); });
   L.push("", "Reading rules. A malefic dasha obstructs, LP-085-3, unless the planet is connected to a yogakaraka, then it gives the yoga's fruit in proportion to its own strength, LP-086-1, and its marakatva stays, LP-086-2. A maraka's dasha gives auspicious fruit first and inauspicious later, LP-085-8.");
   return L.join("\n");
 }

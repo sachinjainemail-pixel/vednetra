@@ -110,7 +110,7 @@ function check(text, opts) {
     const has = (arr, re) => arr.filter(l => re.test(l));
     if (s2 && has(inRange(s2, s3), /^RULES CITED\b/).length !== 1) errors.push("S2 must contain exactly one line starting RULES CITED. Run rules_lookup.js and list the rule ids used, or write that the library holds no rule");
     if (s6 && has(inRange(s6, s7), /^WINDOW SCAN\b/).length !== 1) errors.push("S6 must contain exactly one line starting WINDOW SCAN. Run window_scan.js and state the windows found and which were weighed");
-    if (s6 && has(inRange(s6, s7), /^DASHA LORDS\b/).length !== 1) errors.push("S6 must contain exactly one line starting DASHA LORDS giving the Laghu Parashari role of the running Mahadasha, Antardasha and Pratyantardasha lords from functional_nature.js");
+    if (s6 && has(inRange(s6, s7), /^DASHA LORDS\b/).length !== 1) errors.push("S6 must contain exactly one line starting DASHA LORDS giving the Laghu Parashari role of the running dasha lords at every level, Mahadasha, Antardasha, Pratyantardasha, Sookshma and Prana, from functional_nature.js");
     let tallyLine = "";
     if (s8) {
       const r8 = inRange(s8, s9);

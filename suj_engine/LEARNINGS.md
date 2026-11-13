@@ -80,9 +80,12 @@ G12 DASHA RESULTS. The owner said to take dasha results from the Laghu Parashari
    malefic is connected to a yogakaraka, LP-086-1, when it gives the yoga's fruit in proportion to its own strength and keeps its
    marakatva, LP-086-2. A maraka's dasha gives auspicious fruit first and inauspicious later, LP-085-8. The answer states these on
    a DASHA LORDS line in S6, which the guard requires.
-   Differences between the owner's three classes and Laghu Parashari, for the owner to settle. The library puts the 3rd and 11th
-   lords among the doshi, LP-023-16, the 2nd and 12th lords among the sama, LP-024-18, and the 8th lord among the doshi too. The
-   owner's classes put 6 8 12 as harmful and say nothing of 2 3 11.
+   OWNER DECISION, round 9. Laghu Parashari is for dasha results ONLY, and only for the concerned planet in its own Mahadasha,
+   Antardasha, Pratyantardasha, Sookshma or Prana. It does not enter the natal strength tally. In the natal tally the owner's
+   own classes govern, trine most beneficial, kendra somewhat, trik harmful, aspects by natural nature. So the library's calling
+   the 3rd and 11th lords doshi and the 2nd and 12th lords sama applies when that planet's dasha runs, and not to the natal
+   promise. Houses 2, 3 and 11 stay outside the owner's classes in the natal tally and carry no weight. functional_nature.js
+   prints all five dasha levels.
 
 G3 Every flag against the leading option appears on the COUNTER EVIDENCE line and is counted in the tally. A flag may
    be answered by a protective factor only if that factor is counted on the other side. The guard requires the line.

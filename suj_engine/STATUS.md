@@ -104,8 +104,10 @@
   lords, with the library's rule ids. answer_guard.js requires a DASHA LORDS line in S6, prepare.js runs the new tool. Self tests
   15 of 15 and strength 13 of 13. Question 1 of Kundali 892 retried with typed evidence in
   suj_engine/experiments/q1_evidence_round8.json, Graduation 63, Post graduation 43, so the answer is still Graduation.
-- Open for the owner. Houses 2 3 11 carry no weight in the tally, Laghu Parashari calls the 3rd and 11th lords doshi and the 2nd and
-  12th sama. The factors 1.0 for trine and 0.5 for kendra are the engine author's reading.
+- Round 9, owner decision. Laghu Parashari is for dasha results only, for the concerned planet in its own Mahadasha, Antardasha,
+  Pratyantardasha, Sookshma or Prana. It does not enter the natal tally, where the owner's classes govern. Houses 2 3 11 therefore stay
+  outside the classes and carry no weight in the tally. functional_nature.js now prints all five dasha levels. Still the engine
+  author's reading, the factors 1.0 for trine and 0.5 for kendra.
 - Question 1 of Kundali 892 under the new rule with the evidence listed by the analyst, Graduation 65, Post graduation 39. Result
   is Graduation, so the true answer is still missed. The owner is asked to check the placement of the planets in the evidence table.
 - Still open, planet strength winner to event result mapping, the sibling brother and sister split, employed or not, and

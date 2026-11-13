@@ -179,7 +179,7 @@ function render(r) {
   L.push("", "Per option");
   r.rows.forEach(x => L.push("- " + x.option + ", favour " + x.favour + " from " + (x.forPlanets.join(", ") || "none") + ", against " + x.against + " from " + (x.againstPlanets.join(", ") || "none") + ", score " + x.score + ", owner adjusted score " + x.scoreOwnerAdjusted));
   L.push("", "Winner " + r.winner + ". Winner on the owner adjusted weights " + r.winnerOwnerAdjusted + (r.winner === r.winnerOwnerAdjusted ? ", the two agree." : ", the two differ, state it as a counter point."));
-  if (r.notCovered.length) L.push("", "Not covered by the owner's rule, weight zero, " + r.notCovered.join(", ") + ". Laghu Parashari calls the 3rd and 11th lords doshi, and the 2nd and 12th lords sama.");
+  if (r.notCovered.length) L.push("", "Not covered by the owner's rule, weight zero, " + r.notCovered.join(", ") + ". They stay outside the owner's classes in the natal tally. Laghu Parashari calls the 3rd and 11th lords doshi and the 2nd and 12th lords sama, but only for the dasha of that planet, see functional_nature.js.");
   L.push("", r.tallyLine);
   return L.join("\n");
 }
