@@ -104,6 +104,11 @@
   lords, with the library's rule ids. answer_guard.js requires a DASHA LORDS line in S6, prepare.js runs the new tool. Self tests
   15 of 15 and strength 13 of 13. Question 1 of Kundali 892 retried with typed evidence in
   suj_engine/experiments/q1_evidence_round8.json, Graduation 63, Post graduation 43, so the answer is still Graduation.
+- Round 10, owner pointed to the direct nodal rules in Laghu Parashari. functional_nature.js now classifies Rahu and Ketu by the house
+  occupied and the companion planet, LP-056-6, LP-062-1, LP-057-2, LP-062-2, LP-062-3, LP-058-3, with no sign lordship, LP-060-2.
+  Kundali 892, the running Pratyantardasha Rahu is alone in the 12th, sama but vyayakaraka, doubling Mars. Self test
+  tests/functional_selftest.js prints 9 of 9. Aspects are not counted as sambandha for the nodes, LP-057-4. Still open, the
+  window scan reads dasha to Pratyantardasha only and its significator list does not yet use these node verdicts.
 - Round 9, owner decision. Laghu Parashari is for dasha results only, for the concerned planet in its own Mahadasha, Antardasha,
   Pratyantardasha, Sookshma or Prana. It does not enter the natal tally, where the owner's classes govern. Houses 2 3 11 therefore stay
   outside the classes and carry no weight in the tally. functional_nature.js now prints all five dasha levels. Still the engine

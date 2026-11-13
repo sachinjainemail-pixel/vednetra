@@ -80,6 +80,16 @@ G12 DASHA RESULTS. The owner said to take dasha results from the Laghu Parashari
    malefic is connected to a yogakaraka, LP-086-1, when it gives the yoga's fruit in proportion to its own strength and keeps its
    marakatva, LP-086-2. A maraka's dasha gives auspicious fruit first and inauspicious later, LP-085-8. The answer states these on
    a DASHA LORDS line in S6, which the guard requires.
+   RAHU AND KETU, round 10. The library has direct rules, sloka 13 of Laghu Parashari. The nodes own no sign, so no sign lordship,
+   exaltation or debilitation, LP-060-2. They are judged by the house occupied and the planet they sit with, LP-056-6. The node
+   becomes the lord of the house it occupies. With a companion planet the result follows that planet read through its houses. Alone
+   it follows the house, LP-062-1. Alone in a trikona it is shubha, in the 8th shubha, in a kendra sama, in the 2nd or 7th
+   marakesha, in the 12th sama but vyayakaraka, in 3 6 11 papi. It doubles the result of the lord of the house it occupies,
+   LP-057-2. In a kendra or trikona conjoined with a kendresha or trikonesha it is a yogakaraka, LP-057-2 and LP-062-2, with
+   conjunction only and no aspect, LP-057-4. In the 2nd or 7th with a benefic that lords the 2nd or 7th it is certainly a marakesha,
+   LP-062-3. With the Sun or the Moon the house verdict is used, LP-058-3. functional_nature.js codes all of this. Kundali 892, Rahu
+   alone in the 12th is sama but vyayakaraka and doubles Mars, Ketu in the 6th with the Moon is papi and increases the 6th house's
+   results, destruction of enemies.
    OWNER DECISION, round 9. Laghu Parashari is for dasha results ONLY, and only for the concerned planet in its own Mahadasha,
    Antardasha, Pratyantardasha, Sookshma or Prana. It does not enter the natal strength tally. In the natal tally the owner's
    own classes govern, trine most beneficial, kendra somewhat, trik harmful, aspects by natural nature. So the library's calling
