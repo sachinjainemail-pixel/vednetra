@@ -14,21 +14,102 @@
       "asOf": "2026-11-12",
       "resultsReported": "2026-11-13",
       "questions": [
-        { "n": 1, "topic": "education", "kind": "ordinal", "options": ["High school", "Intermediate", "Graduation", "Post graduation"],
-          "engine": "Graduation", "truth": "Post graduation", "errorTags": ["prior_override"],
-          "note": "Chart showed Jupiter 5th from Moon, Mercury highest Shadbala, Budha Aditya and a Venus antardasha with Venus in D24 house 11. The engine saw them and chose the middle option by typicality." },
-        { "n": 2, "topic": "marriage", "kind": "status", "options": ["Married", "Divorced", "Widowed", "Unmarried"],
-          "engine": "Married", "truth": "Married", "errorTags": [],
-          "note": "Promise, dasha and transit all pointed one way. Window Rahu Mars Jupiter 29 Nov 2019 to 19 Jan 2020 is a candidate, the true date is not known." },
-        { "n": 3, "topic": "work", "kind": "status", "options": ["Business", "Unemployed", "Government job", "Private job"],
-          "engine": "Government job", "truth": "Unemployed", "errorTags": ["capacity_vs_status", "prior_override"],
-          "note": "Strong tenth house promise was read as employment. Flags toward not working were set aside: Saturn in 2nd, Saturn and Rahu aspect on 4th, D10 Sun and Moon in 12th, Mercury in D10 8th, D10 10th empty, 10th lord combust. The window scan found a grade A window in 2025 for job start and it was wrong, so a window alone does not prove the event." },
-        { "n": 4, "topic": "siblings", "kind": "count", "options": ["Two brothers two sisters", "One brother one sister", "Only child", "One brother three sisters"],
-          "engine": "One brother three sisters", "truth": "Two brothers two sisters", "errorTags": ["invented_rule"],
-          "note": "Count was decided by a planet and sign gender heuristic made up by the engine. Not in the owner's methodology and not in the rule library. 11th house Ashtakavarga was 38 and Mars the karaka was in a dual sign, both ignored." },
-        { "n": 5, "topic": "parents", "kind": "status", "options": ["Father alive", "Neither alive", "Both alive", "Mother alive"],
-          "engine": "Both alive", "truth": "Mother alive", "errorTags": ["flag_dismissed", "winner_mapping", "prior_override"],
-          "note": "Engine itself listed Jupiter, lord of the father's 8th, in the father's 2nd, Saturn and Rahu aspect on the father's 8th, and a Rahu Mercury window in 2010 and 2011 with Saturn in Virgo and Jupiter in Pisces on that house. These were set aside using the Saturn winner and typicality. Father not alive is the truth." }
+        {
+          "n": 1,
+          "topic": "education",
+          "kind": "ordinal",
+          "options": [
+            "High school",
+            "Intermediate",
+            "Graduation",
+            "Post graduation"
+          ],
+          "engine": "Graduation",
+          "truth": "Post graduation",
+          "errorTags": [
+            "prior_override"
+          ],
+          "note": "Chart showed Jupiter 5th from Moon, Mercury highest Shadbala, Budha Aditya and a Venus antardasha with Venus in D24 house 11. The engine saw them and chose the middle option by typicality."
+        },
+        {
+          "n": 2,
+          "topic": "marriage",
+          "kind": "status",
+          "options": [
+            "Married",
+            "Divorced",
+            "Widowed",
+            "Unmarried"
+          ],
+          "engine": "Married",
+          "truth": "Married",
+          "errorTags": [],
+          "note": "Promise, dasha and transit all pointed one way. Window Rahu Mars Jupiter 29 Nov 2019 to 19 Jan 2020 is a candidate, the true date is not known."
+        },
+        {
+          "n": 3,
+          "topic": "work",
+          "kind": "status",
+          "options": [
+            "Business",
+            "Unemployed",
+            "Government job",
+            "Private job"
+          ],
+          "engine": "Government job",
+          "truth": "Unemployed",
+          "errorTags": [
+            "capacity_vs_status",
+            "prior_override"
+          ],
+          "note": "Strong tenth house promise was read as employment. Flags toward not working were set aside: Saturn in 2nd, Saturn and Rahu aspect on 4th, D10 Sun and Moon in 12th, Mercury in D10 8th, D10 10th empty, 10th lord combust. The window scan found a grade A window in 2025 for job start and it was wrong, so a window alone does not prove the event."
+        },
+        {
+          "n": 4,
+          "topic": "siblings",
+          "kind": "count",
+          "options": [
+            "Two brothers two sisters",
+            "One brother one sister",
+            "Only child",
+            "One brother three sisters"
+          ],
+          "engine": "One brother three sisters",
+          "truth": "Two brothers two sisters",
+          "errorTags": [
+            "invented_rule"
+          ],
+          "note": "Count was decided by a planet and sign gender heuristic made up by the engine. Not in the owner's methodology and not in the rule library. 11th house Ashtakavarga was 38 and Mars the karaka was in a dual sign, both ignored."
+        },
+        {
+          "n": 5,
+          "topic": "parents",
+          "kind": "status",
+          "options": [
+            "Father alive",
+            "Neither alive",
+            "Both alive",
+            "Mother alive"
+          ],
+          "engine": "Both alive",
+          "truth": "Mother alive",
+          "errorTags": [
+            "flag_dismissed",
+            "winner_mapping",
+            "prior_override"
+          ],
+          "note": "Engine itself listed Jupiter, lord of the father's 8th, in the father's 2nd, Saturn and Rahu aspect on the father's 8th, and a Rahu Mercury window in 2010 and 2011 with Saturn in Virgo and Jupiter in Pisces on that house. These were set aside using the Saturn winner and typicality. Father not alive is the truth."
+        }
+      ],
+      "reruns": [
+        {
+          "date": "2026-11-13",
+          "engineRound": 12,
+          "script": "suj_engine/experiments/rerun_892_round12.js",
+          "note": "Generated evidence, owner rules to round 12. Every hypothesis scored under 50. Answers Graduation, Unmarried, Not working, Only child, Neither alive. Right on work and on the father only, wrong on the rest. Pessimistic by structure, see rerun_892_round12_results.md. Hindsight run, not a test.",
+          "correct": 1,
+          "of": 5
+        }
       ]
     }
   ]

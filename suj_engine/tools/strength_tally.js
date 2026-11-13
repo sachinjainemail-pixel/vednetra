@@ -22,6 +22,9 @@
  *      planet that lords a house and also aspects is two separate pieces of evidence that can point in different directions.
  *      The tool therefore takes two typed entries and works out the side itself.
  *        type lordship  give planet, house, and ref lagna or moon. The tool checks that the planet really lords that house.
+ *                       Optional from, a house number. Then the class is taken from the house counted FROM that house, the owner's
+ *                       method of the Nth house from the house of the subject. For the father, from 9, the 4th house is the 8th from
+ *                       the 9th and so a trik, and its lord is judged harmful for the father.
  *                       Trine houses 1 5 9 are for with factor 1.0, kendra houses 4 7 10 are for with factor 0.5, trik houses
  *                       6 8 12 are against with factor 1.0. Houses 2 3 11 are not covered by the owner's rule, factor 0 and
  *                       they are reported. The factors 1.0 and 0.5 are the engine author's reading of most and somewhat.
@@ -123,10 +126,11 @@ function tally(cfg) {
       const ref = e.ref === "moon" ? ctx.moon : ctx.lagna;
       const lord = signLord((ref + Number(e.house) - 1) % 12);
       if (lord !== e.planet) throw new Error(e.planet + " does not lord house " + e.house + " from the " + (e.ref || "lagna") + ", the lord is " + lord);
-      const c = LORD_CLASS[Number(e.house)];
+      const rel = e.from ? ((Number(e.house) - Number(e.from) + 12) % 12) + 1 : Number(e.house);
+      const c = LORD_CLASS[rel];
       e.klass = c[0]; e.side = c[1] || "for"; e.factor = c[2];
       if (!c[1]) notCovered.push(e.planet + " lords house " + e.house);
-      e.factor_text = e.factor_text || (e.planet + " lords house " + e.house + " from the " + (e.ref || "lagna") + ", " + c[0] + " lord");
+      e.factor_text = e.factor_text || (e.planet + " lords house " + e.house + " from the " + (e.ref || "lagna") + (e.from ? ", house " + rel + " from house " + e.from : "") + ", " + c[0] + " lord");
       e.factor = e.factor_text; e.mult = c[2];
     } else if (e.type === "aspect") {
       e.klass = ctx.nat[e.planet]; e.side = e.klass === "benefic" ? "for" : "against"; e.mult = 1;
@@ -191,4 +195,4 @@ if (require.main === module) {
   const res = tally(JSON.parse(arg));
   console.log(argv.indexOf("--json") >= 0 ? JSON.stringify(res, null, 1) : render(res));
 }
-module.exports = { tally, render };
+module.exports = { tally, render, naturalNature, strengths };

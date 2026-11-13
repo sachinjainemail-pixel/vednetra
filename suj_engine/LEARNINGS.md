@@ -143,6 +143,11 @@ H5 Not working with a strong tenth house. The chart had Saturn in the 2nd, the t
    in the 12th, D10 Mercury in the 8th and the D10 10th house empty. Test whether such a set marks a homemaker
    pattern in further female charts.
 
+H6 Calibration. In the round 12 rerun of Kundali 892 every hypothesis scored under 50 in the strength tally, including marriage. The line at 50 does
+   not fit the way the evidence is generated, which has more entries against than for, and the real strength S sits near 45 to 50 for most planets. On
+   this chart a line near 40 would separate four of six answers. This is one chart and must not be used to set the line. Collect the scores of many
+   charts with the true answers and set the line from them. Until then a score under 50 is not read as a no. See experiments/rerun_892_round12_results.md.
+
 ## What the new tools do and do not do
 
 - functional_nature.js gives the Laghu Parashari class of each planet for dasha results. Connections to the yogakarakas are shown only as
