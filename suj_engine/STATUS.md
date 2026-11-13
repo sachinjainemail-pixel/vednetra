@@ -82,6 +82,21 @@
   for future charts, and say how a planet strength winner should map to an event result, which is an open question
   in section 5.4 of the methodology.
 
+## Round 6. Owner decision on weighing evidence, rerun of Kundali 892 (done)
+
+- Rerun of Kundali 892 with the proposed planet resolution is in suj_engine/experiments, results in rerun_892_results.md. Still
+  one of five, and it showed that window scan counts are not evidence of an event.
+- OWNER DECISION. Where evidence is for and against an option, the side with the stronger planets decides, planets weighed by
+  strength and not factors counted. Built as suj_engine/tools/strength_tally.js. Planets count once per side, weight is the
+  Shadbala percent with the owner adjusted figure beside it, Rahu and Ketu take their sign lord's weight as a flagged proposal,
+  and the score is the share of strength in favour, 0 to 100. Ordered options take the highest level above 50.
+  answer_guard.js has a new --ordinal flag. Self test prints 14 of 14. LEARNINGS.md G2 and G5, ANSWER_TEMPLATE.md and
+  ENGINE_CONTRACT.md requirement 15 updated.
+- Question 1 of Kundali 892 under the new rule with the evidence listed by the analyst, Graduation 65, Post graduation 39. Result
+  is Graduation, so the true answer is still missed. The owner is asked to check the placement of the planets in the evidence table.
+- Still open, planet strength winner to event result mapping, the sibling brother and sister split, employed or not, and
+  whether planet_strength.js should drop planets with fewer than three subject links and add derived houses.
+
 ## Next phases (waiting for the owner's further instructions)
 
 - Phase 1. Question intake and event mapping (question to house, karaka, divisional chart, Nth house).

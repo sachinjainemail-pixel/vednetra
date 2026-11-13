@@ -30,11 +30,23 @@ const cases = [
   ["missing window scan", base({ scan: "plain" }), false, /WINDOW SCAN/],
   ["hedging still fails", base({ extra: "this cannot be determined" }), false, /Hedging/]
 ];
+const ORD = ["High school", "Intermediate", "Graduation", "Post graduation"];
+const ordCases = [
+  ["ordered, highest option above 50 passes", base({ tally: "EVIDENCE TALLY High school 100, Intermediate 100, Graduation 65, Post graduation 39", final: "FINAL ANSWER Graduation" }).replace("Final answer Post graduation", "Final answer Graduation"), true],
+  ["ordered, final above the highest passing option fails", base({ tally: "EVIDENCE TALLY High school 100, Intermediate 100, Graduation 65, Post graduation 39", final: "FINAL ANSWER Post graduation" }), false, /highest option above 50/],
+  ["ordered, final below the highest passing option fails", base({ tally: "EVIDENCE TALLY High school 100, Intermediate 100, Graduation 65, Post graduation 39", final: "FINAL ANSWER Intermediate" }), false, /highest option above 50/]
+];
 let pass = 0;
 cases.forEach(([name, text, ok, re]) => {
   const r = check(text, { options: OPTS });
   const good = r.ok === ok && (ok || !re || r.errors.some(e => re.test(e)));
   if (good) pass++; else console.log("FAIL " + name + " ok=" + r.ok + " " + JSON.stringify(r.errors));
 });
-console.log(pass + " of " + cases.length + " passed");
-process.exit(pass === cases.length ? 0 : 1);
+ordCases.forEach(([name, text, ok, re]) => {
+  const r = check(text, { options: ORD, ordinal: true });
+  const good = r.ok === ok && (ok || !re || r.errors.some(e => re.test(e)));
+  if (good) pass++; else console.log("FAIL " + name + " ok=" + r.ok + " " + JSON.stringify(r.errors));
+});
+const total = cases.length + ordCases.length;
+console.log(pass + " of " + total + " passed");
+process.exit(pass === total ? 0 : 1);

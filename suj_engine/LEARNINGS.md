@@ -38,20 +38,24 @@ of it. What the case does show is how the engine went wrong, and that is what is
 
 G1 Decide only on counted chart evidence. Typicality, base rates, what is common and the safe choice are not
    evidence. answer_guard.js version 2 fails an answer that uses such wording.
-G2 Every answer carries an EVIDENCE TALLY line in S8 with a whole number for every option. One unit is one distinct
-   chart factor from the methodology that points at the option, for example a house, a lord, the karaka, the Nth house
-   from them, D9, the subject varga, a dasha window, a transit, a rule from the library. A factor seen in the Lagna
-   chart and the Moon chart is counted once and noted. The final answer is the option with the highest number. A tie
-   needs a TIE BREAK line naming the deciding step of METHODOLOGY.md section 5.4. The guard checks this.
+G2 OWNER DECISION, round 6. Evidence for and against an option is weighed by the STRENGTH OF THE PLANETS on each side,
+   not by counting factors. Each piece of evidence names one planet, a side and an option. A planet counts once per side. Its
+   weight is its Shadbala percent against the Santhanam minimum, with the owner adjusted figure shown beside it. Rahu and Ketu
+   take the weight of their sign lord, flagged, which is the engine author's proposal. The score of an option is the share of
+   planet strength in its favour, 0 to 100. Use node suj_engine/tools/strength_tally.js, which prints the evidence table and the
+   EVIDENCE TALLY line. Options with no order, the highest score wins and a tie goes to the larger favour weight. The guard
+   checks the line against the final answer. Which planet stands on which side is the analyst's judgement and is shown in the
+   evidence table so that it can be corrected.
 G3 Every flag against the leading option appears on the COUNTER EVIDENCE line and is counted in the tally. A flag may
    be answered by a protective factor only if that factor is counted on the other side. The guard requires the line.
 G4 A natal promise is capacity. For status questions, working or not, married or not, parent alive or not, tally the
    promise and the status indicators separately and let the status tally decide. A candidate window from the window
    scan is needed for an event to be called past. A window alone does not prove it. In case 1 a grade A job window
    existed in 2025 and the true answer was unemployed.
-G5 Ordinal options such as education levels. Evaluate each level with its own chain of houses, lords, varga and
-   dasha window. Do not pick the middle by default. Proposed, from one case: where the chains of two levels are level
-   in the tally, the higher level wins, because the lower level is already contained in the higher one.
+G5 Ordered options such as education levels. List them lowest first. Evidence for a level supports that level and every lower
+   one. Evidence against a level means the native does not reach it, so it opposes that level and every higher one. The answer
+   is the highest level whose strength share is above 50, or the lowest level when none is. This is how strength_tally.js
+   works and how answer_guard.js with --ordinal checks. It follows the owner's decision of round 6 on question 1.
 G6 Count questions such as the number of siblings. Use only documented counting indicators, the occupants and
    aspects of the sibling houses, the Ashtakavarga of those houses, the karaka and the sign type of the karaka, D3.
    Do not decide by planet or sign gender counting unless a rule is found by rules_lookup.js or cited from a classical
@@ -74,8 +78,10 @@ G11 After every owner reported result, add the case to cases.json, run cases_rep
 
 H1 In case 1 every miss had the true answer on the side of the engine's own flags. If the next charts show the same,
    the tally rule G2 should become the main decider and the planet strength winner a tie breaker only.
-H2 Ordinal. The true level was the highest level whose chain was supported. Test it on further education, wealth
-   and rank questions.
+H2 Ordinal. The true level was the highest level whose chain was supported. Under the owner's strength rule and the
+   evidence listed for Kundali 892, Graduation scores 65 and Post graduation 39, so the rule gives Graduation again. The
+   result did not change when Rahu was removed from both sides, Post graduation 44. Whether the planets were placed on the
+   right sides is for the owner to check in the evidence table.
 H3 Counts. The larger family coincided with a very high Ashtakavarga on the 11th house, 38 against an average of
    about 28, and the karaka Mars in a dual sign. Record Ashtakavarga and karaka sign in each sibling case.
 H4 Parents. The true loss was the father. The chart showed Jupiter, lord of the father's 8th, in the father's 2nd,
@@ -88,6 +94,8 @@ H5 Not working with a strong tenth house. The chart had Saturn in the 2nd, the t
 
 ## What the new tools do and do not do
 
+- strength_tally.js weighs the planets for and against each option by Shadbala percent, the owner's rule of round 6. It
+  cannot decide which side a planet belongs on, that stays with the analysis.
 - window_scan.js lists candidate dasha and double transit windows. On this chart the wide view gave 72 to 142 windows
   per event, so it separates nothing. The strict view gives 5 to 18 and is usable, but the same period, 2010 and
   2011, showed up for the father, for marriage, for a job and for education. It finds candidates. It does not

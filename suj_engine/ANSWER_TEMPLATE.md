@@ -29,8 +29,10 @@ S7. TRANSIT VALIDATION
 S8. RECONCILIATION OF SECTIONS
     Which sections agreed, which differed, and why the chosen answer wins.
     Contains one line starting EVIDENCE TALLY with a whole number for every option, in the form
-    EVIDENCE TALLY Option A 5, Option B 8, Option C 2, Option D 1. The final answer is the option with the highest
-    number. A tie needs one line starting TIE BREAK naming the deciding step.
+    EVIDENCE TALLY Option A 40, Option B 72, Option C 55, Option D 10. The numbers come from strength_tally.js, the share of
+    planet strength in favour of each option, 0 to 100, the owner's rule of round 6. The final answer is the option with the
+    highest number. A tie needs one line starting TIE BREAK naming the deciding step. For ordered options list them lowest
+    first and run the guard with --ordinal, the final answer is the highest option above 50.
     Contains one line starting COUNTER EVIDENCE naming the strongest evidence against the final answer.
 S9. SUMMARY
     Short analysis recap by section, then a line starting FINAL ANSWER with one concrete answer, then 2 or 3

@@ -2,7 +2,11 @@
 /*
  * SUJ engine answer guard. Checks a drafted answer against the owner's hard coded rules before it is sent.
  *
- *   node suj_engine/tools/answer_guard.js answer.txt [--options "Option A|Option B"] [--strict-style] [--v1]
+ *   node suj_engine/tools/answer_guard.js answer.txt [--options "Option A|Option B"] [--strict-style] [--v1] [--ordinal]
+ *
+ * --ordinal is for ordered options such as education levels. Give the options lowest first. The final answer must be the
+ * highest option whose EVIDENCE TALLY number is above 50, or the lowest option when none is. The tally numbers come from
+ * strength_tally.js, whole numbers from 0 to 100, the share of planet strength that stands in favour of the option.
  *
  * Version 2 (round 5, from the first tested chart) adds process checks. Use --v1 to run only the older checks.
  *   RULES CITED line in the answer, WINDOW SCAN line in S6, EVIDENCE TALLY and COUNTER EVIDENCE lines in S8.
@@ -132,8 +136,13 @@ function check(text, opts) {
         const hit = opts.options.filter(o => finalLine.toLowerCase().indexOf(o.toLowerCase()) >= 0);
         const fo = hit.filter(o => !hit.some(p => p !== o && p.toLowerCase().indexOf(o.toLowerCase()) >= 0))[0];
         const mx = Math.max.apply(null, Object.values(nums));
+        if (opts.ordinal) {
+          let exp = opts.options[0];
+          for (let i = opts.options.length - 1; i >= 0; i--) if (nums[opts.options[i]] > 50) { exp = opts.options[i]; break; }
+          if (fo && fo !== exp) errors.push("Ordered options. The final answer " + fo + " is not the highest option above 50 in the EVIDENCE TALLY, which is " + exp);
+        } else
         if (fo && nums[fo] < mx) errors.push("The final answer " + fo + " has " + nums[fo] + " in the EVIDENCE TALLY but the highest is " + mx + ". A choice must follow the counted evidence");
-        if (fo && nums[fo] === mx && Object.values(nums).filter(v => v === mx).length > 1 && !lines.some(l => /^TIE BREAK\b/.test(l)))
+        if (!opts.ordinal && fo && nums[fo] === mx && Object.values(nums).filter(v => v === mx).length > 1 && !lines.some(l => /^TIE BREAK\b/.test(l)))
           errors.push("The EVIDENCE TALLY has a tie for the highest number. Add a line starting TIE BREAK that names the deciding step");
       }
     }
@@ -156,7 +165,7 @@ if (require.main === module) {
   if (!file) { console.error("Usage: answer_guard.js answer.txt [--options \"A|B\"] [--strict-style]"); process.exit(2); }
   const oi = argv.indexOf("--options");
   const options = oi >= 0 ? argv[oi + 1].split("|").map(s => s.trim()).filter(Boolean) : [];
-  const res = check(fs.readFileSync(file, "utf8"), { options, strictStyle: argv.indexOf("--strict-style") >= 0, v1: argv.indexOf("--v1") >= 0 });
+  const res = check(fs.readFileSync(file, "utf8"), { options, strictStyle: argv.indexOf("--strict-style") >= 0, v1: argv.indexOf("--v1") >= 0, ordinal: argv.indexOf("--ordinal") >= 0 });
   res.errors.forEach(e => console.log("ERROR " + e));
   res.warnings.forEach(w => console.log("WARNING " + w));
   console.log(res.ok ? "GUARD PASSED" : "GUARD FAILED");

@@ -47,7 +47,7 @@ out.push("", "## CHECKLIST for the answer, enforced by answer_guard.js version 2
   "1. Run planet_strength.js for the planets whose results conflict. Topics " + m.strength + ".",
   "2. S2 has a RULES CITED line. S6 has a WINDOW SCAN line and weighs the strict windows first.",
   "3. Write down every flag that points against your leading option. They go on the COUNTER EVIDENCE line or into the tally.",
-  "4. S8 has an EVIDENCE TALLY line with a whole number for every option. The final answer is the option with the highest number.",
+  "4. Weigh the evidence with strength_tally.js, planets for and against each option by Shadbala percent. S8 has its EVIDENCE TALLY line. The final answer is the option with the highest number, or for ordered options the highest above 50, guard flag --ordinal.",
   "5. No typicality, no base rate, no safe choice. No rule that is not in the methodology, the library or a cited text.",
   "6. Candidate windows are not proof. A natal promise is capacity and not proof of status. Check the status indicators separately.");
 console.log(out.join("\n"));

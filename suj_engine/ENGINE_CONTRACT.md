@@ -55,9 +55,11 @@ Claude Code session recognise any reference to "SUJ engine" as this engine.
 Round 5 additions, from the first tested chart. Added by the engine author after the owner reported results. They keep the
 engine inside the owner's methodology and are open to the owner's change. See LEARNINGS.md.
 
-15. COUNTED EVIDENCE. The answer rests on counted chart evidence only. Typicality, base rates and the safe choice are not
-    evidence. With options, S8 carries an EVIDENCE TALLY with a whole number per option and the final answer is the option
-    with the highest number. Every flag against the final answer is named on the COUNTER EVIDENCE line.
+15. WEIGHED EVIDENCE. The answer rests on chart evidence only. Typicality, base rates and the safe choice are not evidence.
+    Where evidence is both for and against, the side with the stronger planets decides, the owner's rule of round 6. With
+    options, S8 carries an EVIDENCE TALLY from strength_tally.js with a whole number per option and the final answer is the
+    option with the highest number, or for ordered options the highest above 50. Every flag against the final answer is named
+    on the COUNTER EVIDENCE line.
 16. STATUS NEEDS WINDOWS AND STATUS INDICATORS. A natal promise is capacity. Whether an event has happened, is
     happening or is due needs the strict window scan, window_scan.js, and status indicators counted separately.
 17. NO INVENTED RULES. Only the owner's methodology, the rule library and cited classical texts may enter the tally. Any
@@ -100,6 +102,10 @@ Rule library lookup for the chart placements and an event tag:
 Dossier for a question, runs the dominant house scan, the strict windows and the rule lookup together:
 
     node suj_engine/tools/prepare.js '{"gender":"female","date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0,"topic":"parents"}'
+
+Strength tally, the planets for and against each option weighed by Shadbala percent:
+
+    node suj_engine/tools/strength_tally.js '{"gender":"female","date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0,"kind":"ordered","options":["Low","High"],"evidence":[{"option":"High","side":"for","planet":"Mercury","factor":"reason"}]}'
 
 Scoreboard of tested charts and guard self test:
 
