@@ -104,6 +104,10 @@
   lords, with the library's rule ids. answer_guard.js requires a DASHA LORDS line in S6, prepare.js runs the new tool. Self tests
   15 of 15 and strength 13 of 13. Question 1 of Kundali 892 retried with typed evidence in
   suj_engine/experiments/q1_evidence_round8.json, Graduation 63, Post graduation 43, so the answer is still Graduation.
+- Round 11, owner asked to go down to Sookshma and leave Prana. window_scan.js now reads Mahadasha, Antardasha, Pratyantardasha and
+  Sookshma, day by day. The window and its grade are still fixed at Pratyantardasha level and each window lists the Sookshma
+  periods whose lord is a significator, the sharpest days. Prana is not scanned. Self test tests/window_selftest.js prints 6 of 6.
+  Run time about 2 seconds per event. The Sookshma list does not make the scan discriminate better, it only gives dates.
 - Round 10, owner pointed to the direct nodal rules in Laghu Parashari. functional_nature.js now classifies Rahu and Ketu by the house
   occupied and the companion planet, LP-056-6, LP-062-1, LP-057-2, LP-062-2, LP-062-3, LP-058-3, with no sign lordship, LP-060-2.
   Kundali 892, the running Pratyantardasha Rahu is alone in the 12th, sama but vyayakaraka, doubling Mars. Self test
