@@ -8,7 +8,8 @@
  * highest option whose EVIDENCE TALLY number is above 50, or the lowest option when none is. The tally numbers come from
  * strength_tally.js, whole numbers from 0 to 100, the share of planet strength that stands in favour of the option.
  *
- * Version 2 (round 5, from the first tested chart) adds process checks. Use --v1 to run only the older checks.
+ * Version 2 (round 5, from the first tested chart) adds process checks. Use --v1 to run only the older checks, --v2 to skip the version 3 check.
+ * Version 3 (round 22) adds the ENGINE VERSION line in S8, copied from prepare.js. The default engine is 2.0, see data/engine_config.json. legacy needs --allow-legacy.
  *   RULES CITED line in the answer, WINDOW SCAN and DASHA LORDS lines in S6, EVIDENCE TALLY and COUNTER EVIDENCE lines in S8.
  *   With options, the EVIDENCE TALLY line must give a whole number for every option, and the final answer must hold
  *   the highest number. A tie for the highest number needs a TIE BREAK line that names the deciding step.
@@ -147,6 +148,15 @@ function check(text, opts) {
           errors.push("The EVIDENCE TALLY has a tie for the highest number. Add a line starting TIE BREAK that names the deciding step");
       }
     }
+    // version 3, engine version line, round 22
+    if (!opts.v2) {
+      if (s8) {
+        const ev = has(inRange(s8, s9), /^ENGINE VERSION\b/);
+        if (ev.length !== 1) errors.push("S8 must contain exactly one line starting ENGINE VERSION, copy it from prepare.js. The default engine is version 2.0");
+        else if (!/\b2\.0\b/.test(ev[0]) && !/legacy/i.test(ev[0])) errors.push("The ENGINE VERSION line must name version 2.0, or legacy for an old result being reproduced");
+        else if (/legacy/i.test(ev[0]) && !opts.allowLegacy) errors.push("ENGINE VERSION legacy is only for reproducing old results. Answer with engine 2.0, or run the guard with --allow-legacy");
+      }
+    }
     // reasoning from priors
     PRIOR_WORDS.forEach(re => { const m = text.match(re); if (m) errors.push("Reasoning from typicality or base rates is not allowed, found \"" + m[0] + "\". Decide from counted chart evidence"); });
   }
@@ -166,7 +176,7 @@ if (require.main === module) {
   if (!file) { console.error("Usage: answer_guard.js answer.txt [--options \"A|B\"] [--strict-style]"); process.exit(2); }
   const oi = argv.indexOf("--options");
   const options = oi >= 0 ? argv[oi + 1].split("|").map(s => s.trim()).filter(Boolean) : [];
-  const res = check(fs.readFileSync(file, "utf8"), { options, strictStyle: argv.indexOf("--strict-style") >= 0, v1: argv.indexOf("--v1") >= 0, ordinal: argv.indexOf("--ordinal") >= 0 });
+  const res = check(fs.readFileSync(file, "utf8"), { options, strictStyle: argv.indexOf("--strict-style") >= 0, v1: argv.indexOf("--v1") >= 0, v2: argv.indexOf("--v2") >= 0, allowLegacy: argv.indexOf("--allow-legacy") >= 0, ordinal: argv.indexOf("--ordinal") >= 0 });
   res.errors.forEach(e => console.log("ERROR " + e));
   res.warnings.forEach(w => console.log("WARNING " + w));
   console.log(res.ok ? "GUARD PASSED" : "GUARD FAILED");

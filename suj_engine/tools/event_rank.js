@@ -24,8 +24,10 @@
 const { scan } = require("./window_scan");
 const { loadVedicCore } = require("./vednetra_loader");
 const { capacity } = require("./degree_capacity");
+const { resolve: resolveEngine } = require("./engine_config");
 
-function rank(cfg) {
+function rank(cfg0) {
+  const cfg = resolveEngine(cfg0);
   const events = cfg.events || ["marriage", "child_birth", "health_crisis", "job_start", "education_step", "sibling_birth", "father_loss", "mother_loss", "mother_in_law_loss", "foreign_travel", "property"];
   const VC = loadVedicCore(cfg.appDir);
   const t = String(cfg.time).length === 5 ? cfg.time + ":00" : cfg.time;

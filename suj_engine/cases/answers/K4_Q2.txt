@@ -33,6 +33,7 @@ Now, Saturn in Pisces house 4 retrograde on the 4th house with Rahu, Jupiter in 
 
 S8. RECONCILIATION OF SECTIONS
 D24 looks supportive, the 4th and 5th lords are Mrita and the 9th lord is Bala, and the education score is under the line in both settings. The field scores CA 40 and B Tech 40 are equal and under the line, so they are not used.
+ENGINE VERSION 2.0 degree true, nakshatra true, node bands true
 EVIDENCE TALLY Pursuing CA 40, Pursuing B Tech 40, Pursuing BBA 28, Already Dropped Studies 73
 COUNTER EVIDENCE D24 has Moon, Jupiter and Venus in the 9th house, three planets, and CA and B Tech score 40, above the education exists score of 27 and above BBA.
 TIE BREAK not needed, Already Dropped Studies is the highest. The number for it is 100 minus the education exists score, a convention of the preregistration.

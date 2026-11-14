@@ -168,6 +168,15 @@
 - Still open, planet strength winner to event result mapping, the sibling brother and sister split, employed or not, and
   whether planet_strength.js should drop planets with fewer than three subject links and add derived houses.
 
+## Round 22. Engine 2.0 made the default (done)
+
+The owner asked to update the engine with all the learnings and merge it so that all future analysis follows it.
+- data/engine_config.json and tools/engine_config.js. Version 2.0. Degree capacity, nakshatra and pada impact and the node bands are on by default in strength_tally.js, event_rank.js and window_scan.js. A key set by the caller wins. engine legacy gives the round 12 configuration, used by the old self tests and experiments.
+- The hypothesis generator moved from experiments to tools/hypotheses.js. data/hypothesis_types.json holds the 14 types, data/null_distribution.json the null from 24 random charts. tools/score_hypotheses.js gives the raw score and z score. prepare.js prints them for yes or no topics. It reproduced the stored Kundali 4 scores, 21 for siblings and 40 for CA.
+- answer_guard.js version 3 requires one ENGINE VERSION line in S8, legacy needs --allow-legacy. ANSWER_TEMPLATE.md version 3. CLAUDE.md and ENGINE_CONTRACT.md name engine 2.0 as the default.
+- tests/engine_selftest.js added, 8 checks. Self tests all pass, guard 18, strength 13, functional 9, window 11, rank 5, degree 7, nakshatra 5, engine 8.
+- Honest limits. The z rule is provisional, found after the Kundali 4 answers were known, updated z AUC 0.78 over 80 pairs, post hoc. The Baladi numbers and pada factors are the engine author's. No validated rule for the number of siblings or children, or for divorce. The blind score is 3 of 8. The next blind chart with the null fixed beforehand is the first fair test of the z reading.
+
 ## Next phases (waiting for the owner's further instructions)
 
 - Phase 1. Question intake and event mapping (question to house, karaka, divisional chart, Nth house).

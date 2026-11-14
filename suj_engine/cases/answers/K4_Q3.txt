@@ -33,6 +33,7 @@ Siblings are a natal matter, the transit check is the position of Saturn now on 
 
 S8. RECONCILIATION OF SECTIONS
 The hypothesis score is under the line in both settings, the karaka is Mrita, the 3rd lord is in the 8th, so the answer under the preregistered rule is only child. The Ashtakavarga of the 3rd and 11th houses, mean 32, would have given 2 brothers 2 sisters had the score been over the line.
+ENGINE VERSION 2.0 degree true, nakshatra true, node bands true
 EVIDENCE TALLY 2 Brothers 1 Sister 0, Only Child 79, 2 Brother 2 Sisters 21, 1 Brother 1 Sister 0
 COUNTER EVIDENCE The 11th house has 35 Ashtakavarga points, the highest of the chart, and Rahu transits the 3rd house.
 TIE BREAK not needed, Only Child is the highest. The number for it is 100 minus the siblings hypothesis score, a convention of the preregistration.

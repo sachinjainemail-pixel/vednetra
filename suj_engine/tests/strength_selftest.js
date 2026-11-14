@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* Self test for strength_tally.js on the Kundali 892 chart. node suj_engine/tests/strength_selftest.js */
 const { tally } = require("../tools/strength_tally");
-const C = { gender: "female", date: "1993-01-06", time: "07:10:00", tz: 5.5, lat: 27.1333, lon: 81.9667, asOf: "2026-11-13", varga: 24 };
+const C = { gender: "female", date: "1993-01-06", time: "07:10:00", tz: 5.5, lat: 27.1333, lon: 81.9667, asOf: "2026-11-13", varga: 24, engine: "legacy" };
 let pass = 0, n = 0;
 const ok = (name, cond) => { n++; if (cond) pass++; else console.log("FAIL " + name); };
 // The owner's example. A debilitated Sun in D9 is a weak 9th lord, so its weight against is larger than its weight for.

@@ -47,6 +47,7 @@
 const fs = require("fs");
 const path = require("path");
 const { loadVedicCore } = require("./vednetra_loader");
+const { resolve: resolveEngine } = require("./engine_config");
 
 const KB = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "data", "significations.json"), "utf8"));
 const EVENTS = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "data", "events.json"), "utf8"));
@@ -56,7 +57,8 @@ const houseFrom = (sign, ref) => ((sign - ref + 12) % 12) + 1;
 const signLord = s => { for (const p of Object.keys(KB.ownSigns)) if (KB.ownSigns[p].indexOf(s) >= 0) return p; return null; };
 const iso = d => new Date(d).toISOString().slice(0, 10);
 
-function scan(cfg) {
+function scan(cfg0) {
+  const cfg = resolveEngine(cfg0);
   const VC = loadVedicCore(cfg.appDir);
   const t = String(cfg.time).length === 5 ? cfg.time + ":00" : cfg.time;
   const built = VC.avEngineFor({ name: cfg.name || "Native", gender: cfg.gender || "unspecified",

@@ -76,6 +76,12 @@ engine inside the owner's methodology and are open to the owner's change. See LE
 
 ## Engine tools
 
+ENGINE VERSION 2.0 is the default configuration since round 22, see data/engine_config.json and tools/engine_config.js. All tools run it unless the input says
+"engine":"legacy". It means Baladi degree capacity with bands on Rahu and Ketu, nakshatra and pada impact at weight 0.6, Laghu Parashari for dasha lords and nodes,
+event rank by directness, window scan to Sookshma with the subject varga and the transits from the Lagna, Moon and Sun charts. Start every question with prepare.js, it prints
+the ENGINE VERSION line, the dominant house scan, the strict windows, the rule lookup, the functional nature of the dasha lords and the HYPOTHESIS SCORES for yes or no questions.
+The z reading of the hypothesis scores is provisional. tools/score_hypotheses.js runs it alone. The answer guard is version 3 and requires the ENGINE VERSION line in S8.
+
 Answer guard, run before sending any answer:
 
     node suj_engine/tools/answer_guard.js answer.txt --options "Option A|Option B"

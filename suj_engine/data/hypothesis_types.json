@@ -1,0 +1,177 @@
+{
+ "_note": "Hypothesis types for yes or no questions, round 22. Houses are counted from the Lagna, from is the subject house when the lord and house lists are counted from it. The chain houses, karakas and varga are the engine author's, fixed in round 20 before the blind test of Kundali 4, and were not tuned afterwards. A new type needs its own null distribution, run experiments/null_distribution.js with the type added, before its z score is read.",
+ "types": {
+  "Education exists": {
+   "houses": [
+    4,
+    5,
+    9
+   ],
+   "karakas": [
+    "Mercury",
+    "Jupiter"
+   ],
+   "varga": 24,
+   "topic": "education"
+  },
+  "CA": {
+   "houses": [
+    2,
+    5,
+    11
+   ],
+   "karakas": [
+    "Mercury",
+    "Saturn",
+    "Jupiter"
+   ],
+   "varga": 24,
+   "topic": "education"
+  },
+  "B Tech": {
+   "houses": [
+    4,
+    5,
+    6
+   ],
+   "karakas": [
+    "Mars",
+    "Saturn",
+    "Rahu"
+   ],
+   "varga": 24,
+   "topic": "education"
+  },
+  "BBA": {
+   "houses": [
+    5,
+    7,
+    10
+   ],
+   "karakas": [
+    "Mercury",
+    "Venus",
+    "Sun"
+   ],
+   "varga": 24,
+   "topic": "education"
+  },
+  "Married": {
+   "houses": [
+    7
+   ],
+   "karakas": [
+    "Venus",
+    "Jupiter"
+   ],
+   "varga": 9,
+   "topic": "marriage"
+  },
+  "Happy marriage": {
+   "houses": [
+    7,
+    2
+   ],
+   "karakas": [
+    "Venus",
+    "Jupiter"
+   ],
+   "varga": 9,
+   "topic": "marriage"
+  },
+  "Working": {
+   "houses": [
+    10
+   ],
+   "karakas": [
+    "Saturn"
+   ],
+   "varga": 10,
+   "topic": "work"
+  },
+  "Doctor": {
+   "houses": [
+    6,
+    10
+   ],
+   "karakas": [
+    "Sun",
+    "Mars"
+   ],
+   "varga": 10,
+   "topic": "work"
+  },
+  "Lawyer": {
+   "houses": [
+    9,
+    10
+   ],
+   "karakas": [
+    "Jupiter",
+    "Saturn",
+    "Mercury"
+   ],
+   "varga": 10,
+   "topic": "work"
+  },
+  "Astrologer": {
+   "houses": [
+    8,
+    9,
+    10
+   ],
+   "karakas": [
+    "Jupiter",
+    "Mercury",
+    "Ketu"
+   ],
+   "varga": 10,
+   "topic": "work"
+  },
+  "Has siblings": {
+   "houses": [
+    3,
+    11
+   ],
+   "karakas": [
+    "Mars"
+   ],
+   "varga": 3,
+   "topic": "siblings"
+  },
+  "Father alive": {
+   "houses": [
+    9,
+    4
+   ],
+   "from": 9,
+   "karakas": [
+    "Sun"
+   ],
+   "varga": 12,
+   "topic": "parents"
+  },
+  "Mother alive": {
+   "houses": [
+    4,
+    11
+   ],
+   "from": 4,
+   "karakas": [
+    "Moon"
+   ],
+   "varga": 12,
+   "topic": "parents"
+  },
+  "Has a child": {
+   "houses": [
+    5
+   ],
+   "karakas": [
+    "Jupiter"
+   ],
+   "varga": 7,
+   "topic": "children"
+  }
+ }
+}

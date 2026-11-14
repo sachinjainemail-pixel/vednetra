@@ -71,6 +71,7 @@ const path = require("path");
 const { analyse } = require("./planet_strength");
 const { loadVedicCore } = require("./vednetra_loader");
 const { capacity: degreeCapacity } = require("./degree_capacity");
+const { resolve: resolveEngine } = require("./engine_config");
 const KB = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "data", "significations.json"), "utf8"));
 const signLord = sg => { for (const p of Object.keys(KB.ownSigns)) if (KB.ownSigns[p].indexOf(sg) >= 0) return p; return null; };
 const LORD_CLASS = { 1: ["trine", "for", 1], 5: ["trine", "for", 1], 9: ["trine", "for", 1], 4: ["kendra", "for", 0.5], 7: ["kendra", "for", 0.5], 10: ["kendra", "for", 0.5],
@@ -95,7 +96,8 @@ const SEVEN = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
 const r1 = x => Math.round(x * 10) / 10;
 const ALLP = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
 
-function strengths(cfg) {
+function strengths(cfg0) {
+  const cfg = resolveEngine(cfg0);
   const withVarga = cfg.varga ? { houses: [], karakas: [], varga: cfg.varga } : { topic: undefined, houses: undefined, karakas: undefined };
   const base = analyse(Object.assign({}, cfg, withVarga, { candidates: ["Sun", "Moon"] }));
   const S = { math: {}, adj: {} }, parts = {}, flag = {}, shad = {};
@@ -132,7 +134,8 @@ function strengths(cfg) {
   return { S, parts, flag, shad, cap };
 }
 
-function tally(cfg) {
+function tally(cfg0) {
+  const cfg = resolveEngine(cfg0);
   const st = strengths(cfg);
   const weight = (e, which) => {
     const s = st.S[which][e.planet];

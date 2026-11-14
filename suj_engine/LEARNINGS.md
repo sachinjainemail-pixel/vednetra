@@ -200,6 +200,13 @@ H9 Event rank by directness, round 15, agreed by the owner. Grade the dasha by h
 H8 A professional hypothesis. In Kundali 2 the lawyer hypothesis, 9th and 10th with Jupiter, Saturn and Mercury, scored 51 against astrologer 45 and doctor 40, the
    only one over 50, and was the true profession. The mapping of professions to houses and karakas was fixed by the engine author before the run and is a proposal. One case.
 
+## Engine 2.0 is the default, round 22
+
+All the learnings from Kundali 892, 2, 3 and 4 are now in the default configuration, data/engine_config.json. Guardrails G1 to G12 apply as before. What changed in practice is
+that a new session needs no flags, prepare.js runs the updated engine and prints the ENGINE VERSION line and the HYPOTHESIS SCORES. Two things stay unproven and must be said in an answer
+that uses them. The z reading of hypothesis scores is provisional. The Baladi and pada numbers are the author's. The engine has no rule for counting siblings or children and none for divorce, so an
+answer on those rests on the chain evidence only and must not claim more.
+
 ## What the new tools do and do not do
 
 - functional_nature.js gives the Laghu Parashari class of each planet for dasha results. Connections to the yogakarakas are shown only as

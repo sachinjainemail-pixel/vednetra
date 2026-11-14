@@ -1,4 +1,4 @@
-# SUJ ENGINE ANSWER TEMPLATE (version 2)
+# SUJ ENGINE ANSWER TEMPLATE (version 3)
 
 Every answer from the SUJ engine uses these sections in this order. Headings are plain text lines with no
 markdown symbols, because the owner does not want the characters ( ) ! ; : em dash, curly quotes, / - # * ~ in
@@ -34,6 +34,10 @@ S8. RECONCILIATION OF SECTIONS
     highest number. A tie needs one line starting TIE BREAK naming the deciding step. For ordered options list them lowest
     first and run the guard with --ordinal, the final answer is the highest option above 50.
     Contains one line starting COUNTER EVIDENCE naming the strongest evidence against the final answer.
+    Contains one line starting ENGINE VERSION, copied from the top of the prepare.js dossier, for example
+    ENGINE VERSION 2.0 degree true, nakshatra true, node bands true. Engine 2.0 is the default for every answer from round 22.
+    For a yes or no question about what the native has, quote the HYPOTHESIS SCORES from prepare.js, the raw score and the z
+    score, in the EVIDENCE TALLY or the COUNTER EVIDENCE line, and say that the z reading is provisional.
 S9. SUMMARY
     Short analysis recap by section, then a line starting FINAL ANSWER with one concrete answer, then 2 or 3
     bullet lines. The last bullet starts with "Final answer".

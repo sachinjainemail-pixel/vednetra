@@ -33,6 +33,7 @@ Now, Saturn in Pisces house 4 retrograde, Jupiter in Leo house 9, Rahu in Aquari
 
 S8. RECONCILIATION OF SECTIONS
 The dasha and the event rank agree that none of the three dated events is supported. The 7th lord combust and the karaka Venus in D9 house 12 agree with that. One of twelve dates in the 19th year gave marriage the first place under the base setting, a weak signal.
+ENGINE VERSION 2.0 degree true, nakshatra true, node bands true
 EVIDENCE TALLY Got Married in 19th year 0, Engaged in Feb 26 0, Live in relationship since June 2024 0, None of the above 100
 COUNTER EVIDENCE On one of the twelve sample dates of the 19th year marriage ranked first under the base setting, and one strict marriage window touches that year.
 
