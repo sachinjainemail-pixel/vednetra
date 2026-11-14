@@ -112,6 +112,10 @@ Functional nature of the planets and of the running dasha lords by Laghu Parasha
 
     node suj_engine/tools/functional_nature.js '{"gender":"female","date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0,"asOf":"YYYY-MM-DD"}'
 
+Event rank, which of several candidate events the running dasha lords point to most directly on a date:
+
+    node suj_engine/tools/event_rank.js '{"gender":"female","date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0,"on":"YYYY-MM-DD","events":["marriage","child_birth"]}'
+
 Strength tally, the planets for and against each option weighed by Shadbala percent:
 
     node suj_engine/tools/strength_tally.js '{"gender":"female","date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0,"kind":"ordered","options":["Low","High"],"evidence":[{"option":"High","side":"for","planet":"Mercury","factor":"reason"}]}'

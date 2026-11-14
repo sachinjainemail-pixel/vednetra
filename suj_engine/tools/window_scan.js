@@ -67,17 +67,19 @@ function scan(cfg) {
   const allSigns = houses.map(h => (lagna + h - 1) % 12);
   const targetSigns = cfg.strict ? allSigns.slice(0, 1) : allSigns;
   // dasha significators: lords of the event houses, occupants of those houses, and the karakas
-  const sig = new Set(karakas);
-  allSigns.forEach(s => { sig.add(signLord(s)); });
-  chart.planets.forEach(p => { if (allSigns.indexOf(p.sign) >= 0) sig.add(p.name); });
+  const sig = new Set(), links = {};
+  const link = (pl, why) => { if (!pl) return; sig.add(pl); (links[pl] = links[pl] || []).push(why); };
+  karakas.forEach(k => link(k, "karaka"));
+  allSigns.forEach((sg, i) => link(signLord(sg), "lords house " + houses[i]));
+  chart.planets.forEach(p => { const i = allSigns.indexOf(p.sign); if (i >= 0) link(p.name, "occupies house " + houses[i]); });
   // subject varga, round 14
   const vargaReasons = [];
   if (cfg.varga !== false && preset && preset.varga) {
     const vc = VC.makeVargaChart(chart, preset.varga);
     (preset.vargaHouses || []).forEach(vh => {
       const ksign = (vc.ascendant.sign + vh - 1) % 12, vl = signLord(ksign);
-      if (vl && !sig.has(vl)) { sig.add(vl); vargaReasons.push(vl + " lords the D" + preset.varga + " house " + vh); }
-      vc.planets.filter(q => q.sign === ksign).forEach(q => { if (!sig.has(q.name)) { sig.add(q.name); vargaReasons.push(q.name + " occupies the D" + preset.varga + " house " + vh); } });
+      if (vl) { if (!sig.has(vl)) vargaReasons.push(vl + " lords the D" + preset.varga + " house " + vh); link(vl, "lords D" + preset.varga + " house " + vh); }
+      vc.planets.filter(q => q.sign === ksign).forEach(q => { if (!sig.has(q.name)) vargaReasons.push(q.name + " occupies the D" + preset.varga + " house " + vh); link(q.name, "occupies D" + preset.varga + " house " + vh); });
     });
   }
   // Rahu and Ketu by Laghu Parashari sloka 13
@@ -90,7 +92,7 @@ function scan(cfg) {
       if (comp.length) why.push("conjoined with " + comp.join(" and ") + ", follows the companion, LP-056-6");
       const lord = signLord(P[n].sign);
       if (lord && sig.has(lord)) why.push("sits in the sign of " + lord + ", a significator, and doubles its result, LP-057-2");
-      if (why.length) { nodeReasons[n] = why; sig.add(n); }
+      if (why.length) { nodeReasons[n] = why; link(n, "node, " + why.join("; ")); }
     });
   }
   const sigList = Array.from(sig);
@@ -160,7 +162,7 @@ function scan(cfg) {
   });
   return {
     event: cfg.event || "custom", strict: !!cfg.strict, houses, targetSigns: targetSigns.map(s => SIGN_NAMES[s]), significators: sigList, karakas,
-    vargaReasons, nodeReasons, lagna: SIGN_NAMES[lagna], asOf: iso(asOf), from: iso(from), to: iso(to), windows
+    links, vargaReasons, nodeReasons, lagna: SIGN_NAMES[lagna], asOf: iso(asOf), from: iso(from), to: iso(to), windows
   };
 }
 

@@ -109,6 +109,10 @@
   scores over both charts, 13 hypotheses, AUC 0.50, exactly chance, mean 40.0 for the true and 40.3 for the false. The line near 40 from chart 892 does not hold. The scan
   missed the child event because it reads only D1 houses and Lagna transits, see LEARNINGS H7. cases.json now marks each case blind or not and keeps the hypothesis scores,
   cases_report.js prints the blind score and the AUC. Added the event preset mother_in_law_loss, experiments/lib_hypotheses.js and case2_run.js.
+- Round 15, owner agreed that the grade should follow how directly the dasha lords tie to the event. Built suj_engine/tools/event_rank.js, which ranks candidate events for a date by
+  specificity, a planet's links divided among the events it serves, summed over Mahadasha, Antardasha, Pratyantardasha and Sookshma, ties to the double then the single transit. window_scan.js now
+  also returns the link reasons of each planet. Self test tests/rank_selftest.js prints 5 of 5. On Kundali 2, 3 May 2021, marriage ranks first at 1.76 and child birth last at 0.66, the true event is
+  not found. Not tuned to this chart. Waiting for the next chart, to be answered blind.
 - Round 14, owner said yes to extending the window scan. window_scan.js now adds subject varga significators, D9 marriage, D7 children, D10 work, D24 education, D3 siblings, D12 parents,
   and tests the double transit from the Lagna, the Moon and the Sun in the same reference, which names the reference in each window. Options varga false, refs, gate single. data/events.json
   gives each event its varga and key houses. Self test 11 of 11. On Kundali 2 the child birth of 3 May 2021 is reached only under the widest view, gate single, at grade B, while marriage is

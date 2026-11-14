@@ -163,6 +163,12 @@ H7 Window scan and the subject varga. Kundali 2, the child was born on 3 May 202
    and Sun, while marriage and accident also appear, marriage at grade A. So the engine would still choose marriage. The reason is plain. Jupiter stood on the 5th from the Moon but
    Saturn did not, and the Venus Antardasha is not a child significator. The extension cost discrimination. Strict past windows in Kundali 2 are now marriage 51 all at grade A, child 21,
    accident 27, mother in law 19. A tool that flags marriage 51 times cannot tell a marriage from a child.
+H9 Event rank by directness, round 15, agreed by the owner. Grade the dasha by how directly the running lords tie to the event, and divide a planet's links among the events it serves, so a planet
+   that serves many events gives each only a share. Built as event_rank.js, method written before it was run on any chart. Run on Kundali 2, 3 May 2021, Mahadasha Mercury, Antardasha Venus,
+   Pratyantardasha Mercury, Sookshma Sun. Marriage 1.76, accident 0.86, mother in law 0.70, child birth 0.66. Marriage still first and the true event, child birth, last. Venus is a karaka
+   of marriage for a woman and sits in the D9 7th, and Mercury lords the 7th, so the links point to marriage. Mercury in the D7 5th is the only link to the child. Not tuned to this chart. One
+   thing the tool cannot know is that she was probably married before 2021, since the answers say a very happy marriage and a child, but the marriage date was not given. The next chart,
+   answered before the truth is shown, is the first fair test of the rank.
 H8 A professional hypothesis. In Kundali 2 the lawyer hypothesis, 9th and 10th with Jupiter, Saturn and Mercury, scored 51 against astrologer 45 and doctor 40, the
    only one over 50, and was the true profession. The mapping of professions to houses and karakas was fixed by the engine author before the run and is a proposal. One case.
 
