@@ -159,6 +159,11 @@ H10 Conjunction with the house lord. Kundali 3, the marriage was on 7 December 2
    in the Sookshma is the karaka and Venus in the Prana is the karaka. The owner's method, section 2.3.2 item 6, reads a conjunction with the house lord, and the scan counts a planet only when it lords or
    occupies an event house, is a karaka, or is a varga key house lord or occupant. A planet conjunct a house lord is not a link. Adding it is an engine change that the owner has not yet approved. The owner is asked.
    Window scan on the dates of events that really happened, two dates, none covered by the strict views and one by the widest.
+H11 Degree and capacity, round 17, at the owner's request. Planet degree read as the Baladi avastha, Yuva full, Kumara half, Bala and Vriddha a quarter, Mrita none, reversed in even signs. The factors are the
+   engine author's reading, the library does not hold them. Over the three charts, 14 hypotheses, AUC 0.46 without, 0.55 with, 0.60 with the bands also on the nodes. Direction toward the truth in 7 of 14, chance. It
+   helps in Kundali 892 marriage, the father, and most of Kundali 2's profession hypotheses, and Kundali 3's event, where Rahu's unpenalised weight caused the error. It points the wrong way in 892's education,
+   siblings and mother. Two degree rules also disagree, Mrita by the bands and near the exact exaltation point by Shadbala, Kundali 3's Moon. See experiments/degree_analysis_results.md. The option stays off by default. Needs
+   the owner, the factors, whether the nodes take the bands, and whether a Mrita planet at 29 or at 0 degrees should be read as zero.
 H7 Window scan and the subject varga. Kundali 2, the child was born on 3 May 2021, Mercury Mahadasha, Venus Antardasha, Mercury Pratyantardasha, Sun Sookshma. No
    strict window for child birth covered the date, because the scan reads D1 houses only. In D7, the varga of children, Mercury sits in the 5th house, Venus is
    exalted in the D7 Lagna. On the transit side Jupiter was in Aquarius, the 5th from the Moon, and the Sun was in Aries, the 5th from the Lagna. The owner's method

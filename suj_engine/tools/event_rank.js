@@ -10,6 +10,8 @@
  *      that event its whole weight, a planet that links to many gives each a share.
  *   3. The score of an event is the sum, over the running Mahadasha, Antardasha, Pratyantardasha and Sookshma lords on the date, of the planet's share for that event. Prana is not used.
  *   4. Ties go to the event with the double transit from any reference, Lagna, Moon or Sun, then to the single transit.
+ * Round 17, option degree true. Each lord's share is multiplied by its capacity factor from the Baladi avastha of its degree, see degree_capacity.js. A lord with no capacity at its degree
+ * contributes nothing to any event. The nodes keep the factor 1.
  * The weights are equal for the four levels. That, the division by links, and counting each link once are the engine author's proposal, written before any chart was
  * tested with it. The tool ranks, it does not decide the answer alone.
  *
@@ -18,6 +20,7 @@
  */
 const { scan } = require("./window_scan");
 const { loadVedicCore } = require("./vednetra_loader");
+const { capacity } = require("./degree_capacity");
 
 function rank(cfg) {
   const events = cfg.events || ["marriage", "child_birth", "health_crisis", "job_start", "education_step", "sibling_birth", "father_loss", "mother_loss", "mother_in_law_loss", "foreign_travel", "property"];
@@ -35,8 +38,9 @@ function rank(cfg) {
   });
   const total = {};
   lords.forEach(l => { total[l.lord] = events.reduce((n, ev) => n + ((links[ev][l.lord] || []).length), 0); });
+  const cap = cfg.degree ? capacity(cfg) : null;
   const rows = events.map(ev => {
-    const per = lords.map(l => { const own = (links[ev][l.lord] || []).length; return { level: l.level, lord: l.lord, links: own, of: total[l.lord], share: total[l.lord] ? Math.round(own / total[l.lord] * 100) / 100 : 0, why: links[ev][l.lord] || [] }; });
+    const per = lords.map(l => { const own = (links[ev][l.lord] || []).length; const c = cap ? cap[l.lord].factor : 1; return { level: l.level, lord: l.lord, links: own, of: total[l.lord], capacity: c, share: total[l.lord] ? Math.round(own / total[l.lord] * c * 100) / 100 : 0, why: links[ev][l.lord] || [] }; });
     return { event: ev, score: Math.round(per.reduce((a, x) => a + x.share, 0) * 100) / 100, doubleTransit: trans[ev].double, singleTransit: trans[ev].single, per };
   });
   rows.sort((a, b) => b.score - a.score || (b.doubleTransit - a.doubleTransit) || (b.singleTransit - a.singleTransit));
@@ -47,7 +51,7 @@ function render(r) {
   const L = ["# SUJ EVENT RANK on " + r.on, "Running lords " + r.lords.map(x => x.level + " " + x.lord).join(", "), ""];
   r.rows.forEach((x, i) => {
     L.push((i + 1) + ". " + x.event + " score " + x.score + ", double transit " + (x.doubleTransit ? "yes" : "no") + ", single " + (x.singleTransit ? "yes" : "no"));
-    x.per.forEach(p => L.push("     " + p.level + " " + p.lord + " " + p.links + " of " + p.of + " links " + (p.why.length ? "| " + p.why.join("; ") : "")));
+    x.per.forEach(p => L.push("     " + p.level + " " + p.lord + " " + p.links + " of " + p.of + " links" + (p.capacity !== 1 ? ", capacity " + p.capacity : "") + " " + (p.why.length ? "| " + p.why.join("; ") : "")));
   });
   return L.join("\n");
 }

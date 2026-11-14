@@ -1,0 +1,52 @@
+
+######## K892
+
+Q1 Education, Post graduation, truth yes, score without degree 48, with degree 47 (down)
+  planets used Jupiter 20.1 Vir Kumara x0.5 | Sun 22.0 Sag Vriddha x0.25 | Saturn 23.1 Cap Kumara x0.5 | Rahu 26.4 Sco none, node x1 | Mars 24.6 Gem Mrita x0 | Mercury 11.5 Sag Kumara x0.5 combust | Venus 8.5 Aqu Kumara x0.5
+
+Q2 Married, truth yes, score without degree 43, with degree 53 (up)
+  planets used Mercury 11.5 Sag Kumara x0.5 combust | Mars 24.6 Gem Mrita x0 | Sun 22.0 Sag Vriddha x0.25 | Venus 8.5 Aqu Kumara x0.5 | Jupiter 20.1 Vir Kumara x0.5
+
+Q3 Working, truth no, score without degree 31, with degree 32 (up)
+  planets used Mercury 11.5 Sag Kumara x0.5 combust | Saturn 23.1 Cap Kumara x0.5 | Jupiter 20.1 Vir Kumara x0.5 | Mars 24.6 Gem Mrita x0 | Ketu 26.4 Tau none, node x1
+
+Q4 Has siblings, truth yes, score without degree 29, with degree 23 (down)
+  planets used Saturn 23.1 Cap Kumara x0.5 | Moon 19.7 Tau Kumara x0.5 | Venus 8.5 Aqu Kumara x0.5 | Jupiter 20.1 Vir Kumara x0.5 | Mars 24.6 Gem Mrita x0
+
+Q5 Father alive, truth no, score without degree 45, with degree 40 (down)
+  planets used Sun 22.0 Sag Vriddha x0.25 | Saturn 23.1 Cap Kumara x0.5 | Venus 8.5 Aqu Kumara x0.5 | Jupiter 20.1 Vir Kumara x0.5 | Rahu 26.4 Sco none, node x1
+
+Q5 Mother alive, truth yes, score without degree 34, with degree 30 (down)
+  planets used Jupiter 20.1 Vir Kumara x0.5 | Sun 22.0 Sag Vriddha x0.25 | Saturn 23.1 Cap Kumara x0.5 | Rahu 26.4 Sco none, node x1 | Venus 8.5 Aqu Kumara x0.5 | Moon 19.7 Tau Kumara x0.5
+
+######## K2
+
+Q1 Working, truth yes, score without degree 47, with degree 57 (up)
+  planets used Mercury 10.1 Sco Vriddha x0.25 | Moon 29.4 Lib Mrita x0 combust sandhi | Venus 4.1 Vir Mrita x0 | Saturn 7.4 Cap Vriddha x0.25
+
+Q1 Doctor, truth no, score without degree 40, with degree 27 (down)
+  planets used Venus 4.1 Vir Mrita x0 | Jupiter 16.6 Leo Yuva x1 | Mars 20.9 Lib Vriddha x0.25 combust | Mercury 10.1 Sco Vriddha x0.25 | Moon 29.4 Lib Mrita x0 combust sandhi | Sun 20.6 Lib Vriddha x0.25
+
+Q1 Lawyer, truth yes, score without degree 51, with degree 53 (up)
+  planets used Sun 20.6 Lib Vriddha x0.25 | Mercury 10.1 Sco Vriddha x0.25 | Jupiter 16.6 Leo Yuva x1 | Rahu 18.9 Sag none, node x1 | Moon 29.4 Lib Mrita x0 combust sandhi | Venus 4.1 Vir Mrita x0 | Saturn 7.4 Cap Vriddha x0.25
+
+Q1 Astrologer, truth no, score without degree 45, with degree 56 (up)
+  planets used Moon 29.4 Lib Mrita x0 combust sandhi | Venus 4.1 Vir Mrita x0 | Saturn 7.4 Cap Vriddha x0.25 | Sun 20.6 Lib Vriddha x0.25 | Mercury 10.1 Sco Vriddha x0.25 | Jupiter 16.6 Leo Yuva x1 | Rahu 18.9 Sag none, node x1 | Ketu 18.9 Gem none, node x1
+
+Q2 Married, truth yes, score without degree 39, with degree 37 (down)
+  planets used Mercury 10.1 Sco Vriddha x0.25 | Mars 20.9 Lib Vriddha x0.25 combust | Ketu 18.9 Gem none, node x1 | Rahu 18.9 Sag none, node x1 | Venus 4.1 Vir Mrita x0 | Jupiter 16.6 Leo Yuva x1
+
+Q2 Happy marriage, truth yes, score without degree 33, with degree 34 (up)
+  planets used Mercury 10.1 Sco Vriddha x0.25 | Mars 20.9 Lib Vriddha x0.25 combust | Ketu 18.9 Gem none, node x1 | Rahu 18.9 Sag none, node x1 | Saturn 7.4 Cap Vriddha x0.25 | Venus 4.1 Vir Mrita x0 | Jupiter 16.6 Leo Yuva x1
+
+Q3 Has a child, truth yes, score without degree 36, with degree 46 (up)
+  planets used Mars 20.9 Lib Vriddha x0.25 combust | Saturn 7.4 Cap Vriddha x0.25 | Sun 20.6 Lib Vriddha x0.25 | Moon 29.4 Lib Mrita x0 combust sandhi | Jupiter 16.6 Leo Yuva x1 | Rahu 18.9 Sag none, node x1
+
+######## K3
+
+Q1 Married, truth yes, score without degree 31, with degree 28 (down)
+  planets used Sun 26.4 Lib Mrita x0 | Mars 11.2 Vir Vriddha x0.25 | Ketu 24.4 Sag none, node x1 | Venus 5.2 Sag Bala x0.25 | Jupiter 14.4 Tau Yuva x1
+
+AUC without degree 0.46 over 40 pairs, with degree 0.55 over 40 pairs
+Mean of true hypotheses 39.1 without, 40.8 with. Mean of false 40.3 without, 38.8 with.
+Scores above 50 without 1, with 4 of 14

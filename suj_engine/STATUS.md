@@ -109,6 +109,9 @@
   scores over both charts, 13 hypotheses, AUC 0.50, exactly chance, mean 40.0 for the true and 40.3 for the false. The line near 40 from chart 892 does not hold. The scan
   missed the child event because it reads only D1 houses and Lagna transits, see LEARNINGS H7. cases.json now marks each case blind or not and keeps the hypothesis scores,
   cases_report.js prints the blind score and the AUC. Added the event preset mother_in_law_loss, experiments/lib_hypotheses.js and case2_run.js.
+- Round 17, the owner asked whether the degree of the planets explains the errors. Built degree_capacity.js with data/degree_factors.json, the Baladi avastha and the library's gandanta and pushkara flags, an option degree in
+  strength_tally.js and event_rank.js, and nodeDegree as a variant. Over the three charts the AUC goes 0.46 to 0.55, and 0.60 with the nodes, the direction toward the truth is 7 of 14, chance. Part of Kundali 3's event error is
+  Rahu's unpenalised weight. The option is off by default and the factors are the engine author's reading. Self test tests/degree_selftest.js prints 7 of 7. Question by question in experiments/degree_analysis_results.md.
 - Round 16, third chart, Kundali 3, female, 12 November 2000, 13:13, Indore, true answers given with the chart, so not blind. Divorced now, married on 7 December 2022. Engine under the written
   rules, Unmarried and Child born, none right. Married scored 31. No scan view covered the marriage date, the event rank put marriage second to child birth. Over three charts, 14 hypotheses, AUC
   0.46. Window scan on the two dates of known events, strict views 0 of 2, widest 1 of 2. cases.json keeps dateChecks, cases_report.js prints the recall. New presets eye_surgery and separation. The one

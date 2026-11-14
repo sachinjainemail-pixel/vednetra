@@ -48,6 +48,9 @@
  *   8. For ORDERED options such as education levels, list them lowest first. Evidence for an option supports that option and
  *      every lower one. Evidence against an option means the native does not reach it, so it opposes that option and every
  *      higher one. The answer is the highest option whose score is above 50. If none is, the lowest.
+ *   9. DEGREE, round 17, option degree true. A planet's degree in its sign decides its capacity to give results, the Baladi avastha, Yuva full, Kumara half, Bala and
+ *      Vriddha a quarter, Mrita none, see degree_capacity.js and data/degree_factors.json. With the option on, every weight of that planet, role, harm or weakness, is multiplied by the
+ *      capacity factor, because a planet with little capacity gives little of anything, good or bad. Rahu and Ketu keep the factor 1. The factors are the engine author's reading.
  *   Which planet belongs on which side, and of which type, is a judgement of the analysis. The tool prints the evidence table
  *   so that the owner can check every placement.
  *
@@ -64,6 +67,7 @@ const fs = require("fs");
 const path = require("path");
 const { analyse } = require("./planet_strength");
 const { loadVedicCore } = require("./vednetra_loader");
+const { capacity: degreeCapacity } = require("./degree_capacity");
 const KB = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "data", "significations.json"), "utf8"));
 const signLord = sg => { for (const p of Object.keys(KB.ownSigns)) if (KB.ownSigns[p].indexOf(sg) >= 0) return p; return null; };
 const LORD_CLASS = { 1: ["trine", "for", 1], 5: ["trine", "for", 1], 9: ["trine", "for", 1], 4: ["kendra", "for", 0.5], 7: ["kendra", "for", 0.5], 10: ["kendra", "for", 0.5],
@@ -86,6 +90,7 @@ const DIGNITY = { "Exalted": 6, "Moolatrikona": 5, "Mulatrikona": 5, "Own": 4, "
 const dig = d => (DIGNITY[d] != null ? DIGNITY[d] : 2) / 6 * 100;
 const SEVEN = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
 const r1 = x => Math.round(x * 10) / 10;
+const ALLP = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"];
 
 function strengths(cfg) {
   const withVarga = cfg.varga ? { houses: [], karakas: [], varga: cfg.varga } : { topic: undefined, houses: undefined, karakas: undefined };
@@ -109,14 +114,17 @@ function strengths(cfg) {
     S.math[n] = S.math[lord]; S.adj[n] = S.adj[lord]; shad[n] = shad[lord]; flag[n] = "node, strength of sign lord " + lord;
     parts[n] = { proxy: lord };
   });
-  return { S, parts, flag, shad };
+  const cap = {};
+  ALLP.forEach(p => { cap[p] = 1; });
+  if (cfg.degree) { const dc = degreeCapacity(cfg); if (cfg.nodeDegree) ["Rahu", "Ketu"].forEach(n => { cap[n] = dc[n].factor; }); SEVEN.forEach(p => { cap[p] = dc[p].factor; parts[p].degree = dc[p].degree; parts[p].avastha = dc[p].avastha; parts[p].capacity = dc[p].factor; }); }
+  return { S, parts, flag, shad, cap };
 }
 
 function tally(cfg) {
   const st = strengths(cfg);
   const weight = (e, which) => {
     const s = st.S[which][e.planet];
-    return (e.type === "weakness" ? 100 - s : s) * (e.mult == null ? 1 : e.mult);
+    return (e.type === "weakness" ? 100 - s : s) * (e.mult == null ? 1 : e.mult) * st.cap[e.planet];
   };
   const opts = cfg.options, ordered = cfg.kind === "ordered";
   const ev = cfg.evidence || [];
@@ -166,7 +174,7 @@ function tally(cfg) {
     const mx = Math.max.apply(null, rows.map(r => r[key]));
     return rows.filter(r => r[key] === mx).sort((a, b) => b.favour - a.favour)[0].option;
   };
-  return { kind: cfg.kind, options: opts, weights: { strength: Object.fromEntries(Object.keys(st.S.math).map(p => [p, r1(st.S.math[p])])), strengthOwnerAdjusted: Object.fromEntries(Object.keys(st.S.adj).map(p => [p, r1(st.S.adj[p])])), parts: st.parts, flags: st.flag }, evidence: ev, rows,
+  return { kind: cfg.kind, options: opts, weights: { capacity: st.cap, strength: Object.fromEntries(Object.keys(st.S.math).map(p => [p, r1(st.S.math[p])])), strengthOwnerAdjusted: Object.fromEntries(Object.keys(st.S.adj).map(p => [p, r1(st.S.adj[p])])), parts: st.parts, flags: st.flag }, evidence: ev, rows,
     notCovered, winner: pick("score"), winnerOwnerAdjusted: pick("scoreOwnerAdjusted"),
     tallyLine: "EVIDENCE TALLY " + rows.map(r => r.option + " " + r.score).join(", ") };
 }
@@ -179,7 +187,7 @@ function render(r) {
     L.push("- " + p.padEnd(8) + "S " + String(r.weights.strength[p]).padEnd(6) + (x.proxy ? "node, takes " + x.proxy : "Shadbala " + x.shadbalaPercent + ", D1 " + x.d1 + ", D9 " + x.d9 + ", Vimshopaka " + x.vimshopaka + (x.subjectVarga != null ? ", varga " + x.subjectVarga : "")));
   });
   L.push("", "Evidence table. Check every placement and type.");
-  r.evidence.forEach(e => { const s = r.weights.strength[e.planet]; const m = e.mult == null ? 1 : e.mult; L.push("- " + e.side.toUpperCase() + " " + e.option + " | " + e.planet + " " + e.type + (e.klass ? " " + e.klass : "") + " weight " + r1((e.type === "weakness" ? 100 - s : s) * m) + (m !== 1 ? " factor " + m : "") + (r.weights.flags[e.planet] ? " " + r.weights.flags[e.planet] : "") + " | " + e.factor); });
+  r.evidence.forEach(e => { const s = r.weights.strength[e.planet]; const m = e.mult == null ? 1 : e.mult; L.push("- " + e.side.toUpperCase() + " " + e.option + " | " + e.planet + " " + e.type + (e.klass ? " " + e.klass : "") + " weight " + r1((e.type === "weakness" ? 100 - s : s) * m * (r.weights.capacity ? r.weights.capacity[e.planet] : 1)) + (m !== 1 ? " factor " + m : "") + (r.weights.flags[e.planet] ? " " + r.weights.flags[e.planet] : "") + " | " + e.factor); });
   L.push("", "Per option");
   r.rows.forEach(x => L.push("- " + x.option + ", favour " + x.favour + " from " + (x.forPlanets.join(", ") || "none") + ", against " + x.against + " from " + (x.againstPlanets.join(", ") || "none") + ", score " + x.score + ", owner adjusted score " + x.scoreOwnerAdjusted));
   L.push("", "Winner " + r.winner + ". Winner on the owner adjusted weights " + r.winnerOwnerAdjusted + (r.winner === r.winnerOwnerAdjusted ? ", the two agree." : ", the two differ, state it as a counter point."));
