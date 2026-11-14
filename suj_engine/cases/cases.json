@@ -350,6 +350,71 @@
           "note": "no view covers the date"
         }
       ]
+    },
+    {
+      "id": "K4",
+      "name": "Kundali 4",
+      "gender": "male",
+      "date": "2006-02-14",
+      "time": "05:27:00",
+      "tz": 5.5,
+      "lat": 31.326,
+      "lon": 75.576,
+      "place": "Jalandhar",
+      "asOf": "2026-11-14",
+      "blind": true,
+      "preregistration": "suj_engine/experiments/preregistration_K4.md, committed before the chart was computed",
+      "questions": [
+        {
+          "n": 1,
+          "topic": "marital status",
+          "kind": "event",
+          "options": [
+            "Got Married in 19th year",
+            "Engaged in Feb 26",
+            "Live in relationship since June 2024",
+            "None of the above"
+          ],
+          "engine": "None of the above",
+          "truth": null,
+          "pending": true,
+          "errorTags": [],
+          "note": "Event rank put job_start first on every option date under the updated engine. The base setting put marriage first on 1 of 12 dates in the 19th year."
+        },
+        {
+          "n": 2,
+          "topic": "education",
+          "kind": "status",
+          "options": [
+            "Pursuing CA",
+            "Already Dropped Studies",
+            "Pursuing B Tech",
+            "Pursuing BBA"
+          ],
+          "engine": "Already Dropped Studies",
+          "truth": null,
+          "pending": true,
+          "errorTags": [],
+          "note": "Education exists scored 27 in the updated engine and 38 in the base, under the lines 55.5 and 39.5. CA 40, B Tech 40, BBA 28."
+        },
+        {
+          "n": 3,
+          "topic": "siblings",
+          "kind": "count",
+          "options": [
+            "2 Brothers 1 Sister",
+            "Only Child",
+            "2 Brother 2 Sisters",
+            "1 Brother 1 Sister"
+          ],
+          "engine": "Only Child",
+          "truth": null,
+          "pending": true,
+          "errorTags": [],
+          "note": "Has siblings scored 21 updated and 31 base, under the lines. The Ashtakavarga mean of the 3rd and 11th is 32, which would have given 2 brothers 2 sisters."
+        }
+      ],
+      "hypotheses": []
     }
   ]
 }

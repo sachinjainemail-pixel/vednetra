@@ -189,5 +189,17 @@
     ],
     "note": "separation or divorce, the 7th is the primary house, 6 8 12 are the loss houses",
     "source": "proposed, added in round 16"
+  },
+  "relationship": {
+    "houses": [
+      5,
+      7,
+      12
+    ],
+    "karakas": [
+      "Venus"
+    ],
+    "note": "a romantic or live in relationship, the 5th and 7th with the 12th of bed pleasures",
+    "source": "proposed, pre-registered in round 20"
   }
 }

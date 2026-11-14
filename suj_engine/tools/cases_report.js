@@ -14,7 +14,8 @@ const DATA = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "cases", "cas
 const EVENT_FOR = { education: "education_step", marriage: "marriage", work: "job_start", siblings: "sibling_birth", parents: null };
 
 const rows = [];
-DATA.cases.forEach(c => c.questions.forEach(q => rows.push({ case: c.id, q, ok: q.engine === q.truth, blind: c.blind !== false })));
+const pending = []; DATA.cases.forEach(c => c.questions.forEach(q => { if (q.pending) pending.push(c.id + " Q" + q.n + " " + q.topic + ", engine " + q.engine); }));
+DATA.cases.forEach(c => c.questions.filter(q => !q.pending).forEach(q => rows.push({ case: c.id, q, ok: q.engine === q.truth, blind: c.blind !== false })));
 const pct = (a, b) => b ? Math.round(100 * a / b) + " percent" : "none";
 const out = [];
 out.push("# SUJ CASE SCOREBOARD");
@@ -22,6 +23,7 @@ const bl = rows.filter(r => r.blind);
 out.push("Cases " + DATA.cases.length + ", questions " + rows.length + ", correct " + rows.filter(r => r.ok).length + ", " + pct(rows.filter(r => r.ok).length, rows.length) + ".");
 out.push("BLIND questions, answered before the true answers were known " + bl.length + ", correct " + bl.filter(r => r.ok).length + ", " + pct(bl.filter(r => r.ok).length, bl.length) + ". The others were answered afterwards and do not test the engine.");
 const by = fn => { const m = {}; rows.forEach(r => { const k = fn(r); (m[k] = m[k] || []).push(r); }); return m; };
+if (pending.length) out.push("PENDING, answered blind and waiting for the owner's true answers " + pending.length + ". " + pending.join("; "));
 out.push("", "## By question kind");
 Object.entries(by(r => r.q.kind)).forEach(([k, v]) => out.push("- " + k + " " + v.filter(r => r.ok).length + " of " + v.length));
 out.push("", "## By topic");

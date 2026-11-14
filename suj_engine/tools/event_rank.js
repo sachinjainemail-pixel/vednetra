@@ -14,6 +14,7 @@
  * contributes nothing to any event. The nodes keep the factor 1.
  * Round 18, option nakshatra true. A lord that stands in the star of a significator of the event is linked to the event too, window_scan.js adds that link, and each lord's share is
  * multiplied by its pada factor, pushkara pada, vargottama, gandanta, from data/nakshatra_factors.json.
+ * Option fast true skips the transit tie break except among events tied at the top, which gives the same top event much faster. 
  * The weights are equal for the four levels. That, the division by links, and counting each link once are the engine author's proposal, written before any chart was
  * tested with it. The tool ranks, it does not decide the answer alone.
  *
@@ -36,7 +37,8 @@ function rank(cfg) {
   events.forEach(ev => {
     const base = Object.assign({}, cfg, { event: ev, from: cfg.on, to: cfg.on, asOf: cfg.on });
     links[ev] = scan(Object.assign({}, base, { strict: false })).links;
-    trans[ev] = { double: scan(Object.assign({}, base, { strict: false, minDasha: 0 })).windows.length > 0, single: scan(Object.assign({}, base, { strict: false, minDasha: 0, gate: "single" })).windows.length > 0 };
+    // fast true computes the transit tie break only for events that tie at the top, the order of the top event is the same
+    trans[ev] = cfg.fast ? null : { double: scan(Object.assign({}, base, { strict: false, minDasha: 0 })).windows.length > 0, single: scan(Object.assign({}, base, { strict: false, minDasha: 0, gate: "single" })).windows.length > 0 };
   });
   const total = {};
   lords.forEach(l => { total[l.lord] = events.reduce((n, ev) => n + ((links[ev][l.lord] || []).length), 0); });
@@ -45,8 +47,16 @@ function rank(cfg) {
   const padaF = pl => NF ? (cap[pl].pushkaraPada ? NF.pushkaraPada : 1) * (cap[pl].vargottama ? NF.vargottama : 1) * (cap[pl].gandanta ? NF.gandanta : 1) : 1;
   const rows = events.map(ev => {
     const per = lords.map(l => { const own = (links[ev][l.lord] || []).length; const c = (cfg.degree ? cap[l.lord].factor : 1) * padaF(l.lord); return { level: l.level, lord: l.lord, links: own, of: total[l.lord], capacity: c, share: total[l.lord] ? Math.round(own / total[l.lord] * c * 100) / 100 : 0, why: links[ev][l.lord] || [] }; });
-    return { event: ev, score: Math.round(per.reduce((a, x) => a + x.share, 0) * 100) / 100, doubleTransit: trans[ev].double, singleTransit: trans[ev].single, per };
+    return { event: ev, score: Math.round(per.reduce((a, x) => a + x.share, 0) * 100) / 100, doubleTransit: trans[ev] ? trans[ev].double : false, singleTransit: trans[ev] ? trans[ev].single : false, per };
   });
+  if (cfg.fast) {
+    const top = Math.max.apply(null, rows.map(r => r.score));
+    rows.filter(r => r.score === top).length > 1 && rows.filter(r => r.score === top).forEach(r => {
+      const base = Object.assign({}, cfg, { event: r.event, from: cfg.on, to: cfg.on, asOf: cfg.on });
+      r.doubleTransit = scan(Object.assign({}, base, { strict: false, minDasha: 0 })).windows.length > 0;
+      r.singleTransit = scan(Object.assign({}, base, { strict: false, minDasha: 0, gate: "single" })).windows.length > 0;
+    });
+  }
   rows.sort((a, b) => b.score - a.score || (b.doubleTransit - a.doubleTransit) || (b.singleTransit - a.singleTransit));
   return { on: cfg.on, lords, rows };
 }

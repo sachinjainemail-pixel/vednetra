@@ -109,6 +109,10 @@
   scores over both charts, 13 hypotheses, AUC 0.50, exactly chance, mean 40.0 for the true and 40.3 for the false. The line near 40 from chart 892 does not hold. The scan
   missed the child event because it reads only D1 houses and Lagna transits, see LEARNINGS H7. cases.json now marks each case blind or not and keeps the hypothesis scores,
   cases_report.js prints the blind score and the AUC. Added the event preset mother_in_law_loss, experiments/lib_hypotheses.js and case2_run.js.
+- Round 20, Kundali 4, male, 14 February 2006, 05:27, Jalandhar, the first BLIND test of the updated engine. The configuration and the decision rules were committed in experiments/preregistration_K4.md before the chart was computed.
+  Answers under the rules, marital status None of the above, education Already dropped studies, siblings Only child, saved in suj_engine/cases/answers and recorded as pending in cases.json. All three passed the answer guard. The updated engine
+  and the base setting give the same three answers. Every hypothesis scored under its line, the same lean to the negative side as before. event_rank.js has a fast option. A memory limit of the ephemeris cache in app.js makes long
+  runs need NODE_OPTIONS=--max-old-space-size=6000. Waiting for the owner's true answers.
 - Round 19, the owner decided 60 percent to the nakshatra and 40 percent to the planet degree, the Baladi bands on Rahu and Ketu, and pada numbers tunable if they improve results, and asked for the mix that gets every result
   right. Set the nakshatra weight to 0.6 and the bands on the nodes by default. Searched two families of mixes, 135 and 810 settings, with a permutation test and a leave one chart out check, experiments/quadrant_search.js. Best AUC 0.50
   in the owner's multiplier reading, 0.70 in the blend reading, 45 percent of shuffled answers do as well, held out AUC 0.42 and 0.45. No mix gets all results right and the best one cannot be told from chance. The pada numbers stay
