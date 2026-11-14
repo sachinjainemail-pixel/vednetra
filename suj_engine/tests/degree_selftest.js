@@ -11,7 +11,7 @@ const c = capacity(C);
 ok("Kundali 892 Mars 24.6 Gemini is Mrita with factor 0", c.Mars.avastha === "Mrita" && c.Mars.factor === 0);
 ok("Jupiter 20.1 Virgo, an even sign, is Kumara", c.Jupiter.avastha === "Kumara" && c.Jupiter.factor === 0.5);
 ok("Sun 22 Sagittarius is Vriddha", c.Sun.avastha === "Vriddha" && c.Sun.factor === 0.25);
-ok("the nodes keep the factor 1 by default and take the bands only as a variant", c.Rahu.factor === 1 && capacity(Object.assign({}, C, { nodeDegree: true })).Rahu.factor === 0.25);
+ok("the nodes take the bands by default, the owner's decision of round 19, and keep the factor 1 only with nodeDegree false", c.Rahu.factor === 0.25 && capacity(Object.assign({}, C, { nodeDegree: false })).Rahu.factor === 1);
 const ev = [{ option: "Yes", type: "role", side: "for", planet: "Mars", factor: "x" }];
 const off = tally(Object.assign({}, C, { kind: "choice", options: ["Yes", "No"], evidence: ev.map(e => Object.assign({}, e)) }));
 const on = tally(Object.assign({}, C, { degree: true, kind: "choice", options: ["Yes", "No"], evidence: ev.map(e => Object.assign({}, e)) }));

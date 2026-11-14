@@ -109,6 +109,10 @@
   scores over both charts, 13 hypotheses, AUC 0.50, exactly chance, mean 40.0 for the true and 40.3 for the false. The line near 40 from chart 892 does not hold. The scan
   missed the child event because it reads only D1 houses and Lagna transits, see LEARNINGS H7. cases.json now marks each case blind or not and keeps the hypothesis scores,
   cases_report.js prints the blind score and the AUC. Added the event preset mother_in_law_loss, experiments/lib_hypotheses.js and case2_run.js.
+- Round 19, the owner decided 60 percent to the nakshatra and 40 percent to the planet degree, the Baladi bands on Rahu and Ketu, and pada numbers tunable if they improve results, and asked for the mix that gets every result
+  right. Set the nakshatra weight to 0.6 and the bands on the nodes by default. Searched two families of mixes, 135 and 810 settings, with a permutation test and a leave one chart out check, experiments/quadrant_search.js. Best AUC 0.50
+  in the owner's multiplier reading, 0.70 in the blend reading, 45 percent of shuffled answers do as well, held out AUC 0.42 and 0.45. No mix gets all results right and the best one cannot be told from chance. The pada numbers stay
+  1.15, 1.15 and 0.7. All these options are still off by default. The only fair test is a new chart answered blind. Self tests 15, 13, 9, 11, 5, 7 and 5.
 - Round 18, the owner asked to add the nakshatra and the nakshatra pada to the degree. Built data/nakshatra_factors.json and the nakshatra option in strength_tally.js, event_rank.js and window_scan.js, half weight to the nakshatra lord's real
   strength, pada factors for pushkara pada, vargottama and gandanta. Self test tests/nakshatra_selftest.js prints 5 of 5. Over the 14 hypotheses, AUC 0.46 base, 0.55 with the degree, 0.55 with the degree and the nakshatra, 0.65 when the
   degree bands are also put on Rahu and Ketu. The 0.65 is suggestive and not believable, it is picked from five conditions on the same data. All options are off by default. The next chart, answered blind with the conditions fixed

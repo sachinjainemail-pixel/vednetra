@@ -50,7 +50,7 @@
  *      higher one. The answer is the highest option whose score is above 50. If none is, the lowest.
  *   9. DEGREE, round 17, option degree true. A planet's degree in its sign decides its capacity to give results, the Baladi avastha, Yuva full, Kumara half, Bala and
  *      Vriddha a quarter, Mrita none, see degree_capacity.js and data/degree_factors.json. With the option on, every weight of that planet, role, harm or weakness, is multiplied by the
- *      capacity factor, because a planet with little capacity gives little of anything, good or bad. Rahu and Ketu keep the factor 1. The factors are the engine author's reading.
+ *      capacity factor, because a planet with little capacity gives little of anything, good or bad. Rahu and Ketu take the bands too, the owner's decision of round 19, nodeDegree false switches that off. The factors are the engine author's reading.
  *  10. NAKSHATRA AND PADA, round 18, option nakshatra true. The owner's rule, a planet gives the results of the lord of the nakshatra it stands in, so a planet's strength is a blend of its own and the
  *      strength of its nakshatra lord, weight in data/nakshatra_factors.json, 0.5. Then the pada qualities of the library, pushkara pada, vargottama and gandanta, multiply the strength, the numbers
  *      are the engine author's. The nodes blend their sign lord's strength with the strength of their nakshatra lord.
@@ -128,7 +128,7 @@ function strengths(cfg) {
   }
   const cap = {};
   ALLP.forEach(p => { cap[p] = 1; });
-  if (cfg.degree) { const dc = degreeCapacity(cfg); if (cfg.nodeDegree) ["Rahu", "Ketu"].forEach(n => { cap[n] = dc[n].factor; }); SEVEN.forEach(p => { cap[p] = dc[p].factor; parts[p].degree = dc[p].degree; parts[p].avastha = dc[p].avastha; parts[p].capacity = dc[p].factor; }); }
+  if (cfg.degree) { const dc = degreeCapacity(cfg); if (cfg.nodeDegree !== false) ["Rahu", "Ketu"].forEach(n => { cap[n] = dc[n].factor; }); SEVEN.forEach(p => { cap[p] = dc[p].factor; parts[p].degree = dc[p].degree; parts[p].avastha = dc[p].avastha; parts[p].capacity = dc[p].factor; }); }
   return { S, parts, flag, shad, cap };
 }
 

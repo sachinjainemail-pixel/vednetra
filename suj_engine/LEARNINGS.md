@@ -169,6 +169,11 @@ H12 Nakshatra and pada with the degree, round 18. Half the weight to the nakshat
    row is suggestive and not yet believable. Under two standard errors from chance, five conditions tried on the same hypotheses, the nodes outside the classical scheme, and it works by raising nearly every score. It does
    not fix the event rank, Kundali 2 stays marriage first, Kundali 3 is nearly fixed only when Rahu takes the bands. See experiments/nakshatra_analysis_results.md. The honest test is a new chart answered blind with the
    conditions fixed beforehand. Needs the owner, the weight 0.5, the three pada factors, and whether the nodes take the bands.
+H13 The search for the mix, round 19. The owner decided 60 percent nakshatra and 40 percent the planet, the bands on Rahu and Ketu, and the pada numbers free to tune, and asked for the mix where every result is correct. Two families
+   were searched, 135 and 810 settings, on 14 hypotheses and 2 dated events. Best AUC 0.50 in the owner's multiplier reading and 0.70 in the blend reading. No setting gets the true event first for both dates. Shuffled
+   answers searched the same way give a median best of 0.55 and 0.68, and 45 percent of the shuffles do as well as the observed 0.70. Leave one chart out gives 0.42 and 0.45. So there is no demonstrated quadrant. A mix that fits all
+   fourteen cannot be found in this family, and one that appeared to would be a fit to these charts. A first version of the search put the capacity into S itself and reported a worse AUC, found to be a mistake by the check that
+   the script reproduces round 17 at nakshatra share zero, which it now does exactly. See experiments/quadrant_search_results.md. Set in the data, nakshatra weight 0.6, bands on the nodes by default.
 H7 Window scan and the subject varga. Kundali 2, the child was born on 3 May 2021, Mercury Mahadasha, Venus Antardasha, Mercury Pratyantardasha, Sun Sookshma. No
    strict window for child birth covered the date, because the scan reads D1 houses only. In D7, the varga of children, Mercury sits in the 5th house, Venus is
    exalted in the D7 Lagna. On the transit side Jupiter was in Aquarius, the 5th from the Moon, and the Sun was in Aries, the 5th from the Lagna. The owner's method

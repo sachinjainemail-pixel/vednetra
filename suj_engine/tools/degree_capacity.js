@@ -8,7 +8,7 @@
  *   sandhi, within one degree of a sign boundary
  *   separation from the Sun in degrees, for combustion
  *   distance from the deepest exaltation and debilitation degree, which is the part of Shadbala that already counts degree, Ucchabala
- * Rahu and Ketu get no Baladi avastha, the classical scheme is for the seven planets, and their capacity factor is 1 and flagged. nodeDegree true is a variant that applies the same bands to them.
+ * Rahu and Ketu, the classical scheme is for the seven planets, but the owner decided in round 19 that the same bands apply to them. Round 19, the owner decided that the bands apply to Rahu and Ketu too, so they do by default, nodeDegree false gives the classical scheme.
  * Only the capacity factor is numeric. The rest are flags, because the library gives no numbers for them. strength_tally.js can multiply each planet's weight by the
  * capacity factor, option degree true.
  *
@@ -42,8 +42,8 @@ function capacity(cfg) {
     const node = p.name === "Rahu" || p.name === "Ketu";
     const deg = p.deg, sIdx = p.sign;
     const r = { planet: p.name, sign: SIGNS[sIdx], degree: Math.round(deg * 100) / 100, retrograde: !!p.retrograde };
-    if (node && !cfg.nodeDegree) { r.avastha = "none, node"; r.factor = 1; r.nodeNote = "no Baladi avastha for the nodes, factor 1"; }
-    else if (node) { r.avastha = avastha(sIdx, deg); r.factor = F.factors[r.avastha]; r.nodeNote = "VARIANT, the Baladi bands applied to the node, not in the classical scheme"; }
+    if (node && cfg.nodeDegree === false) { r.avastha = "none, node"; r.factor = 1; r.nodeNote = "nodeDegree false, no Baladi avastha for the node, factor 1"; }
+    else if (node) { r.avastha = avastha(sIdx, deg); r.factor = F.factors[r.avastha]; r.nodeNote = "the owner's decision of round 19, the Baladi bands are applied to Rahu and Ketu, not in the classical scheme"; }
     else { r.avastha = avastha(sIdx, deg); r.factor = F.factors[r.avastha]; }
     const water = [3, 7, 11].indexOf(sIdx) >= 0 && deg >= 29.2, fire = [4, 8, 0].indexOf(sIdx) >= 0 && deg <= 0.8;
     r.gandanta = water || fire;
