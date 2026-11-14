@@ -41,6 +41,8 @@ if (hy.length) {
   out.push("", "## Strength tally scores against the truth");
   out.push("Hypotheses " + hy.length + ", true " + yes.length + ", false " + no.length + ". Mean score of the true ones " + (yes.reduce((a, h) => a + h.score, 0) / (yes.length || 1)).toFixed(1) + ", of the false ones " + (no.reduce((a, h) => a + h.score, 0) / (no.length || 1)).toFixed(1) + ".");
   out.push(n ? "Chance that a true hypothesis outscores a false one, AUC " + (w / n).toFixed(2) + " over " + n + " pairs. 0.50 is chance." : "No pairs yet.");
+  const hb = hy.filter(h => h.scoreB != null);
+  if (hb.length) { let w2 = 0, n2 = 0; hb.filter(h => h.truth).forEach(a => hb.filter(h => !h.truth).forEach(b => { n2++; w2 += a.scoreB > b.scoreB ? 1 : (a.scoreB === b.scoreB ? 0.5 : 0); })); out.push("Updated engine, degree and nakshatra with the nodes, " + hb.length + " hypotheses, AUC " + (n2 ? (w2 / n2).toFixed(2) : "none") + " over " + n2 + " pairs."); }
   out.push("Above 50 " + hy.filter(h => h.score > 50).length + " of " + hy.length + ", of which true " + hy.filter(h => h.score > 50 && h.truth).length + ".");
 }
 // window scan recall on dates of events that really happened

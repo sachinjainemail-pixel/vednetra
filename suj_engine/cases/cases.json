@@ -117,37 +117,43 @@
           "name": "Education Post graduation",
           "truth": true,
           "score": 48,
-          "view2": 48
+          "view2": 48,
+          "scoreB": 57
         },
         {
           "name": "Married",
           "truth": true,
           "score": 43,
-          "view2": 47
+          "view2": 47,
+          "scoreB": 54
         },
         {
           "name": "Working",
           "truth": false,
           "score": 31,
-          "view2": 33
+          "view2": 33,
+          "scoreB": 47
         },
         {
           "name": "Has siblings",
           "truth": true,
           "score": 29,
-          "view2": 37
+          "view2": 37,
+          "scoreB": 21
         },
         {
           "name": "Father alive",
           "truth": false,
           "score": 45,
-          "view2": 45
+          "view2": 45,
+          "scoreB": 45
         },
         {
           "name": "Mother alive",
           "truth": true,
           "score": 34,
-          "view2": 35
+          "view2": 35,
+          "scoreB": 35
         }
       ]
     },
@@ -224,43 +230,50 @@
           "name": "Working",
           "truth": true,
           "score": 47,
-          "view2": 47
+          "view2": 47,
+          "scoreB": 64
         },
         {
           "name": "Doctor",
           "truth": false,
           "score": 40,
-          "view2": 40
+          "view2": 40,
+          "scoreB": 30
         },
         {
           "name": "Lawyer",
           "truth": true,
           "score": 51,
-          "view2": 51
+          "view2": 51,
+          "scoreB": 74
         },
         {
           "name": "Astrologer",
           "truth": false,
           "score": 45,
-          "view2": 45
+          "view2": 45,
+          "scoreB": 66
         },
         {
           "name": "Married",
           "truth": true,
           "score": 39,
-          "view2": 39
+          "view2": 39,
+          "scoreB": 59
         },
         {
           "name": "Happy marriage",
           "truth": true,
           "score": 33,
-          "view2": 33
+          "view2": 33,
+          "scoreB": 50
         },
         {
           "name": "Has a child",
           "truth": true,
           "score": 36,
-          "view2": 37
+          "view2": 37,
+          "scoreB": 63
         }
       ],
       "dateChecks": [
@@ -334,7 +347,8 @@
           "name": "Married",
           "truth": true,
           "score": 31,
-          "view2": 31
+          "view2": 31,
+          "scoreB": 64
         }
       ],
       "dateChecks": [
@@ -376,10 +390,10 @@
             "None of the above"
           ],
           "engine": "None of the above",
-          "truth": null,
-          "pending": true,
+          "truth": "None of the above",
+          "pending": false,
           "errorTags": [],
-          "note": "Event rank put job_start first on every option date under the updated engine. The base setting put marriage first on 1 of 12 dates in the 19th year."
+          "note": "Event rank put job_start first on every option date under the updated engine. The base setting put marriage first on 1 of 12 dates in the 19th year. Truth reported, none of the above, right."
         },
         {
           "n": 2,
@@ -392,10 +406,10 @@
             "Pursuing BBA"
           ],
           "engine": "Already Dropped Studies",
-          "truth": null,
-          "pending": true,
+          "truth": "Already Dropped Studies",
+          "pending": false,
           "errorTags": [],
-          "note": "Education exists scored 27 in the updated engine and 38 in the base, under the lines 55.5 and 39.5. CA 40, B Tech 40, BBA 28."
+          "note": "Education exists scored 27 in the updated engine and 38 in the base, under the lines 55.5 and 39.5. CA 40, B Tech 40, BBA 28. Truth reported, already dropped studies, right."
         },
         {
           "n": 3,
@@ -408,13 +422,48 @@
             "1 Brother 1 Sister"
           ],
           "engine": "Only Child",
-          "truth": null,
-          "pending": true,
-          "errorTags": [],
-          "note": "Has siblings scored 21 updated and 31 base, under the lines. The Ashtakavarga mean of the 3rd and 11th is 32, which would have given 2 brothers 2 sisters."
+          "truth": "1 Brother 1 Sister",
+          "pending": false,
+          "errorTags": [
+            "count_rule_unvalidated",
+            "calibration"
+          ],
+          "note": "Has siblings scored 21 updated and 31 base, under the lines. The Ashtakavarga mean of the 3rd and 11th is 32, which would have given 2 brothers 2 sisters. Truth reported 14 November 2026, the native is a brother with one sister. The score rule said only child, the Ashtakavarga count rule would have said 2 brothers 2 sisters, both wrong."
         }
       ],
-      "hypotheses": []
+      "hypotheses": [
+        {
+          "name": "Education exists",
+          "truth": false,
+          "score": 38,
+          "scoreB": 27
+        },
+        {
+          "name": "CA",
+          "truth": false,
+          "score": 38,
+          "scoreB": 40
+        },
+        {
+          "name": "B Tech",
+          "truth": false,
+          "score": 38,
+          "scoreB": 40
+        },
+        {
+          "name": "BBA",
+          "truth": false,
+          "score": 41,
+          "scoreB": 28
+        },
+        {
+          "name": "Has siblings",
+          "truth": true,
+          "score": 31,
+          "scoreB": 21
+        }
+      ],
+      "resultsReported": "2026-11-14"
     }
   ]
 }
