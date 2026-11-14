@@ -1,469 +1,533 @@
 {
-  "_note": "Registry of tested charts. Each case holds the birth data, the questions with their options, the answer the engine gave, the true answer reported by the owner, and error tags for every miss. Error tags are defined in suj_engine/LEARNINGS.md. Run node suj_engine/tools/cases_report.js for the scoreboard. Add a case after every owner reported result.",
-  "cases": [
+ "_note": "Registry of tested charts. Each case holds the birth data, the questions with their options, the answer the engine gave, the true answer reported by the owner, and error tags for every miss. Error tags are defined in suj_engine/LEARNINGS.md. Run node suj_engine/tools/cases_report.js for the scoreboard. Add a case after every owner reported result.",
+ "cases": [
+  {
+   "id": "K892",
+   "name": "Kundali 892",
+   "gender": "female",
+   "date": "1993-01-06",
+   "time": "07:10:00",
+   "tz": 5.5,
+   "lat": 27.1333,
+   "lon": 81.9667,
+   "place": "Gonda, Uttar Pradesh",
+   "asOf": "2026-11-12",
+   "resultsReported": "2026-11-13",
+   "questions": [
     {
-      "id": "K892",
-      "name": "Kundali 892",
-      "gender": "female",
-      "date": "1993-01-06",
-      "time": "07:10:00",
-      "tz": 5.5,
-      "lat": 27.1333,
-      "lon": 81.9667,
-      "place": "Gonda, Uttar Pradesh",
-      "asOf": "2026-11-12",
-      "resultsReported": "2026-11-13",
-      "questions": [
-        {
-          "n": 1,
-          "topic": "education",
-          "kind": "ordinal",
-          "options": [
-            "High school",
-            "Intermediate",
-            "Graduation",
-            "Post graduation"
-          ],
-          "engine": "Graduation",
-          "truth": "Post graduation",
-          "errorTags": [
-            "prior_override"
-          ],
-          "note": "Chart showed Jupiter 5th from Moon, Mercury highest Shadbala, Budha Aditya and a Venus antardasha with Venus in D24 house 11. The engine saw them and chose the middle option by typicality."
-        },
-        {
-          "n": 2,
-          "topic": "marriage",
-          "kind": "status",
-          "options": [
-            "Married",
-            "Divorced",
-            "Widowed",
-            "Unmarried"
-          ],
-          "engine": "Married",
-          "truth": "Married",
-          "errorTags": [],
-          "note": "Promise, dasha and transit all pointed one way. Window Rahu Mars Jupiter 29 Nov 2019 to 19 Jan 2020 is a candidate, the true date is not known."
-        },
-        {
-          "n": 3,
-          "topic": "work",
-          "kind": "status",
-          "options": [
-            "Business",
-            "Unemployed",
-            "Government job",
-            "Private job"
-          ],
-          "engine": "Government job",
-          "truth": "Unemployed",
-          "errorTags": [
-            "capacity_vs_status",
-            "prior_override"
-          ],
-          "note": "Strong tenth house promise was read as employment. Flags toward not working were set aside: Saturn in 2nd, Saturn and Rahu aspect on 4th, D10 Sun and Moon in 12th, Mercury in D10 8th, D10 10th empty, 10th lord combust. The window scan found a grade A window in 2025 for job start and it was wrong, so a window alone does not prove the event."
-        },
-        {
-          "n": 4,
-          "topic": "siblings",
-          "kind": "count",
-          "options": [
-            "Two brothers two sisters",
-            "One brother one sister",
-            "Only child",
-            "One brother three sisters"
-          ],
-          "engine": "One brother three sisters",
-          "truth": "Two brothers two sisters",
-          "errorTags": [
-            "invented_rule"
-          ],
-          "note": "Count was decided by a planet and sign gender heuristic made up by the engine. Not in the owner's methodology and not in the rule library. 11th house Ashtakavarga was 38 and Mars the karaka was in a dual sign, both ignored."
-        },
-        {
-          "n": 5,
-          "topic": "parents",
-          "kind": "status",
-          "options": [
-            "Father alive",
-            "Neither alive",
-            "Both alive",
-            "Mother alive"
-          ],
-          "engine": "Both alive",
-          "truth": "Mother alive",
-          "errorTags": [
-            "flag_dismissed",
-            "winner_mapping",
-            "prior_override"
-          ],
-          "note": "Engine itself listed Jupiter, lord of the father's 8th, in the father's 2nd, Saturn and Rahu aspect on the father's 8th, and a Rahu Mercury window in 2010 and 2011 with Saturn in Virgo and Jupiter in Pisces on that house. These were set aside using the Saturn winner and typicality. Father not alive is the truth."
-        }
-      ],
-      "reruns": [
-        {
-          "date": "2026-11-13",
-          "engineRound": 12,
-          "script": "suj_engine/experiments/rerun_892_round12.js",
-          "note": "Generated evidence, owner rules to round 12. Every hypothesis scored under 50. Answers Graduation, Unmarried, Not working, Only child, Neither alive. Right on work and on the father only, wrong on the rest. Pessimistic by structure, see rerun_892_round12_results.md. Hindsight run, not a test.",
-          "correct": 1,
-          "of": 5
-        }
-      ],
-      "blind": true,
-      "hypotheses": [
-        {
-          "name": "Education Post graduation",
-          "truth": true,
-          "score": 48,
-          "view2": 48,
-          "scoreB": 57
-        },
-        {
-          "name": "Married",
-          "truth": true,
-          "score": 43,
-          "view2": 47,
-          "scoreB": 54
-        },
-        {
-          "name": "Working",
-          "truth": false,
-          "score": 31,
-          "view2": 33,
-          "scoreB": 47
-        },
-        {
-          "name": "Has siblings",
-          "truth": true,
-          "score": 29,
-          "view2": 37,
-          "scoreB": 21
-        },
-        {
-          "name": "Father alive",
-          "truth": false,
-          "score": 45,
-          "view2": 45,
-          "scoreB": 45
-        },
-        {
-          "name": "Mother alive",
-          "truth": true,
-          "score": 34,
-          "view2": 35,
-          "scoreB": 35
-        }
-      ]
+     "n": 1,
+     "topic": "education",
+     "kind": "ordinal",
+     "options": [
+      "High school",
+      "Intermediate",
+      "Graduation",
+      "Post graduation"
+     ],
+     "engine": "Graduation",
+     "truth": "Post graduation",
+     "errorTags": [
+      "prior_override"
+     ],
+     "note": "Chart showed Jupiter 5th from Moon, Mercury highest Shadbala, Budha Aditya and a Venus antardasha with Venus in D24 house 11. The engine saw them and chose the middle option by typicality."
     },
     {
-      "id": "K2",
-      "name": "Kundali 2",
-      "gender": "female",
-      "date": "1991-11-07",
-      "time": "10:50:00",
-      "tz": 5.5,
-      "lat": 28.6139,
-      "lon": 77.209,
-      "place": "New Delhi",
-      "asOf": "2026-11-14",
-      "resultsReported": "2026-11-14",
-      "blind": false,
-      "blindNote": "The true answers came with the chart. Engine answers below are what the written rules give, produced afterwards. They do not count as a test.",
-      "questions": [
-        {
-          "n": 1,
-          "topic": "work",
-          "kind": "status",
-          "options": [
-            "Doctor",
-            "Astrologer",
-            "Lawyer",
-            "Housewife"
-          ],
-          "engine": "Housewife",
-          "truth": "Lawyer",
-          "errorTags": [
-            "calibration"
-          ],
-          "note": "Working scored 47 so the rule says not working. Lawyer was the best of the three professions, 51 against Astrologer 45 and Doctor 40, and passed 50. Housewife as the complement scores 53, a margin of 2."
-        },
-        {
-          "n": 2,
-          "topic": "marriage",
-          "kind": "status",
-          "options": [
-            "Very happy",
-            "Very unhappy",
-            "Separated from husband",
-            "Divorce in 2023"
-          ],
-          "engine": "Very unhappy",
-          "truth": "Very happy",
-          "errorTags": [
-            "calibration"
-          ],
-          "note": "Married 39 and Happy marriage 33, both under 50. The tally cannot tell unhappy from separation from divorce, so the first of the three was taken."
-        },
-        {
-          "n": 3,
-          "topic": "event on 3 May 2021",
-          "kind": "event",
-          "options": [
-            "Marriage",
-            "Accident",
-            "Child born",
-            "Death of mother in law"
-          ],
-          "engine": "Marriage",
-          "truth": "Child born",
-          "errorTags": [
-            "window_scan_misses_D7",
-            "window_scan_lagna_transit_only"
-          ],
-          "note": "No strict window covers 3 May 2021 for any option. The wide view marks marriage, Mercury Mahadasha, Venus Antardasha, Mercury Pratyantardasha, 7th and 10th lord. The child event was missed because the scan reads D1 houses only. Mercury sits in the 5th house of D7 and Venus is exalted in the D7 Lagna, Jupiter transited Aquarius which is the 5th from the Moon. Round 14, the scan was extended to D7 and to the Moon and Sun transits. The child event is then reached only under the widest view at grade B, marriage stays at grade A, so the answer would still be marriage."
-        }
-      ],
-      "hypotheses": [
-        {
-          "name": "Working",
-          "truth": true,
-          "score": 47,
-          "view2": 47,
-          "scoreB": 64
-        },
-        {
-          "name": "Doctor",
-          "truth": false,
-          "score": 40,
-          "view2": 40,
-          "scoreB": 30
-        },
-        {
-          "name": "Lawyer",
-          "truth": true,
-          "score": 51,
-          "view2": 51,
-          "scoreB": 74
-        },
-        {
-          "name": "Astrologer",
-          "truth": false,
-          "score": 45,
-          "view2": 45,
-          "scoreB": 66
-        },
-        {
-          "name": "Married",
-          "truth": true,
-          "score": 39,
-          "view2": 39,
-          "scoreB": 59
-        },
-        {
-          "name": "Happy marriage",
-          "truth": true,
-          "score": 33,
-          "view2": 33,
-          "scoreB": 50
-        },
-        {
-          "name": "Has a child",
-          "truth": true,
-          "score": 36,
-          "view2": 37,
-          "scoreB": 63
-        }
-      ],
-      "dateChecks": [
-        {
-          "event": "child_birth",
-          "date": "2021-05-03",
-          "strictDouble": false,
-          "strictSingle": false,
-          "wideDouble": false,
-          "wideSingle": true,
-          "rankOfTrueEvent": 4,
-          "of": 4,
-          "note": "wide single, grade B via Moon and Sun"
-        }
-      ]
+     "n": 2,
+     "topic": "marriage",
+     "kind": "status",
+     "options": [
+      "Married",
+      "Divorced",
+      "Widowed",
+      "Unmarried"
+     ],
+     "engine": "Married",
+     "truth": "Married",
+     "errorTags": [],
+     "note": "Promise, dasha and transit all pointed one way. Window Rahu Mars Jupiter 29 Nov 2019 to 19 Jan 2020 is a candidate, the true date is not known."
     },
     {
-      "id": "K3",
-      "name": "Kundali 3 (Mahesh Roy 94)",
-      "gender": "female",
-      "date": "2000-11-12",
-      "time": "13:13:00",
-      "tz": 5.5,
-      "lat": 22.7196,
-      "lon": 75.8577,
-      "place": "Indore, Madhya Pradesh",
-      "asOf": "2026-11-14",
-      "resultsReported": "2026-11-14",
-      "blind": false,
-      "blindNote": "The true answers came with the chart. Engine answers are what the written rules give, produced afterwards. They do not count as a test.",
-      "questions": [
-        {
-          "n": 1,
-          "topic": "marriage",
-          "kind": "status",
-          "options": [
-            "Married",
-            "Unmarried",
-            "Divorced",
-            "Widow"
-          ],
-          "engine": "Unmarried",
-          "truth": "Divorced",
-          "errorTags": [
-            "calibration",
-            "no_rule_for_divorce"
-          ],
-          "note": "Married scored 31, so the tally rule says not married. The engine has no rule that tells a divorce from a continuing marriage, the separation windows are 11 strict and 25 wide between December 2022 and now, all grade A."
-        },
-        {
-          "n": 2,
-          "topic": "event on 7 December 2022",
-          "kind": "event",
-          "options": [
-            "Marriage",
-            "New job",
-            "Child born",
-            "Eye operation"
-          ],
-          "engine": "Child born",
-          "truth": "Marriage",
-          "errorTags": [
-            "window_scan_misses_conjunction",
-            "event_rank_wrong"
-          ],
-          "note": "No scan view covers the date for marriage, not even the widest. The event rank puts child birth first at 3.14, marriage second at 0.43. Dasha was Rahu, Rahu, Mercury, Jupiter, Venus. Mercury, the Pratyantardasha lord, is conjunct the 7th lord Sun in Libra, and the scan does not count a planet that is conjunct a house lord as a link."
-        }
-      ],
-      "hypotheses": [
-        {
-          "name": "Married",
-          "truth": true,
-          "score": 31,
-          "view2": 31,
-          "scoreB": 64
-        }
-      ],
-      "dateChecks": [
-        {
-          "event": "marriage",
-          "date": "2022-12-07",
-          "strictDouble": false,
-          "strictSingle": false,
-          "wideDouble": false,
-          "wideSingle": false,
-          "rankOfTrueEvent": 2,
-          "of": 4,
-          "note": "no view covers the date"
-        }
-      ]
+     "n": 3,
+     "topic": "work",
+     "kind": "status",
+     "options": [
+      "Business",
+      "Unemployed",
+      "Government job",
+      "Private job"
+     ],
+     "engine": "Government job",
+     "truth": "Unemployed",
+     "errorTags": [
+      "capacity_vs_status",
+      "prior_override"
+     ],
+     "note": "Strong tenth house promise was read as employment. Flags toward not working were set aside: Saturn in 2nd, Saturn and Rahu aspect on 4th, D10 Sun and Moon in 12th, Mercury in D10 8th, D10 10th empty, 10th lord combust. The window scan found a grade A window in 2025 for job start and it was wrong, so a window alone does not prove the event."
     },
     {
-      "id": "K4",
-      "name": "Kundali 4",
-      "gender": "male",
-      "date": "2006-02-14",
-      "time": "05:27:00",
-      "tz": 5.5,
-      "lat": 31.326,
-      "lon": 75.576,
-      "place": "Jalandhar",
-      "asOf": "2026-11-14",
-      "blind": true,
-      "preregistration": "suj_engine/experiments/preregistration_K4.md, committed before the chart was computed",
-      "questions": [
-        {
-          "n": 1,
-          "topic": "marital status",
-          "kind": "event",
-          "options": [
-            "Got Married in 19th year",
-            "Engaged in Feb 26",
-            "Live in relationship since June 2024",
-            "None of the above"
-          ],
-          "engine": "None of the above",
-          "truth": "None of the above",
-          "pending": false,
-          "errorTags": [],
-          "note": "Event rank put job_start first on every option date under the updated engine. The base setting put marriage first on 1 of 12 dates in the 19th year. Truth reported, none of the above, right."
-        },
-        {
-          "n": 2,
-          "topic": "education",
-          "kind": "status",
-          "options": [
-            "Pursuing CA",
-            "Already Dropped Studies",
-            "Pursuing B Tech",
-            "Pursuing BBA"
-          ],
-          "engine": "Already Dropped Studies",
-          "truth": "Already Dropped Studies",
-          "pending": false,
-          "errorTags": [],
-          "note": "Education exists scored 27 in the updated engine and 38 in the base, under the lines 55.5 and 39.5. CA 40, B Tech 40, BBA 28. Truth reported, already dropped studies, right."
-        },
-        {
-          "n": 3,
-          "topic": "siblings",
-          "kind": "count",
-          "options": [
-            "2 Brothers 1 Sister",
-            "Only Child",
-            "2 Brother 2 Sisters",
-            "1 Brother 1 Sister"
-          ],
-          "engine": "Only Child",
-          "truth": "1 Brother 1 Sister",
-          "pending": false,
-          "errorTags": [
-            "count_rule_unvalidated",
-            "calibration"
-          ],
-          "note": "Has siblings scored 21 updated and 31 base, under the lines. The Ashtakavarga mean of the 3rd and 11th is 32, which would have given 2 brothers 2 sisters. Truth reported 14 November 2026, the native is a brother with one sister. The score rule said only child, the Ashtakavarga count rule would have said 2 brothers 2 sisters, both wrong."
-        }
-      ],
-      "hypotheses": [
-        {
-          "name": "Education exists",
-          "truth": false,
-          "score": 38,
-          "scoreB": 27
-        },
-        {
-          "name": "CA",
-          "truth": false,
-          "score": 38,
-          "scoreB": 40
-        },
-        {
-          "name": "B Tech",
-          "truth": false,
-          "score": 38,
-          "scoreB": 40
-        },
-        {
-          "name": "BBA",
-          "truth": false,
-          "score": 41,
-          "scoreB": 28
-        },
-        {
-          "name": "Has siblings",
-          "truth": true,
-          "score": 31,
-          "scoreB": 21
-        }
-      ],
-      "resultsReported": "2026-11-14"
+     "n": 4,
+     "topic": "siblings",
+     "kind": "count",
+     "options": [
+      "Two brothers two sisters",
+      "One brother one sister",
+      "Only child",
+      "One brother three sisters"
+     ],
+     "engine": "One brother three sisters",
+     "truth": "Two brothers two sisters",
+     "errorTags": [
+      "invented_rule"
+     ],
+     "note": "Count was decided by a planet and sign gender heuristic made up by the engine. Not in the owner's methodology and not in the rule library. 11th house Ashtakavarga was 38 and Mars the karaka was in a dual sign, both ignored."
+    },
+    {
+     "n": 5,
+     "topic": "parents",
+     "kind": "status",
+     "options": [
+      "Father alive",
+      "Neither alive",
+      "Both alive",
+      "Mother alive"
+     ],
+     "engine": "Both alive",
+     "truth": "Mother alive",
+     "errorTags": [
+      "flag_dismissed",
+      "winner_mapping",
+      "prior_override"
+     ],
+     "note": "Engine itself listed Jupiter, lord of the father's 8th, in the father's 2nd, Saturn and Rahu aspect on the father's 8th, and a Rahu Mercury window in 2010 and 2011 with Saturn in Virgo and Jupiter in Pisces on that house. These were set aside using the Saturn winner and typicality. Father not alive is the truth."
     }
-  ]
+   ],
+   "reruns": [
+    {
+     "date": "2026-11-13",
+     "engineRound": 12,
+     "script": "suj_engine/experiments/rerun_892_round12.js",
+     "note": "Generated evidence, owner rules to round 12. Every hypothesis scored under 50. Answers Graduation, Unmarried, Not working, Only child, Neither alive. Right on work and on the father only, wrong on the rest. Pessimistic by structure, see rerun_892_round12_results.md. Hindsight run, not a test.",
+     "correct": 1,
+     "of": 5
+    }
+   ],
+   "blind": true,
+   "hypotheses": [
+    {
+     "name": "Education Post graduation",
+     "truth": true,
+     "score": 48,
+     "view2": 48,
+     "scoreB": 57
+    },
+    {
+     "name": "Married",
+     "truth": true,
+     "score": 43,
+     "view2": 47,
+     "scoreB": 54
+    },
+    {
+     "name": "Working",
+     "truth": false,
+     "score": 31,
+     "view2": 33,
+     "scoreB": 47
+    },
+    {
+     "name": "Has siblings",
+     "truth": true,
+     "score": 29,
+     "view2": 37,
+     "scoreB": 21
+    },
+    {
+     "name": "Father alive",
+     "truth": false,
+     "score": 45,
+     "view2": 45,
+     "scoreB": 45
+    },
+    {
+     "name": "Mother alive",
+     "truth": true,
+     "score": 34,
+     "view2": 35,
+     "scoreB": 35
+    }
+   ]
+  },
+  {
+   "id": "K2",
+   "name": "Kundali 2",
+   "gender": "female",
+   "date": "1991-11-07",
+   "time": "10:50:00",
+   "tz": 5.5,
+   "lat": 28.6139,
+   "lon": 77.209,
+   "place": "New Delhi",
+   "asOf": "2026-11-14",
+   "resultsReported": "2026-11-14",
+   "blind": false,
+   "blindNote": "The true answers came with the chart. Engine answers below are what the written rules give, produced afterwards. They do not count as a test.",
+   "questions": [
+    {
+     "n": 1,
+     "topic": "work",
+     "kind": "status",
+     "options": [
+      "Doctor",
+      "Astrologer",
+      "Lawyer",
+      "Housewife"
+     ],
+     "engine": "Housewife",
+     "truth": "Lawyer",
+     "errorTags": [
+      "calibration"
+     ],
+     "note": "Working scored 47 so the rule says not working. Lawyer was the best of the three professions, 51 against Astrologer 45 and Doctor 40, and passed 50. Housewife as the complement scores 53, a margin of 2."
+    },
+    {
+     "n": 2,
+     "topic": "marriage",
+     "kind": "status",
+     "options": [
+      "Very happy",
+      "Very unhappy",
+      "Separated from husband",
+      "Divorce in 2023"
+     ],
+     "engine": "Very unhappy",
+     "truth": "Very happy",
+     "errorTags": [
+      "calibration"
+     ],
+     "note": "Married 39 and Happy marriage 33, both under 50. The tally cannot tell unhappy from separation from divorce, so the first of the three was taken."
+    },
+    {
+     "n": 3,
+     "topic": "event on 3 May 2021",
+     "kind": "event",
+     "options": [
+      "Marriage",
+      "Accident",
+      "Child born",
+      "Death of mother in law"
+     ],
+     "engine": "Marriage",
+     "truth": "Child born",
+     "errorTags": [
+      "window_scan_misses_D7",
+      "window_scan_lagna_transit_only"
+     ],
+     "note": "No strict window covers 3 May 2021 for any option. The wide view marks marriage, Mercury Mahadasha, Venus Antardasha, Mercury Pratyantardasha, 7th and 10th lord. The child event was missed because the scan reads D1 houses only. Mercury sits in the 5th house of D7 and Venus is exalted in the D7 Lagna, Jupiter transited Aquarius which is the 5th from the Moon. Round 14, the scan was extended to D7 and to the Moon and Sun transits. The child event is then reached only under the widest view at grade B, marriage stays at grade A, so the answer would still be marriage."
+    }
+   ],
+   "hypotheses": [
+    {
+     "name": "Working",
+     "truth": true,
+     "score": 47,
+     "view2": 47,
+     "scoreB": 64
+    },
+    {
+     "name": "Doctor",
+     "truth": false,
+     "score": 40,
+     "view2": 40,
+     "scoreB": 30
+    },
+    {
+     "name": "Lawyer",
+     "truth": true,
+     "score": 51,
+     "view2": 51,
+     "scoreB": 74
+    },
+    {
+     "name": "Astrologer",
+     "truth": false,
+     "score": 45,
+     "view2": 45,
+     "scoreB": 66
+    },
+    {
+     "name": "Married",
+     "truth": true,
+     "score": 39,
+     "view2": 39,
+     "scoreB": 59
+    },
+    {
+     "name": "Happy marriage",
+     "truth": true,
+     "score": 33,
+     "view2": 33,
+     "scoreB": 50
+    },
+    {
+     "name": "Has a child",
+     "truth": true,
+     "score": 36,
+     "view2": 37,
+     "scoreB": 63
+    }
+   ],
+   "dateChecks": [
+    {
+     "event": "child_birth",
+     "date": "2021-05-03",
+     "strictDouble": false,
+     "strictSingle": false,
+     "wideDouble": false,
+     "wideSingle": true,
+     "rankOfTrueEvent": 4,
+     "of": 4,
+     "note": "wide single, grade B via Moon and Sun"
+    }
+   ]
+  },
+  {
+   "id": "K3",
+   "name": "Kundali 3 (Mahesh Roy 94)",
+   "gender": "female",
+   "date": "2000-11-12",
+   "time": "13:13:00",
+   "tz": 5.5,
+   "lat": 22.7196,
+   "lon": 75.8577,
+   "place": "Indore, Madhya Pradesh",
+   "asOf": "2026-11-14",
+   "resultsReported": "2026-11-14",
+   "blind": false,
+   "blindNote": "The true answers came with the chart. Engine answers are what the written rules give, produced afterwards. They do not count as a test.",
+   "questions": [
+    {
+     "n": 1,
+     "topic": "marriage",
+     "kind": "status",
+     "options": [
+      "Married",
+      "Unmarried",
+      "Divorced",
+      "Widow"
+     ],
+     "engine": "Unmarried",
+     "truth": "Divorced",
+     "errorTags": [
+      "calibration",
+      "no_rule_for_divorce"
+     ],
+     "note": "Married scored 31, so the tally rule says not married. The engine has no rule that tells a divorce from a continuing marriage, the separation windows are 11 strict and 25 wide between December 2022 and now, all grade A."
+    },
+    {
+     "n": 2,
+     "topic": "event on 7 December 2022",
+     "kind": "event",
+     "options": [
+      "Marriage",
+      "New job",
+      "Child born",
+      "Eye operation"
+     ],
+     "engine": "Child born",
+     "truth": "Marriage",
+     "errorTags": [
+      "window_scan_misses_conjunction",
+      "event_rank_wrong"
+     ],
+     "note": "No scan view covers the date for marriage, not even the widest. The event rank puts child birth first at 3.14, marriage second at 0.43. Dasha was Rahu, Rahu, Mercury, Jupiter, Venus. Mercury, the Pratyantardasha lord, is conjunct the 7th lord Sun in Libra, and the scan does not count a planet that is conjunct a house lord as a link."
+    }
+   ],
+   "hypotheses": [
+    {
+     "name": "Married",
+     "truth": true,
+     "score": 31,
+     "view2": 31,
+     "scoreB": 64
+    }
+   ],
+   "dateChecks": [
+    {
+     "event": "marriage",
+     "date": "2022-12-07",
+     "strictDouble": false,
+     "strictSingle": false,
+     "wideDouble": false,
+     "wideSingle": false,
+     "rankOfTrueEvent": 2,
+     "of": 4,
+     "note": "no view covers the date"
+    }
+   ]
+  },
+  {
+   "id": "K4",
+   "name": "Kundali 4",
+   "gender": "male",
+   "date": "2006-02-14",
+   "time": "05:27:00",
+   "tz": 5.5,
+   "lat": 31.326,
+   "lon": 75.576,
+   "place": "Jalandhar",
+   "asOf": "2026-11-14",
+   "blind": true,
+   "preregistration": "suj_engine/experiments/preregistration_K4.md, committed before the chart was computed",
+   "questions": [
+    {
+     "n": 1,
+     "topic": "marital status",
+     "kind": "event",
+     "options": [
+      "Got Married in 19th year",
+      "Engaged in Feb 26",
+      "Live in relationship since June 2024",
+      "None of the above"
+     ],
+     "engine": "None of the above",
+     "truth": "None of the above",
+     "pending": false,
+     "errorTags": [],
+     "note": "Event rank put job_start first on every option date under the updated engine. The base setting put marriage first on 1 of 12 dates in the 19th year. Truth reported, none of the above, right."
+    },
+    {
+     "n": 2,
+     "topic": "education",
+     "kind": "status",
+     "options": [
+      "Pursuing CA",
+      "Already Dropped Studies",
+      "Pursuing B Tech",
+      "Pursuing BBA"
+     ],
+     "engine": "Already Dropped Studies",
+     "truth": "Already Dropped Studies",
+     "pending": false,
+     "errorTags": [],
+     "note": "Education exists scored 27 in the updated engine and 38 in the base, under the lines 55.5 and 39.5. CA 40, B Tech 40, BBA 28. Truth reported, already dropped studies, right."
+    },
+    {
+     "n": 3,
+     "topic": "siblings",
+     "kind": "count",
+     "options": [
+      "2 Brothers 1 Sister",
+      "Only Child",
+      "2 Brother 2 Sisters",
+      "1 Brother 1 Sister"
+     ],
+     "engine": "Only Child",
+     "truth": "1 Brother 1 Sister",
+     "pending": false,
+     "errorTags": [
+      "count_rule_unvalidated",
+      "calibration"
+     ],
+     "note": "Has siblings scored 21 updated and 31 base, under the lines. The Ashtakavarga mean of the 3rd and 11th is 32, which would have given 2 brothers 2 sisters. Truth reported 14 November 2026, the native is a brother with one sister. The score rule said only child, the Ashtakavarga count rule would have said 2 brothers 2 sisters, both wrong."
+    }
+   ],
+   "hypotheses": [
+    {
+     "name": "Education exists",
+     "truth": false,
+     "score": 38,
+     "scoreB": 27
+    },
+    {
+     "name": "CA",
+     "truth": false,
+     "score": 38,
+     "scoreB": 40
+    },
+    {
+     "name": "B Tech",
+     "truth": false,
+     "score": 38,
+     "scoreB": 40
+    },
+    {
+     "name": "BBA",
+     "truth": false,
+     "score": 41,
+     "scoreB": 28
+    },
+    {
+     "name": "Has siblings",
+     "truth": true,
+     "score": 31,
+     "scoreB": 21
+    }
+   ],
+   "resultsReported": "2026-11-14"
+  },
+  {
+   "id": "K5",
+   "name": "Kundali 5",
+   "gender": "male",
+   "date": "1983-01-29",
+   "time": "14:45:00",
+   "tz": 5.5,
+   "lat": 19.076,
+   "lon": 72.8777,
+   "place": "Mumbai",
+   "asOf": "2026-11-14",
+   "blind": true,
+   "preregistration": "none written. The z reading and the null of experiments/null_distribution.json were fixed before this chart, see LEARNINGS H14. The sex of the children and the day event options had no rule fixed beforehand.",
+   "questions": [
+    {
+     "n": 1,
+     "topic": "children",
+     "kind": "count",
+     "options": [
+      "Two sons",
+      "Two daughters",
+      "One son and one daughter",
+      "Childless"
+     ],
+     "engine": "Two sons",
+     "truth": "Two daughters",
+     "pending": false,
+     "errorTags": [
+      "count_rule_unvalidated",
+      "invented_rule"
+     ],
+     "note": "Has a child scored 61, z 1.16, read as yes, and the native has children, the existence call was right. The tally gave the three child options the same number, 61, and the TIE BREAK used a planet gender reading, Mars and Jupiter male planets, no female planet in the chain, a rule marked proposed. It was wrong. The counter evidence line had named the two even signs, Virgo the 5th sign and Scorpio the karaka sign, plus D7 Jupiter in Cancer, which pointed to daughters and was right. One chart, so no rule is drawn. The second ranked answer asked for afterwards was one son one daughter, also wrong."
+    },
+    {
+     "n": 2,
+     "topic": "day event",
+     "kind": "event",
+     "options": [
+      "Foreign travel",
+      "Child birth",
+      "Death",
+      "Car purchase"
+     ],
+     "engine": "Foreign travel",
+     "truth": "Death",
+     "pending": false,
+     "errorTags": [
+      "capacity_vs_status",
+      "winner_mapping",
+      "flag_dismissed"
+     ],
+     "note": "Truth, the native died on 19 September 2022. The event rank on that date put health_crisis first at 1.2, above foreign travel at 1.08, and health_crisis is the 6 8 12 preset, nearest to death, but the engine has no death preset and the answer picked foreign travel from the four options. Death scored 49 against 65 for foreign travel. Dasha that day Sun Jupiter Jupiter Saturn Saturn, Jupiter is the 8th lord and the Antardasha and Pratyantardasha lord, Ketu sits in the 8th, Saturn is the natural karaka of the 8th and death and was the Sookshma and Prana lord. The tally counted Saturn exalted and the strong Lagna lord as evidence against death, which reads the strength of the longevity promise as proof of status, and counted the day engine verdict favourable against death although that verdict is about net benefit and not about the kind of event. The top two answers asked for afterwards were foreign travel and death, so the truth was second."
+    }
+   ],
+   "hypotheses": [
+    {
+     "name": "Has a child",
+     "truth": true,
+     "score": 61,
+     "scoreB": null
+    }
+   ],
+   "resultsReported": "2026-11-14"
+  }
+ ]
 }
