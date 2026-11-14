@@ -1,0 +1,45 @@
+Question 3 Siblings
+
+S0. INTAKE AND TIME FRAME
+Native, male, born 14 February 2006 at 05 27 am in Jalandhar, latitude 31.33 north, longitude 75.58 east, time zone 5.5, Lahiri. Chart from Vednetra. Lagna Sagittarius 29.1 degrees, at the very end of the sign, so a birth time error of a few minutes would move the Lagna to Capricorn. The as of date is 14 November 2026, age 20.
+Sun and Mercury in Aquarius house 3, Mercury combust. Moon in Leo house 9. Mars in Taurus house 6. Jupiter in Libra house 11. Venus in Sagittarius house 1. Saturn in Cancer house 8 retrograde. Rahu in Pisces house 4. Ketu in Virgo house 10.
+Running dasha Venus Mahadasha to 8 December 2027, Ketu Antardasha, Venus Pratyantardasha, Sun Sookshma, Moon Prana.
+This is a blind test. The configuration, the mapping of options and the decision rules were written and committed before the chart was computed, in the file preregistration_K4.md of the suj_engine experiments folder. The updated engine is the degree and nakshatra option with the nakshatra weight 0.6 and the degree bands on Rahu and Ketu.
+
+S1. DOMINANT HOUSE
+The scan finds Sun and Mercury together in house 3 Aquarius. In the Moon chart they stand in house 7 and in the Sun chart in house 1. Sun is lord of 9 and Mercury lord of 7 and 10, Mercury combust. The life theme is effort, communication and skill, carried by a combust Mercury and a Sun in an enemy sign.
+
+S2. D1 ANALYSIS
+Lagna chart, Moon chart and Sun chart. The 3rd house Aquarius holds the Sun and Mercury, Mercury combust. The 3rd lord Saturn is in house 8 retrograde in an enemy sign at 12.6 degrees in Pushya, Yuva by degree. The 11th house Libra holds Jupiter in an enemy sign. The karaka Mars is in house 6 at 4.1 degrees in Taurus, Mrita. The Ashtakavarga sarva points are 29 in house 3 and 35 in house 11, mean 32.
+RULES CITED the library holds no rule on the number of siblings, rules_lookup.js was run.
+
+S3. D9 ANALYSIS
+D9 Lagna Sagittarius. Saturn the 3rd lord is in D9 house 11, Mars the karaka in D9 house 3 with Mercury.
+
+S4. SUBJECT DIVISIONAL CHART ANALYSIS
+D3 Lagna Leo holds the Moon and Venus. Mars is in D3 house 10, Mercury and Jupiter in house 11, Sun in house 7, Saturn in house 4.
+
+S5. PLANET STRENGTH AND CONFLICT RESOLUTION
+Hypothesis has siblings. Updated engine 21, base 31, under the preregistered line of 55.5 and 39.5. The Mars karaka is Mrita by degree and combust Mercury lies on the 3rd house.
+
+S6. DASHA AND TIME STATUS
+Past first. The siblings of a native are born before or soon after the birth, so the time that matters is the early dasha. Ketu Mahadasha ran from 2000 to December 2007, covering the birth and the first two years. Strict sibling birth windows, 26 past windows, 1 in the 19th year, the scan does not separate them.
+WINDOW SCAN strict view with the nodes, the subject varga and the three reference charts. Sibling birth 26 past windows all at grade A, 14 future windows.
+DASHA LORDS Venus Mahadasha badhaka unless connected to a yogakaraka, Ketu Antardasha node and neutral, Venus Pratyantardasha badhaka, Sookshma Sun a promoter and yogakaraka, Prana Moon badhaka.
+TIME STATUS ALREADY HAPPENED, a sibling would be born before now, the finding is that none was.
+
+S7. TRANSIT VALIDATION
+Siblings are a natal matter, the transit check is the position of Saturn now on the 4th house, Jupiter on the 9th, Rahu on the 3rd house in Aquarius, the house of siblings, retrograde. It is not a validation of a sibling birth.
+
+S8. RECONCILIATION OF SECTIONS
+The hypothesis score is under the line in both settings, the karaka is Mrita, the 3rd lord is in the 8th, so the answer under the preregistered rule is only child. The Ashtakavarga of the 3rd and 11th houses, mean 32, would have given 2 brothers 2 sisters had the score been over the line.
+ENGINE VERSION 2.0 degree true, nakshatra true, node bands true
+EVIDENCE TALLY 2 Brothers 1 Sister 0, Only Child 79, 2 Brother 2 Sisters 21, 1 Brother 1 Sister 0
+COUNTER EVIDENCE The 11th house has 35 Ashtakavarga points, the highest of the chart, and Rahu transits the 3rd house.
+TIE BREAK not needed, Only Child is the highest. The number for it is 100 minus the siblings hypothesis score, a convention of the preregistration.
+
+S9. SUMMARY
+Dominant house 3 holds a combust Mercury. The karaka Mars is Mrita, the 3rd lord is in the 8th, the siblings hypothesis scores 21 in the updated engine, under the line. Answer only child. Confidence very low, the count of siblings has no validated rule and the 11th house points the other way.
+FINAL ANSWER Only Child
+• The siblings hypothesis scores under the preregistered line, the karaka Mars is Mrita and the 3rd lord is in the 8th house.
+• Final answer Only Child

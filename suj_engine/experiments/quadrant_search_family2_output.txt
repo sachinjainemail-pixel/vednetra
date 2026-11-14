@@ -1,0 +1,30 @@
+14 hypotheses, 10 true and 4 false. Always answering true gets 10 of 14, 71 percent. The events are 2 targets.
+Owner's mix: 60 percent nakshatra, 40 percent degree, bands on the nodes.
+Previous setting, classical bands 1.15 1.15 0.7: AUC 0.63, events first 0 of 2, best line 30 gives 10 of 14.
+
+FAMILY 2, the round 18 form, strength blended with the star lord's then times the Baladi capacity, nakshatra weight searched
+BEST OF THE GRID: weight 0.6 bands classical pushkara 1.3 vargottama 1.15 gandanta 0.5: AUC 0.70, events first 1 of 2, best line 30 gives 10 of 14.
+Settings that reach exactly this best value 3 of 810. By bands classical 3, soft 0, flat 0, mid 0, steep 0
+AUC over the whole grid, min 0.38, median 0.55, max 0.70
+
+PERMUTATION TEST, truth labels shuffled 2000 times and the whole grid searched each time. The best AUC reached by chance has median 0.68, 95th percentile 0.93. Observed best 0.70. Share of shuffles that did as well 0.448.
+Held out K892, chosen on the other two: weight 0 bands classical 1.3 1 0.5, training AUC 0.75
+Held out K2, chosen on the other two: weight 0 bands flat 1.3 1 0.5, training AUC 0.70
+Held out K3, chosen on the other two: weight 0 bands classical 1.3 1 0.5, training AUC 0.69
+LEAVE ONE CHART OUT, pooled AUC of the held out predictions 0.45 over 14 hypotheses. Held out true scores 55,54,23,36,50,52,38,31,39,40; held out false scores 40,46,40,44
+
+Scores of the 14 hypotheses under the best mix
+  K892 Q1 Education, Post graduation  TRUE  58
+  K892 Q2 Married                     TRUE  53
+  K892 Q3 Working                     false 47
+  K892 Q4 Has siblings                TRUE  21
+  K892 Q5 Father alive                false 45
+  K892 Q5 Mother alive                TRUE  36
+  K2 Q1 Working                       TRUE  66
+  K2 Q1 Doctor                        false 30
+  K2 Q1 Lawyer                        TRUE  74
+  K2 Q1 Astrologer                    false 66
+  K2 Q2 Married                       TRUE  58
+  K2 Q2 Happy marriage                TRUE  49
+  K2 Q3 Has a child                   TRUE  64
+  K3 Q1 Married                       TRUE  71

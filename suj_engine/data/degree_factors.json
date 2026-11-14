@@ -1,0 +1,7 @@
+{
+  "_note": "Capacity of a planet to give results by its degree in the sign, the Baladi avasthas. Round 17, the owner asked to test whether the degree of the planets explains the engine's errors. The ordering Yuva, then Kumara, then Bala and Vriddha, then Mrita is the classical convention. The numeric factors are the engine author's reading and are NOT in the attached rule library, so they are open for the owner to correct. In odd signs the bands run Bala 0 to 6, Kumara 6 to 12, Yuva 12 to 18, Vriddha 18 to 24, Mrita 24 to 30. In even signs the order is reversed. Odd signs are Aries, Gemini, Leo, Libra, Sagittarius, Aquarius.",
+  "factors": { "Bala": 0.25, "Kumara": 0.5, "Yuva": 1.0, "Vriddha": 0.25, "Mrita": 0.0 },
+  "gandanta": "From the rule library, Sutton. The last 0 degrees 48 minutes of Cancer, Scorpio and Pisces, 29 degrees 12 minutes to 30, and the first 0 degrees 48 minutes of Leo, Sagittarius and Aries. A planet there is troubled according to its karaka and house rulerships. Flag only, no number.",
+  "pushkaraBhaga": "From the rule library, Sutton table C3.2, the exact degree in each sign. Flag when within one degree. Flag only.",
+  "pushkaraBhagaDegrees": { "Aries": 21, "Taurus": 14, "Gemini": 18, "Cancer": 8, "Leo": 19, "Virgo": 9, "Libra": 24, "Scorpio": 11, "Sagittarius": 23, "Capricorn": 14, "Aquarius": 19, "Pisces": 9 }
+}

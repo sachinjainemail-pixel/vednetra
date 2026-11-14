@@ -1,0 +1,31 @@
+{
+  "_note": "SUJ engine configuration. Version 2.0 is the default for every analysis since round 22. Every tool reads this file through tools/engine_config.js. Put engine legacy in the tool input to run the old round 12 configuration, only to reproduce an old result. Setting degree, nakshatra or nodeDegree explicitly in the tool input overrides the default for that key.",
+  "version": "2.0",
+  "defaults": {
+    "degree": true,
+    "nakshatra": true,
+    "nodeDegree": true
+  },
+  "windowScan": {
+    "note": "window_scan.js already runs Sookshma level lords, the subject varga, Rahu and Ketu by Laghu Parashari, and Jupiter and Saturn transits from the Lagna, Moon and Sun charts by default. The star link of nakshatra now follows the engine default.",
+    "dashaLevels": 5,
+    "pranaUsed": false
+  },
+  "eventRank": {
+    "note": "event_rank.js ranks events by directness, each running lord's links divided among the events it serves, summed over Mahadasha, Antardasha, Pratyantardasha and Sookshma."
+  },
+  "hypotheses": {
+    "note": "Yes or no questions, does the native have X. tools/score_hypotheses.js scores the hypothesis types in data/hypothesis_types.json with the updated engine and reads the score as a z score against data/null_distribution.json, the score the same type gets on random charts.",
+    "status": "PROVISIONAL. The z reading was found after the true answers of Kundali 4 were known. Updated engine z AUC 0.78 over 80 pairs, post hoc. The first fair test is the next blind chart. Until it is confirmed, report the z score and the raw score together and say that the reading is provisional.",
+    "zRule": {
+      "yesAbove": 0,
+      "note": "The cutoff 0 is the engine author's convention and is not validated. Rank the types of one question by z, for example which profession has the highest z, and read a single yes or no against 0. State that the reading is provisional."
+    }
+  },
+  "knownGaps": [
+    "No validated rule for the number of siblings or children",
+    "No validated rule for divorce versus marriage",
+    "The Baladi capacity numbers and the pada factors 1.15, 1.15, 0.7 are the engine author's and not in the library",
+    "Blind score so far 3 of 8, see cases/cases.json"
+  ]
+}

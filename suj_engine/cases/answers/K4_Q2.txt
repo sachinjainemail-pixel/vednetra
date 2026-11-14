@@ -1,0 +1,45 @@
+Question 2 Education status
+
+S0. INTAKE AND TIME FRAME
+Native, male, born 14 February 2006 at 05 27 am in Jalandhar, latitude 31.33 north, longitude 75.58 east, time zone 5.5, Lahiri. Chart from Vednetra. Lagna Sagittarius 29.1 degrees, at the very end of the sign, so a birth time error of a few minutes would move the Lagna to Capricorn. The as of date is 14 November 2026, age 20.
+Sun and Mercury in Aquarius house 3, Mercury combust. Moon in Leo house 9. Mars in Taurus house 6. Jupiter in Libra house 11. Venus in Sagittarius house 1. Saturn in Cancer house 8 retrograde. Rahu in Pisces house 4. Ketu in Virgo house 10.
+Running dasha Venus Mahadasha to 8 December 2027, Ketu Antardasha, Venus Pratyantardasha, Sun Sookshma, Moon Prana.
+This is a blind test. The configuration, the mapping of options and the decision rules were written and committed before the chart was computed, in the file preregistration_K4.md of the suj_engine experiments folder. The updated engine is the degree and nakshatra option with the nakshatra weight 0.6 and the degree bands on Rahu and Ketu.
+
+S1. DOMINANT HOUSE
+The scan finds Sun and Mercury together in house 3 Aquarius. In the Moon chart they stand in house 7 and in the Sun chart in house 1. Sun is lord of 9 and Mercury lord of 7 and 10, Mercury combust. The life theme is effort, communication and skill, carried by a combust Mercury and a Sun in an enemy sign.
+
+S2. D1 ANALYSIS
+Lagna chart, Moon chart and Sun chart. The 4th house Pisces holds Rahu, its lord Jupiter is in house 11 in an enemy sign at 24.4 degrees, Mrita by degree, though at a pushkara degree and pada. The 5th house Aries is empty, its lord Mars is in house 6 at 4.1 degrees in Taurus, Mrita by degree. The 9th house Leo holds the Moon, its lord Sun is in house 3 in an enemy sign at 1.2 degrees, Bala by degree. The karakas Mercury and Jupiter, Mercury combust.
+RULES CITED the library holds one placement rule and thirteen Laghu Parashari rules with the Education tag for this chart, listed by rules_lookup.js, none of them decides between the options.
+
+S3. D9 ANALYSIS
+D9 Lagna Sagittarius. Jupiter the 4th lord is in D9 house 6, Mars the 5th lord in D9 house 3, Sun the 9th lord in D9 house 11, Mercury in D9 house 3.
+
+S4. SUBJECT DIVISIONAL CHART ANALYSIS
+D24 Lagna Cancer holds Mercury. Moon, Jupiter and Venus sit together in D24 house 9, Sun in house 2, Saturn, Rahu and Ketu in house 11, Mars in house 4. This is a supportive D24 for learning, with three planets in the 9th.
+
+S5. PLANET STRENGTH AND CONFLICT RESOLUTION
+The updated engine gives these hypothesis scores, share of planet strength in favour. Education exists 27, CA 40, B Tech 40, BBA 28. Without the options, 38, 38, 38 and 41. The preregistered line for yes is the median of earlier scores, 55.5 for the updated engine and 39.5 for the base. The education hypothesis is under the line in both.
+
+S6. DASHA AND TIME STATUS
+Past first. Venus Mahadasha since December 2007 and Mercury Antardasha from December 2023 to October 2026 covered the years of study from age 17 to 20. Mercury is the karaka and the 7th and 10th lord. Now Ketu Antardasha from 8 October 2026.
+WINDOW SCAN strict view with the nodes, the subject varga and the three reference charts. Education 34 past windows all at grade A, 13 future windows, 5 in the 19th year, 1 in June 2024. The scan has no power to separate study from its end.
+DASHA LORDS Venus Mahadasha badhaka unless connected to a yogakaraka, Ketu Antardasha node and neutral, Venus Pratyantardasha badhaka, Sookshma Sun a promoter and yogakaraka, Prana Moon badhaka.
+TIME STATUS ALREADY HAPPENED, the end of studies is read from the score under the line.
+
+S7. TRANSIT VALIDATION
+Now, Saturn in Pisces house 4 retrograde on the 4th house with Rahu, Jupiter in Leo house 9, Ketu in Leo house 9, Sun in Libra house 11. Saturn and Rahu on the 4th house in transit, with Rahu the natal occupant, fits an interruption.
+
+S8. RECONCILIATION OF SECTIONS
+D24 looks supportive, the 4th and 5th lords are Mrita and the 9th lord is Bala, and the education score is under the line in both settings. The field scores CA 40 and B Tech 40 are equal and under the line, so they are not used.
+ENGINE VERSION 2.0 degree true, nakshatra true, node bands true
+EVIDENCE TALLY Pursuing CA 40, Pursuing B Tech 40, Pursuing BBA 28, Already Dropped Studies 73
+COUNTER EVIDENCE D24 has Moon, Jupiter and Venus in the 9th house, three planets, and CA and B Tech score 40, above the education exists score of 27 and above BBA.
+TIE BREAK not needed, Already Dropped Studies is the highest. The number for it is 100 minus the education exists score, a convention of the preregistration.
+
+S9. SUMMARY
+The 4th and 5th lords are Mrita by degree, the 9th lord is Bala, Rahu sits on the 4th, the education hypothesis scores 27 in the updated engine and 38 in the base, under the line. Studies have ended. Confidence low, the scores are not shown to carry signal and the D24 contradicts.
+FINAL ANSWER Already Dropped Studies
+• The 4th and 5th lords have no capacity by degree, Rahu is on the 4th, and the education score is under the preregistered line.
+• Final answer Already Dropped Studies

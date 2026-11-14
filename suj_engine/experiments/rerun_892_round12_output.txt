@@ -1,0 +1,81 @@
+
+==== Q1 Education
+chains Graduation houses 4 | Post graduation houses 5,9 karakas Mercury,Jupiter
+evidence entries 22. Per option
+  High school     favour 289    from Jupiter 47.7, Sun 44.6, Mars 34.9, Mercury 49, Saturn 56.3, Venus 56.6
+                  against 0      from   score 100
+  Intermediate    favour 289    from Jupiter 47.7, Sun 44.6, Mars 34.9, Mercury 49, Saturn 56.3, Venus 56.6
+                  against 0      from   score 100
+  Graduation      favour 289    from Jupiter 47.7, Sun 44.6, Mars 34.9, Mercury 49, Saturn 56.3, Venus 56.6
+                  against 198.8  from Saturn 56.3, Rahu 34.9, Jupiter 52.3, Sun 55.4  score 59
+  Post graduation favour 289    from Mars 34.9, Mercury 49, Sun 44.6, Saturn 56.3, Venus 56.6, Jupiter 47.7
+                  against 315    from Saturn 56.3, Rahu 34.9, Jupiter 52.3, Sun 55.4, Mars 65.1, Mercury 51  score 48
+  EVIDENCE TALLY High school 100, Intermediate 100, Graduation 59, Post graduation 48   -> Graduation
+
+==== Q2 Is she married
+chains Married houses 7 karakas Venus,Jupiter
+evidence entries 12. Per option
+  Unmarried       favour 162.1  from Mercury 22.8, Mars 21.6, Venus 55, Jupiter 62.7
+                  against 0      from   score 100
+  Married         favour 162.1  from Mercury 22.8, Mars 21.6, Venus 55, Jupiter 62.7
+                  against 215.5  from Mars 56.8, Sun 67, Mercury 54.3, Jupiter 37.3  score 43
+  EVIDENCE TALLY Unmarried 100, Married 43   -> Unmarried
+
+==== Q3 Is she working
+chains Working houses 10 karakas Saturn
+evidence entries 11. Per option
+  Not working     favour 124.2  from Mercury 17, Saturn 49.6, Jupiter 57.7
+                  against 0      from   score 100
+  Working         favour 124.2  from Mercury 17, Saturn 49.6, Jupiter 57.7
+                  against 270.5  from Mars 56.8, Ketu 55, Mercury 66, Saturn 50.4, Jupiter 42.3  score 31
+  EVIDENCE TALLY Not working 100, Working 31   -> Not working
+
+==== Q4 Does she have siblings
+chains Has siblings houses 3,11 karakas Mars
+evidence entries 13. Per option
+  Only child      favour 99.8   from Venus 56.6, Mars 43.2
+                  against 0      from   score 100
+  Has siblings    favour 99.8   from Venus 56.6, Mars 43.2
+                  against 243.8  from Venus 56.6, Saturn 54.6, Moon 30.1, Jupiter 45.7, Mars 56.8  score 29
+  EVIDENCE TALLY Only child 100, Has siblings 29   -> Only child
+
+==== Q5 Father alive, houses 9 and 8th from 9th
+chains Alive houses 9,4 from 9 karakas Sun
+evidence entries 14. Per option
+  Not alive       favour 203.5  from Sun 51.3, Saturn 59.6, Venus 48.3, Jupiter 44.3
+                  against 0      from   score 100
+  Alive           favour 203.5  from Sun 51.3, Saturn 59.6, Venus 48.3, Jupiter 44.3
+                  against 253.1  from Jupiter 55.7, Sun 51.3, Saturn 59.6, Rahu 34.9, Venus 51.7  score 45
+  EVIDENCE TALLY Not alive 100, Alive 45   -> Not alive
+
+==== Q5 Mother alive, houses 4 and 8th from 4th
+chains Alive houses 4,11 from 4 karakas Moon
+evidence entries 16. Per option
+  Not alive       favour 153.8  from Jupiter 44.3, Sun 51.3, Moon 58.2
+                  against 0      from   score 100
+  Alive           favour 153.8  from Jupiter 44.3, Sun 51.3, Moon 58.2
+                  against 292.3  from Saturn 59.6, Rahu 34.9, Venus 51.7, Jupiter 55.7, Sun 48.7, Moon 41.8  score 34
+  EVIDENCE TALLY Not alive 100, Alive 34   -> Not alive
+
+######## SAME HYPOTHESES, VIEW 2, weakness for carriers only. Scores
+  Q1 Education                                High school 100, Intermediate 100, Graduation 59, Post graduation 48  -> Graduation
+  Q2 Is she married                           Unmarried 100, Married 47  -> Unmarried
+  Q3 Is she working                           Not working 100, Working 33  -> Not working
+  Q4 Does she have siblings                   Only child 100, Has siblings 37  -> Only child
+  Q5 Father alive, houses 9 and 8th from 9th  Not alive 100, Alive 45  -> Not alive
+  Q5 Mother alive, houses 4 and 8th from 4th  Not alive 100, Alive 35  -> Not alive
+
+==== Dasha lords now, Laghu Parashari
+  MD Jupiter 2020-09-28 to 2036-09-28 sadhaka, promoter
+  AD Mercury 2025-05-29 to 2027-09-04 neutral
+  PD Rahu 2026-09-04 to 2027-01-06 neutral but a causer of expenditure
+  SD Mercury 2026-10-28 to 2026-11-15 neutral
+  PR Saturn 2026-11-12 to 2026-11-15 badhaka, obstructer unless connected to a yogakaraka
+
+==== Strict windows with the nodes, Sookshma level
+  marriage       past or running 11, grade A 11, future 2
+  job_start      past or running 17, grade A 1, future 1
+  education_step past or running 12, grade A 10, future 1
+  sibling_birth  past or running 7, grade A 3, future 1
+  father_loss    past or running 14, grade A 3, future 3
+  mother_loss    past or running 26, grade A 26, future 3

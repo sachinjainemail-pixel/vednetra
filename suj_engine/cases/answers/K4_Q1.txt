@@ -1,0 +1,44 @@
+Question 1 Marital status
+
+S0. INTAKE AND TIME FRAME
+Native, male, born 14 February 2006 at 05 27 am in Jalandhar, latitude 31.33 north, longitude 75.58 east, time zone 5.5, Lahiri. Chart from Vednetra. Lagna Sagittarius 29.1 degrees, at the very end of the sign, so a birth time error of a few minutes would move the Lagna to Capricorn. The as of date is 14 November 2026, age 20.
+Sun and Mercury in Aquarius house 3, Mercury combust. Moon in Leo house 9. Mars in Taurus house 6. Jupiter in Libra house 11. Venus in Sagittarius house 1. Saturn in Cancer house 8 retrograde. Rahu in Pisces house 4. Ketu in Virgo house 10.
+Running dasha Venus Mahadasha to 8 December 2027, Ketu Antardasha, Venus Pratyantardasha, Sun Sookshma, Moon Prana.
+This is a blind test. The configuration, the mapping of options and the decision rules were written and committed before the chart was computed, in the file preregistration_K4.md of the suj_engine experiments folder. The updated engine is the degree and nakshatra option with the nakshatra weight 0.6 and the degree bands on Rahu and Ketu.
+
+S1. DOMINANT HOUSE
+The scan finds Sun and Mercury together in house 3 Aquarius. In the Moon chart they stand in house 7 and in the Sun chart in house 1. Sun is lord of 9 and Mercury lord of 7 and 10, Mercury combust. The life theme is effort, communication and skill, carried by a combust Mercury and a Sun in an enemy sign.
+
+S2. D1 ANALYSIS
+Lagna chart, Moon chart and Sun chart. The 7th house Gemini is empty and aspected by no planet but Jupiter in house 11 by its 9th aspect and Saturn in house 8 by its 3rd aspect is not on it. The 7th lord Mercury is combust at 14.8 degrees in house 3 Aquarius, in Shatabhisha pada 3, Yuva by degree, full capacity. The karaka Venus is in house 1 at 24.2 degrees in Purva Ashadha, Mrita by degree, no capacity, and it is also the Mahadasha lord. Kalpurusha 7th, Libra, holds Jupiter.
+RULES CITED the library holds no rule on marital status for these placements, rules_lookup.js was run.
+
+S3. D9 ANALYSIS
+D9 Lagna Sagittarius. The 7th of D9, Gemini, holds the Moon. Venus is in D9 house 12 and Jupiter in D9 house 6. Mercury is in D9 house 3 with Mars.
+
+S4. SUBJECT DIVISIONAL CHART ANALYSIS
+The subject chart for marriage is D9, done above. The karaka Venus in the 12th of D9 and Mrita by degree weakens the marriage promise and the Moon in the 7th of D9 supports it.
+
+S5. PLANET STRENGTH AND CONFLICT RESOLUTION
+The planets that could deliver a marriage or a relationship are Mercury the 7th lord, Venus the karaka and the Moon of D9. The engine does not need a vote here, the question is decided by the event rank on the dates in the options.
+
+S6. DASHA AND TIME STATUS
+Past first. The 19th year, 14 February 2024 to 13 February 2025, ran in Venus Mahadasha, Mercury Antardasha then Mercury with Ketu. The event rank puts job_start first on 11 of the 12 sample dates and marriage first on 1 under the base setting, and job_start on all 12 under the updated engine. February 2026 ran in Venus Mahadasha, Mercury Antardasha, job_start first on all 4 sample dates. June 2024 ran in Venus, Mercury, Ketu, job_start first on all 3 sample dates, the relationship event never first.
+WINDOW SCAN strict view with the nodes, the subject varga and the three reference charts. Marriage 21 past windows, 1 touching the 19th year, none in February 2026. Relationship 6 past windows, none in June 2024. The next marriage windows are in 2029 and the next relationship windows in October and November 2027.
+DASHA LORDS Venus Mahadasha badhaka unless connected to a yogakaraka, Ketu Antardasha node and neutral, Venus Pratyantardasha badhaka, Sookshma Sun a promoter and yogakaraka, Prana Moon badhaka.
+TIME STATUS WILL HAPPEN, none of the three events has happened by the dasha and the event rank, marriage or a committed relationship is due in the later windows.
+
+S7. TRANSIT VALIDATION
+Now, Saturn in Pisces house 4 retrograde, Jupiter in Leo house 9, Rahu in Aquarius house 3, Ketu in Leo house 9, Sun in Libra house 11. None of them sits on the 7th house or its lord. In June 2024 Saturn was in Aquarius house 3, Jupiter in Taurus house 6, Rahu in Pisces house 4, none on the 7th house.
+
+S8. RECONCILIATION OF SECTIONS
+The dasha and the event rank agree that none of the three dated events is supported. The 7th lord combust and the karaka Venus in D9 house 12 agree with that. One of twelve dates in the 19th year gave marriage the first place under the base setting, a weak signal.
+ENGINE VERSION 2.0 degree true, nakshatra true, node bands true
+EVIDENCE TALLY Got Married in 19th year 0, Engaged in Feb 26 0, Live in relationship since June 2024 0, None of the above 100
+COUNTER EVIDENCE On one of the twelve sample dates of the 19th year marriage ranked first under the base setting, and one strict marriage window touches that year.
+
+S9. SUMMARY
+Dominant house 3 with a combust 7th lord. The 7th house is empty, Venus is weak in D9. The event rank puts job_start first on every dated option. No window for the dated events. None of the events has happened. Confidence low, the engine's scores have not been shown to carry signal.
+FINAL ANSWER None of the above
+• The 7th lord is combust, the karaka Venus is in the 12th of D9, and the event rank never puts marriage or a relationship first on the option dates.
+• Final answer None of the above

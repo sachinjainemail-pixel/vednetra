@@ -52,7 +52,35 @@ Claude Code session recognise any reference to "SUJ engine" as this engine.
     final answer. The last bullet starts with Final answer. Nothing follows them.
 14. GUARD. Every answer is checked with suj_engine/tools/answer_guard.js before it is sent. See ANSWER_TEMPLATE.md.
 
+Round 5 additions, from the first tested chart. Added by the engine author after the owner reported results. They keep the
+engine inside the owner's methodology and are open to the owner's change. See LEARNINGS.md.
+
+15. WEIGHED EVIDENCE. The answer rests on chart evidence only. Typicality, base rates and the safe choice are not evidence.
+    Where evidence is both for and against, the side with the stronger planets decides, the owner's rule of rounds 6 and 7. A
+    planet counts by its real strength in the role it plays, a debilitated 9th lord is a weak 9th lord. With
+    options, S8 carries an EVIDENCE TALLY from strength_tally.js with a whole number per option and the final answer is the
+    option with the highest number, or for ordered options the highest above 50. Every flag against the final answer is named
+    on the COUNTER EVIDENCE line.
+16. STATUS NEEDS WINDOWS AND STATUS INDICATORS. A natal promise is capacity. Whether an event has happened, is
+    happening or is due needs the strict window scan, window_scan.js, and status indicators counted separately.
+17. NO INVENTED RULES. Only the owner's methodology, the rule library and cited classical texts may enter the tally. Any
+    other idea is marked proposed and kept out of the tally.
+18. RULE LIBRARY. Run rules_lookup.js for every question and put the ids on the RULES CITED line, or write that the
+    library holds nothing for the event.
+20. ASPECT AND OWNERSHIP. An aspect works by the planet's natural nature. House ownership works by the houses owned, trine most
+    beneficial, kendra somewhat, trik harmful. Dasha results follow the Laghu Parashari rules, and only the dasha results, for the
+    concerned planet in its own Mahadasha, Antardasha, Pratyantardasha, Sookshma or Prana. Run functional_nature.js and give the
+    DASHA LORDS line in S6. Laghu Parashari does not enter the natal strength tally.
+19. CASE LOG. After every owner reported result add the case to suj_engine/cases/cases.json, run cases_report.js and update
+    LEARNINGS.md.
+
 ## Engine tools
+
+ENGINE VERSION 2.0 is the default configuration since round 22, see data/engine_config.json and tools/engine_config.js. All tools run it unless the input says
+"engine":"legacy". It means Baladi degree capacity with bands on Rahu and Ketu, nakshatra and pada impact at weight 0.6, Laghu Parashari for dasha lords and nodes,
+event rank by directness, window scan to Sookshma with the subject varga and the transits from the Lagna, Moon and Sun charts. Start every question with prepare.js, it prints
+the ENGINE VERSION line, the dominant house scan, the strict windows, the rule lookup, the functional nature of the dasha lords and the HYPOTHESIS SCORES for yes or no questions.
+The z reading of the hypothesis scores is provisional. tools/score_hypotheses.js runs it alone. The answer guard is version 3 and requires the ENGINE VERSION line in S8.
 
 Answer guard, run before sending any answer:
 
@@ -73,6 +101,41 @@ Dominant house scan, run it for every native and question:
 
 Add --json for structured output. focusHouse is the house the question is about. The tool reads the chart from
 Vednetra through suj_engine/tools/vednetra_loader.js and scans the Lagna, Moon and Sun charts.
+
+Window scan, candidate dasha and double transit windows for an event, past and future:
+
+    node suj_engine/tools/window_scan.js '{"gender":"female","date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0,"event":"father_loss","strict":true}'
+
+Rule library lookup for the chart placements and an event tag:
+
+    node suj_engine/tools/rules_lookup.js '{"gender":"female","date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0,"event":"Education"}'
+
+Dossier for a question, runs the dominant house scan, the strict windows and the rule lookup together:
+
+    node suj_engine/tools/prepare.js '{"gender":"female","date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0,"topic":"parents"}'
+
+Functional nature of the planets and of the running dasha lords by Laghu Parashari:
+
+    node suj_engine/tools/functional_nature.js '{"gender":"female","date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0,"asOf":"YYYY-MM-DD"}'
+
+Event rank, which of several candidate events the running dasha lords point to most directly on a date:
+
+    node suj_engine/tools/event_rank.js '{"gender":"female","date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0,"on":"YYYY-MM-DD","events":["marriage","child_birth"]}'
+
+Degree capacity of the planets, Baladi avastha and the library's degree flags, an experimental option, off by default:
+
+    node suj_engine/tools/degree_capacity.js '{"gender":"female","date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0}'
+
+The nakshatra and pada impact is the option nakshatra true in strength_tally.js, event_rank.js and window_scan.js, experimental and off by default, factors in suj_engine/data/nakshatra_factors.json.
+
+Strength tally, the planets for and against each option weighed by Shadbala percent:
+
+    node suj_engine/tools/strength_tally.js '{"gender":"female","date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0,"kind":"ordered","options":["Low","High"],"evidence":[{"option":"High","side":"for","planet":"Mercury","factor":"reason"}]}'
+
+Scoreboard of tested charts and guard self test:
+
+    node suj_engine/tools/cases_report.js [--windows]
+    node suj_engine/tests/guard_selftest.js
 
 ## How to use VEDNETRA from Claude Code
 

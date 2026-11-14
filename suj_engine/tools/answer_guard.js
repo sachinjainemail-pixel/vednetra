@@ -2,7 +2,18 @@
 /*
  * SUJ engine answer guard. Checks a drafted answer against the owner's hard coded rules before it is sent.
  *
- *   node suj_engine/tools/answer_guard.js answer.txt [--options "Option A|Option B"] [--strict-style]
+ *   node suj_engine/tools/answer_guard.js answer.txt [--options "Option A|Option B"] [--strict-style] [--v1] [--ordinal]
+ *
+ * --ordinal is for ordered options such as education levels. Give the options lowest first. The final answer must be the
+ * highest option whose EVIDENCE TALLY number is above 50, or the lowest option when none is. The tally numbers come from
+ * strength_tally.js, whole numbers from 0 to 100, the share of planet strength that stands in favour of the option.
+ *
+ * Version 2 (round 5, from the first tested chart) adds process checks. Use --v1 to run only the older checks, --v2 to skip the version 3 check.
+ * Version 3 (round 22) adds the ENGINE VERSION line in S8, copied from prepare.js. The default engine is 2.0, see data/engine_config.json. legacy needs --allow-legacy.
+ *   RULES CITED line in the answer, WINDOW SCAN and DASHA LORDS lines in S6, EVIDENCE TALLY and COUNTER EVIDENCE lines in S8.
+ *   With options, the EVIDENCE TALLY line must give a whole number for every option, and the final answer must hold
+ *   the highest number. A tie for the highest number needs a TIE BREAK line that names the deciding step.
+ *   Reasoning from typicality, base rates or the safe choice is an error. A choice must rest on counted chart evidence.
  *
  * Errors (exit code 1): hedging or undecided language, missing or misordered sections S0 to S9, no TIME STATUS
  * line with one of the three allowed values, no FINAL ANSWER line, final answer not one of the given options,
@@ -20,6 +31,11 @@ const BANNED = [
   /equally (?:likely|possible|probable|strong)/i,
   /\binconclusive\b/i, /\bit depends\b/i, /insufficient (?:evidence|data|information) to/i,
   /\bwe cannot know\b/i, /\bcannot be (?:known|determined|decided|predicted)\b/i, /\bno definitive\b/i
+];
+// Reasoning from priors instead of chart evidence. Added in round 5 after the engine overrode its own flags with typicality.
+const PRIOR_WORDS = [
+  /आम तौर पर/, /सामान्यतः/, /सामान्यतया/, /अक्सर/, /औसत परिवार/, /सुरक्षित विकल्प/, /सबसे सामान्य/, /बहुधा/,
+  /\bbase rate/i, /\btypical(?:ly)?\b/i, /\busually\b/i, /\bmost common/i, /\bstatistical/i, /\bsafe choice/i, /\bon average\b/i, /\bin general\b/i
 ];
 const SECTION_NAMES = ["INTAKE", "DOMINANT HOUSE", "D1 ANALYSIS", "D9 ANALYSIS", "SUBJECT DIVISIONAL", "PLANET STRENGTH", "DASHA", "TRANSIT", "RECONCILIATION", "SUMMARY"];
 const STYLE_CHARS = /[()!;:—“”‘\/\-#*~]/g;
@@ -82,6 +98,69 @@ function check(text, opts) {
     }
   } else if (finalLine != null && finalLine.trim().length < 3) errors.push("FINAL ANSWER is empty");
 
+  // version 2 process checks
+  if (!opts.v1) {
+    const oneLine = (re, label, where) => {
+      const f = lines.filter(l => re.test(l));
+      if (f.length !== 1) errors.push(label + " line is required exactly once" + (where ? " in " + where : "") + ", found " + f.length);
+      return f[0] || "";
+    };
+    const s2 = heads.find(h => h.n === 2), s3 = heads.find(h => h.n === 3);
+    const s8 = heads.find(h => h.n === 8);
+    const inRange = (a, b) => lines.slice(a ? a.line : 0, b ? b.line : lines.length);
+    const has = (arr, re) => arr.filter(l => re.test(l));
+    if (s2 && has(inRange(s2, s3), /^RULES CITED\b/).length !== 1) errors.push("S2 must contain exactly one line starting RULES CITED. Run rules_lookup.js and list the rule ids used, or write that the library holds no rule");
+    if (s6 && has(inRange(s6, s7), /^WINDOW SCAN\b/).length !== 1) errors.push("S6 must contain exactly one line starting WINDOW SCAN. Run window_scan.js and state the windows found and which were weighed");
+    if (s6 && has(inRange(s6, s7), /^DASHA LORDS\b/).length !== 1) errors.push("S6 must contain exactly one line starting DASHA LORDS giving the Laghu Parashari role of the running dasha lords at every level, Mahadasha, Antardasha, Pratyantardasha, Sookshma and Prana, from functional_nature.js");
+    let tallyLine = "";
+    if (s8) {
+      const r8 = inRange(s8, s9);
+      const tl = has(r8, /^EVIDENCE TALLY\b/);
+      if (tl.length !== 1) errors.push("S8 must contain exactly one line starting EVIDENCE TALLY, found " + tl.length); else tallyLine = tl[0];
+      const cl = has(r8, /^COUNTER EVIDENCE\b/);
+      if (cl.length !== 1 || cl[0].replace(/^COUNTER EVIDENCE\s*/, "").trim().length < 10) errors.push("S8 must contain one COUNTER EVIDENCE line that names the strongest evidence against the final answer");
+    }
+    // tally against the options
+    if (tallyLine && opts.options && opts.options.length) {
+      let rest = tallyLine.replace(/^EVIDENCE TALLY\s*/, "");
+      const nums = {};
+      opts.options.slice().sort((a, b) => b.length - a.length).forEach(o => {
+        const i = rest.toLowerCase().indexOf(o.toLowerCase());
+        if (i < 0) return;
+        const after = rest.slice(i + o.length);
+        const m = /^\s*[,.]?\s*(\d+)/.exec(after);
+        if (m) nums[o] = Number(m[1]);
+        rest = rest.slice(0, i) + " ".repeat(o.length) + after;
+      });
+      const missing = opts.options.filter(o => nums[o] === undefined);
+      if (missing.length) errors.push("EVIDENCE TALLY must give a whole number for every option, missing " + missing.join(", "));
+      else if (finalLine != null) {
+        const hit = opts.options.filter(o => finalLine.toLowerCase().indexOf(o.toLowerCase()) >= 0);
+        const fo = hit.filter(o => !hit.some(p => p !== o && p.toLowerCase().indexOf(o.toLowerCase()) >= 0))[0];
+        const mx = Math.max.apply(null, Object.values(nums));
+        if (opts.ordinal) {
+          let exp = opts.options[0];
+          for (let i = opts.options.length - 1; i >= 0; i--) if (nums[opts.options[i]] > 50) { exp = opts.options[i]; break; }
+          if (fo && fo !== exp) errors.push("Ordered options. The final answer " + fo + " is not the highest option above 50 in the EVIDENCE TALLY, which is " + exp);
+        } else
+        if (fo && nums[fo] < mx) errors.push("The final answer " + fo + " has " + nums[fo] + " in the EVIDENCE TALLY but the highest is " + mx + ". A choice must follow the counted evidence");
+        if (!opts.ordinal && fo && nums[fo] === mx && Object.values(nums).filter(v => v === mx).length > 1 && !lines.some(l => /^TIE BREAK\b/.test(l)))
+          errors.push("The EVIDENCE TALLY has a tie for the highest number. Add a line starting TIE BREAK that names the deciding step");
+      }
+    }
+    // version 3, engine version line, round 22
+    if (!opts.v2) {
+      if (s8) {
+        const ev = has(inRange(s8, s9), /^ENGINE VERSION\b/);
+        if (ev.length !== 1) errors.push("S8 must contain exactly one line starting ENGINE VERSION, copy it from prepare.js. The default engine is version 2.0");
+        else if (!/\b2\.0\b/.test(ev[0]) && !/legacy/i.test(ev[0])) errors.push("The ENGINE VERSION line must name version 2.0, or legacy for an old result being reproduced");
+        else if (/legacy/i.test(ev[0]) && !opts.allowLegacy) errors.push("ENGINE VERSION legacy is only for reproducing old results. Answer with engine 2.0, or run the guard with --allow-legacy");
+      }
+    }
+    // reasoning from priors
+    PRIOR_WORDS.forEach(re => { const m = text.match(re); if (m) errors.push("Reasoning from typicality or base rates is not allowed, found \"" + m[0] + "\". Decide from counted chart evidence"); });
+  }
+
   // owner style characters
   const bad = (text.match(STYLE_CHARS) || []);
   if (bad.length) {
@@ -97,7 +176,7 @@ if (require.main === module) {
   if (!file) { console.error("Usage: answer_guard.js answer.txt [--options \"A|B\"] [--strict-style]"); process.exit(2); }
   const oi = argv.indexOf("--options");
   const options = oi >= 0 ? argv[oi + 1].split("|").map(s => s.trim()).filter(Boolean) : [];
-  const res = check(fs.readFileSync(file, "utf8"), { options, strictStyle: argv.indexOf("--strict-style") >= 0 });
+  const res = check(fs.readFileSync(file, "utf8"), { options, strictStyle: argv.indexOf("--strict-style") >= 0, v1: argv.indexOf("--v1") >= 0, v2: argv.indexOf("--v2") >= 0, allowLegacy: argv.indexOf("--allow-legacy") >= 0, ordinal: argv.indexOf("--ordinal") >= 0 });
   res.errors.forEach(e => console.log("ERROR " + e));
   res.warnings.forEach(w => console.log("WARNING " + w));
   console.log(res.ok ? "GUARD PASSED" : "GUARD FAILED");

@@ -1,0 +1,51 @@
+Married hypothesis score 31 view 2 31, favour 120.6 against 264.1
+
+Dasha lords on 7 December 2022 and now, Laghu Parashari
+ 2022-12-07
+   MD Rahu sadhaka, promoter
+   AD Rahu sadhaka, promoter
+   PD Mercury sadhaka, promoter, yogakaraka
+   SD Jupiter badhaka, obstructer unless connected to a yogakaraka, marakesha
+   PR Venus sadhaka, promoter, yogakaraka
+ 2026-11-14
+   MD Rahu sadhaka, promoter
+   AD Saturn sadhaka, promoter
+   PD Saturn sadhaka, promoter
+   SD Rahu sadhaka, promoter
+   PR Rahu sadhaka, promoter
+
+Which scan view covers 7 December 2022
+  marriage    strict double no | strict single no | wide double no | wide single no
+  job_start   strict double no | strict single no | wide double no | wide single no
+  child_birth strict double no | strict single YES A via Moon | wide double no | wide single YES A via Moon
+  eye_surgery strict double no | strict single no | wide double no | wide single no
+
+# SUJ EVENT RANK on 2022-12-07
+Running lords MD Rahu, AD Rahu, PD Mercury, SD Jupiter
+
+1. child_birth score 3.14, double transit no, single yes
+     MD Rahu 2 of 2 links | occupies house 5; node, occupies an event house, so it becomes the lord of that house, LP-062-1; sits in the sign of Mercury, a significator, and doubles its result, LP-057-2
+     AD Rahu 2 of 2 links | occupies house 5; node, occupies an event house, so it becomes the lord of that house, LP-062-1; sits in the sign of Mercury, a significator, and doubles its result, LP-057-2
+     PD Mercury 2 of 2 links | lords house 5; lords D7 house 5
+     SD Jupiter 1 of 7 links | karaka
+2. marriage score 0.43, double transit no, single no
+     MD Rahu 0 of 2 links 
+     AD Rahu 0 of 2 links 
+     PD Mercury 0 of 2 links 
+     SD Jupiter 3 of 7 links | karaka; lords house 2; lords house 11
+3. job_start score 0.29, double transit no, single no
+     MD Rahu 0 of 2 links 
+     AD Rahu 0 of 2 links 
+     PD Mercury 0 of 2 links 
+     SD Jupiter 2 of 7 links | lords house 11; lords house 2
+4. eye_surgery score 0.14, double transit no, single no
+     MD Rahu 0 of 2 links 
+     AD Rahu 0 of 2 links 
+     PD Mercury 0 of 2 links 
+     SD Jupiter 1 of 7 links | lords house 2
+
+Separation windows between 8 December 2022 and 14 November 2026, strict double and wide double
+  strict 11 windows A 2023-01-18 to 2023-03-05 Rahu Rahu Ketu via Moon | A 2023-03-06 to 2023-04-21 Rahu Rahu Venus via Moon | A 2023-04-22 to 2023-08-17 Rahu Rahu Venus via Lagna and Sun | A 2023-08-18 to 2023-10-05 Rahu Rahu Sun via Lagna and Sun | A 2023-10-06 to 2023-12-26 Rahu Rahu Moon via Lagna and Sun | A 2023-12-27 to 2024-02-22 Rahu Rahu Mars via Lagna and Sun | A 2024-02-23 to 2024-05-01 Rahu Jupiter Jupiter via Lagna and Sun | A 2024-05-02 to 2024-06-18 Rahu Jupiter Jupiter via Moon | A 2024-06-19 to 2024-11-03 Rahu Jupiter Saturn via Moon | A 2024-11-04 to 2025-03-08 Rahu Jupiter Mercury via Moon | A 2025-03-09 to 2025-03-29 Rahu Jupiter Ketu via Moon
+  wide 25 windows A 2022-12-08 to 2023-01-07 Rahu Rahu Mercury via Lagna and Moon and Sun | A 2023-01-08 to 2023-01-17 Rahu Rahu Ketu via Lagna and Moon and Sun | A 2023-01-18 to 2023-03-05 Rahu Rahu Ketu via Lagna and Moon and Sun | A 2023-03-06 to 2023-04-21 Rahu Rahu Venus via Lagna and Moon and Sun | A 2023-04-22 to 2023-08-17 Rahu Rahu Venus via Lagna and Moon and Sun | A 2023-08-18 to 2023-10-05 Rahu Rahu Sun via Lagna and Moon and Sun | A 2023-10-06 to 2023-12-26 Rahu Rahu Moon via Lagna and Moon and Sun | A 2023-12-27 to 2024-02-22 Rahu Rahu Mars via Lagna and Moon and Sun | A 2024-02-23 to 2024-05-01 Rahu Jupiter Jupiter via Lagna and Moon and Sun | A 2024-05-02 to 2024-06-18 Rahu Jupiter Jupiter via Lagna and Moon and Sun | A 2024-06-19 to 2024-11-03 Rahu Jupiter Saturn via Lagna and Moon and Sun | A 2024-11-04 to 2025-03-08 Rahu Jupiter Mercury via Lagna and Moon and Sun | A 2025-03-09 to 2025-03-29 Rahu Jupiter Ketu via Lagna and Moon and Sun | A 2025-03-30 to 2025-04-28 Rahu Jupiter Ketu via Lagna and Moon and Sun | A 2025-04-29 to 2025-05-14 Rahu Jupiter Venus via Lagna and Moon and Sun | A 2025-05-15 to 2025-09-21 Rahu Jupiter Venus via Moon | A 2025-09-22 to 2025-10-18 Rahu Jupiter Sun via Moon | A 2025-10-19 to 2025-11-04 Rahu Jupiter Sun via Lagna and Moon and Sun | A 2025-11-05 to 2025-12-05 Rahu Jupiter Moon via Lagna and Moon and Sun | A 2025-12-06 to 2026-01-16 Rahu Jupiter Moon via Moon | A 2026-01-17 to 2026-03-08 Rahu Jupiter Mars via Moon | A 2026-03-09 to 2026-06-01 Rahu Jupiter Rahu via Moon | A 2026-06-02 to 2026-07-17 Rahu Jupiter Rahu via Lagna and Moon and Sun | A 2026-07-18 to 2026-10-31 Rahu Saturn Saturn via Lagna and Moon and Sun | A 2026-11-01 to 2026-11-14 Rahu Saturn Saturn via Lagna and Moon and Sun
+
+Marriage strict windows in life, past 31, between 2022-06 and 2023-06 
