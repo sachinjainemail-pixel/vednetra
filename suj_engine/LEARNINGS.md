@@ -147,6 +147,18 @@ H6 Calibration. In the round 12 rerun of Kundali 892 every hypothesis scored und
    not fit the way the evidence is generated, which has more entries against than for, and the real strength S sits near 45 to 50 for most planets. On
    this chart a line near 40 would separate four of six answers. This is one chart and must not be used to set the line. Collect the scores of many
    charts with the true answers and set the line from them. Until then a score under 50 is not read as a no. See experiments/rerun_892_round12_results.md.
+   UPDATE after the second chart, Kundali 2. The hypothesis scores of both charts, 13 hypotheses, 9 true and 4 false, have a mean of 40.0 for the true and
+   40.3 for the false, and the chance that a true one outscores a false one is 0.50 over 36 pairs, exactly chance. The line near 40 that looked useful on
+   chart 892 does not hold, three of the true hypotheses of Kundali 2 scored 39, 36 and 33. So the strength tally score, as built, carries no signal
+   on two charts. This is the finding that matters more than any single answer. Do not set a line. Revisit the construction of the score, the
+   weakness double count, the S composite and the 1.0 and 0.5 factors, against many charts before trusting it. node suj_engine/tools/cases_report.js prints this table.
+H7 Window scan and the subject varga. Kundali 2, the child was born on 3 May 2021, Mercury Mahadasha, Venus Antardasha, Mercury Pratyantardasha, Sun Sookshma. No
+   strict window for child birth covered the date, because the scan reads D1 houses only. In D7, the varga of children, Mercury sits in the 5th house, Venus is
+   exalted in the D7 Lagna. On the transit side Jupiter was in Aquarius, the 5th from the Moon, and the Sun was in Aries, the 5th from the Lagna. The owner's method
+   reads the Lagna, Moon and Sun charts, section 2.1, and the subject varga, section 3. The scan uses neither the Moon chart for transits nor the subject varga for the
+   dasha significators. One case. If the next chart shows the same, extend the scan. The owner is asked whether to extend it now.
+H8 A professional hypothesis. In Kundali 2 the lawyer hypothesis, 9th and 10th with Jupiter, Saturn and Mercury, scored 51 against astrologer 45 and doctor 40, the
+   only one over 50, and was the true profession. The mapping of professions to houses and karakas was fixed by the engine author before the run and is a proposal. One case.
 
 ## What the new tools do and do not do
 

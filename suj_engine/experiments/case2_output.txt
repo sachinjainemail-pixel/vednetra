@@ -1,0 +1,29 @@
+Hypothesis scores, share of planet strength in favour. View 1 as stated, view 2 weakness for carriers only
+  Working         47   47   favour 147 against 166.3
+  Doctor          40   40   favour 215 against 325.9
+  Lawyer          51   51   favour 280.2 against 274.2
+  Astrologer      45   45   favour 265.7 against 331.1
+  Married         39   39   favour 163.5 against 256.9
+  Happy marriage  33   33   favour 163.5 against 331.8
+  Has a child     36   37   favour 158.6 against 279.3
+
+Dasha lords on 3 May 2021 and now, Laghu Parashari
+ 2021-05-03
+   MD Mercury neutral, marakesha
+   AD Venus badhaka, obstructer unless connected to a yogakaraka
+   PD Mercury neutral, marakesha
+   SD Sun sadhaka, promoter, yogakaraka
+   PR Moon badhaka, obstructer unless connected to a yogakaraka
+ 2026-11-14
+   MD Mercury neutral, marakesha
+   AD Rahu sadhaka, promoter
+   PD Venus badhaka, obstructer unless connected to a yogakaraka
+   SD Jupiter sadhaka, promoter
+   PR Jupiter sadhaka, promoter
+
+Strict windows that cover 3 May 2021, with the nodes. Option events
+  marriage            no strict window on that date. Past windows in life 19, grade A 19
+  child_birth         no strict window on that date. Past windows in life 5, grade A 2
+  health_crisis       no strict window on that date. Past windows in life 16, grade A 16
+  mother_in_law_loss  no strict window on that date. Past windows in life 18, grade A 7
+Wide view on 3 May 2021, marriage yes A Mercury Venus Mercury | child_birth no | health_crisis no | mother_in_law_loss no

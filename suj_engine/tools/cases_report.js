@@ -14,11 +14,13 @@ const DATA = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "cases", "cas
 const EVENT_FOR = { education: "education_step", marriage: "marriage", work: "job_start", siblings: "sibling_birth", parents: null };
 
 const rows = [];
-DATA.cases.forEach(c => c.questions.forEach(q => rows.push({ case: c.id, q, ok: q.engine === q.truth })));
+DATA.cases.forEach(c => c.questions.forEach(q => rows.push({ case: c.id, q, ok: q.engine === q.truth, blind: c.blind !== false })));
 const pct = (a, b) => b ? Math.round(100 * a / b) + " percent" : "none";
 const out = [];
 out.push("# SUJ CASE SCOREBOARD");
+const bl = rows.filter(r => r.blind);
 out.push("Cases " + DATA.cases.length + ", questions " + rows.length + ", correct " + rows.filter(r => r.ok).length + ", " + pct(rows.filter(r => r.ok).length, rows.length) + ".");
+out.push("BLIND questions, answered before the true answers were known " + bl.length + ", correct " + bl.filter(r => r.ok).length + ", " + pct(bl.filter(r => r.ok).length, bl.length) + ". The others were answered afterwards and do not test the engine.");
 const by = fn => { const m = {}; rows.forEach(r => { const k = fn(r); (m[k] = m[k] || []).push(r); }); return m; };
 out.push("", "## By question kind");
 Object.entries(by(r => r.q.kind)).forEach(([k, v]) => out.push("- " + k + " " + v.filter(r => r.ok).length + " of " + v.length));
@@ -29,6 +31,16 @@ const tags = {}; rows.filter(r => !r.ok).forEach(r => r.q.errorTags.forEach(t =>
 Object.entries(tags).sort((a, b) => b[1] - a[1]).forEach(([t, n]) => out.push("- " + t + " " + n));
 out.push("", "## Misses");
 rows.filter(r => !r.ok).forEach(r => out.push("- " + r.case + " Q" + r.q.n + " " + r.q.topic + ", engine " + r.q.engine + ", truth " + r.q.truth + ", tags " + r.q.errorTags.join(" ")));
+// strength tally scores against the true yes or no of each hypothesis
+const hy = []; DATA.cases.forEach(c => (c.hypotheses || []).forEach(h => hy.push(Object.assign({ case: c.id }, h))));
+if (hy.length) {
+  const yes = hy.filter(h => h.truth), no = hy.filter(h => !h.truth);
+  let w = 0, n = 0; yes.forEach(a => no.forEach(b => { n++; w += a.score > b.score ? 1 : (a.score === b.score ? 0.5 : 0); }));
+  out.push("", "## Strength tally scores against the truth");
+  out.push("Hypotheses " + hy.length + ", true " + yes.length + ", false " + no.length + ". Mean score of the true ones " + (yes.reduce((a, h) => a + h.score, 0) / (yes.length || 1)).toFixed(1) + ", of the false ones " + (no.reduce((a, h) => a + h.score, 0) / (no.length || 1)).toFixed(1) + ".");
+  out.push(n ? "Chance that a true hypothesis outscores a false one, AUC " + (w / n).toFixed(2) + " over " + n + " pairs. 0.50 is chance." : "No pairs yet.");
+  out.push("Above 50 " + hy.filter(h => h.score > 50).length + " of " + hy.length + ", of which true " + hy.filter(h => h.score > 50 && h.truth).length + ".");
+}
 out.push("", "Chance level for four options is 25 percent. With " + rows.length + " questions the score cannot show skill either way.");
 
 if (process.argv.indexOf("--windows") >= 0) {

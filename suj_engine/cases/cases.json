@@ -110,6 +110,158 @@
           "correct": 1,
           "of": 5
         }
+      ],
+      "blind": true,
+      "hypotheses": [
+        {
+          "name": "Education Post graduation",
+          "truth": true,
+          "score": 48,
+          "view2": 48
+        },
+        {
+          "name": "Married",
+          "truth": true,
+          "score": 43,
+          "view2": 47
+        },
+        {
+          "name": "Working",
+          "truth": false,
+          "score": 31,
+          "view2": 33
+        },
+        {
+          "name": "Has siblings",
+          "truth": true,
+          "score": 29,
+          "view2": 37
+        },
+        {
+          "name": "Father alive",
+          "truth": false,
+          "score": 45,
+          "view2": 45
+        },
+        {
+          "name": "Mother alive",
+          "truth": true,
+          "score": 34,
+          "view2": 35
+        }
+      ]
+    },
+    {
+      "id": "K2",
+      "name": "Kundali 2",
+      "gender": "female",
+      "date": "1991-11-07",
+      "time": "10:50:00",
+      "tz": 5.5,
+      "lat": 28.6139,
+      "lon": 77.209,
+      "place": "New Delhi",
+      "asOf": "2026-11-14",
+      "resultsReported": "2026-11-14",
+      "blind": false,
+      "blindNote": "The true answers came with the chart. Engine answers below are what the written rules give, produced afterwards. They do not count as a test.",
+      "questions": [
+        {
+          "n": 1,
+          "topic": "work",
+          "kind": "status",
+          "options": [
+            "Doctor",
+            "Astrologer",
+            "Lawyer",
+            "Housewife"
+          ],
+          "engine": "Housewife",
+          "truth": "Lawyer",
+          "errorTags": [
+            "calibration"
+          ],
+          "note": "Working scored 47 so the rule says not working. Lawyer was the best of the three professions, 51 against Astrologer 45 and Doctor 40, and passed 50. Housewife as the complement scores 53, a margin of 2."
+        },
+        {
+          "n": 2,
+          "topic": "marriage",
+          "kind": "status",
+          "options": [
+            "Very happy",
+            "Very unhappy",
+            "Separated from husband",
+            "Divorce in 2023"
+          ],
+          "engine": "Very unhappy",
+          "truth": "Very happy",
+          "errorTags": [
+            "calibration"
+          ],
+          "note": "Married 39 and Happy marriage 33, both under 50. The tally cannot tell unhappy from separation from divorce, so the first of the three was taken."
+        },
+        {
+          "n": 3,
+          "topic": "event on 3 May 2021",
+          "kind": "event",
+          "options": [
+            "Marriage",
+            "Accident",
+            "Child born",
+            "Death of mother in law"
+          ],
+          "engine": "Marriage",
+          "truth": "Child born",
+          "errorTags": [
+            "window_scan_misses_D7",
+            "window_scan_lagna_transit_only"
+          ],
+          "note": "No strict window covers 3 May 2021 for any option. The wide view marks marriage, Mercury Mahadasha, Venus Antardasha, Mercury Pratyantardasha, 7th and 10th lord. The child event was missed because the scan reads D1 houses only. Mercury sits in the 5th house of D7 and Venus is exalted in the D7 Lagna, Jupiter transited Aquarius which is the 5th from the Moon."
+        }
+      ],
+      "hypotheses": [
+        {
+          "name": "Working",
+          "truth": true,
+          "score": 47,
+          "view2": 47
+        },
+        {
+          "name": "Doctor",
+          "truth": false,
+          "score": 40,
+          "view2": 40
+        },
+        {
+          "name": "Lawyer",
+          "truth": true,
+          "score": 51,
+          "view2": 51
+        },
+        {
+          "name": "Astrologer",
+          "truth": false,
+          "score": 45,
+          "view2": 45
+        },
+        {
+          "name": "Married",
+          "truth": true,
+          "score": 39,
+          "view2": 39
+        },
+        {
+          "name": "Happy marriage",
+          "truth": true,
+          "score": 33,
+          "view2": 33
+        },
+        {
+          "name": "Has a child",
+          "truth": true,
+          "score": 36,
+          "view2": 37
+        }
       ]
     }
   ]
