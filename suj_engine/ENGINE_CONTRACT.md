@@ -74,6 +74,13 @@ engine inside the owner's methodology and are open to the owner's change. See LE
 19. CASE LOG. After every owner reported result add the case to suj_engine/cases/cases.json, run cases_report.js and update
     LEARNINGS.md.
 
+Round 23 additions, after Kundali 5, proposals the owner approved.
+
+21. DEATH EVENT. data/events.json has native_death, houses 8, 2 and 7, Saturn the karaka. prepare.js topic death, event_rank.js includes it by default. When an option is the death of the native, run it.
+22. STATUS RULE. The strength of a promise, such as an exalted karaka or a strong Lagna lord, is capacity and is never evidence against an event that has a running dasha and a window. In strength_tally.js
+    mark the entry capacity true and the run statusEvent true, it is listed as not counted. The Vednetra day verdict, favourable or adverse, is a net benefit and does not name the kind of event, it is not evidence against an unpleasant event.
+23. CHILD SEX. node suj_engine/tools/child_sex.js prints sign parity and planet gender readings side by side. Both are proposed and kept out of the tally. Log both in every child question before the truth is known.
+
 ## Engine tools
 
 ENGINE VERSION 2.0 is the default configuration since round 22, see data/engine_config.json and tools/engine_config.js. All tools run it unless the input says

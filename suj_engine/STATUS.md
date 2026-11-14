@@ -181,7 +181,7 @@ The owner asked to update the engine with all the learnings and merge it so that
 
 - Native male, 29 January 1983, 14:45, Mumbai. Question 1 children, question 2 the event of 19 September 2022. Engine answered two sons and foreign travel, the owner reported two daughters and the native's death on 19 September 2022. Both wrong. The top two asked for afterwards were right on question 2, death was second. Recorded as K5 in cases.json, scoreboard 3 of 10 blind, AUC 0.48 raw and 0.68 for the updated engine over 88 pairs.
 - Existence of children was called right by the hypothesis score, 61, z 1.16. The sex call by planet gender was wrong. The death date was missed because the engine has no death event, the event rank had health_crisis first, and the hand typed tally counted a strong longevity promise and a favourable day verdict against death. Details and proposed changes in LEARNINGS H15.
-- Not changed in the tools. Waiting for the owner on the proposals of H15, a death event preset, the rule that a promise is not evidence against an event with a running window, and the sex of child reading.
+- Owner approved the three proposals, built the same round. native_death preset, topic death in prepare.js, native_death in event_rank.js. Status rule in strength_tally.js, options capacity and statusEvent. tools/child_sex.js with the two proposed readings. Self test tests/round23_selftest.js 4 of 4, the other self tests still pass, guard 18, strength 13, rank 5, engine 8, window 11. On Kundali 5, 19 September 2022, event_rank now puts native_death first, 1.0 against foreign travel 0.8, a post hoc result and not a test. Contract requirements 21 to 23, LEARNINGS G13.
 
 ## Next phases (waiting for the owner's further instructions)
 

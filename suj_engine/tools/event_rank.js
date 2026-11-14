@@ -28,7 +28,7 @@ const { resolve: resolveEngine } = require("./engine_config");
 
 function rank(cfg0) {
   const cfg = resolveEngine(cfg0);
-  const events = cfg.events || ["marriage", "child_birth", "health_crisis", "job_start", "education_step", "sibling_birth", "father_loss", "mother_loss", "mother_in_law_loss", "foreign_travel", "property"];
+  const events = cfg.events || ["marriage", "child_birth", "health_crisis", "native_death", "job_start", "education_step", "sibling_birth", "father_loss", "mother_loss", "mother_in_law_loss", "foreign_travel", "property"];
   const VC = loadVedicCore(cfg.appDir);
   const t = String(cfg.time).length === 5 ? cfg.time + ":00" : cfg.time;
   const chart = VC.avEngineFor({ name: "x", gender: cfg.gender || "unspecified", birthISO: cfg.date + "T" + t, tz: Number(cfg.tz), lat: Number(cfg.lat), lon: Number(cfg.lon), place: "" }).chart;

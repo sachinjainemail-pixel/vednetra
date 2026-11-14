@@ -11,5 +11,6 @@
   "health":        { "houses": [1, 6], "karakas": ["Saturn"], "varga": 30, "source": "owner for D30 and Saturn, houses proposed" },
   "wealth":        { "houses": [2, 11], "karakas": ["Jupiter"], "varga": 2, "source": "proposed" },
   "property":      { "houses": [4], "karakas": ["Mars"], "varga": 4, "source": "proposed" },
+  "longevity":    { "houses": [8, 2, 7], "karakas": ["Saturn"], "varga": 30, "source": "proposed, round 23" },
   "foreign":       { "houses": [12, 9], "karakas": ["Rahu"], "varga": 9, "source": "proposed" }
 }

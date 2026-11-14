@@ -142,7 +142,9 @@ function tally(cfg0) {
     return (e.type === "weakness" ? 100 - s : s) * (e.mult == null ? 1 : e.mult) * st.cap[e.planet];
   };
   const opts = cfg.options, ordered = cfg.kind === "ordered";
-  const ev = cfg.evidence || [];
+  // Round 23, status rule. With statusEvent true, evidence marked capacity true on the against side is the strength of a promise and is not counted.
+  const droppedCapacity = [];
+  const ev = (cfg.evidence || []).filter(e => { if (cfg.statusEvent && e.capacity && e.side === "against") { droppedCapacity.push(e); return false; } return true; });
   const ctx = naturalNature(cfg), notCovered = [];
   ev.forEach(e => {
     if (e.type === "lordship") {
@@ -189,7 +191,7 @@ function tally(cfg0) {
     const mx = Math.max.apply(null, rows.map(r => r[key]));
     return rows.filter(r => r[key] === mx).sort((a, b) => b.favour - a.favour)[0].option;
   };
-  return { kind: cfg.kind, options: opts, weights: { capacity: st.cap, strength: Object.fromEntries(Object.keys(st.S.math).map(p => [p, r1(st.S.math[p])])), strengthOwnerAdjusted: Object.fromEntries(Object.keys(st.S.adj).map(p => [p, r1(st.S.adj[p])])), parts: st.parts, flags: st.flag }, evidence: ev, rows,
+  return { kind: cfg.kind, droppedCapacity, options: opts, weights: { capacity: st.cap, strength: Object.fromEntries(Object.keys(st.S.math).map(p => [p, r1(st.S.math[p])])), strengthOwnerAdjusted: Object.fromEntries(Object.keys(st.S.adj).map(p => [p, r1(st.S.adj[p])])), parts: st.parts, flags: st.flag }, evidence: ev, rows,
     notCovered, winner: pick("score"), winnerOwnerAdjusted: pick("scoreOwnerAdjusted"),
     tallyLine: "EVIDENCE TALLY " + rows.map(r => r.option + " " + r.score).join(", ") };
 }
@@ -201,6 +203,7 @@ function render(r) {
     const x = r.weights.parts[p];
     L.push("- " + p.padEnd(8) + "S " + String(r.weights.strength[p]).padEnd(6) + (x.proxy ? "node, takes " + x.proxy : "Shadbala " + x.shadbalaPercent + ", D1 " + x.d1 + ", D9 " + x.d9 + ", Vimshopaka " + x.vimshopaka + (x.subjectVarga != null ? ", varga " + x.subjectVarga : "")));
   });
+  if (r.droppedCapacity && r.droppedCapacity.length) { L.push("", "Not counted, capacity of a promise against an event with a running window, status rule of round 23"); r.droppedCapacity.forEach(e => L.push("- " + e.option + " | " + e.planet + " | " + e.factor)); }
   L.push("", "Evidence table. Check every placement and type.");
   r.evidence.forEach(e => { const s = r.weights.strength[e.planet]; const m = e.mult == null ? 1 : e.mult; L.push("- " + e.side.toUpperCase() + " " + e.option + " | " + e.planet + " " + e.type + (e.klass ? " " + e.klass : "") + " weight " + r1((e.type === "weakness" ? 100 - s : s) * m * (r.weights.capacity ? r.weights.capacity[e.planet] : 1)) + (m !== 1 ? " factor " + m : "") + (r.weights.flags[e.planet] ? " " + r.weights.flags[e.planet] : "") + " | " + e.factor); });
   L.push("", "Per option");

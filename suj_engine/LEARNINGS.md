@@ -97,6 +97,10 @@ G12 DASHA RESULTS. The owner said to take dasha results from the Laghu Parashari
    promise. Houses 2, 3 and 11 stay outside the owner's classes in the natal tally and carry no weight. functional_nature.js
    prints all five dasha levels.
 
+G13 STATUS RULE AND DEATH, round 23, owner approved. A promise is capacity, so a strong karaka or Lagna lord does not count against an event that has a running dasha and a window, the entry is marked capacity true and the tally is run with statusEvent true. The Vednetra day
+   verdict is not evidence against an unpleasant event. native_death is an event preset and prepare.js has the topic death. On Kundali 5, 19 September 2022, event_rank with native_death gives native_death 1.0, foreign_travel 0.8, child_birth 0.73, health_crisis 0.72, so the truth
+   comes first. This was written after the truth was known and is not a test. The strict native_death windows still do not cover the date, the first is 22 April 2023, and the widest views were not checked. Child sex, tools/child_sex.js, sign parity leans daughters, planet gender sons, for Kundali 5 the
+   first was right. Both stay out of the tally, log both on the next child question.
 G3 Every flag against the leading option appears on the COUNTER EVIDENCE line and is counted in the tally. A flag may
    be answered by a protective factor only if that factor is counted on the other side. The guard requires the line.
 G4 A natal promise is capacity. For status questions, working or not, married or not, parent alive or not, tally the

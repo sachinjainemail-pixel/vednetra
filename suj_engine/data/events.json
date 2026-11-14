@@ -1,205 +1,221 @@
 {
-  "_note": "Event presets for window_scan.js. houses are counted from the Lagna. karakas are natural significators whose dasha counts. Every preset marked proposed is the engine author's reading of standard Parashari practice and awaits the owner's confirmation. The window scan only finds candidate periods. It never decides an answer alone. Round 14. varga and vargaHouses name the subject divisional chart and its key houses. The occupants of those houses in that varga and the lords of their signs are added to the dasha significators.",
-  "marriage": {
-    "houses": [
-      7,
-      2,
-      11
-    ],
-    "karakasFemale": [
-      "Venus",
-      "Jupiter"
-    ],
-    "karakasMale": [
-      "Venus"
-    ],
-    "source": "owner for house 7 and karakas, houses 2 and 11 proposed",
-    "varga": 9,
-    "vargaHouses": [
-      7
-    ]
-  },
-  "father_loss": {
-    "houses": [
-      4,
-      10,
-      3
-    ],
-    "karakas": [
-      "Sun"
-    ],
-    "note": "8th, 2nd and 7th from the 9th house",
-    "source": "proposed",
-    "varga": 12,
-    "vargaHouses": [
-      9
-    ]
-  },
-  "mother_loss": {
-    "houses": [
-      11,
-      5,
-      10
-    ],
-    "karakas": [
-      "Moon"
-    ],
-    "note": "8th, 2nd and 7th from the 4th house",
-    "source": "proposed",
-    "varga": 12,
-    "vargaHouses": [
-      4
-    ]
-  },
-  "job_start": {
-    "houses": [
-      10,
-      6,
-      11,
-      2
-    ],
-    "karakas": [
-      "Saturn"
-    ],
-    "source": "owner for house 10 and Saturn, rest proposed",
-    "varga": 10,
-    "vargaHouses": [
-      10
-    ]
-  },
-  "education_step": {
-    "houses": [
-      4,
-      5,
-      9
-    ],
-    "karakas": [
-      "Mercury",
-      "Jupiter"
-    ],
-    "source": "owner for D24, houses and karakas proposed",
-    "varga": 24,
-    "vargaHouses": [
-      4,
-      5
-    ]
-  },
-  "child_birth": {
-    "houses": [
-      5
-    ],
-    "karakas": [
-      "Jupiter"
-    ],
-    "source": "owner for house 5 and Jupiter",
-    "varga": 7,
-    "vargaHouses": [
-      5
-    ]
-  },
-  "sibling_birth": {
-    "houses": [
-      3,
-      11
-    ],
-    "karakas": [
-      "Mars"
-    ],
-    "source": "proposed",
-    "varga": 3,
-    "vargaHouses": [
-      3
-    ]
-  },
-  "foreign_travel": {
-    "houses": [
-      12,
-      9
-    ],
-    "karakas": [
-      "Rahu"
-    ],
-    "source": "proposed"
-  },
-  "property": {
-    "houses": [
-      4
-    ],
-    "karakas": [
-      "Mars"
-    ],
-    "source": "proposed",
-    "varga": 4,
-    "vargaHouses": [
-      4
-    ]
-  },
-  "health_crisis": {
-    "houses": [
-      6,
-      8,
-      12
-    ],
-    "karakas": [
-      "Saturn"
-    ],
-    "source": "proposed"
-  },
-  "mother_in_law_loss": {
-    "houses": [
-      5,
-      11,
-      4
-    ],
-    "karakas": [
-      "Moon"
-    ],
-    "note": "the mother in law is the 10th house, 4th from the 7th. Her 8th is the 5th, her 2nd and 7th are the 11th and the 4th",
-    "source": "proposed, added in round 13"
-  },
-  "eye_surgery": {
-    "houses": [
-      2,
-      12
-    ],
-    "karakas": [
-      "Sun",
-      "Moon"
-    ],
-    "note": "the 2nd house is the right eye, the 12th the left, Sun right eye, Moon left eye",
-    "source": "proposed, added in round 16"
-  },
-  "separation": {
-    "houses": [
-      7,
-      6,
-      8,
-      12
-    ],
-    "karakasFemale": [
-      "Venus",
-      "Jupiter"
-    ],
-    "karakasMale": [
-      "Venus"
-    ],
-    "varga": 9,
-    "vargaHouses": [
-      7
-    ],
-    "note": "separation or divorce, the 7th is the primary house, 6 8 12 are the loss houses",
-    "source": "proposed, added in round 16"
-  },
-  "relationship": {
-    "houses": [
-      5,
-      7,
-      12
-    ],
-    "karakas": [
-      "Venus"
-    ],
-    "note": "a romantic or live in relationship, the 5th and 7th with the 12th of bed pleasures",
-    "source": "proposed, pre-registered in round 20"
-  }
+ "_note": "Event presets for window_scan.js. houses are counted from the Lagna. karakas are natural significators whose dasha counts. Every preset marked proposed is the engine author's reading of standard Parashari practice and awaits the owner's confirmation. The window scan only finds candidate periods. It never decides an answer alone. Round 14. varga and vargaHouses name the subject divisional chart and its key houses. The occupants of those houses in that varga and the lords of their signs are added to the dasha significators.",
+ "marriage": {
+  "houses": [
+   7,
+   2,
+   11
+  ],
+  "karakasFemale": [
+   "Venus",
+   "Jupiter"
+  ],
+  "karakasMale": [
+   "Venus"
+  ],
+  "source": "owner for house 7 and karakas, houses 2 and 11 proposed",
+  "varga": 9,
+  "vargaHouses": [
+   7
+  ]
+ },
+ "father_loss": {
+  "houses": [
+   4,
+   10,
+   3
+  ],
+  "karakas": [
+   "Sun"
+  ],
+  "note": "8th, 2nd and 7th from the 9th house",
+  "source": "proposed",
+  "varga": 12,
+  "vargaHouses": [
+   9
+  ]
+ },
+ "mother_loss": {
+  "houses": [
+   11,
+   5,
+   10
+  ],
+  "karakas": [
+   "Moon"
+  ],
+  "note": "8th, 2nd and 7th from the 4th house",
+  "source": "proposed",
+  "varga": 12,
+  "vargaHouses": [
+   4
+  ]
+ },
+ "job_start": {
+  "houses": [
+   10,
+   6,
+   11,
+   2
+  ],
+  "karakas": [
+   "Saturn"
+  ],
+  "source": "owner for house 10 and Saturn, rest proposed",
+  "varga": 10,
+  "vargaHouses": [
+   10
+  ]
+ },
+ "education_step": {
+  "houses": [
+   4,
+   5,
+   9
+  ],
+  "karakas": [
+   "Mercury",
+   "Jupiter"
+  ],
+  "source": "owner for D24, houses and karakas proposed",
+  "varga": 24,
+  "vargaHouses": [
+   4,
+   5
+  ]
+ },
+ "child_birth": {
+  "houses": [
+   5
+  ],
+  "karakas": [
+   "Jupiter"
+  ],
+  "source": "owner for house 5 and Jupiter",
+  "varga": 7,
+  "vargaHouses": [
+   5
+  ]
+ },
+ "sibling_birth": {
+  "houses": [
+   3,
+   11
+  ],
+  "karakas": [
+   "Mars"
+  ],
+  "source": "proposed",
+  "varga": 3,
+  "vargaHouses": [
+   3
+  ]
+ },
+ "foreign_travel": {
+  "houses": [
+   12,
+   9
+  ],
+  "karakas": [
+   "Rahu"
+  ],
+  "source": "proposed"
+ },
+ "property": {
+  "houses": [
+   4
+  ],
+  "karakas": [
+   "Mars"
+  ],
+  "source": "proposed",
+  "varga": 4,
+  "vargaHouses": [
+   4
+  ]
+ },
+ "health_crisis": {
+  "houses": [
+   6,
+   8,
+   12
+  ],
+  "karakas": [
+   "Saturn"
+  ],
+  "source": "proposed"
+ },
+ "mother_in_law_loss": {
+  "houses": [
+   5,
+   11,
+   4
+  ],
+  "karakas": [
+   "Moon"
+  ],
+  "note": "the mother in law is the 10th house, 4th from the 7th. Her 8th is the 5th, her 2nd and 7th are the 11th and the 4th",
+  "source": "proposed, added in round 13"
+ },
+ "eye_surgery": {
+  "houses": [
+   2,
+   12
+  ],
+  "karakas": [
+   "Sun",
+   "Moon"
+  ],
+  "note": "the 2nd house is the right eye, the 12th the left, Sun right eye, Moon left eye",
+  "source": "proposed, added in round 16"
+ },
+ "separation": {
+  "houses": [
+   7,
+   6,
+   8,
+   12
+  ],
+  "karakasFemale": [
+   "Venus",
+   "Jupiter"
+  ],
+  "karakasMale": [
+   "Venus"
+  ],
+  "varga": 9,
+  "vargaHouses": [
+   7
+  ],
+  "note": "separation or divorce, the 7th is the primary house, 6 8 12 are the loss houses",
+  "source": "proposed, added in round 16"
+ },
+ "relationship": {
+  "houses": [
+   5,
+   7,
+   12
+  ],
+  "karakas": [
+   "Venus"
+  ],
+  "note": "a romantic or live in relationship, the 5th and 7th with the 12th of bed pleasures",
+  "source": "proposed, pre-registered in round 20"
+ },
+ "native_death": {
+  "houses": [
+   8,
+   2,
+   7
+  ],
+  "karakas": [
+   "Saturn"
+  ],
+  "varga": 30,
+  "vargaHouses": [
+   1
+  ],
+  "note": "death of the native. The 8th is the primary house, the 2nd and 7th are the maraka houses, Saturn is the karaka of the 8th and of death. Round 23, after Kundali 5 where the death date was missed for lack of this event.",
+  "source": "proposed, round 23"
+ }
 }

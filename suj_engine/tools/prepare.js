@@ -25,6 +25,7 @@ const MAP = {
   parents:   { events: ["father_loss", "mother_loss"], tag: "Parents / Family", focus: 9, strength: "father and mother" },
   children:  { events: ["child_birth"], tag: "Children", focus: 5, strength: "children" },
   health:    { events: ["health_crisis"], tag: "Health / Disease", focus: 6, strength: "health" },
+  death:     { events: ["native_death", "health_crisis"], tag: "Longevity", focus: 8, strength: "longevity" },
   wealth:    { events: [], tag: "Wealth / Finance", focus: 2, strength: "wealth" },
   property:  { events: ["property"], tag: "Property / Vehicles", focus: 4, strength: "property" },
   foreign:   { events: ["foreign_travel"], tag: "Travel / Foreign", focus: 12, strength: "foreign" }
@@ -55,6 +56,7 @@ out.push("", "## CHECKLIST for the answer, enforced by answer_guard.js version 3
   "0a. For a yes or no question about what the native has, such as education, profession, siblings, parents or a child, use the HYPOTHESIS SCORES above. Quote the score and the z, and state that the z reading is provisional.",
   "1. Run planet_strength.js for the planets whose results conflict. Topics " + m.strength + ".",
   "2. S2 has a RULES CITED line. S6 has a WINDOW SCAN line, weighing the strict windows first, and a DASHA LORDS line from the functional nature table.",
+  "1a. STATUS RULE, round 23. The strength of a promise, an exalted karaka or a strong Lagna lord, is capacity and is never evidence against an event that has a running dasha and a window. In strength_tally.js mark such an entry capacity true with statusEvent true and it is not counted. The day engine verdict favourable or adverse is a net benefit and does not name the kind of event, never count it against an unpleasant event.",
   "2a. An aspect works by the planet's NATURAL nature. House ownership works by the houses owned, trine most beneficial, kendra somewhat, trik harmful. In strength_tally.js give lordship and aspect as separate typed entries.",
   "3. Write down every flag that points against your leading option. They go on the COUNTER EVIDENCE line or into the tally.",
   "4. Weigh the evidence with strength_tally.js, planets for and against each option by Shadbala percent. S8 has its EVIDENCE TALLY line. The final answer is the option with the highest number, or for ordered options the highest above 50, guard flag --ordinal.",
