@@ -156,5 +156,38 @@
     ],
     "note": "the mother in law is the 10th house, 4th from the 7th. Her 8th is the 5th, her 2nd and 7th are the 11th and the 4th",
     "source": "proposed, added in round 13"
+  },
+  "eye_surgery": {
+    "houses": [
+      2,
+      12
+    ],
+    "karakas": [
+      "Sun",
+      "Moon"
+    ],
+    "note": "the 2nd house is the right eye, the 12th the left, Sun right eye, Moon left eye",
+    "source": "proposed, added in round 16"
+  },
+  "separation": {
+    "houses": [
+      7,
+      6,
+      8,
+      12
+    ],
+    "karakasFemale": [
+      "Venus",
+      "Jupiter"
+    ],
+    "karakasMale": [
+      "Venus"
+    ],
+    "varga": 9,
+    "vargaHouses": [
+      7
+    ],
+    "note": "separation or divorce, the 7th is the primary house, 6 8 12 are the loss houses",
+    "source": "proposed, added in round 16"
   }
 }

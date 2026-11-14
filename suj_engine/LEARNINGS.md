@@ -152,6 +152,13 @@ H6 Calibration. In the round 12 rerun of Kundali 892 every hypothesis scored und
    chart 892 does not hold, three of the true hypotheses of Kundali 2 scored 39, 36 and 33. So the strength tally score, as built, carries no signal
    on two charts. This is the finding that matters more than any single answer. Do not set a line. Revisit the construction of the score, the
    weakness double count, the S composite and the 1.0 and 0.5 factors, against many charts before trusting it. node suj_engine/tools/cases_report.js prints this table.
+   UPDATE after the third chart, Kundali 3. 14 hypotheses, 10 true and 4 false, mean 39.1 for the true and 40.3 for the false, AUC 0.46 over 40 pairs, a little under chance. One of 14 is above
+   50. Kundali 3 Married scored 31 and she did marry on 7 December 2022. The strength tally score still has no signal on three charts.
+H10 Conjunction with the house lord. Kundali 3, the marriage was on 7 December 2022, Mahadasha Rahu, Antardasha Rahu, Pratyantardasha Mercury, Sookshma Jupiter, Prana Venus. No scan view covered the date for
+   marriage, not even the widest, and the event rank put child birth first. In the chart the 7th lord Sun is debilitated in Libra with Mercury, so the Pratyantardasha lord is conjunct the 7th lord. Jupiter
+   in the Sookshma is the karaka and Venus in the Prana is the karaka. The owner's method, section 2.3.2 item 6, reads a conjunction with the house lord, and the scan counts a planet only when it lords or
+   occupies an event house, is a karaka, or is a varga key house lord or occupant. A planet conjunct a house lord is not a link. Adding it is an engine change that the owner has not yet approved. The owner is asked.
+   Window scan on the dates of events that really happened, two dates, none covered by the strict views and one by the widest.
 H7 Window scan and the subject varga. Kundali 2, the child was born on 3 May 2021, Mercury Mahadasha, Venus Antardasha, Mercury Pratyantardasha, Sun Sookshma. No
    strict window for child birth covered the date, because the scan reads D1 houses only. In D7, the varga of children, Mercury sits in the 5th house, Venus is
    exalted in the D7 Lagna. On the transit side Jupiter was in Aquarius, the 5th from the Moon, and the Sun was in Aries, the 5th from the Lagna. The owner's method

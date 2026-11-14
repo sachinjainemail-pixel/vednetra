@@ -41,6 +41,13 @@ if (hy.length) {
   out.push(n ? "Chance that a true hypothesis outscores a false one, AUC " + (w / n).toFixed(2) + " over " + n + " pairs. 0.50 is chance." : "No pairs yet.");
   out.push("Above 50 " + hy.filter(h => h.score > 50).length + " of " + hy.length + ", of which true " + hy.filter(h => h.score > 50 && h.truth).length + ".");
 }
+// window scan recall on dates of events that really happened
+const dc = []; DATA.cases.forEach(c => (c.dateChecks || []).forEach(x => dc.push(Object.assign({ case: c.id }, x))));
+if (dc.length) {
+  out.push("", "## Window scan on dates of events that really happened");
+  out.push("Dates " + dc.length + ". Covered by strict double " + dc.filter(x => x.strictDouble).length + ", strict single " + dc.filter(x => x.strictSingle).length + ", wide double " + dc.filter(x => x.wideDouble).length + ", wide single " + dc.filter(x => x.wideSingle).length + ".");
+  dc.forEach(x => out.push("- " + x.case + " " + x.event + " " + x.date + ", event rank " + x.rankOfTrueEvent + " of " + x.of + ". " + (x.note || "")));
+}
 out.push("", "Chance level for four options is 25 percent. With " + rows.length + " questions the score cannot show skill either way.");
 
 if (process.argv.indexOf("--windows") >= 0) {

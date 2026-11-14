@@ -262,6 +262,93 @@
           "score": 36,
           "view2": 37
         }
+      ],
+      "dateChecks": [
+        {
+          "event": "child_birth",
+          "date": "2021-05-03",
+          "strictDouble": false,
+          "strictSingle": false,
+          "wideDouble": false,
+          "wideSingle": true,
+          "rankOfTrueEvent": 4,
+          "of": 4,
+          "note": "wide single, grade B via Moon and Sun"
+        }
+      ]
+    },
+    {
+      "id": "K3",
+      "name": "Kundali 3 (Mahesh Roy 94)",
+      "gender": "female",
+      "date": "2000-11-12",
+      "time": "13:13:00",
+      "tz": 5.5,
+      "lat": 22.7196,
+      "lon": 75.8577,
+      "place": "Indore, Madhya Pradesh",
+      "asOf": "2026-11-14",
+      "resultsReported": "2026-11-14",
+      "blind": false,
+      "blindNote": "The true answers came with the chart. Engine answers are what the written rules give, produced afterwards. They do not count as a test.",
+      "questions": [
+        {
+          "n": 1,
+          "topic": "marriage",
+          "kind": "status",
+          "options": [
+            "Married",
+            "Unmarried",
+            "Divorced",
+            "Widow"
+          ],
+          "engine": "Unmarried",
+          "truth": "Divorced",
+          "errorTags": [
+            "calibration",
+            "no_rule_for_divorce"
+          ],
+          "note": "Married scored 31, so the tally rule says not married. The engine has no rule that tells a divorce from a continuing marriage, the separation windows are 11 strict and 25 wide between December 2022 and now, all grade A."
+        },
+        {
+          "n": 2,
+          "topic": "event on 7 December 2022",
+          "kind": "event",
+          "options": [
+            "Marriage",
+            "New job",
+            "Child born",
+            "Eye operation"
+          ],
+          "engine": "Child born",
+          "truth": "Marriage",
+          "errorTags": [
+            "window_scan_misses_conjunction",
+            "event_rank_wrong"
+          ],
+          "note": "No scan view covers the date for marriage, not even the widest. The event rank puts child birth first at 3.14, marriage second at 0.43. Dasha was Rahu, Rahu, Mercury, Jupiter, Venus. Mercury, the Pratyantardasha lord, is conjunct the 7th lord Sun in Libra, and the scan does not count a planet that is conjunct a house lord as a link."
+        }
+      ],
+      "hypotheses": [
+        {
+          "name": "Married",
+          "truth": true,
+          "score": 31,
+          "view2": 31
+        }
+      ],
+      "dateChecks": [
+        {
+          "event": "marriage",
+          "date": "2022-12-07",
+          "strictDouble": false,
+          "strictSingle": false,
+          "wideDouble": false,
+          "wideSingle": false,
+          "rankOfTrueEvent": 2,
+          "of": 4,
+          "note": "no view covers the date"
+        }
       ]
     }
   ]
