@@ -12,6 +12,8 @@
  *   4. Ties go to the event with the double transit from any reference, Lagna, Moon or Sun, then to the single transit.
  * Round 17, option degree true. Each lord's share is multiplied by its capacity factor from the Baladi avastha of its degree, see degree_capacity.js. A lord with no capacity at its degree
  * contributes nothing to any event. The nodes keep the factor 1.
+ * Round 18, option nakshatra true. A lord that stands in the star of a significator of the event is linked to the event too, window_scan.js adds that link, and each lord's share is
+ * multiplied by its pada factor, pushkara pada, vargottama, gandanta, from data/nakshatra_factors.json.
  * The weights are equal for the four levels. That, the division by links, and counting each link once are the engine author's proposal, written before any chart was
  * tested with it. The tool ranks, it does not decide the answer alone.
  *
@@ -38,9 +40,11 @@ function rank(cfg) {
   });
   const total = {};
   lords.forEach(l => { total[l.lord] = events.reduce((n, ev) => n + ((links[ev][l.lord] || []).length), 0); });
-  const cap = cfg.degree ? capacity(cfg) : null;
+  const cap = cfg.degree || cfg.nakshatra ? capacity(cfg) : null;
+  const NF = cfg.nakshatra ? JSON.parse(require("fs").readFileSync(require("path").join(__dirname, "..", "data", "nakshatra_factors.json"), "utf8")) : null;
+  const padaF = pl => NF ? (cap[pl].pushkaraPada ? NF.pushkaraPada : 1) * (cap[pl].vargottama ? NF.vargottama : 1) * (cap[pl].gandanta ? NF.gandanta : 1) : 1;
   const rows = events.map(ev => {
-    const per = lords.map(l => { const own = (links[ev][l.lord] || []).length; const c = cap ? cap[l.lord].factor : 1; return { level: l.level, lord: l.lord, links: own, of: total[l.lord], capacity: c, share: total[l.lord] ? Math.round(own / total[l.lord] * c * 100) / 100 : 0, why: links[ev][l.lord] || [] }; });
+    const per = lords.map(l => { const own = (links[ev][l.lord] || []).length; const c = (cfg.degree ? cap[l.lord].factor : 1) * padaF(l.lord); return { level: l.level, lord: l.lord, links: own, of: total[l.lord], capacity: c, share: total[l.lord] ? Math.round(own / total[l.lord] * c * 100) / 100 : 0, why: links[ev][l.lord] || [] }; });
     return { event: ev, score: Math.round(per.reduce((a, x) => a + x.share, 0) * 100) / 100, doubleTransit: trans[ev].double, singleTransit: trans[ev].single, per };
   });
   rows.sort((a, b) => b.score - a.score || (b.doubleTransit - a.doubleTransit) || (b.singleTransit - a.singleTransit));

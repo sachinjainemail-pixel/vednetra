@@ -51,6 +51,9 @@
  *   9. DEGREE, round 17, option degree true. A planet's degree in its sign decides its capacity to give results, the Baladi avastha, Yuva full, Kumara half, Bala and
  *      Vriddha a quarter, Mrita none, see degree_capacity.js and data/degree_factors.json. With the option on, every weight of that planet, role, harm or weakness, is multiplied by the
  *      capacity factor, because a planet with little capacity gives little of anything, good or bad. Rahu and Ketu keep the factor 1. The factors are the engine author's reading.
+ *  10. NAKSHATRA AND PADA, round 18, option nakshatra true. The owner's rule, a planet gives the results of the lord of the nakshatra it stands in, so a planet's strength is a blend of its own and the
+ *      strength of its nakshatra lord, weight in data/nakshatra_factors.json, 0.5. Then the pada qualities of the library, pushkara pada, vargottama and gandanta, multiply the strength, the numbers
+ *      are the engine author's. The nodes blend their sign lord's strength with the strength of their nakshatra lord.
  *   Which planet belongs on which side, and of which type, is a judgement of the analysis. The tool prints the evidence table
  *   so that the owner can check every placement.
  *
@@ -114,6 +117,15 @@ function strengths(cfg) {
     S.math[n] = S.math[lord]; S.adj[n] = S.adj[lord]; shad[n] = shad[lord]; flag[n] = "node, strength of sign lord " + lord;
     parts[n] = { proxy: lord };
   });
+  const NF = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "data", "nakshatra_factors.json"), "utf8"));
+  if (cfg.nakshatra) {
+    const dc0 = degreeCapacity(cfg), S0 = { math: Object.assign({}, S.math), adj: Object.assign({}, S.adj) };
+    ALLP.forEach(p => {
+      const nl = dc0[p].nakLord, f = (dc0[p].pushkaraPada ? NF.pushkaraPada : 1) * (dc0[p].vargottama && SEVEN.indexOf(p) >= 0 ? NF.vargottama : 1) * (dc0[p].gandanta ? NF.gandanta : 1);
+      ["math", "adj"].forEach(k => { S[k][p] = Math.min(100, ((1 - NF.blend) * S0[k][p] + NF.blend * S0[k][nl]) * f); });
+      parts[p] = Object.assign(parts[p] || {}, { nakshatra: dc0[p].nakshatra + " pada " + dc0[p].pada, nakLord: nl, padaFactor: Math.round(f * 100) / 100, vargottama: dc0[p].vargottama, pushkaraPada: dc0[p].pushkaraPada, gandanta: dc0[p].gandanta });
+    });
+  }
   const cap = {};
   ALLP.forEach(p => { cap[p] = 1; });
   if (cfg.degree) { const dc = degreeCapacity(cfg); if (cfg.nodeDegree) ["Rahu", "Ketu"].forEach(n => { cap[n] = dc[n].factor; }); SEVEN.forEach(p => { cap[p] = dc[p].factor; parts[p].degree = dc[p].degree; parts[p].avastha = dc[p].avastha; parts[p].capacity = dc[p].factor; }); }

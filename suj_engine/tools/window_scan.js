@@ -26,6 +26,9 @@
  *   three charts. The double transit must hold in the SAME reference chart. Windows say which reference passed. refs, a list such as ["Lagna"],
  *   restricts it. gate single asks for only Jupiter or Saturn in a reference, a wider view.
  *
+ * ROUND 18, option nakshatra true. A planet that stands in the star of a significator gives that significator's results, the owner's rule of section 4.1 item 7, so it is
+ * added as a significator with the reason, stands in the star of X. This widens the list.
+ *
  * Rahu and Ketu as significators, round 12, by the direct rules of Laghu Parashari sloka 13. The nodes own no sign, LP-060-2, so a node
  * is a significator of the event only when
  *   it occupies an event house, the node then becomes the lord of that house, LP-062-1, or
@@ -81,6 +84,10 @@ function scan(cfg) {
       if (vl) { if (!sig.has(vl)) vargaReasons.push(vl + " lords the D" + preset.varga + " house " + vh); link(vl, "lords D" + preset.varga + " house " + vh); }
       vc.planets.filter(q => q.sign === ksign).forEach(q => { if (!sig.has(q.name)) vargaReasons.push(q.name + " occupies the D" + preset.varga + " house " + vh); link(q.name, "occupies D" + preset.varga + " house " + vh); });
     });
+  }
+  if (cfg.nakshatra) {
+    const base = new Set(sig);
+    chart.planets.forEach(q => { if (q.name !== "Rahu" && q.name !== "Ketu" && base.has(q.nakLord)) link(q.name, "stands in the star of " + q.nakLord); });
   }
   // Rahu and Ketu by Laghu Parashari sloka 13
   const nodeReasons = {};

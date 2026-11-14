@@ -109,6 +109,10 @@
   scores over both charts, 13 hypotheses, AUC 0.50, exactly chance, mean 40.0 for the true and 40.3 for the false. The line near 40 from chart 892 does not hold. The scan
   missed the child event because it reads only D1 houses and Lagna transits, see LEARNINGS H7. cases.json now marks each case blind or not and keeps the hypothesis scores,
   cases_report.js prints the blind score and the AUC. Added the event preset mother_in_law_loss, experiments/lib_hypotheses.js and case2_run.js.
+- Round 18, the owner asked to add the nakshatra and the nakshatra pada to the degree. Built data/nakshatra_factors.json and the nakshatra option in strength_tally.js, event_rank.js and window_scan.js, half weight to the nakshatra lord's real
+  strength, pada factors for pushkara pada, vargottama and gandanta. Self test tests/nakshatra_selftest.js prints 5 of 5. Over the 14 hypotheses, AUC 0.46 base, 0.55 with the degree, 0.55 with the degree and the nakshatra, 0.65 when the
+  degree bands are also put on Rahu and Ketu. The 0.65 is suggestive and not believable, it is picked from five conditions on the same data. All options are off by default. The next chart, answered blind with the conditions fixed
+  before, is the real test. Details in experiments/nakshatra_analysis_results.md.
 - Round 17, the owner asked whether the degree of the planets explains the errors. Built degree_capacity.js with data/degree_factors.json, the Baladi avastha and the library's gandanta and pushkara flags, an option degree in
   strength_tally.js and event_rank.js, and nodeDegree as a variant. Over the three charts the AUC goes 0.46 to 0.55, and 0.60 with the nodes, the direction toward the truth is 7 of 14, chance. Part of Kundali 3's event error is
   Rahu's unpenalised weight. The option is off by default and the factors are the engine author's reading. Self test tests/degree_selftest.js prints 7 of 7. Question by question in experiments/degree_analysis_results.md.

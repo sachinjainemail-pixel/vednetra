@@ -120,6 +120,8 @@ Degree capacity of the planets, Baladi avastha and the library's degree flags, a
 
     node suj_engine/tools/degree_capacity.js '{"gender":"female","date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0}'
 
+The nakshatra and pada impact is the option nakshatra true in strength_tally.js, event_rank.js and window_scan.js, experimental and off by default, factors in suj_engine/data/nakshatra_factors.json.
+
 Strength tally, the planets for and against each option weighed by Shadbala percent:
 
     node suj_engine/tools/strength_tally.js '{"gender":"female","date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0,"kind":"ordered","options":["Low","High"],"evidence":[{"option":"High","side":"for","planet":"Mercury","factor":"reason"}]}'

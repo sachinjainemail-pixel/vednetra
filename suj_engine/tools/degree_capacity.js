@@ -52,6 +52,7 @@ function capacity(cfg) {
     r.pushkaraPada = PUSHKARA_PADA.some(([ns, ps]) => ns.some(n => key(n) === key(p.nakshatra)) && ps.indexOf(p.pada) >= 0);
     if (p.name !== "Sun") r.sunSeparation = Math.round(angDist(p.lon, P.Sun.lon) * 100) / 100;
     r.combust = !!p.combust;
+    r.nakshatra = p.nakshatra; r.pada = p.pada; r.nakLord = p.nakLord; r.vargottama = p.navamsaSign === p.sign;
     if (EXALT[p.name]) { const [es, ed] = EXALT[p.name]; const lonEx = es * 30 + ed; r.fromExaltPoint = Math.round(angDist(p.lon, lonEx) * 10) / 10; r.fromDebilPoint = Math.round(angDist(p.lon, (lonEx + 180) % 360) * 10) / 10; }
     out[p.name] = r;
   });

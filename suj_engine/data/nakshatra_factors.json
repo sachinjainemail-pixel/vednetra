@@ -1,0 +1,7 @@
+{
+  "_note": "Nakshatra and pada impact, round 18. blend is the weight given to the nakshatra lord's real strength, the owner's rule of section 4.1 item 7, a planet in the star of another gives the results of that other, Venus in Saturn's star gives Venus and Saturn results. The weight 0.5 is the engine author's reading. The pada factors come from the qualities the library names, Sutton chapter 3, pushkara pada, vargottama and gandanta, but the numbers are the engine author's and are NOT in the library. They are open for the owner to correct. The library also marks some planet in nakshatra rules with a star for good and a warning sign for bad, but only 0 to 4 rules exist per planet, too few to count, so the markers are shown and not used.",
+  "blend": 0.5,
+  "pushkaraPada": 1.15,
+  "vargottama": 1.15,
+  "gandanta": 0.7
+}

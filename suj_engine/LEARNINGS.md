@@ -164,6 +164,11 @@ H11 Degree and capacity, round 17, at the owner's request. Planet degree read as
    helps in Kundali 892 marriage, the father, and most of Kundali 2's profession hypotheses, and Kundali 3's event, where Rahu's unpenalised weight caused the error. It points the wrong way in 892's education,
    siblings and mother. Two degree rules also disagree, Mrita by the bands and near the exact exaltation point by Shadbala, Kundali 3's Moon. See experiments/degree_analysis_results.md. The option stays off by default. Needs
    the owner, the factors, whether the nodes take the bands, and whether a Mrita planet at 29 or at 0 degrees should be read as zero.
+H12 Nakshatra and pada with the degree, round 18. Half the weight to the nakshatra lord's real strength, pushkara pada and vargottama times 1.15, gandanta times 0.7, all the engine author's numbers. 14 hypotheses of three
+   charts. AUC base 0.46, degree 0.55, nakshatra and pada alone 0.46, both 0.55, both with the degree bands on Rahu and Ketu 0.65, in that last case 8 of the 10 true hypotheses are above 50 and 3 of the 4 false are not. The last
+   row is suggestive and not yet believable. Under two standard errors from chance, five conditions tried on the same hypotheses, the nodes outside the classical scheme, and it works by raising nearly every score. It does
+   not fix the event rank, Kundali 2 stays marriage first, Kundali 3 is nearly fixed only when Rahu takes the bands. See experiments/nakshatra_analysis_results.md. The honest test is a new chart answered blind with the
+   conditions fixed beforehand. Needs the owner, the weight 0.5, the three pada factors, and whether the nodes take the bands.
 H7 Window scan and the subject varga. Kundali 2, the child was born on 3 May 2021, Mercury Mahadasha, Venus Antardasha, Mercury Pratyantardasha, Sun Sookshma. No
    strict window for child birth covered the date, because the scan reads D1 houses only. In D7, the varga of children, Mercury sits in the 5th house, Venus is
    exalted in the D7 Lagna. On the transit side Jupiter was in Aquarius, the 5th from the Moon, and the Sun was in Aries, the 5th from the Lagna. The owner's method

@@ -1,0 +1,53 @@
+
+######## K892
+Q1 Education, Post graduationTRUE base 48  degree 47  nakshatra 53  both 49  both+nodes 56
+   Jupiter Hasta-4 star lord Moon | Sun Purva Ashadha-3 star lord Venus pushkara | Saturn Shravana-4 star lord Moon | Rahu Jyeshtha-3 star lord Mercury | Mars Punarvasu-2 star lord Jupiter pushkara | Mercury Mula-4 star lord Ketu | Venus Shatabhisha-1 star lord Rahu
+Q2 Married                TRUE base 43  degree 53  nakshatra 45  both 54  both+nodes 54
+   Mercury Mula-4 star lord Ketu | Mars Punarvasu-2 star lord Jupiter pushkara | Sun Purva Ashadha-3 star lord Venus pushkara | Venus Shatabhisha-1 star lord Rahu | Jupiter Hasta-4 star lord Moon
+Q3 Working                falsebase 31  degree 32  nakshatra 36  both 37  both+nodes 45
+   Mercury Mula-4 star lord Ketu | Saturn Shravana-4 star lord Moon | Jupiter Hasta-4 star lord Moon | Mars Punarvasu-2 star lord Jupiter pushkara | Ketu Mrigashira-1 star lord Mars
+Q4 Has siblings           TRUE base 29  degree 23  nakshatra 32  both 22  both+nodes 22
+   Saturn Shravana-4 star lord Moon | Moon Rohini-3 star lord Moon | Venus Shatabhisha-1 star lord Rahu | Jupiter Hasta-4 star lord Moon | Mars Punarvasu-2 star lord Jupiter pushkara
+Q5 Father alive           falsebase 45  degree 40  nakshatra 44  both 39  both+nodes 45
+   Sun Purva Ashadha-3 star lord Venus pushkara | Saturn Shravana-4 star lord Moon | Venus Shatabhisha-1 star lord Rahu | Jupiter Hasta-4 star lord Moon | Rahu Jyeshtha-3 star lord Mercury
+Q5 Mother alive           TRUE base 34  degree 30  nakshatra 36  both 31  both+nodes 35
+   Jupiter Hasta-4 star lord Moon | Sun Purva Ashadha-3 star lord Venus pushkara | Saturn Shravana-4 star lord Moon | Rahu Jyeshtha-3 star lord Mercury | Venus Shatabhisha-1 star lord Rahu | Moon Rohini-3 star lord Moon
+
+######## K2
+Q1 Working                TRUE base 47  degree 57  nakshatra 52  both 63  both+nodes 63
+   Mercury Anuradha-3 star lord Saturn | Moon Vishakha-3 star lord Jupiter | Venus Uttara Phalguni-3 star lord Sun | Saturn Uttara Ashadha-4 star lord Sun pushkara
+Q1 Doctor                 falsebase 40  degree 27  nakshatra 43  both 29  both+nodes 29
+   Venus Uttara Phalguni-3 star lord Sun | Jupiter Purva Phalguni-1 star lord Venus VARGOTTAMA | Mars Vishakha-1 star lord Jupiter | Mercury Anuradha-3 star lord Saturn | Moon Vishakha-3 star lord Jupiter | Sun Vishakha-1 star lord Jupiter
+Q1 Lawyer                 TRUE base 51  degree 53  nakshatra 55  both 57  both+nodes 74
+   Sun Vishakha-1 star lord Jupiter | Mercury Anuradha-3 star lord Saturn | Jupiter Purva Phalguni-1 star lord Venus VARGOTTAMA | Rahu Purva Ashadha-2 star lord Venus | Moon Vishakha-3 star lord Jupiter | Venus Uttara Phalguni-3 star lord Sun | Saturn Uttara Ashadha-4 star lord Sun pushkara
+Q1 Astrologer             falsebase 45  degree 56  nakshatra 49  both 61  both+nodes 66
+   Moon Vishakha-3 star lord Jupiter | Venus Uttara Phalguni-3 star lord Sun | Saturn Uttara Ashadha-4 star lord Sun pushkara | Sun Vishakha-1 star lord Jupiter | Mercury Anuradha-3 star lord Saturn | Jupiter Purva Phalguni-1 star lord Venus VARGOTTAMA | Rahu Purva Ashadha-2 star lord Venus | Ketu Ardra-4 star lord Rahu pushkara
+Q2 Married                TRUE base 39  degree 37  nakshatra 40  both 36  both+nodes 60
+   Mercury Anuradha-3 star lord Saturn | Mars Vishakha-1 star lord Jupiter | Ketu Ardra-4 star lord Rahu pushkara | Rahu Purva Ashadha-2 star lord Venus | Venus Uttara Phalguni-3 star lord Sun | Jupiter Purva Phalguni-1 star lord Venus VARGOTTAMA
+Q2 Happy marriage         TRUE base 33  degree 34  nakshatra 33  both 32  both+nodes 51
+   Mercury Anuradha-3 star lord Saturn | Mars Vishakha-1 star lord Jupiter | Ketu Ardra-4 star lord Rahu pushkara | Rahu Purva Ashadha-2 star lord Venus | Saturn Uttara Ashadha-4 star lord Sun pushkara | Venus Uttara Phalguni-3 star lord Sun | Jupiter Purva Phalguni-1 star lord Venus VARGOTTAMA
+Q3 Has a child            TRUE base 36  degree 46  nakshatra 39  both 49  both+nodes 63
+   Mars Vishakha-1 star lord Jupiter | Saturn Uttara Ashadha-4 star lord Sun pushkara | Sun Vishakha-1 star lord Jupiter | Moon Vishakha-3 star lord Jupiter | Jupiter Purva Phalguni-1 star lord Venus VARGOTTAMA | Rahu Purva Ashadha-2 star lord Venus
+
+######## K3
+Q1 Married                TRUE base 31  degree 28  nakshatra 40  both 47  both+nodes 60
+   Sun Vishakha-2 star lord Jupiter pushkara | Mars Hasta-1 star lord Moon | Ketu Purva Ashadha-4 star lord Venus | Venus Mula-2 star lord Ketu | Jupiter Rohini-2 star lord Moon VARGOTTAMA pushkara
+
+Condition       AUC    toward truth of 14   above 50
+base            0.46   0                  1   true above 50 1 false above 50 0
+degree          0.55   7                  4   true above 50 3 false above 50 1
+nakshatra       0.46   10                 3   true above 50 3 false above 50 0
+both            0.55   8                  4   true above 50 3 false above 50 1
+both+nodes      0.65   10                 9   true above 50 8 false above 50 1
+
+Event rank on the dated events
+  K2 3 May 2021 truth child_birth   base        marriage 1.76 | health_crisis 0.86 | mother_in_law_loss 0.7 | child_birth 0.66
+  K2 3 May 2021 truth child_birth   degree      marriage 0.29 | child_birth 0.16 | health_crisis 0.16 | mother_in_law_loss 0.13
+  K2 3 May 2021 truth child_birth   nakshatra   marriage 1.77 | health_crisis 0.94 | mother_in_law_loss 0.69 | child_birth 0.6
+  K2 3 May 2021 truth child_birth   both        marriage 0.3 | health_crisis 0.2 | child_birth 0.15 | mother_in_law_loss 0.1
+  K2 3 May 2021 truth child_birth   both+nodes  marriage 0.3 | health_crisis 0.2 | child_birth 0.15 | mother_in_law_loss 0.1
+  K3 7 Dec 2022 truth marriage      base        child_birth 3.14 | marriage 0.43 | job_start 0.29 | eye_surgery 0.14
+  K3 7 Dec 2022 truth marriage      degree      child_birth 2.64 | marriage 0.43 | job_start 0.29 | eye_surgery 0.14
+  K3 7 Dec 2022 truth marriage      nakshatra   child_birth 3.45 | marriage 0.44 | job_start 0.44 | eye_surgery 0.29
+  K3 7 Dec 2022 truth marriage      both        child_birth 2.95 | marriage 0.44 | job_start 0.44 | eye_surgery 0.29
+  K3 7 Dec 2022 truth marriage      both+nodes  child_birth 0.65 | marriage 0.44 | job_start 0.44 | eye_surgery 0.29
