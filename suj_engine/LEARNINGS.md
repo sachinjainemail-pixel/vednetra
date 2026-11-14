@@ -157,6 +157,12 @@ H7 Window scan and the subject varga. Kundali 2, the child was born on 3 May 202
    exalted in the D7 Lagna. On the transit side Jupiter was in Aquarius, the 5th from the Moon, and the Sun was in Aries, the 5th from the Lagna. The owner's method
    reads the Lagna, Moon and Sun charts, section 2.1, and the subject varga, section 3. The scan uses neither the Moon chart for transits nor the subject varga for the
    dasha significators. One case. If the next chart shows the same, extend the scan. The owner is asked whether to extend it now.
+   DONE in round 14 at the owner's word. window_scan.js now adds the occupants and sign lords of the key houses of the subject varga to the dasha significators and tests the
+   double transit from the Lagna, the Moon and the Sun, in the same reference chart. RESULT on Kundali 2, 3 May 2021. Strict double transit, still no window for any option. Wide
+   view, double transit, marriage grade A via the Lagna, child birth none. Only with gate single, Jupiter or Saturn alone in a reference, does child birth appear, grade B via the Moon
+   and Sun, while marriage and accident also appear, marriage at grade A. So the engine would still choose marriage. The reason is plain. Jupiter stood on the 5th from the Moon but
+   Saturn did not, and the Venus Antardasha is not a child significator. The extension cost discrimination. Strict past windows in Kundali 2 are now marriage 51 all at grade A, child 21,
+   accident 27, mother in law 19. A tool that flags marriage 51 times cannot tell a marriage from a child.
 H8 A professional hypothesis. In Kundali 2 the lawyer hypothesis, 9th and 10th with Jupiter, Saturn and Mercury, scored 51 against astrologer 45 and doctor 40, the
    only one over 50, and was the true profession. The mapping of professions to houses and karakas was fixed by the engine author before the run and is a proposal. One case.
 

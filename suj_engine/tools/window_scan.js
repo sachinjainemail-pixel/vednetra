@@ -18,6 +18,14 @@
  * preset only (the primary house of the event). Strict mode is the narrow view. The default is the wide view.
  * Add --json for structured output.
  *
+ * ROUND 14, the owner's method, sections 2.1 and 3. Two extensions.
+ *   Subject varga. The occupants of the key houses of the event's divisional chart, D9 for marriage, D7 for children, D10 for work, D24 for
+ *   education, D3 for siblings, D12 for parents, and the lords of their signs there, are added to the dasha significators. Reasons are listed.
+ *   varga false switches it off.
+ *   Sudarshan transits. The transits of Jupiter and Saturn are tested on the event houses counted from the Lagna, from the Moon and from the Sun, the
+ *   three charts. The double transit must hold in the SAME reference chart. Windows say which reference passed. refs, a list such as ["Lagna"],
+ *   restricts it. gate single asks for only Jupiter or Saturn in a reference, a wider view.
+ *
  * Rahu and Ketu as significators, round 12, by the direct rules of Laghu Parashari sloka 13. The nodes own no sign, LP-060-2, so a node
  * is a significator of the event only when
  *   it occupies an event house, the node then becomes the lord of that house, LP-062-1, or
@@ -62,6 +70,16 @@ function scan(cfg) {
   const sig = new Set(karakas);
   allSigns.forEach(s => { sig.add(signLord(s)); });
   chart.planets.forEach(p => { if (allSigns.indexOf(p.sign) >= 0) sig.add(p.name); });
+  // subject varga, round 14
+  const vargaReasons = [];
+  if (cfg.varga !== false && preset && preset.varga) {
+    const vc = VC.makeVargaChart(chart, preset.varga);
+    (preset.vargaHouses || []).forEach(vh => {
+      const ksign = (vc.ascendant.sign + vh - 1) % 12, vl = signLord(ksign);
+      if (vl && !sig.has(vl)) { sig.add(vl); vargaReasons.push(vl + " lords the D" + preset.varga + " house " + vh); }
+      vc.planets.filter(q => q.sign === ksign).forEach(q => { if (!sig.has(q.name)) { sig.add(q.name); vargaReasons.push(q.name + " occupies the D" + preset.varga + " house " + vh); } });
+    });
+  }
   // Rahu and Ketu by Laghu Parashari sloka 13
   const nodeReasons = {};
   if (cfg.nodes !== false) {
@@ -85,6 +103,11 @@ function scan(cfg) {
   const minDasha = cfg.minDasha || 2, step = (cfg.stepDays || 1) * 86400000;
   const tl = chart.vimshottari.timeline;
 
+  // reference charts for the transits, Sudarshan
+  let refs = [{ name: "Lagna", sign: lagna }, { name: "Moon", sign: P.Moon.sign }, { name: "Sun", sign: P.Sun.sign }];
+  if (cfg.refs) refs = refs.filter(r => cfg.refs.indexOf(r.name) >= 0);
+  const seenSign = {}; refs = refs.filter(r => { if (seenSign[r.sign] !== undefined) { refs.find(q => q.sign === r.sign).name += " and " + r.name; return false; } seenSign[r.sign] = true; return true; });
+
   const samples = [];
   for (let ms = from.getTime(); ms <= to.getTime(); ms += step) {
     const d = new Date(ms);
@@ -98,24 +121,31 @@ function scan(cfg) {
     if (cfg.strict && !(hit[1] && hit[2])) continue;
     const tc = VC.buildChart(d, Number(cfg.lat), Number(cfg.lon), Number(cfg.tz));
     const tp = {}; tc.planets.forEach(p => { tp[p.name] = p; });
-    const on = {};
-    for (const pl of Object.keys(ASPECTS)) {
-      const hits = targetSigns.filter(ts => ASPECTS[pl].indexOf(houseFrom(ts, tp[pl].sign)) >= 0);
-      if (hits.length) on[pl] = hits.map(ts => houseFrom(ts, lagna));
+    let found = null;
+    for (const ref of refs) {
+      const tsigns = cfg.strict ? [(ref.sign + houses[0] - 1) % 12] : houses.map(h => (ref.sign + h - 1) % 12);
+      const on = {};
+      for (const pl of Object.keys(ASPECTS)) {
+        const hits = tsigns.filter(ts => ASPECTS[pl].indexOf(houseFrom(ts, tp[pl].sign)) >= 0);
+        if (hits.length) on[pl] = hits.map(ts => houseFrom(ts, ref.sign));
+      }
+      const pass = cfg.gate === "single" ? (on.Jupiter || on.Saturn) : (on.Jupiter && on.Saturn);
+      if (pass) { if (!found) found = { names: [ref.name], on }; else found.names.push(ref.name); }
     }
-    if (!(on.Jupiter && on.Saturn)) continue;
+    if (!found) continue;
+    const on = found.on;
     const extra = ["Rahu", "Ketu", "Sun"].filter(x => on[x]);
-    samples.push({ ms, lords, sd, sdHit: sig.has(sd), dashaCount, hit, extra, jup: on.Jupiter, sat: on.Saturn,
+    samples.push({ ms, lords, sd, sdHit: sig.has(sd), dashaCount, hit, extra, jup: on.Jupiter || [], sat: on.Saturn || [], via: found.names.join(" and "),
       tj: SIGN_NAMES[tp.Jupiter.sign], ts: SIGN_NAMES[tp.Saturn.sign] });
   }
   // merge consecutive samples with the same chain and the same transit picture
   const windows = [];
   for (const s of samples) {
-    const key = s.lords.join(">") + "|" + s.tj + "|" + s.ts;
+    const key = s.lords.join(">") + "|" + s.tj + "|" + s.ts + "|" + s.via;
     const last = windows[windows.length - 1];
     let w = last;
     if (last && last.key === key && s.ms - last.endMs <= 3 * step) { last.endMs = s.ms; last.extra = Array.from(new Set(last.extra.concat(s.extra))); }
-    else { w = { key, startMs: s.ms, endMs: s.ms, lords: s.lords, dashaCount: s.dashaCount, extra: s.extra.slice(), jup: s.jup, sat: s.sat, tj: s.tj, ts: s.ts, sdRuns: [] }; windows.push(w); }
+    else { w = { key, startMs: s.ms, endMs: s.ms, lords: s.lords, dashaCount: s.dashaCount, extra: s.extra.slice(), jup: s.jup, sat: s.sat, via: s.via, tj: s.tj, ts: s.ts, sdRuns: [] }; windows.push(w); }
     if (s.sdHit) {
       const lr = w.sdRuns[w.sdRuns.length - 1];
       if (lr && lr.lord === s.sd && s.ms - lr.endMs <= 3 * step) lr.endMs = s.ms; else w.sdRuns.push({ lord: s.sd, startMs: s.ms, endMs: s.ms });
@@ -130,7 +160,7 @@ function scan(cfg) {
   });
   return {
     event: cfg.event || "custom", strict: !!cfg.strict, houses, targetSigns: targetSigns.map(s => SIGN_NAMES[s]), significators: sigList, karakas,
-    nodeReasons, lagna: SIGN_NAMES[lagna], asOf: iso(asOf), from: iso(from), to: iso(to), windows
+    vargaReasons, nodeReasons, lagna: SIGN_NAMES[lagna], asOf: iso(asOf), from: iso(from), to: iso(to), windows
   };
 }
 
@@ -138,6 +168,7 @@ function render(r) {
   const L = [];
   L.push("# SUJ WINDOW SCAN, event " + r.event + (r.strict ? ", strict view" : ", wide view"));
   L.push("Lagna " + r.lagna + ". Event houses " + r.houses.join(", ") + " = signs " + r.targetSigns.join(", ") + ". Dasha significators " + r.significators.join(", ") + ".");
+  (r.vargaReasons || []).length && L.push("From the subject varga " + r.vargaReasons.join("; ") + ".");
   Object.keys(r.nodeReasons || {}).forEach(n => L.push(n + " is a significator, " + r.nodeReasons[n].join("; ") + "."));
   L.push("Levels Mahadasha, Antardasha, Pratyantardasha and Sookshma. Prana is not scanned.");
   L.push("Scan " + r.from + " to " + r.to + ", as of " + r.asOf + ". Windows found " + r.windows.length + ". Grades A or B only, see the header of the tool.");
@@ -145,7 +176,7 @@ function render(r) {
     const w = r.windows.filter(x => x.timeStatus === status);
     L.push("", "## " + status + " windows " + w.length);
     w.forEach(x => L.push("- " + x.grade + " " + x.start + " to " + x.end + ", age " + x.ageStart + ", MD AD PD " + x.lords.join(" ") +
-      ", Jupiter in " + x.tj + " on houses " + x.jup.join(",") + ", Saturn in " + x.ts + " on houses " + x.sat.join(",") +
+      ", via " + x.via + ", Jupiter in " + x.tj + " on houses " + x.jup.join(",") + ", Saturn in " + x.ts + " on houses " + x.sat.join(",") +
       (x.extra.length ? ", also " + x.extra.join(" ") : "") +
       (x.sookshma.length ? ". Sookshma significators " + x.sookshma.map(q => q.lord + " " + q.start + " to " + q.end).join(", ") : ". No Sookshma significator inside")));
   }

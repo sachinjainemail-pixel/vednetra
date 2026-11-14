@@ -1,5 +1,5 @@
 {
-  "_note": "Event presets for window_scan.js. houses are counted from the Lagna. karakas are natural significators whose dasha counts. Every preset marked proposed is the engine author's reading of standard Parashari practice and awaits the owner's confirmation. The window scan only finds candidate periods. It never decides an answer alone.",
+  "_note": "Event presets for window_scan.js. houses are counted from the Lagna. karakas are natural significators whose dasha counts. Every preset marked proposed is the engine author's reading of standard Parashari practice and awaits the owner's confirmation. The window scan only finds candidate periods. It never decides an answer alone. Round 14. varga and vargaHouses name the subject divisional chart and its key houses. The occupants of those houses in that varga and the lords of their signs are added to the dasha significators.",
   "marriage": {
     "houses": [
       7,
@@ -13,7 +13,11 @@
     "karakasMale": [
       "Venus"
     ],
-    "source": "owner for house 7 and karakas, houses 2 and 11 proposed"
+    "source": "owner for house 7 and karakas, houses 2 and 11 proposed",
+    "varga": 9,
+    "vargaHouses": [
+      7
+    ]
   },
   "father_loss": {
     "houses": [
@@ -25,7 +29,11 @@
       "Sun"
     ],
     "note": "8th, 2nd and 7th from the 9th house",
-    "source": "proposed"
+    "source": "proposed",
+    "varga": 12,
+    "vargaHouses": [
+      9
+    ]
   },
   "mother_loss": {
     "houses": [
@@ -37,7 +45,11 @@
       "Moon"
     ],
     "note": "8th, 2nd and 7th from the 4th house",
-    "source": "proposed"
+    "source": "proposed",
+    "varga": 12,
+    "vargaHouses": [
+      4
+    ]
   },
   "job_start": {
     "houses": [
@@ -49,7 +61,11 @@
     "karakas": [
       "Saturn"
     ],
-    "source": "owner for house 10 and Saturn, rest proposed"
+    "source": "owner for house 10 and Saturn, rest proposed",
+    "varga": 10,
+    "vargaHouses": [
+      10
+    ]
   },
   "education_step": {
     "houses": [
@@ -61,7 +77,12 @@
       "Mercury",
       "Jupiter"
     ],
-    "source": "owner for D24, houses and karakas proposed"
+    "source": "owner for D24, houses and karakas proposed",
+    "varga": 24,
+    "vargaHouses": [
+      4,
+      5
+    ]
   },
   "child_birth": {
     "houses": [
@@ -70,7 +91,11 @@
     "karakas": [
       "Jupiter"
     ],
-    "source": "owner for house 5 and Jupiter"
+    "source": "owner for house 5 and Jupiter",
+    "varga": 7,
+    "vargaHouses": [
+      5
+    ]
   },
   "sibling_birth": {
     "houses": [
@@ -80,7 +105,11 @@
     "karakas": [
       "Mars"
     ],
-    "source": "proposed"
+    "source": "proposed",
+    "varga": 3,
+    "vargaHouses": [
+      3
+    ]
   },
   "foreign_travel": {
     "houses": [
@@ -99,7 +128,11 @@
     "karakas": [
       "Mars"
     ],
-    "source": "proposed"
+    "source": "proposed",
+    "varga": 4,
+    "vargaHouses": [
+      4
+    ]
   },
   "health_crisis": {
     "houses": [
