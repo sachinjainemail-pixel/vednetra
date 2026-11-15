@@ -157,6 +157,14 @@ function check(text, opts) {
         else if (/legacy/i.test(ev[0]) && !opts.allowLegacy) errors.push("ENGINE VERSION legacy is only for reproducing old results. Answer with engine 2.0, or run the guard with --allow-legacy");
       }
     }
+    // G13 chained inference, round 25, Kundali 893. One answer was built on the answer to another question and spoiled three. A reference to another
+    // question is allowed on the COUNTER EVIDENCE line only, where the dependency is declared.
+    const s0 = heads.find(h => h.n === 0);
+    const crossRe = /\b(?:question|Q)\s*\d\b/i;
+    lines.slice(s0 ? s0.line : 0).forEach(l => { if (crossRe.test(l) && !/^COUNTER EVIDENCE\b/.test(l) && !/^S\d\./.test(l)) errors.push("G13 chained inference, a line refers to another question, \"" + l.slice(0, 60) + "\". Answer each question from its own evidence and declare a dependency on the COUNTER EVIDENCE line only"); });
+    // G15 a tie break on a reading that is only PROPOSED needs the NO RULE label
+    const tb = lines.filter(l => /^TIE BREAK\b/.test(l)), cl2 = lines.filter(l => /^COUNTER EVIDENCE\b/.test(l));
+    if (tb.some(l => /proposed/i.test(l)) && !(cl2[0] && /^COUNTER EVIDENCE\s+NO RULE\b/.test(cl2[0]))) errors.push("G15 the TIE BREAK rests on a PROPOSED reading, so the COUNTER EVIDENCE line must start with NO RULE");
     // reasoning from priors
     PRIOR_WORDS.forEach(re => { const m = text.match(re); if (m) errors.push("Reasoning from typicality or base rates is not allowed, found \"" + m[0] + "\". Decide from counted chart evidence"); });
   }

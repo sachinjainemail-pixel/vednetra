@@ -1,0 +1,25 @@
+{
+ "_note": "Round 25, Kundali 893. Question kinds for which neither the owner's methodology nor the rule library nor a cited text holds a validated rule. The engine still decides, but the answer carries NO RULE and the case is tagged no_rule in cases.json. pattern is a case insensitive regular expression over the question and the options.",
+ "topics": [
+  {
+   "name": "community of the spouse, caste or religion",
+   "pattern": "inter ?-?caste|another caste|other caste|inter ?-?religio|another religion|other religion|inter ?-?faith|दूसरी जाति|दूसरे धर्म|अंतरजातीय|विजातीय|traditional marriage|arranged marriage|love marriage|पारंपरिक",
+   "why": "The library holds nothing that decides the caste or religion of a spouse. Kundali 893 was answered from the author's own reading of the nodal axis and was wrong, see LEARNINGS H20. Shri Jha Ji holds R308, R988 and R2193 on the nodes and the religion of the planets, which this engine is not allowed to cite."
+  },
+  {
+   "name": "sex of a child",
+   "pattern": "one son|one daughter|एक पुत्र|एक पुत्री|son and daughter|पुत्र और पुत्री|बेटा|बेटी|boy|girl",
+   "why": "The engine has no validated rule for the sex of a child or for the number of children. Chain evidence is identical for every composition."
+  },
+  {
+   "name": "number of siblings or children",
+   "pattern": "how many (siblings|children)|number of (siblings|children)|भाई बहन की संख्या|कितने भाई|कितनी संतान|brothers?\\\\b.*sisters?",
+   "why": "No validated counting rule, see LEARNINGS G6."
+  },
+  {
+   "name": "divorce versus marriage",
+   "pattern": "divorc|तलाक|separat|अलग रह",
+   "why": "No validated rule for divorce, see engine_config knownGaps."
+  }
+ ]
+}

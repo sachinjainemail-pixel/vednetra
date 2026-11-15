@@ -74,6 +74,13 @@ engine inside the owner's methodology and are open to the owner's change. See LE
 19. CASE LOG. After every owner reported result add the case to suj_engine/cases/cases.json, run cases_report.js and update
     LEARNINGS.md.
 
+Round 25 additions, from Kundali 893. They are process rules and change no weight. See LEARNINGS.md G13 to G16.
+
+21. NO CHAINED INFERENCE. A question is answered from its own evidence and never from the answer to another question of the same chart. A dependency is declared on the COUNTER EVIDENCE line only. The guard checks it.
+22. RESIDENCE IS NOT TRAVEL. A foreign window never breaks a tie for living abroad. The 4th house decides residence.
+23. NO VALIDATED RULE. For the question kinds in data/no_rule_topics.json the answer decides, starts the COUNTER EVIDENCE line with NO RULE, and the case is tagged no_rule. A TIE BREAK on a PROPOSED reading needs that label.
+24. A DATED QUESTION IS READ UNDER BOTH TRANSIT GATES. prepare.js with on set to the date prints the event rank and the windows under the double and the single gate for every event, and the answer says which gate each option rests on.
+
 ## Engine tools
 
 ENGINE VERSION 2.0 is the default configuration since round 22, see data/engine_config.json and tools/engine_config.js. All tools run it unless the input says
@@ -110,7 +117,7 @@ Rule library lookup for the chart placements and an event tag:
 
     node suj_engine/tools/rules_lookup.js '{"gender":"female","date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0,"event":"Education"}'
 
-Dossier for a question, runs the dominant house scan, the strict windows and the rule lookup together:
+Dossier for a question, runs the dominant house scan, the strict windows and the rule lookup together. Add question and options to get the no rule banner, and on and events to get the dated question section:
 
     node suj_engine/tools/prepare.js '{"gender":"female","date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0,"topic":"parents"}'
 

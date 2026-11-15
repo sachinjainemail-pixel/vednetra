@@ -32,7 +32,11 @@ const cases = [
   ["missing engine version", base({ engine: "" }), false, /ENGINE VERSION/],
   ["engine version 1.0 fails", base({ engine: "ENGINE VERSION 1.0" }), false, /version 2.0/],
   ["engine legacy fails without the flag", base({ engine: "ENGINE VERSION legacy" }), false, /only for reproducing/],
-  ["hedging still fails", base({ extra: "this cannot be determined" }), false, /Hedging/]
+  ["hedging still fails", base({ extra: "this cannot be determined" }), false, /Hedging/],
+  ["G13 a reference to another question fails", base({ extra: "The marriage on 10 December 2024 found under question 5 shows the native is married" }), false, /G13/],
+  ["G13 a reference on the counter evidence line passes", base({ counter: "COUNTER EVIDENCE the result depends on the answer to question 5 and the 7th lord is combust" }), true],
+  ["G15 a proposed tie break without NO RULE fails", base({ tally: "EVIDENCE TALLY Graduation 7, Post graduation 7, Intermediate 1, High school 0", tie: "TIE BREAK the nodal axis is a PROPOSED reading of the author" }), false, /G15/],
+  ["G15 a proposed tie break with NO RULE passes", base({ tally: "EVIDENCE TALLY Graduation 7, Post graduation 7, Intermediate 1, High school 0", tie: "TIE BREAK the nodal axis is a PROPOSED reading of the author", counter: "COUNTER EVIDENCE NO RULE for this kind of question and the 7th lord is combust" }), true]
 ];
 const ORD = ["High school", "Intermediate", "Graduation", "Post graduation"];
 const ordCases = [

@@ -13,7 +13,12 @@ const TYPES = {
   "Working": [[{ option: "Yes", houses: [10], karakas: ["Saturn"], varga: 10 }]], "Doctor": [[{ option: "Yes", houses: [6, 10], karakas: ["Sun", "Mars"], varga: 10 }]],
   "Lawyer": [[{ option: "Yes", houses: [9, 10], karakas: ["Jupiter", "Saturn", "Mercury"], varga: 10 }]], "Astrologer": [[{ option: "Yes", houses: [8, 9, 10], karakas: ["Jupiter", "Mercury", "Ketu"], varga: 10 }]],
   "Has siblings": [[{ option: "Yes", houses: [3, 11], karakas: ["Mars"], varga: 3 }]], "Father alive": [[{ option: "Yes", houses: [9, 4], from: 9, karakas: ["Sun"], varga: 12 }]],
-  "Mother alive": [[{ option: "Yes", houses: [4, 11], from: 4, karakas: ["Moon"], varga: 12 }]], "Has a child": [[{ option: "Yes", houses: [5], karakas: ["Jupiter"], varga: 7 }]]
+  "Mother alive": [[{ option: "Yes", houses: [4, 11], from: 4, karakas: ["Moon"], varga: 12 }]], "Has a child": [[{ option: "Yes", houses: [5], karakas: ["Jupiter"], varga: 7 }]],
+  // round 25, added after Kundali 893, the chains written before that run
+  "Government job": [[{ option: "Yes", houses: [10, 6], karakas: ["Sun"], varga: 10 }]], "Private job": [[{ option: "Yes", houses: [10, 6], karakas: ["Saturn", "Mercury"], varga: 10 }]],
+  "Own business": [[{ option: "Yes", houses: [7, 10, 11], karakas: ["Mercury", "Venus"], varga: 10 }]], "Unemployed": [[{ option: "Yes", houses: [12, 8], karakas: ["Saturn"], varga: 10 }]],
+  "Lives at birth place": [[{ option: "Yes", houses: [4, 1], karakas: ["Moon"], varga: 4 }]], "Lives in another state": [[{ option: "Yes", houses: [3, 9], karakas: ["Mercury"], varga: 9 }]],
+  "Lives abroad": [[{ option: "Yes", houses: [12, 9], karakas: ["Rahu"], varga: 9 }]]
 };
 // the ephemeris cache in app.js never empties and a long run hits the limit of a Map, so every random chart runs in its own process
 const charts = [];

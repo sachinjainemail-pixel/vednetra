@@ -17,11 +17,13 @@ const NULL = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "data", "null
 function score(cfg) {
   const names = cfg.types || Object.keys(TYPES).filter(n => !cfg.topic || TYPES[n].topic === cfg.topic);
   if (!names.length) throw new Error("No hypothesis type for that topic. Known topics: " + Array.from(new Set(Object.values(TYPES).map(t => t.topic))).join(", "));
-  const ctx = H.context(cfg);
+  // topic only filters the hypothesis types here. It must not travel on into planet_strength.js, which reads it as a strength preset and rejects marriage and work.
+  const run = Object.assign({}, cfg); delete run.topic; delete run.types;
+  const ctx = H.context(run);
   const rows = names.map(n => {
     const t = TYPES[n]; if (!t) throw new Error("Unknown hypothesis type " + n);
     const hs = [{ option: "Yes", houses: t.houses, from: t.from, karakas: t.karakas, varga: t.varga }];
-    const res = H.run(Object.assign({}, cfg), ctx, hs, ["No", "Yes"], false);
+    const res = H.run(Object.assign({}, run), ctx, hs, ["No", "Yes"], false);
     const row = res.rows[1], nl = NULL.out[n] && NULL.out[n].B;
     const z = nl ? (row.score - nl.m) / nl.sd : null;
     return { type: n, topic: t.topic, score: row.score, favour: row.favour, against: row.against, nullMean: nl ? Math.round(nl.m * 10) / 10 : null, nullSd: nl ? Math.round(nl.sd * 10) / 10 : null, z: z == null ? null : Math.round(z * 100) / 100,

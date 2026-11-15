@@ -1,5 +1,5 @@
 {
- "_note": "Hypothesis types for yes or no questions, round 22. Houses are counted from the Lagna, from is the subject house when the lord and house lists are counted from it. The chain houses, karakas and varga are the engine author's, fixed in round 20 before the blind test of Kundali 4, and were not tuned afterwards. A new type needs its own null distribution, run experiments/null_distribution.js with the type added, before its z score is read.",
+ "_note": "Hypothesis types for yes or no questions, round 22. Houses are counted from the Lagna, from is the subject house when the lord and house lists are counted from it. The chain houses, karakas and varga are the engine author's, fixed in round 20 before the blind test of Kundali 4, and were not tuned afterwards. A new type needs its own null distribution, run experiments/null_distribution.js with the type added, before its z score is read. Round 25, Kundali 893. Government job, Private job, Own business, Unemployed and the three residence types were added. They are the chains written before the run on Kundali 893, nothing was tuned, and each has its own null distribution from the same 24 random charts.",
  "types": {
   "Education exists": {
    "houses": [
@@ -172,6 +172,86 @@
    ],
    "varga": 7,
    "topic": "children"
+  },
+  "Government job": {
+   "houses": [
+    10,
+    6
+   ],
+   "karakas": [
+    "Sun"
+   ],
+   "varga": 10,
+   "topic": "work"
+  },
+  "Private job": {
+   "houses": [
+    10,
+    6
+   ],
+   "karakas": [
+    "Saturn",
+    "Mercury"
+   ],
+   "varga": 10,
+   "topic": "work"
+  },
+  "Own business": {
+   "houses": [
+    7,
+    10,
+    11
+   ],
+   "karakas": [
+    "Mercury",
+    "Venus"
+   ],
+   "varga": 10,
+   "topic": "work"
+  },
+  "Unemployed": {
+   "houses": [
+    12,
+    8
+   ],
+   "karakas": [
+    "Saturn"
+   ],
+   "varga": 10,
+   "topic": "work"
+  },
+  "Lives at birth place": {
+   "houses": [
+    4,
+    1
+   ],
+   "karakas": [
+    "Moon"
+   ],
+   "varga": 4,
+   "topic": "residence"
+  },
+  "Lives in another state": {
+   "houses": [
+    3,
+    9
+   ],
+   "karakas": [
+    "Mercury"
+   ],
+   "varga": 9,
+   "topic": "residence"
+  },
+  "Lives abroad": {
+   "houses": [
+    12,
+    9
+   ],
+   "karakas": [
+    "Rahu"
+   ],
+   "varga": 9,
+   "topic": "residence"
   }
  }
 }

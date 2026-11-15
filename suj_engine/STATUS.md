@@ -168,6 +168,18 @@
 - Still open, planet strength winner to event result mapping, the sibling brother and sister split, employed or not, and
   whether planet_strength.js should drop planets with fewer than three subject links and add derived houses.
 
+## Round 25. Learnings built into every engine after Kundali 893 (done)
+
+The owner asked for the learnings of the wrong answers to be built into every engine that got a question wrong, for any life event of any native, and not only for this chart. Done as process and tooling fixes, with no weight, band, prior or window rule changed on one chart.
+- SUJ. Bug, the hypothesis scores of the marriage and work topics had failed in every dossier. Fixed with a self test. Seven new hypothesis types with null distributions, four event presets, the topics residence and business, the NO VALIDATED RULE banner, the dated question section under both gates, G13 to G16, contract requirements 21 to 24, template version 4, guard checks for chained inference and for a PROPOSED tie break. Self tests guard 22, strength 13, functional 9, window 11, rank 5, degree 7, nakshatra 5, engine 12, all pass.
+- Shri Jha Ji. The marks followed the option probability and not the category mass, so the pick and the marks disagreed. Seven option phrasings were unread. Fixed, with tests, 113 of 113 pass. Ledger entry, three hypotheses, a README learning log.
+- Poddar. The commonest childless label of the practice groups, written with the visarga, was read as a child of unknown count in 33 options. Caste, religion, English and Hindi phrasings were unclassified, so one option took 72 percent. Prior ties silently took the first option. Fixed with the canon layer 4, UNMAPPED and TIE flags, chart 893 added to the practice charts, BENCHMARKS B17.
+- KP Pro. An unreadable option was dropped without a word and the only readable one could win. Kinds of marriage, medical, intermediate and hometown were unread. There was no way to answer what happened on a date. Fixed, with a dated command, tests 93 of 93, chart 893 added to the backtest, FINDINGS F9.
+- Chawdhri. The engine gives evidence and no pick. The errors were in how the report was read, an adverse lean taken as the outcome and a closed gate taken as a denial. The reading protocol of the skill was extended and the check recorded without birth data. No trigger was coded for a child, the books give none.
+- Vednetra KP skill. Outside the repositories, not changed. Its B4 board vetoes a CSL that stands in the star of Rahu or Ketu as a retrograde planet. The nodes are always retrograde in the mean node, so the veto fires for every CSL in a node star. It denied children on Kundali 893 and the native has a daughter. The board is part of the VedNetra app, app.js, and was not changed here because the rule is the owner's. Needs the owner.
+- The ten Vednetra skills not yet run on this chart remain not run.
+- Needs the owner. Whether the SUJ engine may cite the Shri Jha Ji rulebook, where R308, R988 and R2193 on the nodes and the religion of the planets, which fit this chart, sit. Whether the retrograde veto of the KP board should leave out the nodes. The KP Pro engine of the owner, KP-Pro-sutton, counts only Mars, Mercury, Jupiter, Venus and Saturn as truly retrograde, so the app board and that engine disagree.
+
 ## Round 24. Kundali 893 true answers (done)
 
 - The owner reported the true answers. SUJ 1 of 6, MBA right. Blind total 4 of 14. Recorded in cases.json as K893, with the SARVA columns under otherMethods, cases_report.js run, LEARNINGS H15 to H21 written.

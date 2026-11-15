@@ -22,7 +22,9 @@ function context(C) {
 
 function build(C, ctx, h, carriersOnly) {
   const { P, LAG, MOON, nat } = ctx;
-  const base = analyse(Object.assign({}, C, { houses: [], karakas: [], varga: h.varga, candidates: ["Sun", "Moon"] }));
+  // topic is the question topic of prepare.js, marriage or work, and planet_strength.js rejects it as a strength preset. It leaked in and the hypothesis scores of
+  // two of the six topics failed in every dossier until Kundali 893. The chains here carry their own houses and karakas, so the key is dropped.
+  const base = analyse(Object.assign({}, C, { topic: undefined, houses: [], karakas: [], varga: h.varga, candidates: ["Sun", "Moon"] }));
   const lordships = pl => KB.ownSigns[pl].map(sg => ((sg - LAG + 12) % 12) + 1).sort((a, b) => a - b);
   const ev = [], involved = new Set();
   const add = e => { ev.push(Object.assign({ option: h.option }, e)); involved.add(e.planet); };

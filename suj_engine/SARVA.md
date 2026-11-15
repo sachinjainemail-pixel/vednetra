@@ -33,11 +33,24 @@ the scratchpad directory, never into a repository.
 
 If the registry grows, the owner adds a row here and every later table gets the new column. Never drop a column.
 
+## The engines after the repairs of round 25 (Kundali 893)
+
+Every engine of the registry was repaired for the faults that the first SARVA table exposed. Run them in the form below, and read their flags into the cell.
+
+| Column | What changed, and what the back end must do |
+|---|---|
+| SUJ | prepare.js takes question and options, prints the NO VALIDATED RULE banner, and takes on and events for a dated question under both transit gates. Hypothesis scores now run for marriage, work and residence. answer_guard.js fails a reference to another question and a PROPOSED tie break without NO RULE. |
+| Shri Jha Ji | The marks now follow the category mass, and the lexicon reads caste, religion, arranged, birth place, hometown, another state and another city. If a stop sign still prints, reword in the scratchpad copy of q.json. |
+| Chawdhri | Follow the section Multiple choice and dated questions in the skill. An adverse lean is not the outcome, a closed gate is not a denial, run the dated report with the topics of every option. |
+| Poddar | mcq_predict.py prints TIE and UNMAPPED. A cell with a TIE or an UNMAPPED option is broken by the chart reading and is marked read, the first option is never the pick. |
+| KP Pro | kpredict ask now says INCOMPLETE and SAME MEANING. Use kpredict dated --event-date for any question about what happened on a date. |
+| Vednetra skills | Unchanged. Note that the KP board of the app denies a CSL that stands in the star of Rahu or Ketu as retrograde, which is a known disagreement with the KP Pro engine, STATUS round 25. |
+
 ## Rules for the back end
 
 1. Intake as in CLAUDE.md. If the birth data is missing ask for it in one short message, nothing else.
 2. As of date is the system date. Dated events ("what happened on DATE") are run at that date in every methodology.
-3. Same question text and same options in every methodology. Options are never reordered.
+3. Same question text and same options in every methodology. Options are never reordered and never translated. Pass them exactly as the owner wrote them, in the owner's language. On Kundali 893 the options were put into English for the Poddar and KP Pro runs and the English childless and kinds of marriage were unreadable to the Poddar engine, so its cells came out of a flat prior.
 4. Every column gives exactly one option per question, or one concrete answer if there are no options. A methodology that
    gives no pick of its own (Chawdhri, Poddar) is read from its evidence by the analyst and the cell says read.
 5. Each methodology keeps its own rules. Do not blend schools, do not carry a result of one methodology into another.

@@ -21,5 +21,15 @@ const K4 = { gender: "male", date: "2006-02-14", time: "05:27:00", tz: 5.5, lat:
 const r = score(K4), by = {}; r.rows.forEach(x => { by[x.type] = x; });
 ok("hypothesis scores of Kundali 4 reproduce the stored updated scores 21 and 40", by["Has siblings"].score === 21 && by["CA"].score === 40);
 ok("the z score is read against the stored null distribution", Math.abs(by["Has siblings"].z - (21 - 29.1) / 24) < 0.2 && /PROVISIONAL/.test(r.status));
+// round 25, Kundali 893. The topic key leaked from prepare.js into planet_strength.js and the hypothesis scores of marriage and work failed in every dossier.
+const K893 = { gender: "male", date: "1989-10-29", time: "12:20:00", tz: 5.5, lat: 26.8467, lon: 80.9462, asOf: "2026-11-15" };
+let leaked = null; try { leaked = score(Object.assign({}, K893, { topic: "marriage" })); } catch (e) { leaked = e.message; }
+ok("the hypothesis scores run for the marriage topic", leaked && leaked.rows && leaked.rows.some(x => x.type === "Married"));
+let leaked2 = null; try { leaked2 = score(Object.assign({}, K893, { topic: "work" })); } catch (e) { leaked2 = e.message; }
+ok("the hypothesis scores run for the work topic and list the four kinds of work", leaked2 && leaked2.rows && ["Government job", "Private job", "Own business", "Unemployed"].every(n => leaked2.rows.some(x => x.type === n)));
+let leaked3 = null; try { leaked3 = score(Object.assign({}, K893, { topic: "residence" })); } catch (e) { leaked3 = e.message; }
+ok("the hypothesis scores run for the residence topic", leaked3 && leaked3.rows && leaked3.rows.length === 3 && leaked3.rows.every(x => x.z !== null));
+const EV = require("../data/events.json");
+ok("the events accident, imprisonment, business_start and relocation exist", ["accident", "imprisonment", "business_start", "relocation"].every(k => EV[k] && EV[k].houses.length));
 console.log(pass + " of " + total + " passed");
 process.exit(pass === total ? 0 : 1);

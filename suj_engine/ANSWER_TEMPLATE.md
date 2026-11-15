@@ -1,4 +1,4 @@
-# SUJ ENGINE ANSWER TEMPLATE (version 3)
+# SUJ ENGINE ANSWER TEMPLATE (version 4)
 
 Every answer from the SUJ engine uses these sections in this order. Headings are plain text lines with no
 markdown symbols, because the owner does not want the characters ( ) ! ; : em dash, curly quotes, / - # * ~ in
@@ -33,7 +33,8 @@ S8. RECONCILIATION OF SECTIONS
     planet strength in favour of each option, 0 to 100, the owner's rule of round 6. The final answer is the option with the
     highest number. A tie needs one line starting TIE BREAK naming the deciding step. For ordered options list them lowest
     first and run the guard with --ordinal, the final answer is the highest option above 50.
-    Contains one line starting COUNTER EVIDENCE naming the strongest evidence against the final answer.
+    Contains one line starting COUNTER EVIDENCE naming the strongest evidence against the final answer. For a question with no validated rule, data/no_rule_topics.json, it starts COUNTER EVIDENCE NO RULE.
+    A reference to another question of the chart is allowed on this line only, LEARNINGS G13.
     Contains one line starting ENGINE VERSION, copied from the top of the prepare.js dossier, for example
     ENGINE VERSION 2.0 degree true, nakshatra true, node bands true. Engine 2.0 is the default for every answer from round 22.
     For a yes or no question about what the native has, quote the HYPOTHESIS SCORES from prepare.js, the raw score and the z
@@ -58,3 +59,6 @@ S9. SUMMARY
 8. Read suj_engine/LEARNINGS.md before answering. Its guardrails G1 to G11 apply to every question.
 9. Without options, the EVIDENCE TALLY line may be left out of the number check, but the line and the COUNTER EVIDENCE
    line are still required, and the tally lists the candidate answers the analysis considered.
+10. A dated question is answered from both transit gates, prepare.js with on. Say which gate each option rests on, LEARNINGS G16.
+11. Version 4 of the template adds the NO RULE label and the ban on references to other questions, both checked by answer_guard.js.
+
