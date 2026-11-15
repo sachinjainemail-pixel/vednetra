@@ -62,6 +62,51 @@ short message and then proceed. The as-of date is the system date.
 The owner is building this engine in rounds and will give further instructions. Update STATUS.md after each
 round.
 
+## SERVER mode, all engines
+
+Trigger. If the first word of the owner's prompt is "server", in any letter case and with or without punctuation after
+it, the prompt is a SERVER request. The rest of the prompt holds the birth details and one or more questions, with options
+if any. Do not ask what server means. It asks for a comprehensive analysis of EVERY question and one prediction for each,
+based on all the engine repositories attached to the session. A prompt that merely contains the word server elsewhere is
+not a trigger. If birth data is missing, ask for it in one short message and then proceed.
+
+Engines used, each run by its own rules and tools. They are sibling repositories of this one under /home/user.
+1. SUJ engine in vednetra, the lead engine. Follow every rule of the SUJ engine section above for each question.
+2. Sudarshan engine in Shri-Jha-Ji. Read its CLAUDE.md first. Birth file as in examples/birth.sample.json, then
+   node bin/jyotish.js ask --file chart.json --topic TOPIC --now ASOF, with --options for options, or answer --file
+   birth.json --questions q.json for a set of questions. Report its picks as that engine labels them, including any
+   pick that is uncalibrated.
+3. Chawdhri engine in CHAWDHRI. Read its CLAUDE.md and .claude/skills/vedic-engine/SKILL.md first. It must never be
+   mixed with another school, so run it as an isolated pass. It needs its own VedNetra copy with the high precision
+   patch. The default target of engine/bridge/setup_vednetra.sh is the home folder vednetra, which would patch THIS
+   repository. Always pass another folder, for example
+   sh engine/bridge/setup_vednetra.sh /home/user/vednetra_chawdhri, then set VEDNETRA_DIR to that folder and run
+   python3 -m engine --date D --time T --city PLACE --question Q --now ASOF.
+4. Poddar engine in poddar-engine. Run engine/setup.sh first, then follow .claude/skills/poddar-engine/SKILL.md.
+5. kpredict in KP-Pro-sutton (KP Pro, KCIL, KP Pro Max). Install with pip install -e . in that folder, then
+   kpredict read or kpredict ask. If a place is unknown pass --lat --lon --tz, never guess it.
+6. poddar-data holds reference data and chat exports only. It is not an engine, use it for look ups when useful.
+   READ-VEDNETRA and SHRIVEDNETRA hold no astrology rules and are not used.
+
+Procedure for each question, in the order asked, none skipped.
+1. Run the SUJ engine fully: prepare.js, then the S0 to S9 layout of ANSWER_TEMPLATE.md.
+2. Run the other four engines on the same question and the same as-of date, the system date, each in its own method.
+   Every number must come from the engine's own tools, never from memory. An engine that cannot run, for example a missing
+   build tool, is reported in S8 with the reason and counts as no vote. Never replace it by a guess.
+3. In S8 add one line starting ENGINE VOTES with the one answer and the time status of each of the five engines, then
+   write each engine's answer with its astrological reason in plain words, without that engine's internal scores.
+   Where engines disagree, give the cause, for example a different ayanamsa, house system or dasha method.
+4. The final answer is the one the SUJ EVIDENCE TALLY selects. The other engines are corroboration. Every engine that
+   disagrees with the final answer is named in the COUNTER EVIDENCE line. If the SUJ tally still ties after the tie break
+   order of METHODOLOGY.md section 5.4, the ENGINE VOTES break the tie and the TIE BREAK line says so.
+5. Write each question draft to its own file, run node suj_engine/tools/answer_guard.js on it, and fix every error.
+   The guard does not yet check the ENGINE VOTES line, so check it by hand.
+6. Send the questions one after another, each with its S0 to S9 sections and its closing 2 or 3 bullets, the last one
+   starting with Final answer. Nothing after the closing bullets of the last question.
+
+All other rules stay in force: one definitive answer per question, counted chart evidence only, a natal promise is
+capacity and not status, and the Chawdhri no mixing rule.
+
 ## Response style preference of the owner
 
 Do not use these characters in chat responses: ( ) ! ; : em dash, curly quotes, / - # * ~ . Judge every

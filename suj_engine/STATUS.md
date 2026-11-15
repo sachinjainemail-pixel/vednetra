@@ -177,6 +177,14 @@ The owner asked to update the engine with all the learnings and merge it so that
 - tests/engine_selftest.js added, 8 checks. Self tests all pass, guard 18, strength 13, functional 9, window 11, rank 5, degree 7, nakshatra 5, engine 8.
 - Honest limits. The z rule is provisional, found after the Kundali 4 answers were known, updated z AUC 0.78 over 80 pairs, post hoc. The Baladi numbers and pada factors are the engine author's. No validated rule for the number of siblings or children, or for divorce. The blind score is 3 of 8. The next blind chart with the null fixed beforehand is the first fair test of the z reading.
 
+## SERVER mode (added after round 22)
+
+A prompt whose first word is server runs every question through the SUJ engine and four sibling engines (Shri-Jha-Ji,
+CHAWDHRI, poddar-engine, KP-Pro-sutton). The rule is in CLAUDE.md. The final answer follows the SUJ evidence tally, the
+other engines are reported on an ENGINE VOTES line in S8 and break only a tie left after the SUJ tie break order.
+answer_guard.js does not yet check the ENGINE VOTES line. Not yet run on a chart. The kpredict install needs a C compiler
+for pyswisseph and has not been tried in this environment.
+
 ## Next phases (waiting for the owner's further instructions)
 
 - Phase 1. Question intake and event mapping (question to house, karaka, divisional chart, Nth house).
