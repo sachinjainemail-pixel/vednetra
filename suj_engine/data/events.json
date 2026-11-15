@@ -201,5 +201,31 @@
     ],
     "note": "a romantic or live in relationship, the 5th and 7th with the 12th of bed pleasures",
     "source": "proposed, pre-registered in round 20"
+  },
+  "accident": {
+    "houses": [
+      8,
+      6,
+      4
+    ],
+    "karakas": [
+      "Mars",
+      "Rahu"
+    ],
+    "note": "vehicle accident or injury, 8th sudden event, 6th injury, 4th vehicle",
+    "source": "proposed, added in round 23 for Kundali 893 question 5"
+  },
+  "imprisonment": {
+    "houses": [
+      12,
+      6,
+      8
+    ],
+    "karakas": [
+      "Saturn",
+      "Rahu"
+    ],
+    "note": "jail or confinement, 12th is the house of prisons, 6th litigation and enemies, 8th sudden restraint",
+    "source": "proposed, added in round 23 for Kundali 893 question 5"
   }
 }

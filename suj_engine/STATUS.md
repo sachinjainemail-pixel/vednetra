@@ -202,3 +202,13 @@ The owner asked to update the engine with all the learnings and merge it so that
 6. The README of this repository records that 52 pre registered tests of classical interpretation rules came
    out at chance level. The engine will always give one definitive answer as required. A confidence grade
    inside the closing summary is proposed so the definitive answer is not mistaken for a proven one.
+
+## Round 23. Kundali 893, six questions answered under engine 2.0 (done)
+
+- Kundali 893, male, 29 October 1989, 12:20, Lucknow. Questions education, marriage type, children, work, the event of 10 December 2024 and residence. Answers saved in suj_engine/cases/answers/K893_Q1.txt to K893_Q6.txt, all pass answer_guard.js. Recorded as pending in cases.json, waiting for the owner's true answers.
+- Answers under the rules. Education MBA, marriage Traditional, children Childless, work Government job, event of 10 December 2024 Marriage, residence Abroad. Confidence low.
+- Bug fixed in tools/score_hypotheses.js. prepare.js passed the topics work and marriage to planet_strength.js, which only knows career and marriage_male, so the hypothesis scores failed for work and marriage. A topic alias now maps work to career, marriage to marriage_male or marriage_female, parents to father. Education and children scores are unchanged.
+- Two event presets added to data/events.json, accident and imprisonment, marked proposed. They are the engine author's and were needed because the question offered those events.
+- Option chains written for this chart and scored with the same builder: Medical, Government job, Private job, Own business, Birthplace, Other state, Abroad, plus Unemployed, Childless and three marriage types without nulls. The nulls of the first seven come from the 24 random charts of null_distribution.js run on 15 November 2026. They are proposals and were not part of any earlier validation.
+- What worked and what did not. The strict window scan separated the events of 10 December 2024 clearly, only marriage had a window and a double transit. The tally by itself did not, Marriage 57 against Child 55, and the event rank put the proposed jail preset 0.03 above marriage. For Q1 and Q4 the raw chain scores sat within 4 to 5 points of each other, so the answers are thin.
+- Needs the owner. The true answers, and the marriage date, because the childless answer depends on the marriage having happened on 10 December 2024.

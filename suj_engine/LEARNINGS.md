@@ -229,3 +229,9 @@ answer on those rests on the chain evidence only and must not claim more.
 - None of this has been shown to raise accuracy. It makes the process auditable and removes the specific habits that
   produced the misses. The README of this repository records that 52 pre registered tests of classical rules came
   out at chance level, and the engine's first score is consistent with that.
+
+## Kundali 893, round 23, answers given and not yet scored
+
+H15 Negative options. When an option is the absence of the event, Intermediate, Unemployed, Childless, Unmarried, the builder has no chain for it and the complement of the positive chain would always win because positive chain scores sit below 50. For Kundali 893 the negative options were given their own chain of loss houses and the status windows decided the children question, as G4 says. A rule for negative options is still missing. It is the same line at 50 problem as H6.
+H16 Cross question consistency. The children answer depends on the marriage date taken from question 5. Questions about one chart should be answered in the order of the events, marriage date first, and the marriage window should be dated before the children window is read. Done here, but the owner did not give the date.
+H17 Proposed presets. accident and imprisonment were added to data/events.json to answer question 5. The event rank put imprisonment 0.83 over marriage 0.80, a difference smaller than anything the engine has been shown to resolve, and the strict window scan decided. If the true event is not marriage, the first thing to check is whether a dated window with the double transit was enough, and whether the preset houses were the cause.

@@ -14,6 +14,8 @@ const { CONFIG } = require("./engine_config");
 const TYPES = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "data", "hypothesis_types.json"), "utf8")).types;
 const NULL = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "data", "null_distribution.json"), "utf8"));
 
+// round 23 fix. The type filter uses the hypothesis topics work, marriage and parents, while planet_strength.js knows career, marriage_male, marriage_female and father. Without this alias prepare.js failed for work and marriage.
+const TOPIC_ALIAS = { work: "career", parents: "father" };
 function score(cfg) {
   const names = cfg.types || Object.keys(TYPES).filter(n => !cfg.topic || TYPES[n].topic === cfg.topic);
   if (!names.length) throw new Error("No hypothesis type for that topic. Known topics: " + Array.from(new Set(Object.values(TYPES).map(t => t.topic))).join(", "));
@@ -21,7 +23,7 @@ function score(cfg) {
   const rows = names.map(n => {
     const t = TYPES[n]; if (!t) throw new Error("Unknown hypothesis type " + n);
     const hs = [{ option: "Yes", houses: t.houses, from: t.from, karakas: t.karakas, varga: t.varga }];
-    const res = H.run(Object.assign({}, cfg), ctx, hs, ["No", "Yes"], false);
+    const res = H.run(Object.assign({}, cfg, { topic: cfg.topic === "marriage" ? (cfg.gender === "female" ? "marriage_female" : "marriage_male") : (TOPIC_ALIAS[cfg.topic] || cfg.topic) }), ctx, hs, ["No", "Yes"], false);
     const row = res.rows[1], nl = NULL.out[n] && NULL.out[n].B;
     const z = nl ? (row.score - nl.m) / nl.sd : null;
     return { type: n, topic: t.topic, score: row.score, favour: row.favour, against: row.against, nullMean: nl ? Math.round(nl.m * 10) / 10 : null, nullSd: nl ? Math.round(nl.sd * 10) / 10 : null, z: z == null ? null : Math.round(z * 100) / 100,
