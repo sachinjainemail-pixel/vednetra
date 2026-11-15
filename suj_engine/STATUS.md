@@ -168,6 +168,12 @@
 - Still open, planet strength winner to event result mapping, the sibling brother and sister split, employed or not, and
   whether planet_strength.js should drop planets with fewer than three subject links and add derived houses.
 
+## Round 23. SARVA methodology, the all methodology comparison table (done)
+
+- The owner asked for one comparison table per chart across all methodologies, with all calculation and analysis kept in the back end, hard coded for every session. Written as suj_engine/SARVA.md and pointed to from the top of CLAUDE.md. Registry SUJ, Shri Jha Ji, Chawdhri, Poddar, KP Pro and the Vednetra skills. The reply is the table only, as a code block that keeps the owner's style rule.
+- First use on Kundali 893, three columns were produced, SUJ, Shri Jha Ji and Chawdhri. The three disagreed on five of six questions and agreed only on no child. The question about 10 December 2024 split three ways, which also puts the SUJ answers on marriage and children, that rest on it, at risk. Poddar, KP Pro and the Vednetra skills were not run on that chart. The true answers are not known.
+- Needs the owner. Which Vednetra skills are the columns, whether the Shri Jha Ji, Chawdhri and Poddar repositories should carry a pointer to SARVA, and the true answers of Kundali 893.
+
 ## Round 22. Engine 2.0 made the default (done)
 
 The owner asked to update the engine with all the learnings and merge it so that all future analysis follows it.

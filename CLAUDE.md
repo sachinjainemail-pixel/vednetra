@@ -1,5 +1,15 @@
 # CLAUDE.md for the vednetra repository
 
+## SARVA methodology, the comparison table. Takes precedence over every reply format below
+
+If the user says SARVA, or gives a chart with questions (native, birth data, questions), they mean the SARVA methodology.
+Read suj_engine/SARVA.md first. In the back end run EVERY methodology of its registry (SUJ engine, Shri Jha Ji, Chawdhri, Poddar,
+KP Pro, and the Vednetra skills) on every question, then reply with ONE comparison table and nothing else, one row per question and
+one column per methodology. No steps, no analysis, no bullets in the reply. The SUJ analysis is still done in full in the back end
+and its draft still passes answer_guard.js, but the SARVA reply replaces the SUJ answer layout and its closing bullets. A column that
+cannot be run says not run, never filled from memory. Do not commit anything unless the user asks. The owner's style rule for chat
+replies applies to the table.
+
 ## SUJ engine
 
 If the user says "SUJ engine", or asks for any astrology prediction, chart reading, dasha timing, promise
