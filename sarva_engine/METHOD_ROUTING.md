@@ -64,9 +64,14 @@ Chart data. The vednetra-bnn skill runner, sex is mandatory because BNN swaps th
 The runner prints a contract check. Any missing block makes the reading partial, say which. A missing block is
 never estimated.
 
-Rules. BNN rule files 02 to 10, see ENGINE_CONTRACT.md section 7. BNN reads karakas and not houses. Read a
-crowded sign one pair at a time and keep the contradictions. Without the rule files the cell is
-NOT RUN BNN RULES MISSING.
+Rules. sarva_engine/knowledge/bnn/BNN-RULES-5COLUMN.csv through the lookup tool.
+    node sarva_engine/tools/bnn_rules.js --method
+    node sarva_engine/tools/bnn_rules.js '{"event":"marriage","q":"Venus","limit":15}'
+    node sarva_engine/tools/bnn_rules.js '{"id":"RAO-DOM-001"}'
+Read the General method rules first, then the event group. BNN reads karakas and not houses. Read a crowded sign
+one pair at a time and keep the contradictions. Cite the Rule ID of each rule used. Where the table's authors
+disagree, cite both. The cell is the option the cited rules and the chart support best, with the transit timing
+check that ARI-TIM and RAO-FND describe. ENGINE_CONTRACT.md section 7 has the missing file fallback.
 
 ## Output per question
 

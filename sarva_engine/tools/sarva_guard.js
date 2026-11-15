@@ -9,6 +9,7 @@
  * Errors
  *   a question without an OPTIONS line, a METHOD block, an EVIDENCE line or a RESULT line for each of the five
  *   methodologies KPPRO, KCIL, SUJ, CHAWDHRI, BNN; a sixth methodology; two RESULT lines for one pair;
+ *   a BNN EVIDENCE line with no Rule ID from the BNN rule base; NOT RUN BNN RULES MISSING while the rule csv is present;
  *   a RESULT that is not one of the listed options, or that hedges; no FINAL TABLE; a table whose header is not
  *   Question, KP Pro, KCIL, SUJ engine, CHAWDHRI, BNN; a row missing or a cell that differs from its RESULT line;
  *   anything after the table; a missing SUJ FILE; a SUJ file that fails suj_engine/tools/answer_guard.js.
@@ -22,11 +23,13 @@ const { spawnSync } = require("child_process");
 const METHODS = ["KPPRO", "KCIL", "SUJ", "CHAWDHRI", "BNN"];
 const HEADER = ["Question", "KP Pro", "KCIL", "SUJ engine", "CHAWDHRI", "BNN"];
 const BNN_MISSING = "NOT RUN BNN RULES MISSING";
+const BNN_FILE = path.join(__dirname, "..", "knowledge", "bnn", "BNN-RULES-5COLUMN.csv");
 const HEDGE = /\b(cannot|can't|unable|undecided|undetermined|equal|tie|either|neither)\b|\bor\b|\//i;
 const BANNED = /[();:—“”‘’!#*~\/]|\s-\s/;
 
 function check(text, opts) {
   opts = opts || {};
+  const bnnPresent = opts.bnnPresent !== undefined ? opts.bnnPresent : fs.existsSync(BNN_FILE);
   const errors = [], warnings = [];
   const err = m => errors.push(m);
   const lines = text.split(/\r?\n/);
@@ -51,7 +54,7 @@ function check(text, opts) {
       if (results[k] !== undefined) err("Two RESULT lines for " + m[1] + " " + m[2] + ".");
       results[k] = m[3].trim();
     } else if ((m = l.match(/^EVIDENCE (Q\d+) (\S+) (.+)$/))) {
-      evidence[m[1] + m[2]] = true;
+      evidence[m[1] + m[2]] = m[3];
     } else if ((m = l.match(/^SUJ FILE (Q\d+) (.+)$/))) {
       sujFiles[m[1]] = m[2].trim();
     }
@@ -65,9 +68,11 @@ function check(text, opts) {
       const k = q + c;
       if (!blocks[k]) err(q + " has no METHOD " + c + " block.");
       if (!evidence[k]) err(q + " " + c + " has no EVIDENCE line.");
+      else if (c === "BNN" && bnnPresent && results[k] !== BNN_MISSING && !/\b[A-Z]{3}-[A-Z0-9]{3}-\d{3}\b/.test(evidence[k])) err(q + " BNN EVIDENCE line must cite at least one Rule ID from the BNN rule base, for example RAO-FND-009.");
       const r = results[k];
       if (r === undefined) { err(q + " " + c + " has no RESULT line."); return; }
-      if (c === "BNN" && r === BNN_MISSING) { incomplete = true; return; }
+      if (c === "BNN" && r === BNN_MISSING && !bnnPresent) { incomplete = true; return; }
+      if (c === "BNN" && r === BNN_MISSING) { err(q + " BNN says the rules are missing but " + BNN_FILE + " is present. Run the BNN reading."); return; }
       if (r === BNN_MISSING) { err(q + " " + c + " uses the BNN missing text, allowed in the BNN column only."); return; }
       const o = options[q];
       if (Array.isArray(o)) {

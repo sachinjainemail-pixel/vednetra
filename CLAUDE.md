@@ -20,8 +20,9 @@ Non negotiable points
 - The final output is one table, the last block of the reply, with one row per question and the columns Question, KP Pro,
   KCIL, SUJ engine, CHAWDHRI, BNN. Each cell is that methodology's finalized option. No sixth column, no vote, no
   combined answer unless the owner asks for one in that session.
-- BNN rules are never read from memory. If the BNN rule files are missing say so and use the exact cell text
-  NOT RUN BNN RULES MISSING, see ENGINE_CONTRACT.md section 7.
+- BNN rules are never read from memory. The BNN rule base is sarva_engine/knowledge/bnn/BNN-RULES-5COLUMN.csv, read with
+  node sarva_engine/tools/bnn_rules.js, and the BNN evidence line cites Rule IDs. Only if the csv is absent from the
+  session use the cell text NOT RUN BNN RULES MISSING, see ENGINE_CONTRACT.md section 7.
 - Never use the kpredict ask default output as a KP Pro or KCIL cell, it is the cohort prior.
 - Write the draft reply to a file and run node sarva_engine/tools/sarva_guard.js on it before sending.
 - Under SARVA the SUJ rules below apply inside the SUJ column. For any question not named SARVA, the SUJ section

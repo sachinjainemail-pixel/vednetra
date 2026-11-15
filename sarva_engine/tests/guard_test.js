@@ -8,7 +8,7 @@ function draft(o) {
   const out = ["OPTIONS Q1 A B C D"];
   METHODS.forEach(c => {
     if (o.skip === c) return;
-    out.push("METHOD " + c + " Q1", "EVIDENCE Q1 " + c + " counted evidence", "RESULT Q1 " + c + " " + res[c]);
+    out.push("METHOD " + c + " Q1", "EVIDENCE Q1 " + c + " counted evidence" + (c === "BNN" ? " RAO-FND-009" : ""), "RESULT Q1 " + c + " " + res[c]);
   });
   out.push("SUJ FILE Q1 /tmp/none.txt");
   const cells = o.cells || [res.KPPRO, res.KCIL, res.SUJ, res.CHAWDHRI, res.BNN];
@@ -16,7 +16,7 @@ function draft(o) {
   if (o.after) out.push("", o.after);
   return out.join("\n");
 }
-const run = d => check(d, { noSujGuard: true });
+const run = (d, o) => check(d, Object.assign({ noSujGuard: true, bnnPresent: false }, o));
 // SUJ FILE existence is checked, so make the fixture exist
 require("fs").writeFileSync("/tmp/none.txt", "x");
 
@@ -32,4 +32,9 @@ const r = run(draft({ res: bnn }));
 assert.deepStrictEqual(r.errors, []); assert.ok(r.incomplete, "BNN missing text is incomplete not clean");
 const bad = { KPPRO: "NOT RUN BNN RULES MISSING", KCIL: "B", SUJ: "C", CHAWDHRI: "B", BNN: "A" };
 assert.ok(run(draft({ res: bad })).errors.length > 0, "missing text outside BNN fails");
+assert.ok(run(draft({ res: bnn }), { bnnPresent: true }).errors.some(e => /rules are missing but/.test(e)), "missing text with the csv present fails");
+const noId = draft().replace(" RAO-FND-009", "");
+assert.deepStrictEqual(run(noId).errors, [], "no Rule ID needed when the csv is absent");
+assert.ok(run(noId, { bnnPresent: true }).errors.some(e => /Rule ID/.test(e)), "BNN evidence without a Rule ID fails when the csv is present");
+assert.deepStrictEqual(run(draft(), { bnnPresent: true }).errors, [], "clean draft passes with the csv present");
 console.log("sarva guard tests passed");

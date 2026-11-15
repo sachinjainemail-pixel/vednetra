@@ -72,14 +72,23 @@ Where methodologies disagree, the table shows the disagreement as it is. It is n
    opinion of the read command and the methodology's own rules.
 4. Never retune a weight, band or rule because of one chart.
 
-## 7. BNN rule files
+## 7. BNN rule base
 
-The BNN reading rules are the owner's BNN rule files 02 to 10. They are not stored in any attached repository
-or synced skill at the time of writing, only the BNN chart export runner is. The engine must not read BNN from
-memory or from general knowledge of Bhrigu Nandi Nadi. If the rule files are not present under
-sarva_engine/knowledge/bnn/ and not given by the owner in the session, the engine states this once at the start,
-asks for the files, and fills the BNN cell with the exact text NOT RUN BNN RULES MISSING. The guard accepts that
-text only in the BNN column and reports the answer as incomplete.
+The BNN rule base is sarva_engine/knowledge/bnn/BNN-RULES-5COLUMN.csv, 3,073 rules from 21 books, supplied by the
+owner. Every BNN cell rests on rules read from it with node sarva_engine/tools/bnn_rules.js, cited by Rule ID.
+The engine never reads BNN from memory or from general knowledge of Bhrigu Nandi Nadi.
+
+1. Start every BNN reading with the General method rules (bnn_rules.js --method): the karaka is the reference
+   point, the Lagna is not primary, houses are counted from a planet, the aspect strength table, the ten rules,
+   and transits as the timer.
+2. Then read the rules of the question's life event group, with bnn_rules.js, and the chart export of the
+   vednetra-bnn skill. Sex is mandatory because the karakas swap by sex.
+3. Where authors in the table disagree, cite both and decide on the chart, the later rule that says it settles
+   the point wins over the earlier one.
+4. Only if the csv is absent from the session, the engine states it once, asks the owner for it, and fills the BNN
+   cell with the exact text NOT RUN BNN RULES MISSING. The guard accepts that text only while the file is
+   absent and reports the answer as incomplete. With the file present the text is an error.
+5. A BNN chart export block that is missing makes the BNN reading partial. Say which block. Never estimate it.
 
 ## 8. Inputs the engine needs
 
