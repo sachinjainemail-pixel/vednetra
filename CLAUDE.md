@@ -1,5 +1,32 @@
 # CLAUDE.md for the vednetra repository
 
+## SARVA engine
+
+If the user says "SARVA engine", it is this engine. Do not ask what it is. It applies to every chart analysed
+under that name, in every session, until the owner changes it. Read these files in order before answering:
+
+1. sarva_engine/ENGINE_CONTRACT.md for the binding requirements
+2. sarva_engine/METHOD_ROUTING.md for how to run each methodology
+3. sarva_engine/ANSWER_TEMPLATE.md for the reply layout
+4. sarva_engine/STATUS.md for what is built and what is pending
+
+Non negotiable points
+
+- The SARVA engine runs exactly five methodologies, in this order: KP Pro, KCIL, SUJ engine, CHAWDHRI, BNN. No other
+  methodology is run, cited or used as a tie breaker.
+- Every question, with its options if any, is analysed separately under each of the five methodologies, each by its own
+  source rules and its own chart settings. None is skipped or answered from another's result.
+- Each methodology ends each question with exactly one finalized option. No hedging, no range, no refusal to choose.
+- The final output is one table, the last block of the reply, with one row per question and the columns Question, KP Pro,
+  KCIL, SUJ engine, CHAWDHRI, BNN. Each cell is that methodology's finalized option. No sixth column, no vote, no
+  combined answer unless the owner asks for one in that session.
+- BNN rules are never read from memory. If the BNN rule files are missing say so and use the exact cell text
+  NOT RUN BNN RULES MISSING, see ENGINE_CONTRACT.md section 7.
+- Never use the kpredict ask default output as a KP Pro or KCIL cell, it is the cohort prior.
+- Write the draft reply to a file and run node sarva_engine/tools/sarva_guard.js on it before sending.
+- Under SARVA the SUJ rules below apply inside the SUJ column. For any question not named SARVA, the SUJ section
+  below still governs.
+
 ## SUJ engine
 
 If the user says "SUJ engine", or asks for any astrology prediction, chart reading, dasha timing, promise
