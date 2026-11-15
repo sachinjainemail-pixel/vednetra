@@ -271,6 +271,53 @@ ANALYSE LORD OF CAPRICORN I.E. SATURN.
 ALL THE STEPS NEED TO BE PERFORMED WITH EFFICIENCY AND SIMILARLY AS HOUSE AND HOUSE LORD WERE ANALYSED ABOVE
 AND THEN DECIDE ACCORDINGLY ON THE OUTCOME USING BEST JUDGEMENT.
 
+### 2.8 KNOWLEDGE BASE 3. SHAAP DOSH (round 23)
+
+Added by the owner in round 23. The owner's Hindi text, word for word, is in suj_engine/SHAAP_DOSH.md and that file is the authority.
+This section is the engine author's English summary of how the engine applies it. It runs inside the D1 analysis of every question, after the
+dominant house scan of section 2.0, and its line goes into S2 of the answer.
+
+THE RULE IN ONE SENTENCE. A shaap is a yoga and not a significator. Rahu, plus an afflicted significator planet, plus the 5th or 9th or a trik
+house, plus a running dasha, makes a shaap yoga. One or two of these alone is not called shaap.
+
+NINE TYPES, each judged by the planet that is afflicted, Sun pitru, Moon matru, Mars bhratru, Mercury matul, Jupiter brahma and dev, Venus patni.
+1. Pitru. Sun conjoined or aspected by Rahu or Saturn, strongest when the 9th house or the 9th lord is afflicted.
+2. Matru. Moon conjoined Rahu or Ketu and the 4th house or lord afflicted by malefics.
+3. Sarpa. Rahu or Ketu influence on the 5th house or the 5th lord, Mars with Rahu tied to the 5th, and the Prashna Marga form with Jupiter.
+4. Brahma or Guru. Jupiter conjoined Rahu, or Jupiter debilitated or combust in the 2nd or 9th.
+5. Bhratru. The 3rd house or lord afflicted by Saturn, or by Mars and Rahu together.
+6. Patni or Stri. Venus afflicted by Rahu or Saturn and the 7th house or lord spoiled, stronger when the Moon is also afflicted.
+7. Pret. A node and Saturn related in the 8th or 12th, the Lagna lord in the 12th, or the Gulika form.
+8. Matul. Mercury in the 6th or 10th afflicted by Rahu or Saturn.
+9. Dev or Kuladevata. The 9th and 5th lords in papa kartari, or either joined with Ketu.
+
+HOW THE ENGINE JUDGES (tool suj_engine/tools/shaap_scan.js, data suj_engine/data/shaap_rules.json).
+1. Each type rule is tested in D1 and again in D9. Both repeat = FORMED FULL. D1 only = FORMED HALF. D9 only = a fault in the quality of the fruit and
+   not a shaap. D1 shaapit with a good D9, the path is cursed and the end is safe. D1 good with D9 afflicted, the tree is green and the fruit hollow.
+2. FORMED needs the type rule, a node (Rahu, or Ketu where the owner allows it, or Gulika for pret and the inferior serpent form) and a house link.
+   With less than that but some evidence the status is INDICATION, and an INDICATION must not be called a shaap in the answer.
+3. Dasha, the fourth pillar. Active when the Mahadasha or Antardasha lord is one of the planets in the evidence. The tool gives the past, present
+   and future windows, which is the time status of the shaap, ACTIVE NOW, TRIGGER AT PD, or DORMANT. Outside the dasha the yoga sleeps.
+4. Modifiers from the owner. The afflicted significator combust or debilitated makes the shaap deeper, a weak afflictor lighter, a retrograde planet makes
+   it repeat, neecha bhanga or Jupiter's aspect gives a way out after the bhoga. Jupiter combust with Rahu is the heaviest brahma shaap.
+5. Saturn afflicted by Rahu has its own block. The occupied house is hurt most, then the 7th aspect house, then the 3rd and 10th aspect houses. If the
+   conjunction is in the 3rd, 6th or 11th the order reverses. Ketu is the silent third partner by position.
+6. Gulika has its own block. Step 1 the house, the field spoiled. Step 2 the planet joined or aspected, the significator spoiled. Step 3 the lord of
+   Gulika's sign, the root. Pret needs more than Gulika's presence. The badhaka house is the 11th for a movable Lagna, the 9th for a fixed one, the 7th for a
+   dual one.
+7. SIGN AND NAKSHATRA. No sign makes a shaap, the engine never reads a shaap from a sign. A sign only names the cause of a shaap the planets already
+   show, Rahu in a movable sign for destruction of serpent eggs. Nakshatra does not decide a shaap in the classical birth chart texts. The Rahu stars Ardra,
+   Swati, Shatabhisha and the Ketu stars Ashwini, Magha, Mula are listed as supporting flags and never counted.
+
+HOW THE FINDING ENTERS THE ANSWER. Proposed by the engine author, awaiting the owner. The finding is harm evidence. A FORMED shaap whose type is read for
+the question's topic enters strength_tally.js as harm entries for its afflicting planets, one entry per planet, with the weight the tally already gives
+to a harm. An INDICATION enters nothing. The topic links are in shaap_rules.json and are the author's proposal. The answer carries one line in S2 starting
+SHAAP SCAN, produced by shaap_scan.js, and answer_guard.js version 4 requires it.
+
+HOW MUCH THE RULE SEPARATES. Measured in round 23 on 300 seeded random charts, data/shaap_frequency.json. At least one of the nine types is FORMED in D1 in 81.7 percent
+of charts, FORMED FULL in 48 percent, FORMED FULL with a running dasha in 32.3 percent. For one type, FORMED FULL runs from 0 percent for brahma to 16.3 percent for sarpa. The
+rules as written are therefore not rare, and a FORMED status is a weak separator. The rules have not been tested against a chart with known outcomes. See LEARNINGS G13 and G14.
+
 ---
 
 ## 3. ANALYSIS OF RELEVANT DIVISIONAL CHARTS RELATED TO THE QUERY

@@ -1,0 +1,118 @@
+{
+  "_note": "SUJ engine knowledge base 3, SHAAP DOSH. Data for tools/shaap_scan.js. The owner gave the rules in Hindi in round 23, the full text is in suj_engine/SHAAP_DOSH.md and that file is the authority. The tool code holds the logic, this file holds the names, the owner's one line rules, the topic links and the policies. Everything marked proposed is the engine author's reading and awaits the owner.",
+  "version": "1.0",
+  "sourceStatus": "Citations (Brihat Parashara Hora Shastra, Phaladeepika, Jataka Parijata, Saravali, Prashna Marga chapters 13 to 15, Karma Vipaka Samhita) are quoted from the owner's text. None was checked against the books in round 23. The owner's own text says there is no single classical text for shaap yogas.",
+  "sutra": {
+    "hi": "राहु + पीड़ित कारक ग्रह + पंचम या नवम या त्रिक भाव + चलती हुई दशा = शाप योग. इनमें से एक दो चीजें अकेली हों तो शाप नहीं कहा जाता.",
+    "en": "Rahu, plus an afflicted significator planet, plus the 5th or 9th or a trik house, plus a running dasha, makes a shaap yoga. One or two of these alone is not called shaap.",
+    "pillars": ["P1 node or carrier", "P2 type rule met by an afflicted significator", "P3 house link", "P4 running dasha"]
+  },
+  "types": [
+    {
+      "id": "pitru", "hi": "पितृ शाप", "en": "Pitru shaap, ancestors and father", "whose": "Sun", "houseFocus": [9],
+      "ruleHi": "सूर्य का राहु या शनि से युति या दृष्टि, विशेषकर नवम भाव या नवमेश के पीड़ित होने पर",
+      "ruleEn": "Sun conjoined or aspected by Rahu or Saturn, strongest when the 9th house or the 9th lord is afflicted.",
+      "ketuAllowed": true, "topics": ["parents", "wealth", "property", "work"]
+    },
+    {
+      "id": "matru", "hi": "मातृ शाप", "en": "Matru shaap, mother", "whose": "Moon", "houseFocus": [4],
+      "ruleHi": "चंद्र का राहु या केतु से युति (ग्रहण योग) एवं चतुर्थ भाव या चतुर्थेश का पाप पीड़ित होना",
+      "ruleEn": "Moon conjoined Rahu or Ketu (eclipse yoga) AND the 4th house or the 4th lord afflicted by malefics.",
+      "ketuAllowed": true, "topics": ["parents", "property", "education"]
+    },
+    {
+      "id": "sarpa", "hi": "सर्प शाप", "en": "Sarpa shaap, serpents, main cause of obstruction in children", "whose": "5th house and 5th lord", "houseFocus": [5],
+      "ruleHi": "पंचम भाव या पंचमेश पर राहु या केतु का प्रभाव, मंगल राहु युति. प्रश्न मार्ग विधि, बाधकेश से युक्त गुरु दुःस्थान में हो और गुरु से केन्द्र में राहु हो तो उत्तम सर्प का शाप, राहु की जगह गुलिक हो तो अधम सर्प का शाप",
+      "ruleEn": "Rahu or Ketu influence on the 5th house or the 5th lord, or Mars with Rahu tied to the 5th. Prashna Marga form, Jupiter with the badhaka lord in a dusthana and Rahu in a kendra from Jupiter gives a superior serpent curse, Gulika in place of Rahu gives an inferior serpent curse.",
+      "ketuAllowed": true, "gulikaCarrier": true, "topics": ["children", "education"]
+    },
+    {
+      "id": "brahma", "hi": "ब्रह्म या गुरु शाप", "en": "Brahma or Guru shaap, teacher, brahmin, dharma", "whose": "Jupiter", "houseFocus": [2, 9],
+      "ruleHi": "बृहस्पति का राहु से युति (चांडाल योग) अथवा नीच या अस्त होकर द्वितीय या नवम में स्थित होना",
+      "ruleEn": "Jupiter conjoined Rahu (chandala yoga), or Jupiter debilitated or combust and standing in the 2nd or the 9th. The owner's words are nicha asta, read here as debilitated OR combust, both together is the heavier case. This reading is proposed.",
+      "ketuAllowed": false, "topics": ["education", "children", "wealth"]
+    },
+    {
+      "id": "bhratru", "hi": "भ्रातृ शाप", "en": "Bhratru shaap, brothers and sisters", "whose": "Mars", "houseFocus": [3],
+      "ruleHi": "तृतीय भाव या तृतीयेश पर मंगल राहु या शनि का पाप प्रभाव",
+      "ruleEn": "The 3rd house or the 3rd lord afflicted by Saturn, or by Mars and Rahu together. Mars afflicted by Rahu or Saturn confirms whose shaap it is.",
+      "ketuAllowed": false, "topics": ["siblings"]
+    },
+    {
+      "id": "patni", "hi": "पत्नी या स्त्री शाप", "en": "Patni or stri shaap, wife and women", "whose": "Venus", "houseFocus": [7],
+      "ruleHi": "शुक्र का राहु या शनि से पीड़ित होना तथा सप्तम भाव सप्तमेश का दूषित होना, चंद्र शुक्र दोनों पीड़ित हों तो योग प्रबल",
+      "ruleEn": "Venus afflicted by Rahu or Saturn AND the 7th house or the 7th lord spoiled. Moon and Venus both afflicted makes the yoga strong.",
+      "ketuAllowed": false, "topics": ["marriage"]
+    },
+    {
+      "id": "pret", "hi": "प्रेत या अतृप्त आत्मा शाप", "en": "Pret shaap, unsatisfied spirit", "whose": "Lagna lord, Gulika, Ketu", "houseFocus": [8, 12],
+      "ruleHi": "अष्टम या द्वादश भाव में राहु या केतु शनि का संबंध, लग्नेश का द्वादश में जाना. गुलिक का चंद्र शनि या राहु से संबंध और 6 8 12 सक्रिय, केवल गुलिक की उपस्थिति से नहीं",
+      "ruleEn": "A node and Saturn related in the 8th or the 12th, or the Lagna lord in the 12th. Gulika route, Gulika related to the Moon, Saturn or Rahu with the 6th, 8th or 12th active. Gulika alone is not enough.",
+      "ketuAllowed": true, "gulikaCarrier": true, "topics": ["health", "foreign"]
+    },
+    {
+      "id": "matul", "hi": "मातुल या मामा शाप", "en": "Matul shaap, maternal uncle", "whose": "Mercury", "houseFocus": [6, 10],
+      "ruleHi": "षष्ठ या दशम भाव में बुध का राहु शनि से पीड़ित होना",
+      "ruleEn": "Mercury standing in the 6th or the 10th and afflicted by Rahu or Saturn.",
+      "ketuAllowed": false, "topics": ["work", "health"]
+    },
+    {
+      "id": "dev", "hi": "कुल देवता या देव शाप", "en": "Kuladevata or dev shaap, family deity neglected", "whose": "5th lord and 9th lord", "houseFocus": [5, 9],
+      "ruleHi": "नवमेश एवं पंचमेश का पाप कर्तरी में या केतु से संबंध",
+      "ruleEn": "The 9th lord and the 5th lord both in papa kartari, or either of them connected with Ketu. Connection of a node is read by conjunction only, the rule of the engine's own library, LP-057-4 and LP-062-2, proposed for this type. With aspects counted the type was FORMED in 65 percent of 20 random charts.",
+      "ketuAllowed": true, "topics": ["children", "parents", "wealth"]
+    }
+  ],
+  "karakaOfShaap": { "Sun": "pitru", "Moon": "matru", "Mars": "bhratru", "Mercury": "matul", "Jupiter": "brahma and dev", "Venus": "patni" },
+  "centralHouses": [5, 9, 6, 8, 12],
+  "rashiPolicy": {
+    "hi": "कोई राशि स्वयं शाप कारक नहीं. राशि केवल कारण बताती है, अस्तित्व नहीं. प्रश्न मार्ग में चर राशि का राहु सर्प अंड नाश का कारण बताता है. शाप योग है कारक नहीं.",
+    "en": "No sign makes a shaap. A sign can only name the cause of a shaap that the planets already show. Rahu in a movable sign names the cause as destruction of serpent eggs, Prashna Marga. Claims that Pisces, Scorpio, Capricorn or Aquarius are shaap signs, or any fact read from signs without planets, are rejected by the owner, round 23. The engine never reads a shaap from a sign."
+  },
+  "nakshatraPolicy": {
+    "hi": "शास्त्रीय जन्मकुंडली ग्रंथों में नक्षत्र से शाप नहीं देखा जाता. कर्म विपाक संहिता अलग परंपरा है. राहु के नक्षत्र आर्द्रा स्वाति शतभिषा और केतु के नक्षत्र अश्विनी मघा मूल में पीड़ित ग्रह होना व्यवहार में शाप संकेत माना जाता है, यह परवर्ती मत है शास्त्रीय नहीं.",
+    "en": "Nakshatra does not decide a shaap in the classical birth chart texts. The Rahu stars Ardra, Swati, Shatabhisha and the Ketu stars Ashwini, Magha, Mula are a later practical sign. The engine lists them as SUPPORTING FLAGS and never counts them in a verdict. Karma Vipaka Samhita, 108 nakshatra pada results, is a separate tradition and its table is not in the engine.",
+    "rahuStars": ["Ardra", "Swati", "Shatabhisha"],
+    "ketuStars": ["Ashwini", "Magha", "Mula"]
+  },
+  "badhaka": {
+    "en": "Badhaka house from the Lagna, movable sign 11th, fixed sign 9th, dual sign 7th. Badhakesh is the lord of that house. Prashna Marga chapter 15 as given by the owner.",
+    "movable": [0, 3, 6, 9], "fixed": [1, 4, 7, 10], "dual": [2, 5, 8, 11]
+  },
+  "gulika": {
+    "modes": [
+      "Conjunction, strongest. Gulika spoils the significations of the planet it sits with, Sun the father side, Moon the mother side and the mind, Jupiter the deity or brahma wrath.",
+      "House, even without a planet. Gulika in the 5th, children obstruction and past life fault, in the 9th, obstruction in the father's dharma, in the Lagna, body pain.",
+      "Aspect or kendra relation, the Prashna Marga method."
+    ],
+    "order": "First the house of Gulika, which field is spoiled. Then the planet it is joined or aspected by, which significator is spoiled. Then the lord of Gulika's sign, where the root of the obstruction lies.",
+    "pretHi": "प्रेत बाधा, गुलिक का चंद्र शनि या राहु से संबंध और साथ में 6 8 12 भाव सक्रिय हों, केवल गुलिक की उपस्थिति से नहीं. प्रश्न मार्ग, गुलिक का बाधक स्थान या दुःस्थान से संबंध.",
+    "pretNote": "The owner gave two forms. Form 1 needs a Moon, Saturn or Rahu relation plus a dusthana link. Form 2, Prashna Marga, needs only the link of Gulika with the badhaka house or a dusthana. The engine reports both, form 2 is the PRET GULIKA CLASSICAL level and form 1 is the STRONG level.",
+    "kruddhaGraha": "The lord of the harm house or the planet that gives the pain is the angry planet. It names whose wrath it is, deity, parents, guru, brahmin. Gulika joined or aspected with the angry planet lifts the pain from wrath to poison or spirit level.",
+    "mandiNote": "Vednetra's Gulika is the point at the start of Saturn's part. The tradition differs on Mandi, set mandi true in the input to use the end of the part."
+  },
+  "shapitShani": {
+    "en": "Saturn afflicted by Rahu. Saturn keeps its nature but its fruit falls. Where it sits it blocks the house, where it looks it dries the houses. Order of harm, the occupied house, then the 7th aspect house, then the 3rd and 10th aspect houses. If the conjunction stands in the 3rd, 6th or 11th the occupied house is hurt less and the aspected houses more. Saturn in own sign or exalted does not destroy the house totally, fruit comes with delay and mental strain. Houses lorded by Saturn are also spoiled indirectly. Operates only in the dasha or antardasha of Saturn or Rahu, outside it the yoga sleeps. Navamsha Saturn should also be afflicted for the full effect.",
+    "ownerWordingNote": "The owner calls the 3rd, 6th and 11th dusthana here. In the usual usage the dusthana are 6, 8, 12 and 3, 6, 10, 11 are upachaya. The engine applies the rule to the houses 3, 6, 11 as written."
+  },
+  "ketuRole": {
+    "en": "Ketu is the pitru side, the one who takes away, and the spirit side. A Ketu link with a shaap house makes the happiness arrive and then go, child born then away, post gained then lost. A Ketu link with the Saturn Rahu yoga by conjunction or by nakshatra makes the shaap hereditary, from the father's side. Ketu is always in the 7th from Rahu, so every Saturn Rahu conjunction automatically receives Ketu's aspect, the engine therefore asks for a Ketu link that is not automatic, a conjunction or a Ketu star, before it calls a shaap hereditary."
+  },
+  "d1d9": {
+    "en": "D1 gives how and when the event comes, D9 gives the taste and the staying power. A shaap is confirmed only when D1 and D9 both repeat the affliction. D1 and D9 both, full. D1 only, half. D9 only, a fault in the quality of the fruit and not a shaap. D1 shaapit with D9 good, the path is cursed and the end is safe. D1 good with D9 afflicted, the tree is green and the fruit hollow.",
+    "ownerTensionNote": "The owner writes both that the fault is firm only when D1 and D9 repeat it, and that one of the two gives half. The engine reads the two as: both is confirmed, D1 alone is half, D9 alone is not a shaap."
+  },
+  "states": {
+    "retrograde": "More active, the shaap repeats, a debt carried from a past birth.",
+    "combust": "The afflicted significator loses its defence. Jupiter combust with Rahu is the heaviest form of brahma shaap.",
+    "debilitated": "Afflicted and debilitated, the yoga is doubled, unless neecha bhanga is present, then the planet gives a fall first and a rise after, the shaap period ends.",
+    "weakAfflictor": "A weak afflictor hits lighter.",
+    "relief": "Own sign or exaltation of Saturn, and a benefic aspect, above all Jupiter's, reduce the poison."
+  },
+  "houseKarakas": {
+    "_note": "Working table of natural house significators used only to list bhava, karaka and lord for the houses a shapit Saturn damages. The engine author's compilation of the common Parashari karakas, editable.",
+    "1": ["Sun"], "2": ["Jupiter"], "3": ["Mars"], "4": ["Moon", "Mercury"], "5": ["Jupiter"], "6": ["Mars", "Saturn"],
+    "7": ["Venus"], "8": ["Saturn"], "9": ["Sun", "Jupiter"], "10": ["Sun", "Mercury", "Jupiter", "Saturn"], "11": ["Jupiter"], "12": ["Saturn", "Ketu"]
+  },
+  "topicLinks": "Each type lists the topics it is read for in the dossier. This map is the engine author's proposal, the owner gave the houses and the planets, not the topics."
+}

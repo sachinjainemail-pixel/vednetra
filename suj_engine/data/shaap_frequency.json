@@ -1,0 +1,84 @@
+{
+ "_note": "Share of random charts, in percent. Seeded sample of 300 births 1950 to 2005, India, as of 2026-11-15, shaap_scan.js version 1.0, node aspects 7th only. A calibration of the rules, not evidence about a native. d1Formed is the D1 status FORMED, formedFull needs D9 to repeat, formedAndActiveNow is D1 FORMED with the Mahadasha or Antardasha lord in the evidence.",
+ "n": 300,
+ "nodeAspects": "7",
+ "anyTypeFormedD1": 81.7,
+ "anyTypeFormedFull": 48,
+ "anyTypeFormedFullAndActiveNow": 32.3,
+ "shapitShaniPresent": 16,
+ "shapitShaniWithD9Repeat": 1.3,
+ "types": {
+  "pitru": {
+   "d1Formed": 23.3,
+   "d1Indication": 26.3,
+   "formedFull": 11.7,
+   "formedHalf": 11.7,
+   "d9Only": 25.7,
+   "formedAndActiveNow": 17
+  },
+  "matru": {
+   "d1Formed": 20,
+   "d1Indication": 1,
+   "formedFull": 4.3,
+   "formedHalf": 15.7,
+   "d9Only": 10.3,
+   "formedAndActiveNow": 12.7
+  },
+  "sarpa": {
+   "d1Formed": 35.3,
+   "d1Indication": 0,
+   "formedFull": 16.3,
+   "formedHalf": 19,
+   "d9Only": 25,
+   "formedAndActiveNow": 18.7
+  },
+  "brahma": {
+   "d1Formed": 4.3,
+   "d1Indication": 6,
+   "formedFull": 0,
+   "formedHalf": 4.3,
+   "d9Only": 10,
+   "formedAndActiveNow": 3.3
+  },
+  "bhratru": {
+   "d1Formed": 16,
+   "d1Indication": 44.7,
+   "formedFull": 9.3,
+   "formedHalf": 6.7,
+   "d9Only": 22.7,
+   "formedAndActiveNow": 9
+  },
+  "patni": {
+   "d1Formed": 23.7,
+   "d1Indication": 21,
+   "formedFull": 10.7,
+   "formedHalf": 13,
+   "d9Only": 23.7,
+   "formedAndActiveNow": 19
+  },
+  "pret": {
+   "d1Formed": 33.3,
+   "d1Indication": 9.3,
+   "formedFull": 7,
+   "formedHalf": 26.3,
+   "d9Only": 18.3,
+   "formedAndActiveNow": 13.3
+  },
+  "matul": {
+   "d1Formed": 3.7,
+   "d1Indication": 40.3,
+   "formedFull": 2.3,
+   "formedHalf": 1.3,
+   "d9Only": 27,
+   "formedAndActiveNow": 3
+  },
+  "dev": {
+   "d1Formed": 17,
+   "d1Indication": 18,
+   "formedFull": 7,
+   "formedHalf": 10,
+   "d9Only": 23.7,
+   "formedAndActiveNow": 7.3
+  }
+ }
+}

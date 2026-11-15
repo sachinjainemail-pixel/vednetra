@@ -48,6 +48,10 @@ Non negotiable points
   siblings, parents or a child, prepare.js prints HYPOTHESIS SCORES with the raw score and a z score against the null distribution. That z reading is PROVISIONAL, it
   was found after the Kundali 4 answers were known, say so in the answer. The number of siblings or children and divorce have no validated rule.
   S8 of every answer has one ENGINE VERSION line, guard v3 checks it.
+- KNOWLEDGE BASE 3, SHAAP DOSH, since round 23. prepare.js prints the SHAAP DOSH SCAN from suj_engine/tools/shaap_scan.js, the nine types pitru, matru, sarpa,
+  brahma, bhratru, patni, pret, matul and dev in D1 and D9, the dasha status, shapit Shani and Gulika. Put its SHAAP SCAN line in S2, guard v4 checks it. A shaap
+  is a yoga. Rahu plus an afflicted significator plus the 5th, 9th or a trik house plus a running dasha. One or two alone is an indication and is not called shaap.
+  No sign and no nakshatra makes a shaap. The owner's Hindi text is suj_engine/SHAAP_DOSH.md and the rules are untested against known outcomes.
 - After the owner reports true answers for a chart, add the case to suj_engine/cases/cases.json, run
   node suj_engine/tools/cases_report.js and update LEARNINGS.md and STATUS.md.
 - Rule library: suj_engine/rules/rules_index.json (1,561 rules from Komilla Sutton The Nakshatras and Umesh

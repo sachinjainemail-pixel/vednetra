@@ -125,6 +125,15 @@ G11 After every owner reported result, add the case to cases.json, run cases_rep
    marriage date, the date a parent was lost, the year a job started, because dates are the only way to test the window
    scan itself.
 
+G13 SHAAP DOSH, round 23, the owner's text in SHAAP_DOSH.md. A shaap is a yoga and not a significator. Only a status FORMED from shaap_scan.js may be called a
+   shaap in an answer. An INDICATION, a D9 only result, a Gulika presence alone, an afflicted house alone, and any sign or nakshatra are not a shaap. D9 only is a
+   fault in the quality of the fruit. The dasha decides whether a FORMED shaap acts now, ACTIVE NOW, or sleeps, DORMANT, and the windows give the time status.
+G14 SHAAP SCAN SEPARATES LITTLE. Measured on 300 seeded random charts, at least one of the nine types was FORMED in D1 in 81.7 percent, FORMED FULL in 48 percent and FORMED FULL
+   with a running dasha in 32.3 percent. One type alone, FORMED FULL, ranged from 0 for brahma to 16.3 for sarpa. The owner holds the Rahu, 5th house and dasha yoga to be rare. Under the
+   rules as coded it is common, because a node influences a given house or lord in about a third of charts. So a shaap finding enters an answer as one piece of harm evidence and
+   never as proof, and the answer must not say that the native is cursed on this basis alone. The rules have not been tested against a chart with known outcomes. The next
+   owner reported chart should be scored for the shaap types against the true answers, parents, siblings, children, marriage, and the case added to cases.json.
+
 ## Hypotheses to test on the next charts. Not rules
 
 H1 In case 1 every miss had the true answer on the side of the engine's own flags. If the next charts show the same,

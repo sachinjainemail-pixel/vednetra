@@ -74,13 +74,24 @@ engine inside the owner's methodology and are open to the owner's change. See LE
 19. CASE LOG. After every owner reported result add the case to suj_engine/cases/cases.json, run cases_report.js and update
     LEARNINGS.md.
 
+Round 23 addition, knowledge base 3, from the owner's text on shaap dosh. The full Hindi text is in suj_engine/SHAAP_DOSH.md.
+
+21. KNOWLEDGE BASE 3, SHAAP DOSH. Run shaap_scan.js for every question, prepare.js does it. A shaap is a yoga and not a significator. Rahu, plus an
+    afflicted significator planet, plus the 5th or 9th or a trik house, plus a running dasha, makes a shaap yoga, and one or two of these alone is not
+    called shaap. The nine types, pitru, matru, sarpa, brahma, bhratru, patni, pret, matul and dev, are judged in D1 and again in D9. Both give FORMED FULL,
+    D1 only gives FORMED HALF, D9 only is a fault in the quality of the fruit and is not a shaap. FORMED, INDICATION and NONE are the only statuses, an
+    INDICATION may not be called a shaap in the answer. The dasha status of a FORMED shaap, ACTIVE NOW, TRIGGER AT PD or DORMANT, comes from the tool, with
+    its past and future windows. No sign and no nakshatra makes a shaap. A sign may only name the cause of a shaap the planets already show. The
+    nakshatra flags are support only and are never counted. S2 of every answer carries one line starting SHAAP SCAN, copied from the dossier, and
+    answer_guard.js version 4 requires it. How a FORMED finding enters the tally, harm evidence for the afflicting planets, is the engine author's proposal.
+
 ## Engine tools
 
 ENGINE VERSION 2.0 is the default configuration since round 22, see data/engine_config.json and tools/engine_config.js. All tools run it unless the input says
 "engine":"legacy". It means Baladi degree capacity with bands on Rahu and Ketu, nakshatra and pada impact at weight 0.6, Laghu Parashari for dasha lords and nodes,
 event rank by directness, window scan to Sookshma with the subject varga and the transits from the Lagna, Moon and Sun charts. Start every question with prepare.js, it prints
 the ENGINE VERSION line, the dominant house scan, the strict windows, the rule lookup, the functional nature of the dasha lords and the HYPOTHESIS SCORES for yes or no questions.
-The z reading of the hypothesis scores is provisional. tools/score_hypotheses.js runs it alone. The answer guard is version 3 and requires the ENGINE VERSION line in S8.
+The z reading of the hypothesis scores is provisional. tools/score_hypotheses.js runs it alone. The answer guard is version 4 since round 23. It requires the ENGINE VERSION line in S8 and the SHAAP SCAN line in S2, and --v3 runs the earlier checks only.
 
 Answer guard, run before sending any answer:
 
@@ -113,6 +124,13 @@ Rule library lookup for the chart placements and an event tag:
 Dossier for a question, runs the dominant house scan, the strict windows and the rule lookup together:
 
     node suj_engine/tools/prepare.js '{"gender":"female","date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0,"topic":"parents"}'
+
+Shaap dosh scan, knowledge base 3, nine types in D1 and D9, shapit Shani, Gulika, dasha windows, and the SHAAP SCAN line for S2:
+
+    node suj_engine/tools/shaap_scan.js '{"gender":"female","date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0,"asOf":"YYYY-MM-DD","topic":"children"}'
+
+Options topic, nodeAspects "7" (default, the owner accepts the 7th aspect of the nodes) or "vednetra" (5th 7th 9th), mandi true. Add --json for structured output.
+Self test node suj_engine/tests/shaap_selftest.js. How often each status appears in 300 random charts is in suj_engine/data/shaap_frequency.json.
 
 Functional nature of the planets and of the running dasha lords by Laghu Parashari:
 

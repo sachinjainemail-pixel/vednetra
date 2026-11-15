@@ -16,6 +16,7 @@ const { lookup, render: renderRules } = require("./rules_lookup");
 const { nature, render: renderNature } = require("./functional_nature");
 const { resolve: resolveEngine, CONFIG } = require("./engine_config");
 const { score: hypScore, render: renderHyp } = require("./score_hypotheses");
+const { scan: shaapScan, render: renderShaap } = require("./shaap_scan");
 
 const MAP = {
   education: { events: ["education_step"], tag: "Education", focus: 4, strength: "education" },
@@ -36,10 +37,11 @@ if (!m) { console.error("Give a topic, one of " + Object.keys(MAP).join(", ")); 
 cfg.asOf = cfg.asOf || new Date().toISOString().slice(0, 10);
 const here = __dirname;
 const out = [];
-out.push("# SUJ DOSSIER for topic " + cfg.topic + ", as of " + cfg.asOf, "ENGINE VERSION " + resolveEngine(cfg).engineVersion + ", degree " + resolveEngine(cfg).degree + ", nakshatra " + resolveEngine(cfg).nakshatra + ", node bands " + (resolveEngine(cfg).nodeDegree !== false) + ". Copy the ENGINE VERSION line into S8 of the answer, answer_guard.js v3 checks it.", "");
+out.push("# SUJ DOSSIER for topic " + cfg.topic + ", as of " + cfg.asOf, "ENGINE VERSION " + resolveEngine(cfg).engineVersion + ", degree " + resolveEngine(cfg).degree + ", nakshatra " + resolveEngine(cfg).nakshatra + ", node bands " + (resolveEngine(cfg).nodeDegree !== false) + ". Copy the ENGINE VERSION line into S8 of the answer, answer_guard.js v4 checks it.", "");
 try {
   out.push(execFileSync("node", [path.join(here, "stellium.js"), JSON.stringify(Object.assign({}, cfg, { focusHouse: m.focus }))], { encoding: "utf8" }));
 } catch (e) { out.push("Dominant house scan failed " + e.message); }
+try { out.push("", renderShaap(shaapScan(cfg))); } catch (e) { out.push("", "Shaap scan failed " + e.message); }
 m.events.forEach(ev => {
   out.push("", render(scan(Object.assign({}, cfg, { event: ev, strict: true }))));
   const wide = scan(Object.assign({}, cfg, { event: ev, strict: false })).windows;
@@ -50,11 +52,12 @@ out.push("", renderNature(nature(cfg)));
 if (cfg.hypotheses !== false && ["education", "marriage", "work", "siblings", "parents", "children"].indexOf(cfg.topic) >= 0) {
   try { out.push("", "## HYPOTHESIS SCORES for yes or no questions, read with the STATUS line", renderHyp(hypScore(cfg))); } catch (e) { out.push("", "Hypothesis scores failed " + e.message); }
 }
-out.push("", "## CHECKLIST for the answer, enforced by answer_guard.js version 3",
+out.push("", "## CHECKLIST for the answer, enforced by answer_guard.js version 4",
   "0. S8 has one line ENGINE VERSION 2.0 or the version printed above. Engine 2.0 means Baladi degree capacity, nakshatra and pada impact with the nodes on bands, Laghu Parashari for the dasha and for Rahu and Ketu, event rank by directness, window scan to Sookshma with the subject varga and Sun and Moon transits.",
   "0a. For a yes or no question about what the native has, such as education, profession, siblings, parents or a child, use the HYPOTHESIS SCORES above. Quote the score and the z, and state that the z reading is provisional.",
   "1. Run planet_strength.js for the planets whose results conflict. Topics " + m.strength + ".",
   "2. S2 has a RULES CITED line. S6 has a WINDOW SCAN line, weighing the strict windows first, and a DASHA LORDS line from the functional nature table.",
+  "2b. S2 has a SHAAP SCAN line, copy it from the SHAAP DOSH SCAN above (knowledge base 3, round 23). Call a chart shaapit only where the status is FORMED, and name the D1 and D9 result and the dasha status. An INDICATION is not a shaap. No sign and no nakshatra makes a shaap.",
   "2a. An aspect works by the planet's NATURAL nature. House ownership works by the houses owned, trine most beneficial, kendra somewhat, trik harmful. In strength_tally.js give lordship and aspect as separate typed entries.",
   "3. Write down every flag that points against your leading option. They go on the COUNTER EVIDENCE line or into the tally.",
   "4. Weigh the evidence with strength_tally.js, planets for and against each option by Shadbala percent. S8 has its EVIDENCE TALLY line. The final answer is the option with the highest number, or for ordered options the highest above 50, guard flag --ordinal.",

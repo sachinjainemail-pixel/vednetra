@@ -177,6 +177,25 @@ The owner asked to update the engine with all the learnings and merge it so that
 - tests/engine_selftest.js added, 8 checks. Self tests all pass, guard 18, strength 13, functional 9, window 11, rank 5, degree 7, nakshatra 5, engine 8.
 - Honest limits. The z rule is provisional, found after the Kundali 4 answers were known, updated z AUC 0.78 over 80 pairs, post hoc. The Baladi numbers and pada factors are the engine author's. No validated rule for the number of siblings or children, or for divorce. The blind score is 3 of 8. The next blind chart with the null fixed beforehand is the first fair test of the z reading.
 
+## Round 23. Shaap dosh, knowledge base 3 (done, untested on outcomes)
+
+The owner gave the rules of shaap dosh in Hindi, nine types, the planets, houses, signs and nakshatras that enter, the Gulika readings from Prashna Marga, the shapit Shani rules, Ketu's
+role, the D1 against D9 rule and the effect of retrograde, combust and debilitated planets.
+- suj_engine/SHAAP_DOSH.md keeps the owner's text word for word and ends with the engine author's notes, 13 readings chosen where the text is ambiguous, what is not coded, and 3 things in the text that could not be verified.
+- data/shaap_rules.json holds the types, rules, policies and the topic links. tools/shaap_scan.js tests the nine types in D1 and in D9, the four pillars, the dasha status with past and future windows,
+  the owner's modifiers, shapit Shani, Gulika (Vednetra's own point) and the support only nakshatra flags, and prints the SHAAP SCAN line for S2. The one change to app.js is a read only handle,
+  standingGulika added to sujInternals. No screen or behaviour changed, so the cache version numbers were not bumped. Vednetra's self test still prints 8 of 8.
+- prepare.js prints the SHAAP DOSH SCAN for every topic and a checklist item 2b. answer_guard.js is version 4 and requires one SHAAP SCAN line in S2, --v3 runs the older checks. ANSWER_TEMPLATE.md is version 4, ENGINE_CONTRACT.md has
+  requirement 21, METHODOLOGY.md section 2.8, LEARNINGS.md G13 and G14, CLAUDE.md points to it.
+- Self tests, shaap 25 of 25 (new), guard 22 of 22, strength 13, functional 9, window 11, rank 5, degree 7, nakshatra 5, engine 8.
+- Calibration, experiments/shaap_frequency.js, 300 seeded random charts, data/shaap_frequency.json. At least one type FORMED in D1 in 81.7 percent, FORMED FULL in 48 percent, FORMED FULL with a running dasha in 32.3 percent.
+  Per type FORMED FULL, pitru 11.7, matru 4.3, sarpa 16.3, brahma 0, bhratru 9.3, patni 10.7, pret 7, matul 2.3, dev 7 percent. Shapit Shani present in 16 percent, with D9 repeating in 1.3 percent. The first reading was looser and was tightened in the same
+  round after a 20 chart trial, evidence now needs a type defining planet and not an afflicted house alone, Gulika pret needs Gulika itself in a dusthana or the badhaka house, nodes aspect the 7th only, Ketu connects a lord by conjunction only.
+- Honest limits. The rules are the owner's, coded as written, not tested against any chart with known outcomes. The book citations were not checked against the books. How a FORMED finding enters the strength tally, as harm evidence for the
+  afflicting planets, and the topic links of the nine types, are the engine author's proposals. Karma Vipaka Samhita, D10 repetition and the indirect spoiling of houses by sign and nakshatra lords of Saturn and Rahu are not coded.
+- Needs the owner. Confirm or correct the 13 readings in SHAAP_DOSH.md section 12, above all the dev rule, the pret Gulika rule, the node aspects, and the proposed entry into the tally. Give true answers on parents, siblings, children and marriage for
+  charts already tested, so that the shaap types can be scored against outcomes for the first time.
+
 ## Next phases (waiting for the owner's further instructions)
 
 - Phase 1. Question intake and event mapping (question to house, karaka, divisional chart, Nth house).

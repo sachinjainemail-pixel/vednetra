@@ -27951,7 +27951,8 @@
     vargaDignity: vargaDignity, neechabhanga: neechabhanga, neechabhangaReport: neechabhangaReport,
     scanYogas: scanYogas, planetsAspectingPlanet: planetsAspectingPlanet,
     aspectNameToHouse: aspectNameToHouse, isD9Vargottama: isD9Vargottama,
-    vargaSign: vargaSign, vargaDivisions: vargaDivisions
+    vargaSign: vargaSign, vargaDivisions: vargaDivisions,
+    standingGulika: standingGulika
   };
   if (typeof window !== "undefined") window.VedicCore = coreApi;
   if (typeof globalThis !== "undefined") globalThis.VedicCore = coreApi;

@@ -10,6 +10,8 @@
  *
  * Version 2 (round 5, from the first tested chart) adds process checks. Use --v1 to run only the older checks, --v2 to skip the version 3 check.
  * Version 3 (round 22) adds the ENGINE VERSION line in S8, copied from prepare.js. The default engine is 2.0, see data/engine_config.json. legacy needs --allow-legacy.
+ * Version 4 (round 23) adds the SHAAP SCAN line in S2, copied from the SHAAP DOSH SCAN in the prepare.js dossier, knowledge base 3. It must carry FORMED, INDICATION or NONE.
+ * Use --v3 to run the checks of version 3 only, for answers written before round 23.
  *   RULES CITED line in the answer, WINDOW SCAN and DASHA LORDS lines in S6, EVIDENCE TALLY and COUNTER EVIDENCE lines in S8.
  *   With options, the EVIDENCE TALLY line must give a whole number for every option, and the final answer must hold
  *   the highest number. A tie for the highest number needs a TIE BREAK line that names the deciding step.
@@ -112,6 +114,11 @@ function check(text, opts) {
     if (s2 && has(inRange(s2, s3), /^RULES CITED\b/).length !== 1) errors.push("S2 must contain exactly one line starting RULES CITED. Run rules_lookup.js and list the rule ids used, or write that the library holds no rule");
     if (s6 && has(inRange(s6, s7), /^WINDOW SCAN\b/).length !== 1) errors.push("S6 must contain exactly one line starting WINDOW SCAN. Run window_scan.js and state the windows found and which were weighed");
     if (s6 && has(inRange(s6, s7), /^DASHA LORDS\b/).length !== 1) errors.push("S6 must contain exactly one line starting DASHA LORDS giving the Laghu Parashari role of the running dasha lords at every level, Mahadasha, Antardasha, Pratyantardasha, Sookshma and Prana, from functional_nature.js");
+    if (!opts.v3 && !opts.v2 && s2) {
+      const sh = has(inRange(s2, s3), /^SHAAP SCAN\b/);
+      if (sh.length !== 1) errors.push("S2 must contain exactly one line starting SHAAP SCAN, copied from the SHAAP DOSH SCAN of prepare.js (knowledge base 3), found " + sh.length);
+      else if (!/\b(FORMED|INDICATION|NONE)\b/i.test(sh[0])) errors.push("The SHAAP SCAN line must state FORMED, INDICATION or NONE for the types read, as printed by shaap_scan.js");
+    }
     let tallyLine = "";
     if (s8) {
       const r8 = inRange(s8, s9);
@@ -173,10 +180,10 @@ function check(text, opts) {
 if (require.main === module) {
   const argv = process.argv.slice(2);
   const file = argv.find(a => !a.startsWith("--") && argv[argv.indexOf(a) - 1] !== "--options");
-  if (!file) { console.error("Usage: answer_guard.js answer.txt [--options \"A|B\"] [--strict-style]"); process.exit(2); }
+  if (!file) { console.error("Usage: answer_guard.js answer.txt [--options \"A|B\"] [--strict-style] [--v3]"); process.exit(2); }
   const oi = argv.indexOf("--options");
   const options = oi >= 0 ? argv[oi + 1].split("|").map(s => s.trim()).filter(Boolean) : [];
-  const res = check(fs.readFileSync(file, "utf8"), { options, strictStyle: argv.indexOf("--strict-style") >= 0, v1: argv.indexOf("--v1") >= 0, v2: argv.indexOf("--v2") >= 0, allowLegacy: argv.indexOf("--allow-legacy") >= 0, ordinal: argv.indexOf("--ordinal") >= 0 });
+  const res = check(fs.readFileSync(file, "utf8"), { options, strictStyle: argv.indexOf("--strict-style") >= 0, v1: argv.indexOf("--v1") >= 0, v2: argv.indexOf("--v2") >= 0, v3: argv.indexOf("--v3") >= 0, allowLegacy: argv.indexOf("--allow-legacy") >= 0, ordinal: argv.indexOf("--ordinal") >= 0 });
   res.errors.forEach(e => console.log("ERROR " + e));
   res.warnings.forEach(w => console.log("WARNING " + w));
   console.log(res.ok ? "GUARD PASSED" : "GUARD FAILED");

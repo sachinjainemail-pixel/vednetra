@@ -1,17 +1,18 @@
 #!/usr/bin/env node
-/* Self test for answer_guard.js version 3. Builds one good draft and several bad ones and checks the verdicts.
+/* Self test for answer_guard.js version 4. Builds one good draft and several bad ones and checks the verdicts.
  *   node suj_engine/tests/guard_selftest.js     prints N of N passed */
 const { check } = require("../tools/answer_guard");
 const OPTS = ["Graduation", "Post graduation", "Intermediate", "High school"];
 const base = (over) => {
   const o = Object.assign({
     rules: "RULES CITED S-N04-009 for Moon in Rohini, the library holds no rule on the event itself",
+    shaap: "SHAAP SCAN FORMED none. INDICATION only dev. read for education sarpa none, brahma none. Entered as harm evidence only for the named planets, not as proof",
     scan: "WINDOW SCAN strict view found 6 past windows, 2 grade A, weighed against the dasha chain\nDASHA LORDS MD Jupiter promoter with dosha triggered, AD Mercury neutral marakesha, PD Rahu node",
     tally: "EVIDENCE TALLY Graduation 4, Post graduation 7, Intermediate 1, High school 0",
     counter: "COUNTER EVIDENCE Mars the fifth lord is retrograde in an enemy sign and the D24 lagna lord is in the 12th house",
     tie: "", engine: "ENGINE VERSION 2.0 degree true, nakshatra true, node bands true", final: "FINAL ANSWER Post graduation", extra: ""
   }, over || {});
-  return ["S0. INTAKE AND TIME FRAME", "x", "S1. DOMINANT HOUSE", "x", "S2. D1 ANALYSIS", o.rules, "S3. D9 ANALYSIS", "x",
+  return ["S0. INTAKE AND TIME FRAME", "x", "S1. DOMINANT HOUSE", "x", "S2. D1 ANALYSIS", o.rules, o.shaap, "S3. D9 ANALYSIS", "x",
     "S4. SUBJECT DIVISIONAL CHART ANALYSIS", "x", "S5. PLANET STRENGTH AND CONFLICT RESOLUTION", "x",
     "S6. DASHA AND TIME STATUS", o.scan, "TIME STATUS ALREADY HAPPENED done", "S7. TRANSIT VALIDATION", "x",
     "S8. RECONCILIATION OF SECTIONS", o.engine, o.tally, o.counter, o.tie, o.extra, "S9. SUMMARY", "recap", o.final,
@@ -32,7 +33,10 @@ const cases = [
   ["missing engine version", base({ engine: "" }), false, /ENGINE VERSION/],
   ["engine version 1.0 fails", base({ engine: "ENGINE VERSION 1.0" }), false, /version 2.0/],
   ["engine legacy fails without the flag", base({ engine: "ENGINE VERSION legacy" }), false, /only for reproducing/],
-  ["hedging still fails", base({ extra: "this cannot be determined" }), false, /Hedging/]
+  ["hedging still fails", base({ extra: "this cannot be determined" }), false, /Hedging/],
+  ["missing shaap scan line", base({ shaap: "" }), false, /SHAAP SCAN/],
+  ["shaap scan line without a status", base({ shaap: "SHAAP SCAN was looked at" }), false, /FORMED, INDICATION or NONE/],
+  ["two shaap scan lines", base({ shaap: "SHAAP SCAN FORMED none\nSHAAP SCAN NONE" }), false, /exactly one line starting SHAAP SCAN/]
 ];
 const ORD = ["High school", "Intermediate", "Graduation", "Post graduation"];
 const ordCases = [
@@ -51,6 +55,10 @@ ordCases.forEach(([name, text, ok, re]) => {
   const good = r.ok === ok && (ok || !re || r.errors.some(e => re.test(e)));
   if (good) pass++; else console.log("FAIL " + name + " ok=" + r.ok + " " + JSON.stringify(r.errors));
 });
-const total = cases.length + ordCases.length;
+// version 3 flag, an answer written before round 23 has no SHAAP SCAN line and passes with --v3 only
+const old = base({ shaap: "" });
+const oldOn = check(old, { options: OPTS }), oldV3 = check(old, { options: OPTS, v3: true });
+if (!oldOn.ok && oldOn.errors.some(e => /SHAAP SCAN/.test(e)) && oldV3.ok) pass++; else console.log("FAIL version 3 flag " + JSON.stringify(oldV3.errors));
+const total = cases.length + ordCases.length + 1;
 console.log(pass + " of " + total + " passed");
 process.exit(pass === total ? 0 : 1);

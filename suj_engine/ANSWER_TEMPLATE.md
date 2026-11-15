@@ -1,4 +1,4 @@
-# SUJ ENGINE ANSWER TEMPLATE (version 3)
+# SUJ ENGINE ANSWER TEMPLATE (version 4)
 
 Every answer from the SUJ engine uses these sections in this order. Headings are plain text lines with no
 markdown symbols, because the owner does not want the characters ( ) ! ; : em dash, curly quotes, / - # * ~ in
@@ -12,6 +12,9 @@ S2. D1 ANALYSIS
     Lagna chart, Moon chart and Sun chart. Processes A to E in methodology order and the weightage order of section 1.
     Contains one line starting RULES CITED with the rule ids from rules_lookup.js, or a statement that the library
     holds no rule for the event.
+    Contains one line starting SHAAP SCAN, copied from the SHAAP DOSH SCAN of prepare.js (knowledge base 3, round 23). It
+    states which of the nine types are FORMED, which are only INDICATION, the D1 and D9 result and the dasha status of
+    a FORMED type, and the types read for the topic. Only a FORMED type may be called a shaap in the answer.
 S3. D9 ANALYSIS
     Always done, whether or not the question concerns marriage.
 S4. SUBJECT DIVISIONAL CHART ANALYSIS
@@ -55,6 +58,6 @@ S9. SUMMARY
    and fix every error it reports. Version 2 of the guard checks the new lines above and fails typicality or
    base rate wording. Use --v1 only to read old answers.
 7. Start every question with node suj_engine/tools/prepare.js, then planet_strength.js for conflicting planets.
-8. Read suj_engine/LEARNINGS.md before answering. Its guardrails G1 to G11 apply to every question.
+8. Read suj_engine/LEARNINGS.md before answering. Its guardrails G1 to G13 apply to every question.
 9. Without options, the EVIDENCE TALLY line may be left out of the number check, but the line and the COUNTER EVIDENCE
    line are still required, and the tally lists the candidate answers the analysis considered.
