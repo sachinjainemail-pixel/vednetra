@@ -168,6 +168,13 @@
 - Still open, planet strength winner to event result mapping, the sibling brother and sister split, employed or not, and
   whether planet_strength.js should drop planets with fewer than three subject links and add derived houses.
 
+## Round 24. Kundali 893 true answers (done)
+
+- The owner reported the true answers. SUJ 1 of 6, MBA right. Blind total 4 of 14. Recorded in cases.json as K893, with the SARVA columns under otherMethods, cases_report.js run, LEARNINGS H15 to H21 written.
+- The z reading of the hypothesis scores had its first fair test, 4 of 6, level with chance. The default double transit gate missed the child birth of 10 December 2024 and the single gate found it, the second case after Kundali 2. The chain of answers from question 5 spoiled questions 2 and 3.
+- Not changed in any tool or in the configuration, two cases are too few. Proposals G13 and G14 and the gate single print in prepare.js wait for the owner.
+- SARVA columns still not run on this chart, ten Vednetra skills (5in1, bnn, bphs, kcil, mediastro, quad, sav, trinetra, ududaya, ukn).
+
 ## Round 23. SARVA methodology, the all methodology comparison table (done)
 
 - The owner asked for one comparison table per chart across all methodologies, with all calculation and analysis kept in the back end, hard coded for every session. Written as suj_engine/SARVA.md and pointed to from the top of CLAUDE.md. Registry SUJ, Shri Jha Ji, Chawdhri, Poddar, KP Pro and the Vednetra skills. The reply is the table only, as a code block that keeps the owner's style rule.
