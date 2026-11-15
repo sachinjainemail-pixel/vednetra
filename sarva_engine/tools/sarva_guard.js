@@ -9,7 +9,7 @@
  * Errors
  *   a question without an OPTIONS line, a METHOD block, an EVIDENCE line or a RESULT line for each of the five
  *   methodologies KPPRO, KCIL, SUJ, CHAWDHRI, BNN; a sixth methodology; two RESULT lines for one pair;
- *   a BNN EVIDENCE line with no Rule ID from the BNN rule base; NOT RUN BNN RULES MISSING while the rule csv is present;
+ *   a BNN EVIDENCE line with no Rule ID from the BNN rule base or no BNN grade; NOT RUN BNN RULES MISSING while the rule csv is present;
  *   a RESULT that is not one of the listed options, or that hedges; no FINAL TABLE; a table whose header is not
  *   Question, KP Pro, KCIL, SUJ engine, CHAWDHRI, BNN; a row missing or a cell that differs from its RESULT line;
  *   anything after the table; a missing SUJ FILE; a SUJ file that fails suj_engine/tools/answer_guard.js.
@@ -69,6 +69,7 @@ function check(text, opts) {
       if (!blocks[k]) err(q + " has no METHOD " + c + " block.");
       if (!evidence[k]) err(q + " " + c + " has no EVIDENCE line.");
       else if (c === "BNN" && bnnPresent && results[k] !== BNN_MISSING && !/\b[A-Z]{3}-[A-Z0-9]{3}-\d{3}\b/.test(evidence[k])) err(q + " BNN EVIDENCE line must cite at least one Rule ID from the BNN rule base, for example RAO-FND-009.");
+      else if (c === "BNN" && bnnPresent && results[k] !== BNN_MISSING && !/\b(CONFIRMED|INDICATED|POSSIBLE|OPEN|DENIED)\b/.test(evidence[k])) err(q + " BNN EVIDENCE line must carry the BNN grade, one of CONFIRMED, INDICATED, POSSIBLE, OPEN, DENIED.");
       const r = results[k];
       if (r === undefined) { err(q + " " + c + " has no RESULT line."); return; }
       if (c === "BNN" && r === BNN_MISSING && !bnnPresent) { incomplete = true; return; }

@@ -64,14 +64,19 @@ Chart data. The vednetra-bnn skill runner, sex is mandatory because BNN swaps th
 The runner prints a contract check. Any missing block makes the reading partial, say which. A missing block is
 never estimated.
 
+Procedure. sarva_engine/knowledge/bnn/BNN_PROCEDURE.md, then the guide sections it names in
+BNN-METHOD-GUIDE.txt, found through BNN-METHOD-GUIDE.index.tsv. Follow guide section 6 in order for every question. For a
+multiple choice question write the ten layers of every option before reading the chart, then screen the options, then read
+the karaka frame, then time it, then rank with the tie break ladder of guide section 14. Read the department section of
+guide 16 for the question.
+
 Rules. sarva_engine/knowledge/bnn/BNN-RULES-5COLUMN.csv through the lookup tool.
     node sarva_engine/tools/bnn_rules.js --method
     node sarva_engine/tools/bnn_rules.js '{"event":"marriage","q":"Venus","limit":15}'
-    node sarva_engine/tools/bnn_rules.js '{"id":"RAO-DOM-001"}'
-Read the General method rules first, then the event group. BNN reads karakas and not houses. Read a crowded sign
-one pair at a time and keep the contradictions. Cite the Rule ID of each rule used. Where the table's authors
-disagree, cite both. The cell is the option the cited rules and the chart support best, with the transit timing
-check that ARI-TIM and RAO-FND describe. ENGINE_CONTRACT.md section 7 has the missing file fallback.
+    node sarva_engine/tools/bnn_rules.js '{"id":"RAO-FND-009"}'
+The guide writes IDs without hyphens, such as RAO EDU 003. The corpus has them with hyphens, RAO-EDU-003.
+Cite the Rule ID of each rule used. Where the table's authors disagree, cite both. The cell is the rank 1 option of the
+BNN procedure. ENGINE_CONTRACT.md section 7 has the grade rules and the missing file fallback.
 
 ## Output per question
 

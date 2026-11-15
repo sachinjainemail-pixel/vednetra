@@ -37,7 +37,7 @@ METHOD BNN Q1
 
 Line rules.
 1. RESULT carries the option label exactly as listed in OPTIONS, or for OPEN a short concrete answer.
-2. The BNN EVIDENCE line cites Rule IDs from the BNN rule base. Only if the rule csv is absent from the session
+2. The BNN EVIDENCE line carries the BNN grade word and cites Rule IDs from the BNN rule base. Only if the rule csv is absent from the session
    the result reads RESULT Q1 BNN NOT RUN BNN RULES MISSING, in the BNN column only.
 3. Every question has all five METHOD blocks, each with one EVIDENCE line and one RESULT line.
 

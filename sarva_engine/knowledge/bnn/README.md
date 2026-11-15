@@ -28,6 +28,10 @@ Known data issues, left as supplied.
 5. Some rules are notes written against an earlier engine, they begin EXTENDS or CONFIRMS. They are still rules of
    the source book, read the quoted passage.
 
-What is not here. The chart export runner of the vednetra-bnn skill supplies the chart numbers. This file is the
+The procedure. BNN-METHOD-GUIDE.pdf is the owner's 54 page guide to the BNN project method, with BNN-METHOD-GUIDE.txt
+as its extracted text and BNN-METHOD-GUIDE.index.tsv as a heading index with line numbers. BNN_PROCEDURE.md is the English
+map. All 123 rule IDs the guide cites were checked against the csv and all exist.
+
+What the chart export runner does. The chart export runner of the vednetra-bnn skill supplies the chart numbers. This file is the
 rule base and not a worked procedure document. If the owner has a separate step by step BNN procedure beyond the
 General method rules, it should be added next to this file.

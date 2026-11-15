@@ -72,23 +72,31 @@ Where methodologies disagree, the table shows the disagreement as it is. It is n
    opinion of the read command and the methodology's own rules.
 4. Never retune a weight, band or rule because of one chart.
 
-## 7. BNN rule base
+## 7. BNN, rule base and method guide
 
-The BNN rule base is sarva_engine/knowledge/bnn/BNN-RULES-5COLUMN.csv, 3,073 rules from 21 books, supplied by the
-owner. Every BNN cell rests on rules read from it with node sarva_engine/tools/bnn_rules.js, cited by Rule ID.
-The engine never reads BNN from memory or from general knowledge of Bhrigu Nandi Nadi.
+BNN rests on two owner supplied files under sarva_engine/knowledge/bnn/.
+1. BNN-RULES-5COLUMN.csv, 3,073 rules from 21 books, read with node sarva_engine/tools/bnn_rules.js.
+2. BNN-METHOD-GUIDE.pdf with its text BNN-METHOD-GUIDE.txt and index BNN-METHOD-GUIDE.index.tsv, the owner's 54 page
+   guide to the procedure. BNN_PROCEDURE.md is the English map of it. The guide wins on any difference.
 
-1. Start every BNN reading with the General method rules (bnn_rules.js --method): the karaka is the reference
-   point, the Lagna is not primary, houses are counted from a planet, the aspect strength table, the ten rules,
-   and transits as the timer.
-2. Then read the rules of the question's life event group, with bnn_rules.js, and the chart export of the
-   vednetra-bnn skill. Sex is mandatory because the karakas swap by sex.
-3. Where authors in the table disagree, cite both and decide on the chart, the later rule that says it settles
-   the point wins over the earlier one.
-4. Only if the csv is absent from the session, the engine states it once, asks the owner for it, and fills the BNN
-   cell with the exact text NOT RUN BNN RULES MISSING. The guard accepts that text only while the file is
-   absent and reports the answer as incomplete. With the file present the text is an error.
-5. A BNN chart export block that is missing makes the BNN reading partial. Say which block. Never estimate it.
+Requirements.
+1. The BNN procedure of the guide is followed in its own order, steps 0 to 11 of guide section 6. Read the guide
+   sections for the question's department, guide section 16, before reading the chart. The BNN tie break ladder, the
+   grades and the grade caps apply as the guide states them.
+2. Every BNN claim rests on a rule searched in the session and quoted by Rule ID. The engine never reads BNN from
+   memory or from general knowledge of Bhrigu Nandi Nadi.
+3. BNN reads karakas and not houses. Time comes from Vimshottari and transit on a verified panchang. Sex is mandatory.
+4. The BNN cell is the rank 1 option of the BNN procedure, one option, see BNN_PROCEDURE.md for how SARVA reconciles the
+   guide where the guide would print two answers. A ladder tie is shown in the EVIDENCE line as LADDER TIE FORCED PICK.
+5. The BNN EVIDENCE line carries the BNN grade, one of CONFIRMED, INDICATED, POSSIBLE, OPEN or DENIED, and at least one
+   Rule ID, and for a department that is at or below its best fixed answer says so.
+6. Where authors in the rule base disagree, cite both and decide on the chart. The later rule that says it settles the
+   point wins over the earlier one.
+7. BNN does not read another SARVA methodology's verdict. The guide's comparison with Chawdhri and Sutton is NOT RUN.
+8. A BNN chart export block that is missing makes the reading partial. Say which block. Never estimate it.
+9. Only if the rule csv is absent from the session, the engine states it once, asks the owner for it, and fills the BNN
+   cell with the exact text NOT RUN BNN RULES MISSING. The guard accepts that text only while the csv is absent and
+   reports the answer as incomplete. With the csv present the text is an error.
 
 ## 8. Inputs the engine needs
 
