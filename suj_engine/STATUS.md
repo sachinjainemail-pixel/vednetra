@@ -179,10 +179,10 @@ The owner asked to update the engine with all the learnings and merge it so that
 
 ## SERVER mode (added after round 22)
 
-A prompt whose first word is server runs every question through the SUJ engine and four sibling engines (Shri-Jha-Ji,
-CHAWDHRI, poddar-engine, KP-Pro-sutton). The rule is in CLAUDE.md. The final answer follows the SUJ evidence tally, the
-other engines are reported on an ENGINE VOTES line in S8 and break only a tie left after the SUJ tie break order.
-answer_guard.js does not yet check the ENGINE VOTES line. Not yet run on a chart. The kpredict install needs a C compiler
+A prompt whose first word is server runs every question through seven methodologies and shows each one's own answer. They
+are the SUJ engine, Shri-Jha-Ji, CHAWDHRI, poddar-engine and the three kpredict methods KP Pro, KCIL and KP Pro Max. There is
+no combined verdict, the owner chooses. The rule is in CLAUDE.md. The SUJ part keeps the S0 to S9 layout and the guard, and
+the guard does not check the ANSWERS BY METHODOLOGY block. Not yet run on a chart. The kpredict install needs a C compiler
 for pyswisseph and has not been tried in this environment.
 
 ## Next phases (waiting for the owner's further instructions)
