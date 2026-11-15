@@ -1,6 +1,51 @@
+<!-- SARVA-RULE-START -->
+# SARVA trigger. This rule comes first and overrides every other routing rule in this file and in the other repositories
+
+If the first word of the owner's message is SARVA, in any case, or the owner says "SARVA engine", the owner is asking for the SARVA method. The owner may have typed it by voice, so "server" or "sarva" at the very start of a message with birth details after it also means SARVA. Do not ask what it is.
+
+SARVA means all the engines combined. Run every engine below on the same native and the same questions, then reconcile them into one answer per question. Do not fall back to a single engine by default, not to the SUJ engine of the vednetra repository, not to the Shri Jha Ji, CHAWDHRI, Poddar or KP Pro Sutton engines on their own. The rules in those repositories that forbid mixing methods, for example the CHAWDHRI rule against other schools, are lifted for a SARVA message only. Each engine still follows its own method internally, they are mixed only at the reconciliation step.
+
+## Engines inside SARVA
+
+All the repositories sit in /home/user, owner account sachinjainemail-pixel on GitHub. If a repository is not in the session, attach it with the add_repo tool, clone it to /home/user, then call register_repo_root. Read the CLAUDE.md and README.md of each engine before running it.
+
+1. SUJ engine, repository vednetra, folder suj_engine. Read ENGINE_CONTRACT.md, METHODOLOGY.md, STATUS.md and LEARNINGS.md in that order. Start each question with node suj_engine/tools/prepare.js, run planet_strength.js and strength_tally.js, write the answer draft to a file and check it with node suj_engine/tools/answer_guard.js.
+2. Shri Jha Ji, repository Shri-Jha-Ji. Run node bin/jyotish.js answer for options, or ask --file chart.json --topic for open questions. Read docs/METHODOLOGY.md, docs/RULEBOOK.md and docs/DECODER.md.
+3. CHAWDHRI, repository CHAWDHRI. Follow .claude/skills/vedic-engine/SKILL.md, run sh jyotish.sh. Read dasha_gate for each topic.
+4. Poddar engine, repository poddar-engine, with the skill in .claude/skills/poddar-engine. Run engine/setup.sh first. poddar-data holds only data and chat exports and is not an engine.
+5. KP Pro Sutton, repository KP-Pro-sutton. Run kpredict ask for options, kpredict read for open questions. Its three KP methods count as one engine vote.
+
+vednetra supplies the chart numbers. READ-VEDNETRA and SHRIVEDNETRA are copies of the Vednetra app and are not engines.
+
+## Intake
+
+The message gives the kundali number if any, gender, date of birth, time of birth, place of birth, then the questions with their options. Look up the latitude, longitude and time zone of the place. If something is missing, ask for it in one short message. The as-of date is the system date.
+
+## Procedure for every question
+
+1. Run all five engines on the question. If an engine cannot run, say which one and why, and continue with the rest. Never invent an engine's output.
+2. For every question check the promise and the time status, already happened, happening now or due in the future, from the system date. Every engine's own rules for this stay in force.
+3. Record the pick of each engine for the question. With options, the pick is one option.
+4. Reconcile into exactly one definitive answer per question, with or without options. The answer is the pick that most engines support. Counting rule, proposed by the engine author and awaiting the owner, each engine has one vote, KP Pro Sutton counts once. A tie is broken by the SUJ engine evidence tally, then by the engine with the stronger stated chart evidence. Never call the engines equal, never say the result cannot be decided. State which engines agreed, which differed and why the chosen answer wins.
+5. Typicality, base rates and the safe choice are not evidence. A natal promise is capacity and not proof of status.
+6. For a dated question, such as what happened on a given date, rank the candidate events with each engine's dasha and transit method and name the one event.
+
+## Answer format
+
+Show a section per engine in short form, then a reconciliation section with a table of the picks, then a summary. End every answer with 2 or 3 bulleted one liners that summarise the analysis, the last one starting with Final answer, and nothing after them. Use the SUJ answer template for its own section, and run answer_guard.js on that section.
+
+In chat replies do not use these characters, ( ) ! ; : em dash, curly quotes, / - # * ~. This applies to chat replies and not to code or to saved files.
+
+## After the owner reports the true answers
+
+Add the case to every engine that keeps a case log, update the learnings of each, and record which engine was right on each question, so the counting rule can be tested and changed on evidence.
+<!-- SARVA-RULE-END -->
+
 # CLAUDE.md for the vednetra repository
 
 ## SUJ engine
+
+This section applies only when the message does not start with SARVA. A message that starts with SARVA follows the SARVA rule at the top of this file.
 
 If the user says "SUJ engine", or asks for any astrology prediction, chart reading, dasha timing, promise
 of an event or question about a native in this repository, they mean the SUJ engine. Do not ask what it is.
