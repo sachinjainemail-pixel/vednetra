@@ -45,6 +45,16 @@ were updated, and the guard tests cover seven methodologies and per source prese
 - Neither document reports a measured accuracy for its READ layer worth trusting. Quad's own contract says its 52 rule tests were
   at chance. Udu reports none. This is stated in the EVIDENCE line.
 
+## Round 5, KP Pro v15 booklet installed
+
+The owner supplied the 33 section Hindi booklet on SHRI GANESHA BLESSED KP PRO v15. It extends the existing KP Pro column, no
+column was added, the table still has eight columns. Stored with its text, section index and an English map. Contract section
+7d, the routing, the template, CLAUDE.md and the guard were updated. One real conflict was found and reconciled. The contract had
+barred priors as evidence for every column, while the KP Pro method itself lets a computed prior decide when the chart is
+UNDECIDED. Contract section 6.3 now allows that for KP Pro only and requires PRIOR DOMINANT in the evidence line. The guard checks a
+HIGH, MEDIUM or LOW word and a basis word in every KP Pro evidence line. KP 15 as a separate file and the 122 question ledger were not
+supplied, the v15 instructions in the sibling repo hold the Rule of 10 mechanics.
+
 ## Pending
 
 A. Udu corpus. The nine UDU-*.md corpus files, and ideally the four UDU-REF files and UDU-000-MANIFEST.md, go in

@@ -45,7 +45,8 @@ Line rules.
 1. RESULT carries the option label exactly as listed in OPTIONS, or for OPEN a short concrete answer.
 2. The BNN EVIDENCE line carries the BNN grade word and cites Rule IDs from the BNN rule base. Only if the rule csv is absent from the session
    the result reads RESULT Q1 BNN NOT RUN BNN RULES MISSING, in the BNN column only.
-3. The UDU EVIDENCE line cites a Udu Rule ID and says no accuracy is measured for Udu. The QUAD EVIDENCE line uses the confidence
+3. The KPPRO EVIDENCE line carries HIGH, MEDIUM or LOW and CHART DECIDED, PRIOR DOMINANT or R10 DECIDED.
+   The UDU EVIDENCE line cites a Udu Rule ID and says no accuracy is measured for Udu. The QUAD EVIDENCE line uses the confidence
    words COMPUTED, CLASSICAL, UNSTABLE or VACUOUS. Where the rule files of Udu or Quad are absent, the result is the exact
    text NOT RUN UDU RULES MISSING or NOT RUN QUAD RULES MISSING in that column only.
 4. Every question has all seven METHOD blocks, each with one EVIDENCE line and one RESULT line.

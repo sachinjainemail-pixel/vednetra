@@ -7,6 +7,10 @@ Common first step. Collect the inputs of ENGINE_CONTRACT.md section 8. Fix the a
 
 ## 1. KP Pro (code KPPRO)
 
+Method. sarva_engine/knowledge/kppro/KP_PRO_PROCEDURE.md, then the booklet sections it names in KP-PRO-METHODOLOGY.txt through
+KP-PRO-METHODOLOGY.index.tsv. The booklet's eight run preflight, with the plus and minus 5 minute reports and the Rule of 10 layers
+written before the chart, applies to every question. The prior, the four bands and the Rule of 10 arbitration decide the cell.
+
 Source of rules. ../KP-Pro-sutton/knowledge/kp_pro/KP-PROJECT-INSTRUCTIONS-v15.md first, then the KP-1 to KP-14
 files it names. The scored CSL gate, the significator count, the fructification windows and the stability tier
 are the decision parts.

@@ -12,6 +12,8 @@
  *   a question without an OPTIONS line, a METHOD block, an EVIDENCE line or a RESULT line for each methodology;
  *   a methodology that is not one of the seven; two RESULT lines for one pair;
  *   a RESULT that is not one of the listed options, or that hedges;
+ *   KPPRO EVIDENCE with no confidence word HIGH, MEDIUM or LOW or no basis word CHART DECIDED, PRIOR DOMINANT or R10 DECIDED
+ *   while the KP Pro booklet is installed;
  *   BNN EVIDENCE with no Rule ID or no BNN grade while the BNN rule csv is present;
  *   UDU EVIDENCE with no Udu Rule ID while the nine Udu corpus files are present;
  *   QUAD EVIDENCE with none of COMPUTED, CLASSICAL, UNSTABLE, VACUOUS while the Quad full methodology is present;
@@ -41,13 +43,16 @@ function sources() {
   return {
     BNN: has("bnn/BNN-RULES-5COLUMN.csv"),
     UDU: UDU_FILES.every(f => has("udu/" + f)),
-    QUAD: ["pdf", "txt", "md"].some(e => has("quad/QUAD-FULL-METHODOLOGY." + e))
+    QUAD: ["pdf", "txt", "md"].some(e => has("quad/QUAD-FULL-METHODOLOGY." + e)),
+    KPPRO: has("kppro/KP-PRO-METHODOLOGY.txt")
   };
 }
 const UDU_ID = /\b[A-Z]{3}(-[A-Z0-9])?-\d{4}\b/;
 const BNN_ID = /\b[A-Z]{3}-[A-Z0-9]{3}-\d{3}\b/;
 const BNN_GRADE = /\b(CONFIRMED|INDICATED|POSSIBLE|OPEN|DENIED)\b/;
 const QUAD_WORD = /\b(COMPUTED|CLASSICAL|UNSTABLE|VACUOUS)\b/;
+const KP_TRUST = /\b(HIGH|MEDIUM|LOW)\b/;
+const KP_BASIS = /\b(CHART DECIDED|PRIOR DOMINANT|R10 DECIDED)\b/;
 
 function check(text, opts) {
   opts = opts || {};
@@ -93,6 +98,10 @@ function check(text, opts) {
       if (r === undefined) { err(q + " " + c + " has no RESULT line."); return; }
       const ev = evidence[k];
       if (!ev) err(q + " " + c + " has no EVIDENCE line.");
+      if (c === "KPPRO" && ev && present.KPPRO) {
+        if (!KP_BASIS.test(ev)) err(q + " KPPRO EVIDENCE line must say CHART DECIDED, PRIOR DOMINANT or R10 DECIDED.");
+        else if (!KP_TRUST.test(ev)) err(q + " KPPRO EVIDENCE line must carry the confidence word HIGH, MEDIUM or LOW.");
+      }
       const rulesBased = c === "BNN" || c === "UDU" || c === "QUAD";
       if (r === NOT_RUN(c)) {
         if (!rulesBased) err(q + " " + c + " uses a not run text, allowed for BNN, UDU and QUAD only.");

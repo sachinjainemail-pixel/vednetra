@@ -3,7 +3,7 @@ const assert = require("assert");
 const fs = require("fs");
 const { check, METHODS, NOT_RUN } = require("../tools/sarva_guard");
 
-const EVID = { BNN: " POSSIBLE RAO-FND-009", UDU: " ASH-1467", QUAD: " COMPUTED" };
+const EVID = { KPPRO: " CHART DECIDED MEDIUM", BNN: " POSSIBLE RAO-FND-009", UDU: " ASH-1467", QUAD: " COMPUTED" };
 const BASE = { KPPRO: "B", KCIL: "B", SUJ: "C", CHAWDHRI: "B", BNN: "A", UDU: "B", QUAD: "C" };
 fs.writeFileSync("/tmp/none.txt", "x");
 
@@ -22,7 +22,7 @@ function draft(o) {
   if (o.after) out.push("", o.after);
   return out.join("\n");
 }
-const ALL = { BNN: true, UDU: true, QUAD: true }, NONE = { BNN: false, UDU: false, QUAD: false };
+const ALL = { KPPRO: true, BNN: true, UDU: true, QUAD: true }, NONE = { KPPRO: false, BNN: false, UDU: false, QUAD: false };
 const run = (d, present) => check(d, { noSujGuard: true, present: present || ALL });
 
 assert.deepStrictEqual(run(draft()).errors, [], "clean draft passes with all sources present");
@@ -51,6 +51,9 @@ assert.ok(run(draft().replace(" RAO-FND-009", "")).errors.some(e => /BNN.*Rule I
 assert.ok(run(draft().replace(" POSSIBLE", "")).errors.some(e => /BNN.*grade/.test(e)), "BNN needs a grade");
 assert.ok(run(draft().replace(" ASH-1467", "")).errors.some(e => /UDU.*Rule ID/.test(e)), "UDU needs a rule id");
 assert.ok(run(draft().replace(" COMPUTED", "")).errors.some(e => /QUAD.*confidence/.test(e)), "QUAD needs a confidence word");
+assert.ok(run(draft().replace(" CHART DECIDED", "")).errors.some(e => /KPPRO.*CHART DECIDED/.test(e)), "KPPRO needs a basis word");
+assert.ok(run(draft().replace(" MEDIUM", "")).errors.some(e => /KPPRO.*confidence/.test(e)), "KPPRO needs a confidence word");
+assert.ok(run(draft({ res: { KPPRO: "A" } })).errors.length === 0, "KPPRO prior dominant answer is allowed");
 assert.deepStrictEqual(run(draft({ noEvid: true }), NONE).errors, [], "no source specific evidence is needed while sources are absent");
 
 console.log("sarva guard tests passed");

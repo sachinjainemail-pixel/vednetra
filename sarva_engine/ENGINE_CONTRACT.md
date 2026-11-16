@@ -69,10 +69,12 @@ Where methodologies disagree, the table shows the disagreement as it is. It is n
    never from memory.
 2. Check the promise and also the time status for every event, already happened, happening now or due in the
    future, using the system date as the as-of date.
-3. A chosen option rests on counted chart evidence. Typicality, base rates, cohort priors and the safe choice
-   are not evidence. In particular the kpredict ask command at its default setting returns the cohort prior
-   because the measured chart weight is 0. That output is never a KP Pro or KCIL cell. Use the per method
-   opinion of the read command and the methodology's own rules.
+3. A chosen option rests on counted chart evidence. Typicality, base rates, cohort priors and the safe choice are not evidence,
+   with one exception. The KP Pro method itself defines a computed prior and lets the chart decide when the significator NET
+   band is STRONG, PRESENT or ABSENT, see 7d. Only there may the prior decide, and the EVIDENCE line then says PRIOR DOMINANT.
+   The kpredict ask command at its default setting returns the cohort prior because the measured chart weight is 0, so the chart
+   never enters it. That output is never a KP Pro or KCIL cell. Use the per method opinion of the read command and the
+   methodology's own rules.
 4. Never retune a weight, band or rule because of one chart.
 
 ## 7. BNN, rule base and method guide
@@ -129,6 +131,25 @@ QUAD_PROCEDURE.md.
 3. When the file is present the report contract binds. The levels licensed, the stability gate, the four confidence words
    COMPUTED, CLASSICAL, UNSTABLE and VACUOUS in the EVIDENCE line, no death dating, no claim of a validated hit rate.
    The cell is the option the Rule of 10 ranks first.
+
+## 7d. KP Pro, rules and method
+
+The KP Pro column follows the owner's KP Pro v15 booklet, sarva_engine/knowledge/kppro/KP-PRO-METHODOLOGY.docx with its text, section
+index and the English map KP_PRO_PROCEDURE.md. The booklet wins on any difference. The rule files are in the sibling repo.
+1. Authority order of booklet section 3, the eight run preflight and the eight box gate of section 4, the thirteen fixed settings of
+   section 5, the prior and the four bands of section 8, the stability tier and admissibility of section 9, the KP 11 version 4
+   promise gate of section 10, significators and NET of section 11, fructification and transit of sections 19 and 20, the Rule of 10
+   with its arbitration of section 17, and the 17 mandatory rules of section 28.
+2. The KP Pro cell is the answer for the stated birth time. Differences at plus and minus 5 minutes go in the EVIDENCE line.
+3. The KP Pro EVIDENCE line carries a confidence word HIGH, MEDIUM or LOW and a basis word CHART DECIDED, PRIOR DOMINANT or R10 DECIDED.
+   The guard checks both while the booklet is installed.
+4. Cusp sub lords of houses 2, 3, 5, 6, 8, 9, 11 and 12 from the VedNetra KP report are checked against true Placidus from kpredict,
+   and a difference is named as a declared conflict.
+5. The Rule of 10 comparison with Chawdhri and Sutton is NOT RUN because no methodology reads another's verdict. The Sutton layer
+   inside KP Pro runs.
+6. Natal questions only. Horary needs a judgment moment and is outside SARVA.
+7. Honest record from the booklet, the owner's ledger of 122 questions, version 14 at 47.5 percent with 41 to 45 expected on unseen
+   charts, the chart adding nothing over the prior for marital status, siblings, residence and parents, Rule of 10 unmeasured.
 
 ## 8. Inputs the engine needs
 
