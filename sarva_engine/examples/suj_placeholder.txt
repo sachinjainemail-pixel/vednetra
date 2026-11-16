@@ -1,0 +1,1 @@
+Placeholder for the SUJ answer file named in the format example. A real reply names a real SUJ answer that passed suj_engine/tools/answer_guard.js.
