@@ -12,17 +12,20 @@ under that name, in every session, until the owner changes it. Read these files 
 
 Non negotiable points
 
-- The SARVA engine runs exactly five methodologies, in this order: KP Pro, KCIL, SUJ engine, CHAWDHRI, BNN. No other
-  methodology is run, cited or used as a tie breaker.
-- Every question, with its options if any, is analysed separately under each of the five methodologies, each by its own
+- The SARVA engine runs exactly seven methodologies, in this order: KP Pro, KCIL, SUJ engine, CHAWDHRI, BNN, Udu, Quad Dasha.
+  No other methodology is run, cited or used as a tie breaker. Chara, Kaal Chakra and Yogini run only inside Quad Dasha.
+- Every question, with its options if any, is analysed separately under each of the seven methodologies, each by its own
   source rules and its own chart settings. None is skipped or answered from another's result.
 - Each methodology ends each question with exactly one finalized option. No hedging, no range, no refusal to choose.
 - The final output is one table, the last block of the reply, with one row per question and the columns Question, KP Pro,
-  KCIL, SUJ engine, CHAWDHRI, BNN. Each cell is that methodology's finalized option. No sixth column, no vote, no
+  KCIL, SUJ engine, CHAWDHRI, BNN, Udu, Quad Dasha. Each cell is that methodology's finalized option. No eighth column, no vote, no
   combined answer unless the owner asks for one in that session.
 - BNN rules are never read from memory. The BNN rule base is sarva_engine/knowledge/bnn/BNN-RULES-5COLUMN.csv, read with
   node sarva_engine/tools/bnn_rules.js, and the BNN evidence line cites Rule IDs. Only if the csv is absent from the
   session use the cell text NOT RUN BNN RULES MISSING, see ENGINE_CONTRACT.md section 7.
+- Udu answers only from its own corpus and Quad Dasha only by its own report contract. Their rule files are in
+  sarva_engine/knowledge/udu and sarva_engine/knowledge/quad. Where those rule files are not yet supplied the cell is the exact
+  text NOT RUN UDU RULES MISSING or NOT RUN QUAD RULES MISSING, never a guess. See ENGINE_CONTRACT.md sections 7b and 7c.
 - Never use the kpredict ask default output as a KP Pro or KCIL cell, it is the cohort prior.
 - Write the draft reply to a file and run node sarva_engine/tools/sarva_guard.js on it before sending.
 - Under SARVA the SUJ rules below apply inside the SUJ column. For any question not named SARVA, the SUJ section

@@ -1,6 +1,6 @@
 # SARVA METHOD ROUTING
 
-How each of the five methodologies is run for one native. Paths with two dots are sibling repositories checked
+How each of the seven methodologies is run for one native. Paths with two dots are sibling repositories checked
 out next to this one. If a sibling is not attached to the session, say so and ask, do not improvise.
 
 Common first step. Collect the inputs of ENGINE_CONTRACT.md section 8. Fix the as-of date from the system clock.
@@ -78,7 +78,29 @@ The guide writes IDs without hyphens, such as RAO EDU 003. The corpus has them w
 Cite the Rule ID of each rule used. Where the table's authors disagree, cite both. The cell is the rank 1 option of the
 BNN procedure. ENGINE_CONTRACT.md section 7 has the grade rules and the missing file fallback.
 
+## 6. Udu (code UDU)
+
+Method. sarva_engine/knowledge/udu/UDU_PROCEDURE.md, then the document sections it names in UDU-METHODOLOGY.txt through
+UDU-METHODOLOGY.index.tsv. Rules. The nine corpus files UDU-*.md in sarva_engine/knowledge/udu, routed by question as in
+document section 5. Not yet supplied, see knowledge/udu/README.md, so the cell is NOT RUN UDU RULES MISSING.
+
+Chart. The vednetra-ududaya skill runner, gender and birth time required, Lahiri only.
+    node ~/.claude/skills/synced/*/vednetra-ududaya/scripts/run_ududaya_export.js '{"name":"N","gender":"male","date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0,"place":"P"}'
+For a past event recast the chart on the event date. Dasha dates come from the report, the pratyantar is counted by the engine
+and said so.
+
+## 7. Quad Dasha (code QUAD)
+
+Method. sarva_engine/knowledge/quad/QUAD_PROCEDURE.md and QUAD-REPORT-CONTRACT.md. Rules. Sections 3 to 19 of the Quad methodology
+file, not yet supplied, see knowledge/quad/README.md, so the cell is NOT RUN QUAD RULES MISSING.
+
+Chart and dashas. The vednetra-quad skill runner.
+    node ~/.claude/skills/synced/*/vednetra-quad/scripts/run_quad_dasha.js --selftest
+    node ~/.claude/skills/synced/*/vednetra-quad/scripts/run_quad_dasha.js '{"name":"N","date":"YYYY-MM-DD","time":"HH:MM","tz":5.5,"lat":0,"lon":0,"asOf":"AS_OF"}'
+The self test must print RESULT READY. Without a birth time read only the Chara section. Do not use VedNetra's own Char Dasha or
+Yogini cards.
+
 ## Output per question
 
-For each question write five blocks in the order above, then move to the next question. After the last question
+For each question write seven blocks in the order above, then move to the next question. After the last question
 write the final table. ANSWER_TEMPLATE.md has the exact lines.

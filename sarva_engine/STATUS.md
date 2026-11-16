@@ -31,8 +31,29 @@ guide prints two options on a rung 9 tie and SARVA must give one. The guard chec
 BNN measured accuracy per the guide is 52 of 127, 40.9 percent, chance 24.8 percent, and at or below the best fixed
 answer in seven of ten departments.
 
+## Round 4, Udu and Quad Dasha added, seven methodologies
+
+The owner asked on 16 November 2026 for the attached methodologies to be added the way BNN was, and for the engine to be as
+comprehensive as possible. The SARVA engine now has seven methodologies, KP Pro, KCIL, SUJ engine, CHAWDHRI, BNN, Udu and Quad
+Dasha. The table has eight columns. Contract sections 1 to 4, 6, 7b and 7c, the routing, the template, CLAUDE.md and the guard
+were updated, and the guard tests cover seven methodologies and per source presence.
+- Udu. Installed the 34 page methodology document, its text and heading index, and UDU_PROCEDURE.md. The nine corpus files of
+  11,683 rules were not supplied, so the Udu cell is NOT RUN UDU RULES MISSING until they are placed in knowledge/udu.
+- Quad Dasha. Installed the 2 page intro file, which holds only section 1 and the reading guide, the report contract from the
+  owner's vednetra-quad skill, and QUAD_PROCEDURE.md. Sections 3 to 19 were not supplied, so the Quad cell is NOT RUN QUAD RULES
+  MISSING until the full file is placed at knowledge/quad/QUAD-FULL-METHODOLOGY.
+- Neither document reports a measured accuracy for its READ layer worth trusting. Quad's own contract says its 52 rule tests were
+  at chance. Udu reports none. This is stated in the EVIDENCE line.
+
 ## Pending
 
+A. Udu corpus. The nine UDU-*.md corpus files, and ideally the four UDU-REF files and UDU-000-MANIFEST.md, go in
+   knowledge/udu. Then a lookup tool like bnn_rules.js should be built against the real layout. Until then the Udu column is
+   NOT RUN UDU RULES MISSING in every reply.
+B. Quad Dasha full methodology, sections 3 to 19, saved as knowledge/quad/QUAD-FULL-METHODOLOGY.pdf, txt or md. Until then the
+   Quad column is NOT RUN QUAD RULES MISSING in every reply. The compute layer is available now through the vednetra-quad runner.
+C. As of this round two of the seven columns cannot be filled, so every SARVA reply is reported INCOMPLETE by the guard, exit
+   code 3, until A and B are done.
 0. The files the guide names but does not attach, LEDGER BNN, 23 BACKTEST WHATSAPP 20, 24 DEPARTMENT METHODS, 25 RULE
    OF 10 AMENDMENT, 25 BACKTEST DATASET and project files 01, 03 to 10, are not here. The guide summarises them. Say a
    missing ledger once per session. Please add them if you want the BNN column to follow them in full.

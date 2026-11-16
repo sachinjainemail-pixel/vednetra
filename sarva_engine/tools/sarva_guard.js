@@ -4,15 +4,21 @@
  *
  *   node sarva_engine/tools/sarva_guard.js reply.txt [--no-suj-guard]
  *
- * Exit code 0 clean, 1 errors, 3 valid but incomplete because the BNN rule files were missing.
+ * Exit code 0 clean, 1 errors, 3 valid but incomplete because the rules of BNN, Udu or Quad Dasha were missing.
+ *
+ * The seven methodologies, in order: KPPRO, KCIL, SUJ, CHAWDHRI, BNN, UDU, QUAD.
  *
  * Errors
- *   a question without an OPTIONS line, a METHOD block, an EVIDENCE line or a RESULT line for each of the five
- *   methodologies KPPRO, KCIL, SUJ, CHAWDHRI, BNN; a sixth methodology; two RESULT lines for one pair;
- *   a BNN EVIDENCE line with no Rule ID from the BNN rule base or no BNN grade; NOT RUN BNN RULES MISSING while the rule csv is present;
- *   a RESULT that is not one of the listed options, or that hedges; no FINAL TABLE; a table whose header is not
- *   Question, KP Pro, KCIL, SUJ engine, CHAWDHRI, BNN; a row missing or a cell that differs from its RESULT line;
- *   anything after the table; a missing SUJ FILE; a SUJ file that fails suj_engine/tools/answer_guard.js.
+ *   a question without an OPTIONS line, a METHOD block, an EVIDENCE line or a RESULT line for each methodology;
+ *   a methodology that is not one of the seven; two RESULT lines for one pair;
+ *   a RESULT that is not one of the listed options, or that hedges;
+ *   BNN EVIDENCE with no Rule ID or no BNN grade while the BNN rule csv is present;
+ *   UDU EVIDENCE with no Udu Rule ID while the nine Udu corpus files are present;
+ *   QUAD EVIDENCE with none of COMPUTED, CLASSICAL, UNSTABLE, VACUOUS while the Quad full methodology is present;
+ *   NOT RUN X RULES MISSING for BNN, UDU or QUAD while that source is present, or for any other column;
+ *   no final table; a table whose header is not Question, KP Pro, KCIL, SUJ engine, CHAWDHRI, BNN, Udu, Quad Dasha;
+ *   a row missing or a cell that differs from its RESULT line; anything after the table;
+ *   a missing SUJ FILE; a SUJ file that fails suj_engine/tools/answer_guard.js.
  * Warning
  *   characters the owner does not want in responses, outside the table delimiter row.
  */
@@ -20,16 +26,32 @@ const fs = require("fs");
 const path = require("path");
 const { spawnSync } = require("child_process");
 
-const METHODS = ["KPPRO", "KCIL", "SUJ", "CHAWDHRI", "BNN"];
-const HEADER = ["Question", "KP Pro", "KCIL", "SUJ engine", "CHAWDHRI", "BNN"];
-const BNN_MISSING = "NOT RUN BNN RULES MISSING";
-const BNN_FILE = path.join(__dirname, "..", "knowledge", "bnn", "BNN-RULES-5COLUMN.csv");
+const METHODS = ["KPPRO", "KCIL", "SUJ", "CHAWDHRI", "BNN", "UDU", "QUAD"];
+const HEADER = ["Question", "KP Pro", "KCIL", "SUJ engine", "CHAWDHRI", "BNN", "Udu", "Quad Dasha"];
+const NOT_RUN = c => "NOT RUN " + c + " RULES MISSING";
+const KNOW = path.join(__dirname, "..", "knowledge");
+const UDU_FILES = ["UDU-vivah-sambandh.md", "UDU-karya-dhan.md", "UDU-arogya-ayu.md", "UDU-vidya-swabhav.md",
+  "UDU-santan-parivar.md", "UDU-dharma-upay.md", "UDU-samay-muhurat.md", "UDU-yatra-shatru.md", "UDU-mool-tattva.md"];
 const HEDGE = /\b(cannot|can't|unable|undecided|undetermined|equal|tie|either|neither)\b|\bor\b|\//i;
 const BANNED = /[();:—“”‘’!#*~\/]|\s-\s/;
 
+// A source is present only when its rule files are in the knowledge folder.
+function sources() {
+  const has = f => fs.existsSync(path.join(KNOW, f));
+  return {
+    BNN: has("bnn/BNN-RULES-5COLUMN.csv"),
+    UDU: UDU_FILES.every(f => has("udu/" + f)),
+    QUAD: ["pdf", "txt", "md"].some(e => has("quad/QUAD-FULL-METHODOLOGY." + e))
+  };
+}
+const UDU_ID = /\b[A-Z]{3}(-[A-Z0-9])?-\d{4}\b/;
+const BNN_ID = /\b[A-Z]{3}-[A-Z0-9]{3}-\d{3}\b/;
+const BNN_GRADE = /\b(CONFIRMED|INDICATED|POSSIBLE|OPEN|DENIED)\b/;
+const QUAD_WORD = /\b(COMPUTED|CLASSICAL|UNSTABLE|VACUOUS)\b/;
+
 function check(text, opts) {
   opts = opts || {};
-  const bnnPresent = opts.bnnPresent !== undefined ? opts.bnnPresent : fs.existsSync(BNN_FILE);
+  const present = Object.assign(sources(), opts.present || {});
   const errors = [], warnings = [];
   const err = m => errors.push(m);
   const lines = text.split(/\r?\n/);
@@ -67,14 +89,24 @@ function check(text, opts) {
     METHODS.forEach(c => {
       const k = q + c;
       if (!blocks[k]) err(q + " has no METHOD " + c + " block.");
-      if (!evidence[k]) err(q + " " + c + " has no EVIDENCE line.");
-      else if (c === "BNN" && bnnPresent && results[k] !== BNN_MISSING && !/\b[A-Z]{3}-[A-Z0-9]{3}-\d{3}\b/.test(evidence[k])) err(q + " BNN EVIDENCE line must cite at least one Rule ID from the BNN rule base, for example RAO-FND-009.");
-      else if (c === "BNN" && bnnPresent && results[k] !== BNN_MISSING && !/\b(CONFIRMED|INDICATED|POSSIBLE|OPEN|DENIED)\b/.test(evidence[k])) err(q + " BNN EVIDENCE line must carry the BNN grade, one of CONFIRMED, INDICATED, POSSIBLE, OPEN, DENIED.");
       const r = results[k];
       if (r === undefined) { err(q + " " + c + " has no RESULT line."); return; }
-      if (c === "BNN" && r === BNN_MISSING && !bnnPresent) { incomplete = true; return; }
-      if (c === "BNN" && r === BNN_MISSING) { err(q + " BNN says the rules are missing but " + BNN_FILE + " is present. Run the BNN reading."); return; }
-      if (r === BNN_MISSING) { err(q + " " + c + " uses the BNN missing text, allowed in the BNN column only."); return; }
+      const ev = evidence[k];
+      if (!ev) err(q + " " + c + " has no EVIDENCE line.");
+      const rulesBased = c === "BNN" || c === "UDU" || c === "QUAD";
+      if (r === NOT_RUN(c)) {
+        if (!rulesBased) err(q + " " + c + " uses a not run text, allowed for BNN, UDU and QUAD only.");
+        else if (present[c]) err(q + " " + c + " says the rules are missing but the " + c + " rule files are present in sarva_engine/knowledge. Run the " + c + " reading.");
+        else incomplete = true;
+        return;
+      }
+      if (/^NOT RUN/i.test(r)) { err(q + " " + c + " has a not run result that is not the exact text " + NOT_RUN(c) + "."); return; }
+      if (ev && rulesBased && present[c]) {
+        if (c === "BNN" && !BNN_ID.test(ev)) err(q + " BNN EVIDENCE line must cite at least one Rule ID from the BNN rule base, for example RAO-FND-009.");
+        else if (c === "BNN" && !BNN_GRADE.test(ev)) err(q + " BNN EVIDENCE line must carry the BNN grade, one of CONFIRMED, INDICATED, POSSIBLE, OPEN, DENIED.");
+        if (c === "UDU" && !UDU_ID.test(ev)) err(q + " UDU EVIDENCE line must cite at least one Udu Rule ID such as ASH-1467 or RBS-1-0943.");
+        if (c === "QUAD" && !QUAD_WORD.test(ev)) err(q + " QUAD EVIDENCE line must use the confidence words COMPUTED, CLASSICAL, UNSTABLE or VACUOUS.");
+      }
       const o = options[q];
       if (Array.isArray(o)) {
         if (o.indexOf(r) < 0) err(q + " " + c + " RESULT " + r + " is not one of the options " + o.join(", ") + ".");
@@ -125,7 +157,7 @@ function check(text, opts) {
     if (/^(SUJ FILE|OPTIONS|RESULT|EVIDENCE|METHOD)/.test(l.trim()) && !BANNED.test(l.replace(/\//g, ""))) return;
     if (BANNED.test(l)) warnings.push("Line " + (i + 1) + " has a character the owner does not want in responses.");
   });
-  return { errors, warnings: warnings.slice(0, 5), incomplete, questions };
+  return { errors, warnings: warnings.slice(0, 5), incomplete, questions, present };
 }
 
 if (require.main === module) {
@@ -135,7 +167,8 @@ if (require.main === module) {
   r.warnings.forEach(w => console.log("WARNING " + w));
   r.errors.forEach(e => console.log("ERROR " + e));
   if (r.errors.length) { console.log("GUARD FAILED with " + r.errors.length + " errors."); process.exit(1); }
-  if (r.incomplete) { console.log("GUARD PASSED but INCOMPLETE. The BNN column was not run because the BNN rule files are missing. Tell the owner."); process.exit(3); }
-  console.log("GUARD PASSED, " + r.questions.length + " questions, five methodologies each, final table matches.");
+  const miss = ["BNN", "UDU", "QUAD"].filter(c => !r.present[c]);
+  if (r.incomplete) { console.log("GUARD PASSED but INCOMPLETE. Not run for lack of rule files: " + miss.join(", ") + ". Tell the owner."); process.exit(3); }
+  console.log("GUARD PASSED, " + r.questions.length + " questions, seven methodologies each, final table matches.");
 }
-module.exports = { check, METHODS, HEADER };
+module.exports = { check, METHODS, HEADER, NOT_RUN };
