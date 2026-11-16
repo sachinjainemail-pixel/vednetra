@@ -31,7 +31,10 @@ Non negotiable points
 - KCIL follows the owner's v2.6 summary in sarva_engine/knowledge/kcil, on Khullar settings only. Its evidence line says STABLE,
   TWO CANDIDATES or NO RULE REGISTER, and for two candidates the cell is the one its closing rule of section 16.30 prefers.
 - Never use the kpredict ask default output as a KP Pro or KCIL cell, it never lets the chart in.
-- Write the draft reply to a file and run node sarva_engine/tools/sarva_guard.js on it before sending.
+- Start every SARVA session with node sarva_engine/tools/sarva_preflight.js. Udu and Quad Dasha are standing gaps, the owner will
+  not supply their rule files, so their cells stay NOT RUN UDU RULES MISSING and NOT RUN QUAD RULES MISSING and the guard ends with
+  exit code 3. That is expected. See ENGINE_CONTRACT.md section 10.
+- Write the draft reply to a file and run node sarva_engine/tools/sarva_guard.js on it before sending. sarva_engine/examples shows the layout.
 - Under SARVA the SUJ rules below apply inside the SUJ column. For any question not named SARVA, the SUJ section
   below still governs.
 

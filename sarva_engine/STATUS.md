@@ -64,7 +64,25 @@ candidates and forbids merging them, SARVA needs one cell, so the cell is the ca
 and the line names the other. The PDF holds parts 1 to 10 only and refers to a part 11 that is absent, and to a KCIL 11 RULE OF 10
 file that the PDF itself says is still to be uploaded. The v2.6 instructions in the sibling repo hold sections 16 to 18.
 
-## Pending
+## Round 7, finalized on the supplied material
+
+The owner stated on 16 November 2026 that no further files will be shared and asked to finalize. Done in this round.
+- End to end test of every route on a sample native taken from the skill documentation, not a real person. kpredict read, SUJ
+  prepare.js, CHAWDHRI jyotish.sh, and the BNN, KCIL, Quad Dasha and Udu chart runners all ran. Quad self test 8 of 8, BNN export
+  complete with all blocks, CHAWDHRI ephemeris checks passed. KCIL reported all 12 cusps as unstable for the sample, and Quad
+  withdrew its Kaal Chakra and Chara rows as UNSTABLE.
+- Three practical faults found and fixed in the routing. The Udu runner writes to a Windows path unless outFile is passed. kpredict
+  must be installed in a virtualenv in a fresh container. The Quad report is saved inside the skill folder.
+- New tools/sarva_preflight.js, shows which columns can run in the session and what to fix. New examples/format_example.txt, the
+  guard accepts it with exit code 3. The guard tests now include it.
+- Contract section 10 records the standing design, five columns on complete rules, Udu and Quad as standing not run columns.
+- Still true, no chart has been run through a full SARVA reply yet, and no column has been scored against known answers. The
+  measured records of the methodologies, all near the base rate, apply, and the owner can add true answers for a chart later,
+  which would be the first measurement of the engine as a whole.
+
+## Pending after finalization
+
+A and B below are closed by the owner's decision, they stand as gaps. The rest are not blocking.
 
 A. Udu corpus. The nine UDU-*.md corpus files, and ideally the four UDU-REF files and UDU-000-MANIFEST.md, go in
    knowledge/udu. Then a lookup tool like bnn_rules.js should be built against the real layout. Until then the Udu column is

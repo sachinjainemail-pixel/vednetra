@@ -3,7 +3,12 @@
 How each of the seven methodologies is run for one native. Paths with two dots are sibling repositories checked
 out next to this one. If a sibling is not attached to the session, say so and ask, do not improvise.
 
-Common first step. Collect the inputs of ENGINE_CONTRACT.md section 8. Fix the as-of date from the system clock.
+Common first step. Run node sarva_engine/tools/sarva_preflight.js, it shows which of the seven columns can run in this session and what
+to fix. Then collect the inputs of ENGINE_CONTRACT.md section 8. Fix the as-of date from the system clock.
+
+Tested on 16 November 2026 with a sample native, every command below ran end to end, kpredict read, SUJ prepare.js, CHAWDHRI jyotish.sh,
+and the BNN, KCIL, Quad Dasha and Udu chart runners. The notes below come from that test. Skill paths use the glob
+~/.claude/skills/synced/*/ because the folder name is account specific.
 
 ## 1. KP Pro (code KPPRO)
 
@@ -19,7 +24,8 @@ Chart and numbers. True Placidus cusps from kpredict. Do not use VedNetra cusps 
 and 12 because VedNetra falls back to Porphyry there, see ../KP-Pro-sutton/docs/FINDINGS.md.
 
 Run.
-    cd ../KP-Pro-sutton && pip install -e .
+    cd ../KP-Pro-sutton && python3 -m venv /tmp/kpvenv && /tmp/kpvenv/bin/pip install -e .
+    (a fresh container has no kpredict, install it once per session, the flags come after the word read)
     kpredict read --name N --sex M|F --date YYYY-MM-DD --time HH:MM:SS --lat LAT --lon LON --tz TZ \
         --today AS_OF --events EVENT_CODES --windows
 Take the KP_PRO opinion of the output. Map the question's options to the event states the KP Pro rules decide,
@@ -93,8 +99,9 @@ UDU-METHODOLOGY.index.tsv. Rules. The nine corpus files UDU-*.md in sarva_engine
 document section 5. Not yet supplied, see knowledge/udu/README.md, so the cell is NOT RUN UDU RULES MISSING.
 
 Chart. The vednetra-ududaya skill runner, gender and birth time required, Lahiri only.
-    node ~/.claude/skills/synced/*/vednetra-ududaya/scripts/run_ududaya_export.js '{"name":"N","gender":"male","date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0,"place":"P"}'
-For a past event recast the chart on the event date. Dasha dates come from the report, the pratyantar is counted by the engine
+    node ~/.claude/skills/synced/*/vednetra-ududaya/scripts/run_ududaya_export.js '{"outFile":"/tmp/udu_report.md","name":"N","gender":"male","date":"YYYY-MM-DD","time":"HH:MM:SS","tz":5.5,"lat":0,"lon":0,"place":"P"}'
+Always pass outFile, the runner otherwise writes to a Windows path D:\Books_Master and creates a stray folder named D: in the
+current directory. For a past event recast the chart on the event date. Dasha dates come from the report, the pratyantar is counted by the engine
 and said so.
 
 ## 7. Quad Dasha (code QUAD)
@@ -105,7 +112,8 @@ file, not yet supplied, see knowledge/quad/README.md, so the cell is NOT RUN QUA
 Chart and dashas. The vednetra-quad skill runner.
     node ~/.claude/skills/synced/*/vednetra-quad/scripts/run_quad_dasha.js --selftest
     node ~/.claude/skills/synced/*/vednetra-quad/scripts/run_quad_dasha.js '{"name":"N","date":"YYYY-MM-DD","time":"HH:MM","tz":5.5,"lat":0,"lon":0,"asOf":"AS_OF"}'
-The self test must print RESULT READY. Without a birth time read only the Chara section. Do not use VedNetra's own Char Dasha or
+The self test must print RESULT READY. The runner saves its report in the skill's charts folder and prints the path, read it from
+there. In the sample test the KCD and Chara rows shifted within plus or minus 5 minutes, so those rows are withdrawn as UNSTABLE. Without a birth time read only the Chara section. Do not use VedNetra's own Char Dasha or
 Yogini cards.
 
 ## Output per question

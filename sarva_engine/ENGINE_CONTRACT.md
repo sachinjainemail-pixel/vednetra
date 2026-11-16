@@ -187,7 +187,23 @@ Write the draft reply to a file and run node sarva_engine/tools/sarva_guard.js o
 part of each question is also checked by suj_engine/tools/answer_guard.js, which the SARVA guard runs when the
 SUJ answer file is named. See ANSWER_TEMPLATE.md.
 
-## 10. Persistence
+## 10. Standing gaps, the final design on the material supplied
+
+On 16 November 2026 the owner stated that no further files will be shared and asked for the engine to be finalized on what was
+supplied. The standing design is therefore this.
+1. Five columns run on complete rules, KP Pro, KCIL, SUJ engine, CHAWDHRI and BNN.
+2. Udu and Quad Dasha stay in the table as columns. Their rule files, the nine Udu corpus files and the full Quad Dasha methodology,
+   were not supplied. Each cell reads exactly NOT RUN UDU RULES MISSING or NOT RUN QUAD RULES MISSING. This is a standing state and
+   not an error. The engine never fills those cells from memory or from general astrology, because the Udu method itself forbids
+   answering without its corpus and the Quad contract allows only claims that name a rule.
+3. A complete SARVA reply therefore ends with the guard exit code 3, valid but incomplete, until those files are added. The LIMITS
+   line of the reply says which two columns are not run.
+4. If the owner later supplies the files, they go in sarva_engine/knowledge/udu and knowledge/quad under the names in those folders'
+   README.md files, and the guard and preflight switch the columns to full runs on their own. If the owner prefers to drop the two
+   columns, that is a change to sections 1 and 4 and to the guard, made on the owner's instruction.
+5. Run node sarva_engine/tools/sarva_preflight.js at the start of every SARVA session.
+
+## 11. Persistence
 
 These requirements are stored in the repository and loaded through CLAUDE.md. They hold in this session and in
 every new session. They change only when the owner changes them, and STATUS.md records each change.

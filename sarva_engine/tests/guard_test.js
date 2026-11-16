@@ -58,4 +58,9 @@ assert.ok(run(draft().replace(" MEDIUM", "")).errors.some(e => /KPPRO.*confidenc
 assert.ok(run(draft({ res: { KPPRO: "A" } })).errors.length === 0, "KPPRO prior dominant answer is allowed");
 assert.deepStrictEqual(run(draft({ noEvid: true }), NONE).errors, [], "no source specific evidence is needed while sources are absent");
 
+// the shipped format example must pass the guard as valid but incomplete, exit code 3 while Udu and Quad rules are absent
+const cp = require("child_process"), path = require("path");
+const ex = cp.spawnSync("node", [path.join(__dirname, "..", "tools", "sarva_guard.js"), path.join(__dirname, "..", "examples", "format_example.txt"), "--no-suj-guard"], { encoding: "utf8", cwd: path.join(__dirname, "..", "..") });
+const udu = ["vivah-sambandh","karya-dhan","arogya-ayu","vidya-swabhav","santan-parivar","dharma-upay","samay-muhurat","yatra-shatru","mool-tattva"].every(n => fs.existsSync(path.join(__dirname, "..", "knowledge", "udu", "UDU-" + n + ".md")));
+if (!udu) assert.strictEqual(ex.status, 3, "the format example is valid but incomplete while the Udu corpus is absent");
 console.log("sarva guard tests passed");
