@@ -28,6 +28,8 @@ Non negotiable points
   text NOT RUN UDU RULES MISSING or NOT RUN QUAD RULES MISSING, never a guess. See ENGINE_CONTRACT.md sections 7b and 7c.
 - KP Pro follows the owner's v15 booklet in sarva_engine/knowledge/kppro. Its own prior may decide only when its NET band is
   UNDECIDED, and the KP Pro evidence line then says PRIOR DOMINANT with a HIGH, MEDIUM or LOW word.
+- KCIL follows the owner's v2.6 summary in sarva_engine/knowledge/kcil, on Khullar settings only. Its evidence line says STABLE,
+  TWO CANDIDATES or NO RULE REGISTER, and for two candidates the cell is the one its closing rule of section 16.30 prefers.
 - Never use the kpredict ask default output as a KP Pro or KCIL cell, it never lets the chart in.
 - Write the draft reply to a file and run node sarva_engine/tools/sarva_guard.js on it before sending.
 - Under SARVA the SUJ rules below apply inside the SUJ column. For any question not named SARVA, the SUJ section

@@ -28,6 +28,10 @@ output as the cell, see ENGINE_CONTRACT.md section 6.3. Never use the ensemble c
 
 ## 2. KCIL (code KCIL)
 
+Method. sarva_engine/knowledge/kcil/KCIL_PROCEDURE.md, then the parts it names in KCIL-METHODOLOGY-V2.6.txt through
+KCIL-METHODOLOGY-V2.6.index.tsv. Run the chart validity check, then rectification, then the three gates, before any answer. The
+sections 16, 17 and 18 locks are in the v2.6 instructions in the sibling repo.
+
 Source of rules. ../KP-Pro-sutton/knowledge/kcil/KCIL-CUSTOM-INSTRUCTIONS-v2.6.md and the KCIL-1 to KCIL-10
 files. The cuspal sub sub lord is the verdict.
 

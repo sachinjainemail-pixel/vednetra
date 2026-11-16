@@ -55,6 +55,15 @@ UNDECIDED. Contract section 6.3 now allows that for KP Pro only and requires PRI
 HIGH, MEDIUM or LOW word and a basis word in every KP Pro evidence line. KP 15 as a separate file and the 122 question ledger were not
 supplied, the v15 instructions in the sibling repo hold the Rule of 10 mechanics.
 
+## Round 6, KCIL v2.6 summary installed
+
+The owner supplied the 65 page Hindi summary of KCIL v2.6. It extends the existing KCIL column, no column was added. Stored with its
+text, part index and an English map. Contract section 7e, the routing, the template, CLAUDE.md and the guard were updated. The guard
+checks a determinacy mark in every KCIL evidence line. One reconciliation, KCIL answers a non determinate question with two
+candidates and forbids merging them, SARVA needs one cell, so the cell is the candidate its own closing rule of section 16.30 prefers
+and the line names the other. The PDF holds parts 1 to 10 only and refers to a part 11 that is absent, and to a KCIL 11 RULE OF 10
+file that the PDF itself says is still to be uploaded. The v2.6 instructions in the sibling repo hold sections 16 to 18.
+
 ## Pending
 
 A. Udu corpus. The nine UDU-*.md corpus files, and ideally the four UDU-REF files and UDU-000-MANIFEST.md, go in

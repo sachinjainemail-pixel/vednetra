@@ -151,6 +151,29 @@ index and the English map KP_PRO_PROCEDURE.md. The booklet wins on any differenc
 7. Honest record from the booklet, the owner's ledger of 122 questions, version 14 at 47.5 percent with 41 to 45 expected on unseen
    charts, the chart adding nothing over the prior for marital status, siblings, residence and parents, Rule of 10 unmeasured.
 
+## 7e. KCIL, rules and method
+
+The KCIL column follows the owner's KCIL v2.6 summary, sarva_engine/knowledge/kcil/KCIL-METHODOLOGY-V2.6.pdf with its text, part index
+and the English map KCIL_PROCEDURE.md. The summary wins on any difference. The rule files and the v2.6 instructions with sections 16,
+17 and 18 are in the sibling repo.
+1. The chart is cast on the seven fixed settings, Khullar ayanamsa by formula with zero year 292, Placidus, geocentric latitude, true
+   nodes, nutation applied, depth to Prana, longitude to the second. The chart validity check is step zero. A KP report or a VedNetra
+   Lahiri chart is never a KCIL chart. Gender is mandatory. The KCIL chart casts with the vednetra-kcil runner or the kcil method of
+   kpredict.
+2. KCIL is a closed system. No retrograde, combustion, aspects, strength, yogas, divisional charts, Ashtakavarga, no almanac, festival
+   or news, no KP rules, no Uranus Neptune or Pluto.
+3. The order is rectification before any verdict, the three promise gates of the Ascendant, the main cusp and the 11th, the descending
+   permission ladder Dasa Bhukti Antara Sookshma Prana, with transit and progression, the competitive scoring of options, the Rule of
+   10 layers written before the chart, and the locks of sections 16 and 17. A failed gate is an answer.
+4. The KCIL EVIDENCE line carries one of STABLE, TWO CANDIDATES or NO RULE REGISTER. For TWO CANDIDATES it names the sub sub lord that
+   flips and the seconds, and the cell is the candidate preferred by the KCIL closing rule of section 16.30, the lower grade, the smaller
+   count, the event not yet occurred, the person still alive. For NO RULE REGISTER, height, graded build, religion, a named city, a
+   child's sex and a relative's life span, the cell is the option the nearest real rule supports and the line names that rule. The
+   guard checks the mark while the summary is installed.
+5. Horary is outside SARVA. Rectification is inside it.
+6. Honest record, version 2.4 scored 27.6 percent on 123 questions, equal to always choosing option 1, determinate answers 44.4
+   percent and non determinate 33.3, the expected rate on a quiz chart to the minute 2 to 3 of 6, the Rule of 10 unmeasured.
+
 ## 8. Inputs the engine needs
 
 Native name, gender (mandatory, BNN and KCIL both depend on it), date of birth, time of birth with seconds if
