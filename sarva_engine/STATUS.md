@@ -80,6 +80,19 @@ The owner stated on 16 November 2026 that no further files will be shared and as
   measured records of the methodologies, all near the base rate, apply, and the owner can add true answers for a chart later,
   which would be the first measurement of the engine as a whole.
 
+## Round 8, portable edition
+
+The owner asked on 16 November 2026 for a very detailed engine document that can be run with any other LLM. Written as
+SARVA_PORTABLE_ENGINE.md. It packs the binding rules, intake, the compute plane and chart packs, the knowledge bundle per methodology,
+the orchestration with three run modes and the isolation they give, the seven methodology modules, the option choosing mechanics, the
+exact output grammar, the guard and a manual audit for models without a shell, paste ready prompts, the failure catalogue and the file manifest.
+- Items marked PORT are portability additions, no astrology and no methodology change, awaiting the owner. Items marked GAP are stated and not filled.
+- Open owner decisions are listed in section 13.2 of that file. The main ones, no sanctioned cell text for a missing chart pack in the four
+  rule complete columns, whether run modes B and C that cannot meet the isolation rule R7 are allowed, and an inline form of the SUJ FILE
+  for chat only models.
+- Not changed, the contract, the guard, the preflight, CLAUDE.md. The document is derived and must be regenerated if the contract changes.
+- Not tested, no other model has been run on this document yet. The guard self test and the format example still pass.
+
 ## Pending after finalization
 
 A and B below are closed by the owner's decision, they stand as gaps. The rest are not blocking.
