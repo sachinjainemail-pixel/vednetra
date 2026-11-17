@@ -81,6 +81,8 @@ Round 25 additions, from Kundali 893. They are process rules and change no weigh
 23. NO VALIDATED RULE. For the question kinds in data/no_rule_topics.json the answer decides, starts the COUNTER EVIDENCE line with NO RULE, and the case is tagged no_rule. A TIE BREAK on a PROPOSED reading needs that label.
 24. A DATED QUESTION IS READ UNDER BOTH TRANSIT GATES. prepare.js with on set to the date prints the event rank and the windows under the double and the single gate for every event, and the answer says which gate each option rests on.
 
+25. SARVA IS A PROGRAM. The comparison table is built and checked by suj_engine/sarva, never by hand. Options are copied verbatim from the owner's text, a reworded option or a pick that is not one of the options is refused, a chained inference is refused, a dated pick must record both transit gates, an engine that already holds the answers of the chart is marked seen and not scored. See SARVA.md.
+
 ## Engine tools
 
 ENGINE VERSION 2.0 is the default configuration since round 22, see data/engine_config.json and tools/engine_config.js. All tools run it unless the input says

@@ -1,89 +1,67 @@
 # SARVA METHODOLOGY, the all methodology comparison
 
-Added in round 23 by the owner. Binding for every chart, in this session and in every new Claude Code session.
+Round 23 gave the rule, round 26 made it a program. Binding for every chart, in this session and in every new Claude Code session. The program is suj_engine/sarva, and the table it prints is the whole reply.
 
 ## Trigger
 
-The word SARVA at the start of a message, or any chart with questions (a native, birth data and one or more questions) in this
-repository. If the owner gives a chart and questions, this applies even when the word SARVA is missing.
+The word SARVA at the start of a message, or any chart with questions (a native, birth data and one or more questions) in this repository. If the owner gives a chart and questions, this applies even when the word SARVA is missing.
 
 ## What the owner wants
 
-1. Run EVERY methodology in the registry below on the chart, for EVERY question, in the back end.
-2. The ONLY response is one comparison table. One row per question, one column per methodology. No steps, no analysis,
-   no sections, no bullets, no explanation. All calculation and analysis stay in the back end.
-3. This replaces the SUJ answer layout for the reply. The SUJ analysis is still done in full in the back end, and its
-   draft still passes node suj_engine/tools/answer_guard.js, but the reply carries only the table. The rule of CLAUDE.md that
-   every answer ends with closing bullets does not apply to the SARVA reply.
+1. Run EVERY methodology of the registry on the chart, for EVERY question, in the back end.
+2. The ONLY response is one comparison table, one row per question and one column per methodology. No steps, no analysis, no sections, no bullets, no explanation. The table is printed by `index.js table` and by nothing else, and it is not printed when its guard fails.
+3. The SUJ analysis is still done in full in the back end, its draft still passes answer_guard.js, but the reply carries only the table. CLAUDE.md rules about closing bullets do not apply to the SARVA reply.
+4. Do not commit anything unless the owner asks.
 
-## Registry of methodologies
+## The procedure, every time
 
-Each column is one entry. Every repository sits next to this one under /home/user. If a repository is not present in the
-session, attach it with add_repo before running. Run each in its own working directory and write every input and output to
-the scratchpad directory, never into a repository.
+1. Write chart.json in the scratchpad. The questions and options are copied from the owner's text character for character, in the owner's language, and the owner's raw text goes in the field post. The tool checks that every option is a substring of post. Never translate, reword, reorder or shorten an option. Give the chart number in number when the chart belongs to a group.
+2. `node suj_engine/sarva/index.js run chart.json --out DIR --asof DATE`. It classifies each question (education, marriage, children, work, residence, siblings, parents, or a dated event), runs Shri Jha Ji, Poddar and KP Pro on the options exactly as written, writes the dossiers for SUJ, Chawdhri and the Vednetra KP skill, prints which questions have no validated rule, and writes picks.template.json.
+3. Read the dossiers and fill picks.json. This is the reader's step, for SUJ, Chawdhri and the Vednetra KP skill, which give evidence and no pick, and for any Poddar tie. Each pick is one of the options verbatim. Rules for the reader in the section below.
+4. `node suj_engine/sarva/index.js table chart.json --out DIR --picks picks.json`. If the guard fails, fix the picks and run it again. Send the printed table as the reply, and nothing with it.
+5. After the owner reports the true answers, write truths.json with the owner's option text and run `index.js score ... --record`. Then record the case as in CLAUDE.md, with the SARVA picks under otherMethods, and update LEARNINGS.md and STATUS.md. The scoreboard is suj_engine/cases/sarva_scores.json.
 
-| Column | Where | How to run |
+## The registry, suj_engine/sarva/registry.json
+
+SUJ (analyst), Shri Jha Ji (auto), Chawdhri (analyst), Poddar (auto, ties go to the reader), KP Pro (auto), Vednetra KP skill (analyst), Other Vednetra skills (report only, they say not run until the owner decides how they are read). The owner adds a row, and every later table gets the column. A column is never dropped. If every cell of a column says not run for one reason, the table shows it as one line.
+Repositories sit next to this one, SARVA_ROOT overrides. A missing repository gives not run. Attach it with add_repo first.
+
+## What the program refuses, and why. Each line is a mistake of Kundali 893
+
+| Guard | Refuses | Origin |
 |---|---|---|
-| SUJ | this repository, suj_engine | As in CLAUDE.md. prepare.js for every question, planet_strength.js for conflicting planets, event_rank.js and window_scan.js for a dated event, strength_tally.js for options, answer_guard.js on the draft. One option per question. |
-| Shri Jha Ji | Shri-Jha-Ji | node bin/jyotish.js answer --file birth.json --questions q.json --now AS_OF. birth.json holds name, gender, date, time, place, lat, lon, tz. q.json is a list of text and options. Cell is the first place of the marks and the second place when the engine gives one. If it prints a stop sign for an option with no known word, reword that option with common words in the scratchpad copy of q.json and run again, never edit the repository. |
-| Chawdhri | CHAWDHRI | sh jyotish.sh --date --time --lat --lon --tz --gender --now AS_OF --back 40 --topics education,marriage,career,children,foreign --json, and again with --now set to the date of any dated event. It gives evidence and no pick. Read promise, dasha_gate and the Sutton block and choose the option the evidence supports. Mark that cell read. |
-| Poddar | poddar-engine | Follow .claude/skills/poddar-engine/SKILL.md and engine/00-START-HERE.md. Run engine/setup.sh first. Chart inventory, promise, timing by its dasha systems, gochara, then choose the option. |
-| KP Pro | KP-Pro-sutton | pip install -e . in a venv, then kpredict ask --sex --date --time --place (or --lat --lon --tz) --family FAMILY --options "A) ... | B) ..." for each question, and kpredict read with --windows for a dated event. KP Pro, KCIL and KP Pro Max are read by its ensemble. |
-| Vednetra skills | Skill tool | Every skill whose name starts anthropic-skills:vednetra- (5in1, bnn, bphs, kcil, kp, mediastro, quad, sav, trinetra, ududaya, ukn) plus anthropic-skills:predictive-engine and anthropic-skills:vedic-d1-chart-reader, when the Skill list of the session offers them. One column each. Chart numbers come from node tools/run-nobrowser.js. |
+| G1 verbatim | a pick that is not one of the owner's options, an option that is not in the owner's post | the options were put into English for two engines, Poddar could not read the childless and marriage kind options and answered from a flat prior |
+| G2 no chain | a reader's note that leans on another question, unless dependsOn declares it, and then the cell shows dep | questions 2 and 3 were answered from the wrong reading of question 5 |
+| G3 flags | any flag outside the registry. Tie, unreadable option, no rule, read, shortlist, seen and dep always show in the cell | the table must never look surer than the engines |
+| G4 dated | a reader's pick on a dated question that does not record both transit gates | the double gate alone hid a child birth on two charts |
+| G5 complete | a missing cell | no column is dropped, and a failed engine says not run with a reason |
+| G6 style | a table with a character the owner does not want | the owner's style rule |
+| G7 SUJ draft | a SUJ pick whose draft does not pass answer_guard.js with the owner's options | the guard must not be bypassed |
 
-If the registry grows, the owner adds a row here and every later table gets the new column. Never drop a column.
+Other protections in the program. The first option of a tie is never a pick, the cell says tie. A reader's override of an automatic tie says read. An unreadable option makes the cell say incomplete, unmapped or stop. A question with no validated rule, data/no_rule_topics.json, says no rule in every column but Shri Jha Ji, which holds the rules. An engine that already holds the true answers of the chart in its own data, Poddar practice charts, the KP Pro backtest, a recorded SUJ case, says seen, and the scoreboard does not count it. A first pick that equals the truth is a hit, a tie that contained the truth is a tie hit and never a hit, a second place is counted apart, a column not run is not counted as wrong.
 
-## The engines after the repairs of round 25 (Kundali 893)
+## Rules for the reader of the dossiers
 
-Every engine of the registry was repaired for the faults that the first SARVA table exposed. Run them in the form below, and read their flags into the cell.
-
-| Column | What changed, and what the back end must do |
-|---|---|
-| SUJ | prepare.js takes question and options, prints the NO VALIDATED RULE banner, and takes on and events for a dated question under both transit gates. Hypothesis scores now run for marriage, work and residence. answer_guard.js fails a reference to another question and a PROPOSED tie break without NO RULE. |
-| Shri Jha Ji | The marks now follow the category mass, and the lexicon reads caste, religion, arranged, birth place, hometown, another state and another city. If a stop sign still prints, reword in the scratchpad copy of q.json. |
-| Chawdhri | Follow the section Multiple choice and dated questions in the skill. An adverse lean is not the outcome, a closed gate is not a denial, run the dated report with the topics of every option. |
-| Poddar | mcq_predict.py prints TIE and UNMAPPED. A cell with a TIE or an UNMAPPED option is broken by the chart reading and is marked read, the first option is never the pick. |
-| KP Pro | kpredict ask now says INCOMPLETE and SAME MEANING. Use kpredict dated --event-date for any question about what happened on a date. |
-| Vednetra skills | Unchanged. Note that the KP board of the app denies a CSL that stands in the star of Rahu or Ketu as retrograde, which is a known disagreement with the KP Pro engine, STATUS round 25. |
+1. SUJ. Read every question's dossier as in CLAUDE.md, with all of LEARNINGS.md G1 to G16. A dated question is read under both gates, and the pick records them as gates double and single true.
+2. Chawdhri. Follow the section Multiple choice and dated questions in its skill. An adverse lean is not the outcome, a closed gate is not a denial, past firing windows mean the event could have happened already, the engine has no topic for an accident or a jail, and the books give a trigger for marriage only.
+3. Vednetra KP skill. Read the CSL promise board B4 and the event group scan B5. Note that the app denies a CSL that stands in the star of Rahu or Ketu as retrograde, which is a known disagreement with the KP Pro engine, see STATUS round 25.
+4. Poddar. Break a tie from the chart reading, and mark it read. The first option is never a pick.
+5. Residence is read from the 4th house. A foreign window is travel and not an address, G14.
+6. No reading uses the answer of another question. If two answers must agree, say nothing, the table shows what each engine said.
+7. Do not invent a rule to separate options. If the evidence cannot separate them the reader still names one option, as the contract says always decide, and the cell says no basis or no rule beside it.
 
 ## Rules for the back end
 
 1. Intake as in CLAUDE.md. If the birth data is missing ask for it in one short message, nothing else.
-2. As of date is the system date. Dated events ("what happened on DATE") are run at that date in every methodology.
-3. Same question text and same options in every methodology. Options are never reordered and never translated. Pass them exactly as the owner wrote them, in the owner's language. On Kundali 893 the options were put into English for the Poddar and KP Pro runs and the English childless and kinds of marriage were unreadable to the Poddar engine, so its cells came out of a flat prior.
-4. Every column gives exactly one option per question, or one concrete answer if there are no options. A methodology that
-   gives no pick of its own (Chawdhri, Poddar) is read from its evidence by the analyst and the cell says read.
-5. Each methodology keeps its own rules. Do not blend schools, do not carry a result of one methodology into another.
-   Chawdhri keeps its own scope rule, so SARVA only orchestrates the runs and never changes what a methodology does.
-6. If a methodology cannot be run (missing repository, install failure, no network) the cell says not run and a short
-   reason of two or three words. Never fill a cell from memory or by copying another column.
-7. Computations always come from Vednetra or the methodology's own tool. Nothing by hand.
-8. run-nobrowser.js writes report_out.md into the repository root. Delete it after every run. Do not commit birth data,
-   charts, tables or outputs unless the owner asks. Commit and push only when the owner asks.
-9. After the owner reports true answers, record the case as in CLAUDE.md and add one line per methodology to the
-   scoreboard so the columns can be compared. A table is not an accuracy claim and the reply must not imply one.
+2. As of date is the system date. Dated events are run at that date in every engine that can.
+3. Computations come from Vednetra or the methodology's own tool. Nothing by hand, nothing from memory, nothing copied from another column.
+4. Nothing is written into a repository. run-nobrowser.js writes report_out.md into the repository root, delete it. Do not commit birth data, charts, tables or outputs unless the owner asks.
+5. A table is not an accuracy claim. The scoreboard prints the chance level beside every column. On Kundali 893 the best column was level with chance.
 
 ## Reply format
 
-The reply is a code block, so the columns stay aligned, and nothing else. Optional first line with the native name or chart
-number. Four columns at most per block. If there are more methodologies than four, send several blocks one after another with
-the question column repeated. Cells hold the option text exactly as given in the question, and:
+A code block with space aligned columns and a line of the equal sign under the header, three engines to a block, the question column repeated. No markdown table, its separator needs the hyphen. Cells hold the option text, with the characters the owner does not want turned into spaces, and the flags. One legend line follows, only for flags that appear. The owner's style rule applies, none of these characters ( ) ! ; : em dash, curly quotes, / - # * ~ .
 
-- second place after a comma and the word second, only when the methodology prints one, for example MBA, second MA
-- tie, no basis, or read added after the option when the methodology says so, because the table must not look surer than it is
-- not run with a short reason when a column could not be produced
+## Tests
 
-One legend line under the table is allowed only if one of these flags appears. Nothing else is written.
-
-The owner's style rule applies to the reply: none of these characters ( ) ! ; : em dash, curly quotes, / - # * ~ . A
-code block with space aligned columns and a line of the equal sign under the header keeps the table inside that rule. Do not
-use a markdown table, its separator row needs the hyphen.
-
-Example of the shape only, values are not a result.
-
-```
-Kundali 893     SUJ          Shri Jha Ji    Chawdhri       Poddar
-==================================================================
-1 Education     MBA          MA tie         MBA read       MBA
-2 Marriage      Inter caste  Unmarried      Unmarried read not run no network
-```
+`node suj_engine/tests/sarva_selftest.js` prints 26 of 26. Every guard above has a test, and so does the scoreboard.

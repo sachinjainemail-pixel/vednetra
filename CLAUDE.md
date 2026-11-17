@@ -2,13 +2,14 @@
 
 ## SARVA methodology, the comparison table. Takes precedence over every reply format below
 
-If the user says SARVA, or gives a chart with questions (native, birth data, questions), they mean the SARVA methodology.
-Read suj_engine/SARVA.md first. In the back end run EVERY methodology of its registry (SUJ engine, Shri Jha Ji, Chawdhri, Poddar,
-KP Pro, and the Vednetra skills) on every question, then reply with ONE comparison table and nothing else, one row per question and
-one column per methodology. No steps, no analysis, no bullets in the reply. The SUJ analysis is still done in full in the back end
-and its draft still passes answer_guard.js, but the SARVA reply replaces the SUJ answer layout and its closing bullets. A column that
-cannot be run says not run, never filled from memory. Do not commit anything unless the user asks. The owner's style rule for chat
-replies applies to the table.
+If the user says SARVA, or gives a chart with questions (native, birth data, questions), they mean the SARVA methodology. Read suj_engine/SARVA.md first.
+It is a program, suj_engine/sarva/index.js, with the commands run, table and score. The procedure is fixed. Copy the owner's questions and options character for
+character into chart.json with the owner's raw text in post, never translate or reword an option. Run `run` to run every engine of the registry in the back end
+(SUJ, Shri Jha Ji, Chawdhri, Poddar, KP Pro, the Vednetra KP skill, the other Vednetra skills), read the dossiers, fill picks.json, and run `table`. The guard
+refuses a table that holds a reworded option, a chained inference, a dated pick that did not read both transit gates, a missing column or an unwanted character.
+Reply with the printed table and nothing else, one row per question and one column per methodology, no steps, no analysis, no bullets. A column that cannot be run
+says not run, never filled from memory. When the owner reports true answers run `score --record` and record the case. Do not commit anything unless the user asks.
+The owner's style rule for chat replies applies to the table.
 
 ## SUJ engine
 

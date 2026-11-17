@@ -168,6 +168,16 @@
 - Still open, planet strength winner to event result mapping, the sibling brother and sister split, employed or not, and
   whether planet_strength.js should drop planets with fewer than three subject links and add derived houses.
 
+## Round 26. SARVA made a program (done)
+
+The owner asked that the challenges of the first SARVA table never happen again for any chart or question. SARVA was a document that a reader executed by hand, which is how the options came to be translated, ties came to be read as picks and one answer came to rest on another. It is now suj_engine/sarva, four files and a registry, with a self test of 26 checks, all passing.
+- index.js run, runs Shri Jha Ji, Poddar and KP Pro on the owner's options verbatim, writes the dossiers of SUJ, Chawdhri and the Vednetra KP skill, prints which questions have no validated rule, writes picks.template.json. A dated question goes to each engine in its dated form, the KP Pro dated command, the Poddar windows, the SUJ prepare with on.
+- index.js table, builds the cells, applies the guard G1 to G7 and prints the table, or prints nothing and the errors. SARVA.md lists each guard with the mistake it comes from.
+- index.js score, scores each column against the truths with hit, tie hit, second place and not run kept apart, shows the chance level, and keeps suj_engine/cases/sarva_scores.json. An engine that already holds the answers of the chart is marked seen and not scored, because chart 893 was added to the Poddar practice charts and the KP Pro backtest and the next run of it came out of priors that contained its answers.
+- The first full run on verbatim Hindi options found two more holes in KP Pro, unemployed and another state were not read, fixed there with a test.
+- Tried on Kundali 893, the table came out as in the earlier replies, with the flags now computed. Chance for the six questions is 1.6, and the best column that was not seen had 1 of 6.
+- Not done. The ten other Vednetra skills are report only and say not run. The pick of SUJ, Chawdhri and the Vednetra KP skill is still made by the reader, the program cannot make it and a program that did would be a new unvalidated engine. Poddar ties are broken by the reader. A parser of the owner's raw post into chart.json does not exist, the reader copies the options and the program checks them against the post.
+
 ## Round 25. Learnings built into every engine after Kundali 893 (done)
 
 The owner asked for the learnings of the wrong answers to be built into every engine that got a question wrong, for any life event of any native, and not only for this chart. Done as process and tooling fixes, with no weight, band, prior or window rule changed on one chart.

@@ -1,0 +1,75 @@
+{
+ "_note": "SARVA registry, round 26. One entry per column of the comparison table. mode auto means the engine gives its own pick and the adapter parses it. mode analyst means the engine gives evidence and the pick is made by the reader and supplied in picks.json. mode report means the tool only produces a report and is not yet read, the column says not run until picks exist. A column is never dropped. Repositories sit under root, relative to the parent folder of this repository, override with SARVA_ROOT.",
+ "root": "..",
+ "columns": [
+  {
+   "id": "SUJ",
+   "label": "SUJ",
+   "mode": "analyst",
+   "repo": "vednetra"
+  },
+  {
+   "id": "SJJ",
+   "label": "Shri Jha Ji",
+   "mode": "auto",
+   "repo": "Shri-Jha-Ji"
+  },
+  {
+   "id": "CHW",
+   "label": "Chawdhri",
+   "mode": "analyst",
+   "repo": "CHAWDHRI"
+  },
+  {
+   "id": "POD",
+   "label": "Poddar",
+   "mode": "auto",
+   "repo": "poddar-engine",
+   "tieNeedsRead": true
+  },
+  {
+   "id": "KPP",
+   "label": "KP Pro",
+   "mode": "auto",
+   "repo": "KP-Pro-sutton"
+  },
+  {
+   "id": "VKP",
+   "label": "Vednetra KP",
+   "mode": "analyst",
+   "skill": "vednetra-kp"
+  },
+  {
+   "id": "VSK",
+   "label": "Other Vednetra skills",
+   "mode": "report",
+   "skills": [
+    "vednetra-5in1",
+    "vednetra-bnn",
+    "vednetra-bphs",
+    "vednetra-kcil",
+    "vednetra-mediastro",
+    "vednetra-quad",
+    "vednetra-sav",
+    "vednetra-trinetra",
+    "vednetra-ududaya",
+    "vednetra-ukn"
+   ]
+  }
+ ],
+ "flags": [
+  "tie",
+  "read",
+  "no basis",
+  "incomplete",
+  "same meaning",
+  "unmapped",
+  "stop",
+  "shortlist",
+  "no rule",
+  "dep",
+  "not run",
+  "seen"
+ ],
+ "blockWidth": 3
+}
