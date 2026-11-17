@@ -1,0 +1,51 @@
+S0. INTAKE AND TIME FRAME
+Native male born 23 July 1964 at 23 hours 30 minutes in Kota Rajasthan, latitude 25.18 north, longitude 75.83 east, time zone 5.5, Lahiri ayanamsha. As of date 17 November 2026, age 62 years 3 months.
+Question Q1 which disease does the native have. Options Sugar, BP, Atisar, All.
+The birth time is the stated 23 30 and the Lagna stands at Aries 0.02 degree, on the edge of Pisces, so the Lagna sign depends on the birth minute. This is stated as a limit.
+
+S1. DOMINANT HOUSE
+stellium.js from the Lagna chart gives two houses with two planets each, house 3 Gemini with Mars and Rahu, and house 9 Sagittarius with Moon and Ketu. The same two houses are stelliums from the Moon and from the Sun. House 3 is the first dominant house and Mars with Rahu deliver it. Mars is the Lagna lord and the 8th lord and is the natural karaka of blood, so the life theme runs through effort, courage and the blood and muscle system. The question house 6 is not a stellium, its lord Mercury sits in the 5th and is not in a dominant house.
+
+S2. D1 ANALYSIS
+Lagna chart Aries. Mars 1.91 degree Gemini in an enemy sign with Rahu 7.15 degree, Mercury 1.47 degree Leo in the 5th as 6th lord, Jupiter 28.5 degree Aries in the Lagna, Sun Cancer in the 4th, Moon with Ketu in the 9th, Venus own sign Taurus in the 2nd, Saturn own sign Aquarius in the 11th retrograde.
+Mercury the 6th lord is aspected by Jupiter, Saturn and Ketu. Jupiter in the Lagna is aspected by Saturn and Ketu. Mars is aspected by Moon and Ketu and is conjunct Rahu.
+Moon chart and Sun chart agree that Mars with Rahu and the Moon with Ketu stand in dominant houses.
+Functional nature by Laghu Parashari. Mercury owns 3 and 6, harmful, dasha role badhaka. Mars owns 1 and 8, sadhaka. Saturn owns 10 and 11, badhaka. Sun and Jupiter are the yogakarakas.
+RULES CITED LP-085-3 a malefic dasha obstructs unless connected to a yogakaraka, LP-056-6 Rahu follows the companion Mars, LP-057-2 Rahu doubles the result of Mercury and Ketu doubles the result of Jupiter. The library holds no placement rule that names a disease for this chart.
+
+S3. D9 ANALYSIS
+Navamsha Mercury in Aries house 1, Mars in Libra, Jupiter in Sagittarius Mulatrikona and strong, Venus debilitated in Virgo, Saturn own in Capricorn, Moon vargottama in Sagittarius, Sun in Virgo the 6th. Jupiter is strong in D9 and Venus is weak in D9, so Jupiter holds its own result and Venus does not deliver sugar reliably.
+
+S4. SUBJECT DIVISIONAL CHART ANALYSIS
+D30 is the subject varga for disease. Mars sits in Aries in D30, Mulatrikona in house 1, a good house. Mercury in Aries house 1, Jupiter in Libra house 7 in an enemy sign, Saturn in Sagittarius house 9, Venus in Scorpio house 8 neutral, Sun in Virgo house 6, Moon in Libra house 7. Subject effectiveness from the tool Mars 5, Saturn 5, Mercury 3, Jupiter 3, Venus 3.
+
+S5. PLANET STRENGTH AND CONFLICT RESOLUTION
+planet_strength.js for Mars, Jupiter, Mercury, Venus, Sun, Saturn. Shadbala percent Venus 190, Jupiter 158, Moon 139, Saturn 124, Mars 116, Mercury 110, Sun 91. Real strength S from strength_tally.js Sun 72.6, Jupiter 67.5, Mercury 65.8, Saturn 60.3, Venus 44.2, Mars 37. Ketu 75.3 and Rahu 51.4 by their dispositors.
+Degree capacity by Baladi avastha. Jupiter at 28.5 degree and Venus at 29.6 degree are in Mrita and give no result, Mars at 1.91 degree is Bala with a quarter capacity, Mercury at 1.47 degree is Bala. So the sugar karakas Jupiter and Venus carry no weight in this engine, and the blood karaka Mars is also small.
+Conflict. Sugar rests on Jupiter and Venus, both zero capacity. Blood pressure rests on Mars and Rahu, small weights. Atisar rests on Mercury the 6th lord and the intestinal karaka, with the harm of Saturn and Ketu, the largest. The winner by weight is Atisar.
+
+S6. DASHA AND TIME STATUS
+Past. Mars Mahadasha 1980 to 1987 and Rahu Mahadasha 1987 to 2005 held grade A windows for the 6th and 8th, for example Mars Rahu Rahu 27 September 1980 to 8 November 1980. Jupiter Mahadasha 2005 to 2021.
+Running. Saturn Mahadasha 16 April 2021 to 16 April 2040, Mercury Antardasha 19 April 2024 to 28 December 2026, Saturn Pratyantardasha 25 July 2026 to 28 December 2026, Sookshma Rahu 14 November 2026 to 7 December 2026. The Mahadasha lord Saturn and the Antardasha lord Mercury are both disease significators for the 6th and 8th houses.
+Future. Saturn Ketu Antardasha from 28 December 2026 to 2028.
+TIME STATUS HAPPENING NOW
+WINDOW SCAN strict scan of health crisis found 148 windows, past 140, running 1, future 7. The running grade A window is 1 November 2026 to 28 December 2026 in Saturn Mercury Saturn via Sun, with Jupiter in Leo and Saturn in Pisces on the 6th house. This window was weighed and it supports a disease active now. Candidate windows are not proof and the natal promise is capacity.
+DASHA LORDS Saturn badhaka obstructer, Mercury badhaka obstructer, Saturn badhaka obstructer, Rahu sadhaka node, from the functional nature table.
+
+S7. TRANSIT VALIDATION
+On 17 November 2026 transit Saturn in Pisces 14 degree retrograde, in the 12th from the Lagna, 4th from the Moon. Transit Jupiter in Leo 1.75 degree, on natal Mercury within 17 minutes, in the 5th. Transit Rahu in Aquarius 0.96 degree in the 11th, Ketu in Leo 0.96 degree on natal Mercury within 31 minutes, Sun in Scorpio in the 8th. Transit Mars in Leo on natal Mercury within 45 minutes. Mercury is triggered now by Jupiter, Mars and Ketu together, which supports the 6th lord disease reading.
+
+S8. RECONCILIATION OF SECTIONS
+D1 and the dasha agree on the 6th lord Mercury as the disease planet and on Saturn as the afflictor. D30 puts Mars first, so the blood pressure reading has its own support. D9 keeps Jupiter strong, which weakens the sugar reading as a damage. The planet strength section and the degree capacity make Atisar the heaviest by counted weight.
+EVIDENCE TALLY Sugar 100, BP 100, Atisar 100, All 70
+TIE BREAK three options reach the same score 100 because no benefic against weight survives the degree capacity, so the larger favour weight decides, Atisar 84.2, Sugar 78.9, BP 53.1, All 25.7.
+COUNTER EVIDENCE the strongest evidence against Atisar is that Jupiter aspects Mercury as a benefic and that D30 gives Mars the first place, but Jupiter at 28.5 degree has no capacity and Mars at 1.91 degree has only a quarter capacity.
+ENGINE VERSION 2.0 degree true, nakshatra true, node bands true.
+There is no validated hypothesis score for a named disease, so this is a reading by the planet strength tally and not by a z score.
+
+S9. SUMMARY
+Dominant house 3 with Mars and Rahu, D1 shows Mercury the 6th lord afflicted by Saturn and Ketu, D9 keeps Jupiter strong, D30 favours Mars, planet strength and degree capacity favour the Mercury line, the Saturn Mercury Saturn period is running now and the Jupiter, Mars and Ketu transits sit on natal Mercury.
+FINAL ANSWER Atisar
+• Mercury the 6th lord and Antardasha lord is afflicted by Saturn and Ketu and is triggered by transit Jupiter, Mars and Ketu now.
+• The sugar karakas Jupiter and Venus stand in the last degrees with no capacity, and Mars for blood pressure has only a quarter capacity.
+• Final answer Atisar

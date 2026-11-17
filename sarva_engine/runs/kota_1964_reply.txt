@@ -1,0 +1,74 @@
+INTAKE
+Native unnamed, male as confirmed by the owner, born 23 July 1964 at 23 hours 30 minutes, Kota Rajasthan, latitude 25.18 north, longitude 75.83 east, time zone 5.5. As of date 17 November 2026, age 62 years 3 months.
+The post wrote both the word afternoon and 23 30. The owner chose 23 30, which is 11 30 at night. Place coordinates are the standard values for Kota, not looked up from a record.
+Q1 asks which disease the native has, options Sugar, BP, Atisar, All, listed in the post as 1 to 4. Q2 asks how many children the native has, options Four for 4 children, Three for 3 children, One for 1 child, None for no child, listed in the post as 1 to 4.
+LIMITS These are readings under each methodology and not certainties. The Lagna sits on a sign edge, Aries 0.02 degree on Lahiri, Aries 0.12 degree on the KP chart and Pisces 29 degrees 59 minutes 49 seconds on the Khullar chart, so every house based reading changes with a few seconds of birth time and all twelve KCIL cusps are unstable. The birth time is not rectified because no relative birth dates were given. The Rule of 10 tables of KP Pro and KCIL and the ten layer tables of BNN were not written before the chart, so BNN is capped at POSSIBLE and the KP Pro and KCIL cells carry no Rule of 10. Udu and Quad Dasha are not run, their rule files are not installed. Marriage was taken as given by the question and was not tested in BNN.
+
+QUESTION Q1
+OPTIONS Q1 Sugar|BP|Atisar|All
+
+METHOD KPPRO Q1
+KP ayanamsa 23.2667, true Placidus, mean nodes, stated minute. The 6th cusp is Leo 20 degrees 50 minutes in true Placidus. Its sub lord Jupiter signifies houses 1, 4, 6, 10 and its star lord Sun signifies 4, 6, 11, 12. Gate net is 1, GATE UNDECIDED. Significator NET for house 6 is 0 UNDECIDED, the same at plus 5 minutes and minus 5 minutes. No qualifying window is found. The Graha nature layer reads Jupiter as the face of sugar and tumours, the Sutton and Rashi layers oppose and are NOT SEPARATED, so they only lower confidence. Declared conflict, the VedNetra KP report places the 6th cusp at Leo 27 degrees 41 minutes with sub lord Moon because it falls back to Porphyry, true Placidus from kpredict is used as the contract requires.
+EVIDENCE Q1 KPPRO gate net 1 and NET 0 are both UNDECIDED at all three times, no disease prior exists so the nature of the 6th sub lord Jupiter names the option, PRIOR DOMINANT, LOW
+RESULT Q1 KPPRO Sugar
+METHOD KCIL Q1
+Khullar chart, Lagna Pisces 29 degrees 59 minutes 49 seconds, sub sub lord Jupiter at 98.89 percent, flips to Ketu in 0.6 second. Rectification worksheet, sex test passes, the Prana test fails, not rectified. Ascendant sub sub lord Jupiter reaches 6 by its star lord and 8 by its sub lord, so the native is prone to serious sickness by the rule that 6 and 8 together mean serious sickness. The 6th cusp sub sub lord is Mercury, with star lord Ketu, sub lord Venus and sub sub lord Mars. Mercury sits in bhava 5 whose disease list names intestinal problems and diarrhoea, Ketu co rules cusp 5, Venus links cusp 6 whose list names large intestines, pancreas and diabetes. Mercury as the connected planet makes the disease complicated and Ketu makes it undiagnosed. The nature follows the sub sub lord and its star lord, so the intestinal line leads.
+EVIDENCE Q1 KCIL TWO CANDIDATES, the 6th cusp sub sub lord Mercury flips to Ketu at plus 21.3 seconds and to Saturn at minus 27.3 seconds, the other candidate is Sugar through Ketu with Jupiter as sub lord, the cell keeps the candidate at the recorded second
+RESULT Q1 KCIL Atisar
+METHOD SUJ Q1
+Dominant house 3 with Mars and Rahu. D1 shows the 6th lord Mercury afflicted by Saturn and Ketu aspects. D9 keeps Jupiter strong and Venus weak. D30 gives Mars the first place. Jupiter at 28.5 degrees and Venus at 29.6 degrees are in Mrita and give no result, Mars at 1.91 degrees has a quarter capacity. The Saturn Mercury Saturn period runs now and transit Jupiter, Mars and Ketu stand on natal Mercury within 45 minutes. Time status HAPPENING NOW.
+SUJ FILE Q1 sarva_engine/runs/q1_suj.txt
+EVIDENCE Q1 SUJ tally Sugar 100, BP 100, Atisar 100, All 70, the tie is broken by the larger favour weight, Atisar 84.2, Sugar 78.9, BP 53.1, the margin over Sugar is narrow
+RESULT Q1 SUJ Atisar
+METHOD CHAWDHRI Q1
+Engine run on VedNetra numbers. Running Saturn Mercury Saturn. Health promise reads mixed with 0 percent agreement and low confidence. The running tie 3.44 stays under the open cutoff 4.54. The only book record for this chart that names a disease is Jupiter afflicted in the Lagna, which indicates diabetes, brain congestion, fainting fits and dizziness, scientific pages 257 to 258. Jupiter is aspected by Saturn and Ketu. Mercury in Magha, a star of Ketu, adds disease and fever. No record found for this chart names high blood pressure or diarrhoea as the natal disease. The Sutton layer is a second opinion and is not the cell.
+EVIDENCE Q1 CHAWDHRI promise mixed with 0 percent agreement and LOW confidence, one named disease record, Jupiter afflicted in the Lagna, dasha gate closed by 3.44 against 4.54
+RESULT Q1 CHAWDHRI Sugar
+METHOD BNN Q1
+Sex male. BNN reads karakas. Mars and Rahu stand together in Gemini, the pair is in the engine pair list. The Mars register names blood pressure and says that for chronic problems the link with Saturn or Rahu is the sign, ARI HLT 010. Mars carries blood and blood pressure in the body part table, ARI HLT 003. Rules v and vi of ARI HLT 002 say parts of planets joined to Rahu do not work properly and parts joined to Mars are prone to injury. Diabetes needs Mars with Sun in Cancer in SAK MAR 029, here Mars is in Gemini, so it is not met. The Rahu in Aquarius diabetes cell of AVA HLT 001 is a natal placement and the natal Rahu is in Gemini. The diarrhoea verdict RTP NOD 016 needs the axis reversal of the transit nodes, which is not present. Jupiter the diabetes karaka is supported, and rule vii of ARI HLT 002 says parts joined to Jupiter heal. Disease is a department at or below its best fixed answer in the guide backtest, so the grade stays at POSSIBLE.
+EVIDENCE Q1 BNN POSSIBLE ARI-HLT-010 ARI-HLT-003 ARI-HLT-002 AVA-HLT-001, Mars with Rahu names blood pressure directly, the disease department is at or below its best fixed answer
+RESULT Q1 BNN BP
+METHOD UDU Q1
+EVIDENCE Q1 UDU nine corpus files not installed, no Udu Rule ID can be cited, no accuracy is measured for Udu
+RESULT Q1 UDU NOT RUN UDU RULES MISSING
+METHOD QUAD Q1
+The Quad compute layer ran and its self test passed 8 of 8. Running now Vimshottari Saturn Mercury, Chara Pisces, Kaal Chakra Libra, Yogini Ulka. The Chara rows shift within plus and minus 5 minutes and are withdrawn. The read rules are not installed.
+EVIDENCE Q1 QUAD full methodology file not installed, compute layer only
+RESULT Q1 QUAD NOT RUN QUAD RULES MISSING
+
+QUESTION Q2
+OPTIONS Q2 Four|Three|One|None
+
+METHOD KPPRO Q2
+For a male the 11th cusp is read first. True Placidus 11th cusp is Capricorn 18 degrees 49 minutes, sub lord Mercury in the star of Ketu. Mercury signifies 1, 4, 5, 9, 10 and Ketu signifies 1, 9, 10. The support houses are 2, 5, 11 and the negating houses are 1, 4, 10, 12. Layer A gives one support and three negating, layer B gives two negating, so the gate net is minus 6, DENIED. Significator NET for house 5 is minus 6, ABSENT, the same at the stated minute and at plus and minus 5 minutes. No qualifying window exists at any age. The gate is admissible at the stated minute, at a 5 minute grain the sub lord flips in 194 seconds so the gate is advisory and the NET band carries the answer. Declared conflict, the VedNetra KP report places the 11th cusp at Capricorn 25 degrees 13 minutes by Porphyry with sub lord Rahu, a mixed line, so this denial belongs to true Placidus.
+EVIDENCE Q2 KPPRO gate net minus 6 DENIED and NET minus 6 ABSENT, stable at three times, CHART DECIDED, HIGH
+RESULT Q2 KPPRO None
+METHOD KCIL Q2
+The count is read in the native's own frame, first child on cusp 5, second child on cusp 7, third child on cusp 9, as the rotation lock states. Cusp 5 sub sub lord Sun, its star lord Saturn stands in bhava 11 and its sub lord Ketu co rules cusp 5, indirect link, promised. Cusp 7 sub sub lord Jupiter, star lord Sun reaches 2, sub lord Mars reaches 7, indirect link, promised. Cusp 9 sub sub lord Ketu, its star reaches 9 and its sub reaches 2, direct link, promised. The Ascendant sub sub lord Jupiter reaches 2 and 5 and the 11th cusp sub sub lord Mars reaches 11 by star and 5 by sub, so gates 1 and 3 pass. The rotation names no fourth child cusp. Three cusps pass.
+EVIDENCE Q2 KCIL TWO CANDIDATES, cusp 7 sub sub lord Jupiter flips to Mercury at plus 0.6 second and the cusp 7 link fails, cusp 5 flips to Moon at plus 4.9 seconds and to Venus at minus 4.0 seconds, cusp 9 flips to Mercury at minus 5.2 seconds, the other candidate is 2 children, which is not an offered option, so the cell keeps the candidate at the recorded second
+RESULT Q2 KCIL Three
+METHOD SUJ Q2
+Dominant houses 3 and 9 do not carry the 5th. D1 gives the 5th line to Sun, Mercury and Jupiter and the same line is aspected by Saturn and Ketu. D7 is good for Mercury, Venus and Jupiter. Jupiter at 28.5 degrees has no capacity. The favour weight is 34.0 and the against weight is 75.2. The hypothesis score for has a child is 33 against a null mean of 40.6, z minus 0.43, read as no, and this z reading is provisional. Time status ALREADY HAPPENED, as the question is about the present count. The engine has no validated rule for counting children.
+SUJ FILE Q2 sarva_engine/runs/q2_suj.txt
+EVIDENCE Q2 SUJ tally None 100, One 31, Three 0, Four 0, from the favour weight 34.0 against the against weight 75.2, z minus 0.43 provisional
+RESULT Q2 SUJ None
+METHOD CHAWDHRI Q2
+Engine run on VedNetra numbers. The children promise reads favourable with 60 percent agreement and low confidence, the VedNetra decision is Likely Yes, D7 is strong. Book records, Mercury in the 5th brings children with a first pregnancy that may abort, Mercury in the 5th in Leo gives many daughters and afflicted gives children who do not live, Moon in the 9th gives children, Jupiter in the Lagna gives children. The dasha gate shows past firing windows where the dasha was open and transit supported, Mars Ketu 1984 to 1985 at age 20, Rahu Jupiter 1989 to 1992 at ages 25 to 28, Rahu Mercury 1995 to 1997 at ages 31 to 33, Jupiter Ketu 2012 to 2013 at age 48, and the running Saturn Mercury. Three windows fall inside the child bearing years 20 to 35. The Chawdhri sources hold no rule that counts children, so the count is the reading of these windows and is thin.
+EVIDENCE Q2 CHAWDHRI promise favourable with 60 percent agreement and LOW confidence, three past firing windows in the child bearing years, no counting rule in the sources
+RESULT Q2 CHAWDHRI Three
+METHOD BNN Q2
+Sex male, karaka Jupiter, RAO FND 010. Jupiter stands in Aries and its 5th sign is Leo. Mercury occupies Leo, one planet. The BNN aspect block shows Sun, Moon and Jupiter itself landing on Leo. The full count rule SAK JUP 032 counts planets in the 5th from Jupiter and planets aspecting the 5th, so the raw count is 3 without Jupiter, Mercury, Sun and Moon, and 4 with Jupiter, scaled down for a 1964 birth because the corpus counts come from families born from about 1900 to 1960, giving 3 either way. Sex by RAO FND 026, Mercury and Sun give sons and Moon gives a daughter. RAO DOM 027 reads the planets in the 5th from Jupiter as the issue. The ladder is decided at the rung of the rule naming the count most directly. Children is a department at or below its best fixed answer.
+EVIDENCE Q2 BNN POSSIBLE SAK-JUP-032 RAO-DOM-027 RAO-DOM-010 RAO-FND-010, raw count 3 or 4 scaled to 3, the children department is at or below its best fixed answer
+RESULT Q2 BNN Three
+METHOD UDU Q2
+EVIDENCE Q2 UDU nine corpus files not installed, no Udu Rule ID can be cited, no accuracy is measured for Udu
+RESULT Q2 UDU NOT RUN UDU RULES MISSING
+METHOD QUAD Q2
+The compute layer is the same as for Q1 and the read rules are not installed.
+EVIDENCE Q2 QUAD full methodology file not installed, compute layer only
+RESULT Q2 QUAD NOT RUN QUAD RULES MISSING
+
+| Question | KP Pro | KCIL | SUJ engine | CHAWDHRI | BNN | Udu | Quad Dasha |
+|---|---|---|---|---|---|---|---|
+| Q1 | Sugar | Atisar | Atisar | Sugar | BP | NOT RUN UDU RULES MISSING | NOT RUN QUAD RULES MISSING |
+| Q2 | None | Three | None | Three | Three | NOT RUN UDU RULES MISSING | NOT RUN QUAD RULES MISSING |

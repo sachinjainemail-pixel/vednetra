@@ -1,0 +1,47 @@
+S0. INTAKE AND TIME FRAME
+Native male born 23 July 1964 at 23 hours 30 minutes in Kota Rajasthan, latitude 25.18 north, longitude 75.83 east, time zone 5.5, Lahiri ayanamsha. As of date 17 November 2026, age 62 years 3 months.
+Question Q2 how many children the native has. Options 4 children, 3 children, 1 child, None. The options are ordered from the lowest, None, One, Three, Four, and the guard runs with the ordinal flag.
+The Lagna stands at Aries 0.02 degree on the edge of Pisces, so the 5th house sign depends on the birth minute. This is stated as a limit. The engine has no validated rule for counting children, so the reading below is a reading of whether the 5th house line reaches a child at all.
+
+S1. DOMINANT HOUSE
+stellium.js gives house 3 Gemini with Mars and Rahu and house 9 Sagittarius with Moon and Ketu as the dominant houses in the Lagna, Moon and Sun charts. The 5th house is not a stellium and its lord Sun sits in the 4th, not in a dominant house. Mars with Rahu in house 3 is the Lagna lord and 8th lord and does not carry the 5th house. The life theme of the chart runs through house 3 and house 9, effort and fortune, and the 5th house is a secondary theme.
+
+S2. D1 ANALYSIS
+Lagna Aries, 5th house Leo with Mercury in it and the 5th lord Sun in Cancer in the 4th in a friendly sign. Jupiter the karaka of children stands in the Lagna at 28.5 degree and aspects the 5th, with Saturn and Ketu aspecting Jupiter. Saturn from the 11th aspects the 5th house and Mercury, Ketu aspects Mercury. Jupiter is in the 5th from the Moon, a karaka in the 5th from the Moon.
+Functional nature. Sun and Jupiter are yogakarakas by LP-085-5. Mercury owns 3 and 6, harmful, badhaka by LP-085-3. Saturn owns 10 and 11, badhaka.
+RULES CITED LP-085-5 yogakarakas Sun and Jupiter, LP-085-3 a malefic dasha obstructs, LP-057-2 Ketu doubles the result of Jupiter. The library holds no placement rule for the 5th house of this chart and no rule that counts children.
+
+S3. D9 ANALYSIS
+Navamsha Jupiter in Sagittarius Mulatrikona strong, Moon vargottama in Sagittarius, Sun in Virgo house 6, Mercury in Aries house 1, Mars in Libra, Saturn in Capricorn own, Venus debilitated in Virgo. Jupiter the karaka is strong in D9 and the 5th lord Sun is weak there in the 6th house.
+
+S4. SUBJECT DIVISIONAL CHART ANALYSIS
+D7 is the subject varga for children. Mercury stands in Leo house 5 a friendly sign and a good house, Sun the 5th lord in Aquarius house 11 an enemy sign, Jupiter in Libra house 7 an enemy sign, Venus in Taurus house 2 own sign, Saturn in Aries house 1 debilitated, Moon in Gemini house 3, Mars in Gemini house 3 enemy sign, Rahu in Cancer house 4 and Ketu in Capricorn house 10. Subject effectiveness from the tool Jupiter 5, Saturn 4, Mercury 3, Ketu 3, Sun 2, Venus 2, Moon 1, Mars 1, Rahu 1.
+
+S5. PLANET STRENGTH AND CONFLICT RESOLUTION
+planet_strength.js for Sun, Mercury, Jupiter, Saturn, Moon and Venus. Shadbala percent Jupiter 158, Saturn 124, Mercury 110, Sun 91. Real strength S from strength_tally.js with the subject varga Sun 72.6, Mercury, Jupiter and Saturn between 60 and 68, Ketu 71.9, Venus 43.
+Degree capacity. Jupiter at 28.5 degree is in Mrita and gives no result, so the karaka of children counts as zero in this engine. Mercury at 1.47 degree is Bala, quarter capacity, and the Sun at 7.5 degree gives more. The malefic aspects of Saturn and Ketu on the 5th line carry weights 30.6 and 36.
+Conflict. For the child the planets are Sun, Mercury and Jupiter. Against the child are Saturn and Ketu. The favour weight is 34.0 and the against weight is 75.2, so the stronger side is against.
+
+S6. DASHA AND TIME STATUS
+Past windows for child birth in the strict scan number 89, for example the Mars Ketu and Mars Mercury periods, and they show that the line was opened many times in the child bearing years. A window is capacity and not proof of birth.
+Running. Saturn Mahadasha 16 April 2021 to 16 April 2040, Mercury Antardasha 19 April 2024 to 28 December 2026, Saturn Pratyantardasha 25 July 2026 to 28 December 2026. The running periods are badhaka for the 5th house.
+Future. Saturn Ketu Rahu 27 June 2027 to 14 August 2027 and Saturn Ketu Jupiter 15 August 2027 to 7 October 2027, both grade B, age 63.
+TIME STATUS ALREADY HAPPENED
+WINDOW SCAN strict scan of child birth found 91 windows, past 89, running 0, future 2 both grade B at age 62.9 and 63.1. The past windows were weighed and the future windows were weighed and set aside as a birth at age 63 is not a counted indicator. Candidate windows are not proof, a natal promise is capacity and not status.
+DASHA LORDS Saturn badhaka obstructer, Mercury badhaka obstructer, Saturn badhaka obstructer, Rahu sadhaka node.
+
+S7. TRANSIT VALIDATION
+On 17 November 2026 transit Jupiter in Leo on the 5th house and on natal Mercury within 17 minutes, transit Saturn in Pisces retrograde in the 12th, transit Rahu in Aquarius in the 11th on natal Saturn, transit Ketu in Leo in the 5th on natal Mercury within 31 minutes, transit Sun in Scorpio in the 8th. The transit of Jupiter over the 5th is the only support now, and it falls at age 62 where a birth is not a counted indicator, so the transit does not change the natal reading.
+
+S8. RECONCILIATION OF SECTIONS
+D1 gives the line to the 5th through Jupiter, Sun and Mercury but the same line is aspected by Saturn and Ketu. D7 is good for Mercury, Venus and Jupiter, which is a point for the child. D9 keeps Jupiter strong and the 5th lord Sun weak. Planet strength with degree capacity makes the against weight 75.2 and the favour weight 34.0 for reaching at least one child, so the native does not reach One and the higher levels. HYPOTHESIS SCORES from prepare.js for has a child, raw score 33, null mean 40.6, z minus 0.43, at or below the null mean, read as no. The z reading is provisional, found after the Kundali 4 answers were known.
+EVIDENCE TALLY None 100, One 31, Three 0, Four 0
+COUNTER EVIDENCE the strongest evidence against None is Jupiter the karaka in the Lagna aspecting the 5th with a strong D9 and a strong D7, the Sun as 5th lord yogakaraka, and the 89 strict past windows, but Jupiter at 28.5 degree has no capacity and the Saturn and Ketu aspects outweigh them.
+ENGINE VERSION 2.0 degree true, nakshatra true, node bands true.
+
+S9. SUMMARY
+Dominant houses 3 and 9 do not carry the 5th, D1 gives a mixed 5th line, D7 is good, planet strength with degree capacity puts the against weight 75.2 over the favour weight 34.0, the hypothesis score reads no with a provisional z of minus 0.43.
+FINAL ANSWER None
+• The 5th house line is held by Sun, Mercury and Jupiter but Saturn and Ketu aspect it with the larger counted weight and the karaka Jupiter stands at 28.5 degree with no capacity.
+• The tally reaches None 100 and One 31, and the hypothesis z of minus 0.43 is provisional.
+• Final answer None
