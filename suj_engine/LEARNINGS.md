@@ -232,8 +232,9 @@ answer on those rests on the chain evidence only and must not claim more.
 
 ## Case 5. Prashna chart 894, female, 8 December 1980, 04:38, Mehsana. Reported 17 November 2026
 
-SUJ answered 4 of 5 reported questions, education speciality wrong, profession, siblings, husband profession and parents right. Question 4 on children is still pending.
-Nothing was retuned. What the miss shows, as a hypothesis for the next charts and not a rule.
-- The library holds no rule that names a medical speciality. The dentist answer came from the analyst mapping house 2 face and mouth to dentistry and from entering a Paap Kartari harm against the options that lean on Venus. Both choices were the analyst's. Tag invented_rule. When options are specialities the answer should say before the tally that the evidence entries are the analyst's mapping, and should enter the same type of harm for every option.
-- A tally where one option has a single planet and no weakness scores 100. The tool reads that as a strong option. The Q1 dentist 80 and the Q5 general surgeon 89 both come from options with fewer counter entries, not from more evidence. Watch for this.
-- The parents answer, both alive, rested on reading natal damage as capacity and not as proof of loss, and it was right. The siblings count was right on a 3 point lead, which says nothing about the count rule.
+SUJ answered 2 of 6. Right, children and parents. Wrong, education speciality, present profession, siblings and husband profession. Truth, pediatrician, private job, two sisters and one brother, two sons, orthopedic surgeon, both parents alive. Nothing was retuned. Findings, as hypotheses for the next charts and not rules.
+- A recording error was made and fixed. The owner's submitted answers were first logged as the true answers by mistake. A message that says final answers is a submission. Only a message headed result or marked as reported is a truth.
+- Speciality options. The library names no speciality. The tally entries were the analyst's mapping and both speciality questions missed. In Q1 the right option was second at 42. In Q5 the planet of surgery, Mars, outvoted Saturn the planet of bones. Only KP Pro, which read the sign of the husband's 10th cusp, got Q5. Test whether the rotated 10th house sign and its lord should be a required entry for relatives profession.
+- Tally artefact. An option with a single planet and no counter entry scores 100. The dentist 80 and general surgeon 89 leads came from fewer counter entries, not more evidence.
+- Status versus capacity. The Sun and Rahu government signature was read as present status. She had a government type signature and works in a private job. Natal capacity is not proof, as G guardrails already say.
+- Siblings. A karaka word was overridden by an order rule. The Moon in the sibling frame is the elder sister word and the nothing behind Jupiter rule said eldest. The word was right.

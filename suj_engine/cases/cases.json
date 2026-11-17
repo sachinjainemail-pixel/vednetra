@@ -490,12 +490,12 @@
       "Skin specialist"
      ],
      "engine": "Dentist",
-     "truth": "Gynecologist",
+     "truth": "Pediatrician",
      "pending": false,
      "errorTags": [
       "invented_rule"
      ],
-     "note": "The library names no medical speciality. The tally mapped specialities to planets by the analyst, and the dentist side took the four dominant house planets through house 2 face and mouth, a mapping that is not in the library. Gynecology was scored 21 because the Paap Kartari harm on Venus was entered against it. Truth, gynecologist, wrong."
+     "note": "Tally A 21, B 42, C 80, D 25. The library names no speciality and the dentist lead came from the analyst mapping of house 2 face and mouth. Truth, pediatrician, so the second placed option was right. The native studied MBBS and MD pediatrics at Surat Medical College."
     },
     {
      "n": 2,
@@ -507,10 +507,12 @@
       "Own business"
      ],
      "engine": "Government job",
-     "truth": "Government job",
+     "truth": "Private job",
      "pending": false,
-     "errorTags": [],
-     "note": "Tally 39, 53, 34. Sun, Rahu in the 10th and the Moon as 10th lord carried it. Truth, government job, right."
+     "errorTags": [
+      "capacity_vs_status"
+     ],
+     "note": "Tally 39, 53, 34, government 53. Truth, private job, she now works under another pediatrician in Ahmedabad after moving two years ago for her son's coaching, and earlier ran her own clinic in Deesa. The Sun and Rahu government signature was read as status, it was capacity."
     },
     {
      "n": 3,
@@ -522,12 +524,12 @@
       "One sister and two brothers"
      ],
      "engine": "One sister and two brothers",
-     "truth": "One sister and two brothers",
+     "truth": "Two sisters and one brother",
      "pending": false,
      "errorTags": [
       "count_rule_unvalidated"
      ],
-     "note": "Tally 18, 29, 32, a 3 point lead on a count with no validated rule. Right, but the margin does not support calling the rule valid."
+     "note": "Tally 18, 29, 32 with a 3 point lead and no validated count rule. Truth, an elder sister, the native, and a youngest brother. The Moon in the Mars frame is the elder sister word in the BNN lexicon and was overridden by the nothing behind Jupiter eldest rule."
     },
     {
      "n": 4,
@@ -539,12 +541,10 @@
       "Two daughters"
      ],
      "engine": "Two sons",
-     "truth": null,
-     "pending": true,
-     "errorTags": [
-      "count_rule_unvalidated"
-     ],
-     "note": "Tally A 48, B 48, tie broken by the D7 count of two planets. Truth not reported."
+     "truth": "Two sons",
+     "pending": false,
+     "errorTags": [],
+     "note": "Tally A 48, B 48, tie broken by the D7 count of two planets in the 5th. Truth, two sons, right. The tie break was thin and the number rule is still unvalidated."
     },
     {
      "n": 5,
@@ -556,10 +556,12 @@
       "General surgeon"
      ],
      "engine": "General surgeon",
-     "truth": "General surgeon",
+     "truth": "Orthopedic surgeon",
      "pending": false,
-     "errorTags": [],
-     "note": "Tally 51, 52, 89. Mars as 7th lord and natural surgeon, no weakness flag. Truth, general surgeon, right."
+     "errorTags": [
+      "winner_mapping"
+     ],
+     "note": "Tally 51, 52, 89. Truth, orthopedic surgeon, spine surgery and knee replacement. Saturn as the husband's 10th lord in his 6th was entered as counter evidence and Mars the general surgeon planet was allowed to win. KP Pro alone read the husband's 10th cusp in Capricorn with Saturn and Ketu and was right."
     },
     {
      "n": 6,
@@ -574,7 +576,7 @@
      "truth": "Both alive",
      "pending": false,
      "errorTags": [],
-     "note": "Tally 12, 27, 47, no option above 50. Natal damage was read as capacity and not as proof of loss. Truth, both alive, right."
+     "note": "Tally 12, 27, 47. Truth, both alive, right. Natal damage was read as capacity and not as proof of loss."
     }
    ],
    "hypotheses": [],
