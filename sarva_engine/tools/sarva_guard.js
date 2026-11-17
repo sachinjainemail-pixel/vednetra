@@ -93,7 +93,7 @@ function check(text, opts) {
   });
 
   if (!questions.length) err("No questions found. Each question needs an OPTIONS line.");
-  let incomplete = false;
+  let incomplete = false; const provisional = {};
   questions.forEach(q => {
     if (!options[q]) err(q + " has no OPTIONS line.");
     METHODS.forEach(c => {
@@ -116,6 +116,15 @@ function check(text, opts) {
         return;
       }
       if (/^NOT RUN/i.test(r)) { err(q + " " + c + " has a not run result that is not the exact text " + NOT_RUN(c) + "."); return; }
+      if (ev && (c === "UDU" || c === "QUAD") && !present[c]) {
+        // the corpus or the Quad READ rules are absent, so the cell comes from the provisional promise layer of promise_layer.js
+        if (!/\bPROVISIONAL\b/.test(ev)) err(q + " " + c + " EVIDENCE line must say PROVISIONAL, the cell comes from the promise layer and not from " + (c === "UDU" ? "the Udu corpus" : "the Quad READ rules") + ".");
+        else if (c === "UDU" && !/SARVA-UDU-P/.test(ev)) err(q + " UDU EVIDENCE line must name the rules SARVA-UDU-P that produced the cell.");
+        else if (c === "QUAD" && !/SARVA-QUAD-P/.test(ev)) err(q + " QUAD EVIDENCE line must name the layers SARVA-QUAD-P that produced the cell.");
+        else if (c === "QUAD" && !QUAD_WORD.test(ev)) err(q + " QUAD EVIDENCE line must use the confidence words COMPUTED, UNSTABLE or VACUOUS.");
+        if (c === "UDU" && UDU_ID.test(ev.replace(/SARVA-UDU-P-[A-Z0-9]+/g, ""))) err(q + " UDU EVIDENCE line cites a Udu rule id while the Udu corpus is absent. A provisional cell never cites a Udu rule id.");
+        provisional[c] = true;
+      }
       if (ev && rulesBased && present[c]) {
         if (c === "BNN" && !BNN_ID.test(ev)) err(q + " BNN EVIDENCE line must cite at least one Rule ID from the BNN rule base, for example RAO-FND-009.");
         else if (c === "BNN" && !BNN_GRADE.test(ev)) err(q + " BNN EVIDENCE line must carry the BNN grade, one of CONFIRMED, INDICATED, POSSIBLE, OPEN, DENIED.");
@@ -173,7 +182,7 @@ function check(text, opts) {
     if (/^(SUJ FILE|LEXICON|OPTIONS|RESULT|EVIDENCE|METHOD)/.test(l.trim()) && !BANNED.test(l.replace(/\//g, ""))) return;
     if (BANNED.test(l)) warnings.push("Line " + (i + 1) + " has a character the owner does not want in responses.");
   });
-  return { errors, warnings: warnings.slice(0, 5), incomplete, questions, present };
+  return { errors, warnings: warnings.slice(0, 5), incomplete, questions, present, provisional: Object.keys(provisional) };
 }
 
 if (require.main === module) {
@@ -185,6 +194,7 @@ if (require.main === module) {
   if (r.errors.length) { console.log("GUARD FAILED with " + r.errors.length + " errors."); process.exit(1); }
   const miss = ["BNN", "UDU", "QUAD"].filter(c => !r.present[c]);
   if (r.incomplete) { console.log("GUARD PASSED but INCOMPLETE. Not run for lack of rule files: " + miss.join(", ") + ". Tell the owner."); process.exit(3); }
+  if (r.provisional && r.provisional.length) console.log("NOTE " + r.provisional.join(" and ") + " cells come from the provisional promise layers of promise_layer.js, not from the Udu corpus or the Quad READ rules. Say so to the owner.");
   console.log("GUARD PASSED, " + r.questions.length + " questions, seven methodologies each, final table matches.");
 }
 module.exports = { check, METHODS, HEADER, NOT_RUN };

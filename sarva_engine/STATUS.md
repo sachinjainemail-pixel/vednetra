@@ -118,3 +118,12 @@ and prints the recipe. Contract section 12, routing, template, CLAUDE.md, the gu
 Limits, stated in the README and the contract. 255 entries is not every type that exists. The web research gave blog grade claims only and no speciality table with a classical text. Every page fetch was refused by the network policy of the session,
 the owner approved a new environment with the hosts but the proxy had not picked it up, so all web claims are second hand summaries, tier T3, and cannot be cited. The medical speciality rows rest on KCIL TA lists, KP house keys and karaka lists from memory.
 Nothing in it has been shown to raise accuracy. It was built after K894 was scored, so K894 cannot test it. The next chart is the first test. No weight, band or rule of any methodology was changed.
+
+## Round 10, promise layers for Udu and Quad Dasha, all seven columns fire
+
+The owner asked on 17 November 2026 why Udu and Quad Dasha gave no answer and told the engine to give them a promise prediction part so that all seven fire for every question.
+Why they were blank. Both methods forbid answering without their rules and the rule files were never supplied, see contract sections 7b, 7c and 10.
+Built. sarva_engine/tools/promise_layer.js fires both columns together for every question of a chart from the VedNetra chart and the Quad compute layer. Udu gets rules SARVA-UDU-P in the frame of its documents, Quad gets ten layers SARVA-QUAD-P and the stability gate, with handlers for sons and daughters, brothers and sisters, and parents status, English and Hindi option parsing, and option profiles from the lexicon.
+Contract section 13, routing, template, CLAUDE.md, the guard, the preflight and the format examples were updated, tests in sarva_engine/tests/promise_layer_test.js, 27 checks, and the guard tests extended. A test found a real fault, Devanagari vowel signs were stripped by the text normaliser, which also affected lexicon matching, fixed.
+Limits. Authored layers, not the corpus and not the READ rules, no Udu rule id cited and none invented, every cell marked PROVISIONAL. Not scored on any chart, built after K894 was scored. The parents handler is a weak handler of a kind the owner's BNN backtest found to over call loss. The count handler rests on no validated rule. Nothing was retuned.
+

@@ -2,7 +2,7 @@ FORMAT EXAMPLE ONLY. This file shows the layout the guard accepts. It is not a r
 
 INTAKE
 Native Sample, male, born 1991-12-01 01:15:00 at Sonipat, latitude 28.9931, longitude 77.0151, time zone 5.5. As of date 2026-11-16.
-LIMITS Readings under each methodology, not certainties. Udu and Quad Dasha are not run, their rule files are not installed.
+LIMITS Readings under each methodology, not certainties. Udu and Quad Dasha cells come from provisional promise layers, their rule files are not installed.
 
 QUESTION Q1
 OPTIONS Q1 A B C D
@@ -25,12 +25,12 @@ METHOD BNN Q1
 EVIDENCE Q1 BNN POSSIBLE RAO-FND-009 ARI-GRM-022
 RESULT Q1 BNN A
 METHOD UDU Q1
-EVIDENCE Q1 UDU nine corpus files not installed
-RESULT Q1 UDU NOT RUN UDU RULES MISSING
+EVIDENCE Q1 UDU PROVISIONAL, no Udu corpus rules were used and no Udu rule id is cited, rules SARVA-UDU-P-U1 to U6, weighted sums A 4.10, B 5.20, C 2.00, no accuracy has been measured for Udu
+RESULT Q1 UDU B
 METHOD QUAD Q1
-EVIDENCE Q1 QUAD full methodology file not installed
-RESULT Q1 QUAD NOT RUN QUAD RULES MISSING
+EVIDENCE Q1 QUAD PROVISIONAL, no Quad READ rules were used, Rule of 10 layers SARVA-QUAD-P-L1 to L10, satisfied A 3, B 4, C 2, COMPUTED dasha facts, UNSTABLE L10, VACUOUS none, no validated hit rate
+RESULT Q1 QUAD B
 
 | Question | KP Pro | KCIL | SUJ engine | CHAWDHRI | BNN | Udu | Quad Dasha |
 |---|---|---|---|---|---|---|---|
-| Q1 | B | B | C | B | A | NOT RUN UDU RULES MISSING | NOT RUN QUAD RULES MISSING |
+| Q1 | B | B | C | B | A | B | B |

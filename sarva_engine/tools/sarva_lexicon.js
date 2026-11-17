@@ -29,7 +29,7 @@ function load() {
   const entries = [].concat.apply([], CATFILES.map(c => read("taxonomy_" + c + ".json")));
   return { entries, cards: read("kp_cards.json"), index: read("kp_event_index.json"), matrix: read("kcil_event_matrix.json"), recipes: read("recipes.json"), core: read("core.json"), sources: read("sources.json") };
 }
-const norm = s => String(s || "").toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, " ").replace(/\s+/g, " ").trim();
+const norm = s => String(s || "").toLowerCase().replace(/[^\p{L}\p{M}\p{N}\s]/gu, " ").replace(/\s+/g, " ").trim();
 const stripLabel = s => String(s).replace(/^\s*\(?[A-Za-z]\)?[\s.:)\-]+(?=\S)/, "").trim();
 
 function score(entry, q) {
@@ -183,4 +183,5 @@ function check(L) {
   if (errs.length) { errs.forEach(e => console.log("ERROR " + e)); console.log("LEXICON CHECK FAILED with " + errs.length + " errors"); process.exit(1); }
   console.log("LEXICON CHECK PASSED, " + L.entries.length + " entries, " + L.cards.length + " KP cards, " + L.matrix.length + " KCIL matrix rows");
 }
-main();
+if (require.main === module) main();
+module.exports = { load, match, norm, stripLabel };

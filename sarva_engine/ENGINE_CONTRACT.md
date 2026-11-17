@@ -116,7 +116,7 @@ UDU_PROCEDURE.md. The document wins on any difference.
 4. Gender and birth time are required. Lahiri only. The chart comes from the vednetra-ududaya skill.
 5. The corpus files are not in the repository yet. The guard treats the corpus as present only when all nine files exist in
    sarva_engine/knowledge/udu. Until then the Udu cell is the exact text NOT RUN UDU RULES MISSING, and the guard reports the
-   reply as incomplete. Never fill the Udu cell from memory.
+   reply as incomplete. Never fill the Udu cell from memory. Superseded in part by section 13, while the corpus is absent the Udu cell comes from the provisional promise layer, marked PROVISIONAL, and NOT RUN is the fallback only.
 
 ## 7c. Quad Dasha, rules and method
 
@@ -127,7 +127,7 @@ QUAD_PROCEDURE.md.
 2. The READ rules of Chara, Kaal Chakra, Yogini and Laghu Parashari, and the Rule of 10 option test, are in sections 3 to 19 of
    the Quad methodology file, which has not been supplied. The guard treats the Quad rules as present only when
    sarva_engine/knowledge/quad/QUAD-FULL-METHODOLOGY.pdf, .txt or .md exists. Until then the Quad cell is the exact text
-   NOT RUN QUAD RULES MISSING and the reply is reported as incomplete.
+   NOT RUN QUAD RULES MISSING and the reply is reported as incomplete. Superseded in part by section 13, the Quad cell comes from the provisional promise layer, marked PROVISIONAL, and NOT RUN is the fallback only.
 3. When the file is present the report contract binds. The levels licensed, the stability gate, the four confidence words
    COMPUTED, CLASSICAL, UNSTABLE and VACUOUS in the EVIDENCE line, no death dating, no claim of a validated hit rate.
    The cell is the option the Rule of 10 ranks first.
@@ -189,6 +189,8 @@ SUJ answer file is named. See ANSWER_TEMPLATE.md.
 
 ## 10. Standing gaps, the final design on the material supplied
 
+Section 13 of 17 November 2026 replaces the NOT RUN cells of points 2 and 3 below with provisional promise layer cells. The gaps themselves still stand, the corpus and the READ rules are still not supplied.
+
 On 16 November 2026 the owner stated that no further files will be shared and asked for the engine to be finalized on what was
 supplied. The standing design is therefore this.
 1. Five columns run on complete rules, KP Pro, KCIL, SUJ engine, CHAWDHRI and BNN.
@@ -225,3 +227,19 @@ Added on 17 November 2026 on the owner's instruction, after the first scored cha
 8. Recipes. recipes.json holds one recipe per question family and column, taken from the owner corpora, with the pitfalls the scored chart showed. A recipe does not decide.
 9. Growth. Add lines to the DSL files and rebuild, see the README in the lexicon folder. No entry, weight or recipe is changed because of one chart. Record the chart in the case registry first.
 10. Honest record. The lexicon has not been shown to raise accuracy. Its coverage is 255 entries and the 202 cards, not every type that exists. The web sources were read as search summaries only, because no page could be fetched.
+
+## 13. Promise layers for Udu and Quad Dasha, all seven columns fire
+
+Added on 17 November 2026 on the owner's instruction, after the first scored chart, so that Udu and Quad Dasha answer every question like the other five.
+1. Why they were blank. Udu answers only from its 11,683 rule corpus and forbids a fabricated rule. Quad answers only by its READ rules of sections 3 to 19 and its report contract. Neither file set was supplied, so sections 7b and 7c required NOT RUN.
+2. What was built. sarva_engine/tools/promise_layer.js. It casts the chart through VedNetra and the Quad compute layer and fires both columns together for every question, in the template format.
+   Udu promise layer. Rules SARVA-UDU-P-U1 to U6, F1, F2 and P1. They follow the Udu frame, nakshatra and pada reading, the weighing of section 11 of the Udu document, polarity times confidence times specificity, confidence fixed at inferred 0.7, the Law 3 gate of promise and delivery, the pada rule first on a tie.
+   Quad promise layer. Ten layers SARVA-QUAD-P-L1 to L10 fixed before the chart, six from the chart and Jaimini rashi aspects, four from the Vimshottari, Yogini, Chara and Kaal Chakra periods, ranked by the layers satisfied, the Rule of 10. The stability gate at plus and minus 5 and 15 minutes withdraws an unstable system for every option.
+   A layer that is true or false for every option is VACUOUS and is not counted. An option without a lexicon entry prints NO ENTRY.
+3. What it is not. It is not the Udu corpus and not the Quad READ rules. It is authored by the engine author. It cites no Udu rule id and invents none, the Udu document calls a fabricated rule the one real failure. Its rule ids are SARVA-UDU-P and SARVA-QUAD-P.
+4. Marking. While the corpus or the READ rules are absent, an option cell of Udu or Quad must say PROVISIONAL in its EVIDENCE line and name the SARVA-UDU-P rules or the SARVA-QUAD-P layers. Quad also carries COMPUTED, UNSTABLE or VACUOUS. The Udu EVIDENCE line says that no accuracy has been measured, the Quad line that no hit rate is validated.
+   The guard enforces this and rejects a Udu rule id in a provisional Udu cell. The guard reports a NOTE naming the provisional columns and exits 0. Exit code 3 now means a cell fell back to NOT RUN, which stays legal when the layer cannot run, for example with no birth time.
+5. Switch back. When the nine Udu files or the Quad READ rules are placed in their folders, the guard treats the source as present, the older rules of 7b and 7c apply, and a provisional cell is an error. Then the corpus rules replace the layer.
+6. Isolation holds. The layers read the chart and the lexicon T4 houses and planets only. They read no verdict of another column and no KP, KCIL, BNN, CHAWDHRI or SUJ corpus text. The sex of the planets and the Jaimini karakas are classical facts and not a column rule.
+7. Honest record. The layers were authored after the K894 chart was scored and have not been scored on any chart. The Quad READ rules the owner has recorded tested at chance. Expect the same of this layer until a chart proves otherwise. The parents handler is the weakest, a damage and delivering period rule of the kind that called four living parents gone in the owner's BNN backtest, and its cells carry the words WEAK HANDLER.
+   The count handler for sons, daughters, brothers and sisters rests on no validated count rule in any column. No weight or rule of any column was changed.

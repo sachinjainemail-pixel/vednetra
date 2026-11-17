@@ -6,6 +6,8 @@ out next to this one. If a sibling is not attached to the session, say so and as
 Common first step. Run node sarva_engine/tools/sarva_preflight.js, it shows which of the seven columns can run in this session and what
 to fix. Then collect the inputs of ENGINE_CONTRACT.md section 8. Fix the as-of date from the system clock.
 
+Common third step, fire all seven. After the lexicon run node sarva_engine/tools/promise_layer.js once with every question, birth data and as of date. That gives Udu and Quad for the whole chart at once, and the other five columns are written beside them.
+
 Common second step, the lexicon. For every question that names a speciality, degree, profession, business, disease, income source or a relative, run
     node sarva_engine/tools/sarva_lexicon.js --options "A text|B text|C text" --family
 then once per column with --column KPPRO, KCIL, SUJ, CHAWDHRI or BNN. It lists the houses, planets, cusps, KP cards and BNN rule candidates of each option and the recipe of the
@@ -99,6 +101,8 @@ BNN procedure. ENGINE_CONTRACT.md section 7 has the grade rules and the missing 
 
 ## 6. Udu (code UDU)
 
+Promise layer, from 17 November 2026, ENGINE_CONTRACT.md section 13. Run once for the whole chart, together with Quad, node sarva_engine/tools/promise_layer.js '{config with the questions}'. It prints the METHOD UDU and METHOD QUAD blocks of every question with EVIDENCE and RESULT lines, marked PROVISIONAL. Use them as printed. The corpus path below applies again when the nine files are installed.
+
 Method. sarva_engine/knowledge/udu/UDU_PROCEDURE.md, then the document sections it names in UDU-METHODOLOGY.txt through
 UDU-METHODOLOGY.index.tsv. Rules. The nine corpus files UDU-*.md in sarva_engine/knowledge/udu, routed by question as in
 document section 5. Not yet supplied, see knowledge/udu/README.md, so the cell is NOT RUN UDU RULES MISSING.
@@ -110,6 +114,8 @@ current directory. For a past event recast the chart on the event date. Dasha da
 and said so.
 
 ## 7. Quad Dasha (code QUAD)
+
+Promise layer, the same promise_layer.js run as for Udu, ENGINE_CONTRACT.md section 13. The compute layer below still runs inside it, with the stability gate. The READ rules path applies again when the full methodology file is installed.
 
 Method. sarva_engine/knowledge/quad/QUAD_PROCEDURE.md and QUAD-REPORT-CONTRACT.md. Rules. Sections 3 to 19 of the Quad methodology
 file, not yet supplied, see knowledge/quad/README.md, so the cell is NOT RUN QUAD RULES MISSING.

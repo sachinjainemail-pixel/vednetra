@@ -47,8 +47,8 @@ Line rules.
 2. The BNN EVIDENCE line carries the BNN grade word and cites Rule IDs from the BNN rule base. Only if the rule csv is absent from the session
    the result reads RESULT Q1 BNN NOT RUN BNN RULES MISSING, in the BNN column only.
 3. The KCIL EVIDENCE line carries STABLE, TWO CANDIDATES or NO RULE REGISTER. The KPPRO EVIDENCE line carries HIGH, MEDIUM or LOW and CHART DECIDED, PRIOR DOMINANT or R10 DECIDED.
-   The UDU EVIDENCE line cites a Udu Rule ID and says no accuracy is measured for Udu. The QUAD EVIDENCE line uses the confidence
-   words COMPUTED, CLASSICAL, UNSTABLE or VACUOUS. Where the rule files of Udu or Quad are absent, the result is the exact
+   The UDU EVIDENCE line cites a Udu Rule ID and says no accuracy is measured for Udu. While the corpus is absent it says PROVISIONAL and names the SARVA-UDU-P rules and cites no Udu id, section 13. The QUAD EVIDENCE line uses the confidence
+   words COMPUTED, CLASSICAL, UNSTABLE or VACUOUS. While the READ rules are absent it says PROVISIONAL and names the SARVA-QUAD-P layers. Where the rule files of Udu or Quad are absent, the result is the option of the provisional promise layer, or only if that layer cannot run the exact
    text NOT RUN UDU RULES MISSING or NOT RUN QUAD RULES MISSING in that column only.
 4. Every question has all seven METHOD blocks, each with one EVIDENCE line and one RESULT line.
 
