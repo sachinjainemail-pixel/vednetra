@@ -1,0 +1,49 @@
+S0. INTAKE AND TIME FRAME
+Native Q894, female, born 8 December 1980 at 04 hours 38 minutes in Mehsana Gujarat, latitude 23.588 north, longitude 72.3693 east, time zone 5.5. Ayanamsha Lahiri 23.5954, whole sign houses, Libra Lagna 18.19 degrees, mean nodes. The Lagna is 1.8 degrees from a nakshatra boundary, so the birth time is flagged as sensitive.
+Question 5 Profession of the husband. Options A Physician, B Orthopedic surgeon, C General surgeon. As of date 17 November 2026 from the system clock.
+
+S1. DOMINANT HOUSE
+Lagna chart. House 2 Scorpio is the dominant house with three planets, Sun 22.43 degrees Jyeshtha pada 2, Moon 26.49 degrees Jyeshtha pada 3 and Mercury 9.68 degrees Anuradha pada 2. House 12 Virgo is the secondary stellium with Jupiter and Saturn. The Moon chart and the Sun chart both show the same three planets as a stellium in their house 1 Scorpio, so the finding holds in all three charts.
+Sun is lord of 11 with natural soul, authority, bones, heart. Moon is lord of 10 with natural mind, mother, fluids, nourishment, debilitated and combust. Mercury is lord of 9 and 12 with natural intellect, speech, learning, combust. House 2 gives the area, wealth, family, speech, food, face and eyes, early childhood. The three planets deliver it by their own significations and the combust Moon and Mercury deliver weakly.
+Link to the question. The husband house 7 Aries is empty and not dominant. Its lord Mars sits in house 3. The dominant house 2 is the 8th house counted from the 7th, the house of surgery for the husband, and holds the Sun, Moon and Mercury, so the dominant house planets are carriers of the husband's 8th house work, which the methodology counts as a link.
+
+S2. D1 ANALYSIS
+The 7th house Aries is empty and unaspected, the 7th lord Mars is strong in the 3rd of skill and hands, Purva Ashadha, and Mars is the natural karaka of the husband in a woman's chart and of surgery. The husband's 10th house is the 4th house Capricorn with Ketu and lord Saturn in the 12th with Jupiter, that is the husband's 6th house of healing, with the 6th lord of the native Jupiter. The husband's 8th is the dominant house 2 with the Sun, the natural karaka of the physician, the Moon and Mercury.
+So the husband is a doctor. The surgical side comes from Mars and the husband's 8th house, the bone side from Saturn the husband's 10th lord, and the physician side from Jupiter and the Sun.
+RULES CITED LP-018-8, LP-042-1, LP-052-3. The library holds no rule that names a doctor type for the husband, so the type rests on the tally and is thin.
+
+S3. D9 ANALYSIS
+Navamsa Lagna Pisces. Sun Capricorn house 11, Moon Aquarius house 12, Mars and Mercury together in Virgo house 7, Jupiter Venus and Saturn together in Taurus house 3, Rahu Capricorn house 11, Ketu Cancer house 5. Mercury is exalted in Virgo in D9 and so carries the strongest D9 dignity, the Sun is in an enemy sign and the Moon is in a neutral sign.
+D9 7th house Virgo holds Mars and Mercury together, a surgical combination in the sign of health and treatment. The D9 7th lord Mercury is exalted in Virgo, which gives the husband skill and a learned profession.
+
+S4. SUBJECT DIVISIONAL CHART ANALYSIS
+D9 is the subject varga for the husband. The 7th house Virgo with Mars and Mercury, Jupiter Venus and Saturn in the 3rd Taurus, the 8th from the 7th is the D9 2nd Aries, empty. The Mars and Mercury pair in the 7th reads surgeon and diagnostician together.
+
+S5. PLANET STRENGTH AND CONFLICT RESOLUTION
+Real strength S from strength_tally.js, Sun 53.8, Moon 53.2, Mars 62, Mercury 72.1, Jupiter 38.9, Venus 48.3, Saturn 56.8. Rahu 53.2 takes the Moon and Ketu 49.4 takes Saturn. Shadbala percent Sun 108, Moon 98, Mars 147, Mercury 94, Jupiter 86, Venus 112, Saturn 130.
+Conflict between Mars and Sun for general surgery, Saturn for bones and Jupiter and Sun for the physician. Mars 62 is strong and has no weakness. Saturn 56.8 and Jupiter 38.9 lose weight from the 12th house placement. The more powerful planet is Mars, so the surgeon result is enforced, and between the two surgeons the one without the Saturn weakness wins.
+
+S6. DASHA AND TIME STATUS
+Past periods first. Mercury dasha to 1985, Ketu dasha 1985 to 1992, Venus dasha 1992 to 2012, Sun dasha 2012 to 2018. Running Moon Mahadasha 31 May 2018 to 30 May 2028, Venus Antardasha 31 March 2026 to 29 November 2027, Rahu Pratyantardasha 4 November 2026 to 3 February 2027, Rahu Sookshma, Moon Prana. Future Moon Sun Antardasha 29 November 2027 to 30 May 2028, then Mars Mahadasha from 30 May 2028.
+TIME STATUS HAPPENING NOW. The husband is practising now in the Moon Venus period and the 7th lord Mars is not in an adverse period.
+WINDOW SCAN strict scan of marriage found 90 windows, 68 past, 0 running, 22 future. The past windows give the marriage period and the future windows from June 2027 are not relevant to the husband's profession and were not weighed.
+DASHA LORDS Moon Mahadasha neutral, Venus Antardasha sadhaka promoter, Rahu Pratyantardasha node neutral that doubles the result of Moon by LP-057-2, Rahu Sookshma node neutral, Moon Prana neutral. Sun is badhaka, Mercury and Saturn are the yogakarakas by LP-085-5, Jupiter is badhaka.
+
+S7. TRANSIT VALIDATION
+On 17 November 2026 Saturn is in Pisces retrograde, house 6 from the Lagna and house 5 from the Moon. Jupiter is in Leo, house 11 from the Lagna and house 10 from the Moon, and turns retrograde on 12 December 2026 before entering Cancer on 29 January 2027. Rahu is in Aquarius, house 5, and Ketu in Leo, house 11, both retrograde, and they change sign on 20 December 2026. The Sun is in Scorpio over the natal Sun Moon Mercury stellium.
+Jupiter in Leo supports the 7th house from the Lagna by aspect over Aries. Saturn in Pisces is in the 8th from the 7th lord only by count and is not a trigger for the profession.
+
+S8. RECONCILIATION OF SECTIONS
+Sections agreed that the husband is a doctor with Mars as the main signature. The orthopedic reading rests on Saturn alone and Saturn is weak in the 12th, the physician reading rests on Jupiter, weak in the 12th, and the general surgeon reading rests on Mars, the Sun and Mercury without a weakness except the combust Mercury.
+No HYPOTHESIS SCORES apply, the husband profession is not a yes or no question about what the native has.
+EVIDENCE TALLY A 51, B 52, C 89
+COUNTER EVIDENCE Saturn in the 12th, the husband's 10th lord in his 6th house, points to the bone and joint side of surgery, option B, and its score of 52 is above the physician but far below the lead.
+ENGINE VERSION 2.0 degree true, nakshatra true, node bands true
+
+S9. SUMMARY
+Analysis recap. S1 dominant house is the husband 8th. S2 Mars the 7th lord and the Sun in 8th. S3 D9 Mars and Mercury in 7th. S4 D9 repeats it. S5 Mars the strongest. S6 practising now. S7 no contradiction. S8 tally C 89.
+FINAL ANSWER C
+
+• Mars, lord of the 7th and natural karaka of the husband and of surgery, is the strongest planet and no weakness flag stands against it.
+• The husband's 8th house is the dominant house with the Sun, Moon and Mercury, and D9 7th holds Mars with Mercury.
+• Final answer C General surgeon

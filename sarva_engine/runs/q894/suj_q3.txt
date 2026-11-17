@@ -1,0 +1,49 @@
+S0. INTAKE AND TIME FRAME
+Native Q894, female, born 8 December 1980 at 04 hours 38 minutes in Mehsana Gujarat, latitude 23.588 north, longitude 72.3693 east, time zone 5.5. Ayanamsha Lahiri 23.5954, whole sign houses, Libra Lagna 18.19 degrees, mean nodes. The Lagna is 1.8 degrees from a nakshatra boundary, so the birth time is flagged as sensitive.
+Question 3 Number of brothers and sisters including the native. Options A One sister and one brother, B Two sisters and one brother, C One sister and two brothers. As of date 17 November 2026 from the system clock.
+
+S1. DOMINANT HOUSE
+Lagna chart. House 2 Scorpio is the dominant house with three planets, Sun 22.43 degrees Jyeshtha pada 2, Moon 26.49 degrees Jyeshtha pada 3 and Mercury 9.68 degrees Anuradha pada 2. House 12 Virgo is the secondary stellium with Jupiter and Saturn. The Moon chart and the Sun chart both show the same three planets as a stellium in their house 1 Scorpio, so the finding holds in all three charts.
+Sun is lord of 11 with natural soul, authority, bones, heart. Moon is lord of 10 with natural mind, mother, fluids, nourishment, debilitated and combust. Mercury is lord of 9 and 12 with natural intellect, speech, learning, combust. House 2 gives the area, wealth, family, speech, food, face and eyes, early childhood. The three planets deliver it by their own significations and the combust Moon and Mercury deliver weakly.
+Link to the question. The sibling house 3 Sagittarius is not the dominant house but holds Mars. The 11th lord Sun sits in the dominant house 2, so the dominant house planets lord the elder sibling house and the finding is a major weight for the 11th, the elder brother side.
+
+S2. D1 ANALYSIS
+House 3 Sagittarius holds Mars alone and is not aspected by any planet. Mars is the natural significator of younger brothers and is strong, friendly sign, Purva Ashadha. The 3rd lord Jupiter is in the 12th in an enemy sign with Saturn, so the sibling house lord is weak. The 11th house Leo is empty and its lord Sun is in the dominant house with the Moon and Mercury. Venus in the Lagna is the natural planet of a sister. Male planets Mars and Sun outnumber female planets Venus and Moon in the sibling frame.
+Because the 3rd and the 11th are both involved, the native has younger and elder siblings, the elder through the Sun and the younger through Mars.
+RULES CITED S-N18-006, S-N18-007, S-N20-011, S-N17-016. The library holds no rule for the number of siblings, and the engine has no validated number rule, so the count rests on the tally and is thin.
+
+S3. D9 ANALYSIS
+Navamsa Lagna Pisces. Sun Capricorn house 11, Moon Aquarius house 12, Mars and Mercury together in Virgo house 7, Jupiter Venus and Saturn together in Taurus house 3, Rahu Capricorn house 11, Ketu Cancer house 5. Mercury is exalted in Virgo in D9 and so carries the strongest D9 dignity, the Sun is in an enemy sign and the Moon is in a neutral sign.
+D9 Jupiter Venus and Saturn in the 3rd house Taurus. The sibling house of D9 holds three planets, which supports company of siblings and keeps the Venus sister link.
+
+S4. SUBJECT DIVISIONAL CHART ANALYSIS
+D3 sibling chart. Lagna Aquarius. Mars in the 3rd Aries in own sign, Venus in the 5th Gemini, Mercury in the 10th Scorpio, Sun and Moon in the 6th Cancer, Jupiter and Saturn in the 12th Capricorn. The 3rd lord Mars in own sign in the 3rd is strong and gives a brother, the Sun and Moon together in the 6th show the elder brother and the elder sister side but with friction.
+
+S5. PLANET STRENGTH AND CONFLICT RESOLUTION
+Real strength S from strength_tally.js, Sun 53.8, Moon 53.2, Mars 62, Mercury 72.1, Jupiter 38.9, Venus 48.3, Saturn 56.8. Rahu 53.2 takes the Moon and Ketu 49.4 takes Saturn. Shadbala percent Sun 108, Moon 98, Mars 147, Mercury 94, Jupiter 86, Venus 112, Saturn 130.
+Conflict between Mars and Venus and Sun for the three options. Mars 62 is the strongest carrier and appears in all options. The Sun is weak, S 53.8 with an enemy D9 sign. Venus 48.3 is hemmed. The option with the male planets Mars and Sun collects the larger favour weight 41.9.
+
+S6. DASHA AND TIME STATUS
+Past periods first. Mercury dasha to 1985, Ketu dasha 1985 to 1992, Venus dasha 1992 to 2012, Sun dasha 2012 to 2018. Running Moon Mahadasha 31 May 2018 to 30 May 2028, Venus Antardasha 31 March 2026 to 29 November 2027, Rahu Pratyantardasha 4 November 2026 to 3 February 2027, Rahu Sookshma, Moon Prana. Future Moon Sun Antardasha 29 November 2027 to 30 May 2028, then Mars Mahadasha from 30 May 2028.
+TIME STATUS ALREADY HAPPENED. The siblings are living persons born before or after the native and the question asks their count.
+WINDOW SCAN strict scan of sibling birth found 29 windows, 26 past, 0 running, 3 future. The past windows are weighed as the births of siblings and were not dated here. The 3 future windows from 2028 are not relevant to the count.
+DASHA LORDS Moon Mahadasha neutral, Venus Antardasha sadhaka promoter, Rahu Pratyantardasha node neutral that doubles the result of Moon by LP-057-2, Rahu Sookshma node neutral, Moon Prana neutral. Sun is badhaka, Mercury and Saturn are the yogakarakas by LP-085-5, Jupiter is badhaka.
+
+S7. TRANSIT VALIDATION
+On 17 November 2026 Saturn is in Pisces retrograde, house 6 from the Lagna and house 5 from the Moon. Jupiter is in Leo, house 11 from the Lagna and house 10 from the Moon, and turns retrograde on 12 December 2026 before entering Cancer on 29 January 2027. Rahu is in Aquarius, house 5, and Ketu in Leo, house 11, both retrograde, and they change sign on 20 December 2026. The Sun is in Scorpio over the natal Sun Moon Mercury stellium.
+Jupiter in the 11th from the Lagna touches the elder sibling house and the transit does not change the count.
+
+S8. RECONCILIATION OF SECTIONS
+Sections agreed that Mars gives a younger brother and the 11th side gives an elder one. The 3rd lord weakness lowers every option so all scores are low. The option with two brothers wins because the male planets Mars and Sun collect more weight than the single female planet Venus.
+HYPOTHESIS SCORES from prepare.js, Has siblings score 8 against null 29.1, z minus 0.88, below the null mean. The z reading is provisional and was found after known answers, and the number of siblings has no validated rule.
+EVIDENCE TALLY A 18, B 29, C 32
+COUNTER EVIDENCE The 3rd house holds one planet only and its lord Jupiter is weak, which supports the smallest family, option A, and the hypothesis score is below the null mean. The lead of C over B is only 3 points.
+ENGINE VERSION 2.0 degree true, nakshatra true, node bands true
+
+S9. SUMMARY
+Analysis recap. S1 Sun the 11th lord in dominant house. S2 Mars alone in 3rd, Sun for elder side. S3 D9 three planets in 3rd. S4 D3 Mars in own sign. S5 male planets weigh more. S6 siblings already born. S7 no change. S8 tally C 32 against B 29 and A 18.
+FINAL ANSWER C
+
+• Mars in the 3rd gives a brother and the Sun lord of 11 gives an elder brother, while Venus gives only the native herself as the sister.
+• The evidence is thin, the 3rd lord Jupiter is weak and the margin over the next option is 3 points.
+• Final answer C One sister and two brothers

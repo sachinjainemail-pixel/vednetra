@@ -1,0 +1,50 @@
+S0. INTAKE AND TIME FRAME
+Native Q894, female, born 8 December 1980 at 04 hours 38 minutes in Mehsana Gujarat, latitude 23.588 north, longitude 72.3693 east, time zone 5.5. Ayanamsha Lahiri 23.5954, whole sign houses, Libra Lagna 18.19 degrees, mean nodes. The Lagna is 1.8 degrees from a nakshatra boundary, so the birth time is flagged as sensitive.
+Question 4 Children. Options A One son, B Two sons, C Two daughters. As of date 17 November 2026 from the system clock.
+
+S1. DOMINANT HOUSE
+Lagna chart. House 2 Scorpio is the dominant house with three planets, Sun 22.43 degrees Jyeshtha pada 2, Moon 26.49 degrees Jyeshtha pada 3 and Mercury 9.68 degrees Anuradha pada 2. House 12 Virgo is the secondary stellium with Jupiter and Saturn. The Moon chart and the Sun chart both show the same three planets as a stellium in their house 1 Scorpio, so the finding holds in all three charts.
+Sun is lord of 11 with natural soul, authority, bones, heart. Moon is lord of 10 with natural mind, mother, fluids, nourishment, debilitated and combust. Mercury is lord of 9 and 12 with natural intellect, speech, learning, combust. House 2 gives the area, wealth, family, speech, food, face and eyes, early childhood. The three planets deliver it by their own significations and the combust Moon and Mercury deliver weakly.
+Link to the question. The children house 5 Aquarius is empty and not dominant. Its lord Saturn sits in the secondary stellium house 12 with Jupiter the karaka of children. The dominant house planets do not lord house 5, so the dominant house only colours the delivery.
+
+S2. D1 ANALYSIS
+House 5 Aquarius is empty and unaspected, which does not deny children. The 5th lord Saturn is in the 12th with Jupiter the karaka, both are male planets. Jupiter is in an enemy sign and Saturn is in a trik house, so the supply of children is delayed and reduced. The 5th from the Moon is Pisces, empty, and its lord Jupiter is again in the 12th from the Lagna.
+The Moon, the natural planet of daughters, is debilitated and combust, and Venus is hemmed by Paap Kartari. Both female significators are weak. The male significators Jupiter and Saturn are the carriers of the house 5 results and so sons are indicated. Beeja sphuta is not needed for a woman and Kshetra sphuta in Capricorn, an even sign, is satisfied in D1, D9 and D7.
+RULES CITED LP-076-T, LP-058-3, LP-020-3. The library holds no rule for the number of children and the engine has no validated rule for it.
+
+S3. D9 ANALYSIS
+Navamsa Lagna Pisces. Sun Capricorn house 11, Moon Aquarius house 12, Mars and Mercury together in Virgo house 7, Jupiter Venus and Saturn together in Taurus house 3, Rahu Capricorn house 11, Ketu Cancer house 5. Mercury is exalted in Virgo in D9 and so carries the strongest D9 dignity, the Sun is in an enemy sign and the Moon is in a neutral sign.
+D9 5th house Cancer holds Ketu. Jupiter, Venus and Saturn are together in the 3rd Taurus. The D9 does not add a female child signal.
+
+S4. SUBJECT DIVISIONAL CHART ANALYSIS
+D7 progeny chart. Lagna Aquarius. The 5th house Gemini holds Jupiter and Saturn together, both male planets in an odd sign, so the D7 shows sons and shows two planets in the child house. The 5th lord Mercury is in the 6th Cancer. The Moon is in the 10th Scorpio and Venus in the 2nd Pisces, so the daughter signal is outside the child house.
+
+S5. PLANET STRENGTH AND CONFLICT RESOLUTION
+Real strength S from strength_tally.js, Sun 53.8, Moon 53.2, Mars 62, Mercury 72.1, Jupiter 38.9, Venus 48.3, Saturn 56.8. Rahu 53.2 takes the Moon and Ketu 49.4 takes Saturn. Shadbala percent Sun 108, Moon 98, Mars 147, Mercury 94, Jupiter 86, Venus 112, Saturn 130.
+Conflict between Jupiter and Saturn for sons and Venus and Moon for daughters. Saturn 56.8 and Jupiter 38.9 carry the 5th house, each is lowered by its 12th house placement. Venus and Moon together bring 25.6 for and 92.7 against. The sons side is stronger.
+
+S6. DASHA AND TIME STATUS
+Past periods first. Mercury dasha to 1985, Ketu dasha 1985 to 1992, Venus dasha 1992 to 2012, Sun dasha 2012 to 2018. Running Moon Mahadasha 31 May 2018 to 30 May 2028, Venus Antardasha 31 March 2026 to 29 November 2027, Rahu Pratyantardasha 4 November 2026 to 3 February 2027, Rahu Sookshma, Moon Prana. Future Moon Sun Antardasha 29 November 2027 to 30 May 2028, then Mars Mahadasha from 30 May 2028.
+TIME STATUS ALREADY HAPPENED. The question states the children are born and the strict scan shows 66 past windows.
+WINDOW SCAN strict scan of child birth found 77 windows, 66 past, 0 running, 11 future. The past windows were weighed as the age range of births and the future windows from January 2027 are far from the child bearing age and are not weighed for the answer.
+DASHA LORDS Moon Mahadasha neutral, Venus Antardasha sadhaka promoter, Rahu Pratyantardasha node neutral that doubles the result of Moon by LP-057-2, Rahu Sookshma node neutral, Moon Prana neutral. Sun is badhaka, Mercury and Saturn are the yogakarakas by LP-085-5, Jupiter is badhaka.
+
+S7. TRANSIT VALIDATION
+On 17 November 2026 Saturn is in Pisces retrograde, house 6 from the Lagna and house 5 from the Moon. Jupiter is in Leo, house 11 from the Lagna and house 10 from the Moon, and turns retrograde on 12 December 2026 before entering Cancer on 29 January 2027. Rahu is in Aquarius, house 5, and Ketu in Leo, house 11, both retrograde, and they change sign on 20 December 2026. The Sun is in Scorpio over the natal Sun Moon Mercury stellium.
+Jupiter in Leo, the 11th from the Lagna, does not touch the children house. The Rahu Ketu axis moves over the 5th and 11th on 20 December 2026.
+
+S8. RECONCILIATION OF SECTIONS
+Sections agreed that the children are sons and not daughters. They differ on the number. The tally gives one son and two sons the same 48, because the same planets Jupiter and Saturn carry both.
+HYPOTHESIS SCORES from prepare.js, Has a child score 48 against null 40.6, z 0.42, above the null mean, read as yes. The z reading is provisional and was found after known answers. The number of children has no validated rule.
+EVIDENCE TALLY A 48, B 48, C 22
+TIE BREAK Options A and B tie at 48 and favour weight 95.7 each. The deciding step is the subject varga link count, METHODOLOGY section 5.4 step 6, the D7 5th house holds two planets Jupiter and Saturn, two links, so B Two sons wins.
+COUNTER EVIDENCE Jupiter the karaka and Saturn the 5th lord are both weak in the 12th, which points to a single child, option A, and the number of children has no validated rule.
+ENGINE VERSION 2.0 degree true, nakshatra true, node bands true
+
+S9. SUMMARY
+Analysis recap. S1 dominant house does not lord house 5. S2 male planets carry the 5th and daughters planets are weak. S3 D9 neutral. S4 D7 5th house Jupiter and Saturn, two male planets. S5 sons side stronger. S6 children already born. S7 nodes move on 20 December 2026. S8 tally A 48, B 48, tie broken by D7 count.
+FINAL ANSWER B
+
+• Jupiter and Saturn, both male planets, hold the D7 5th house together, and the daughter planets Moon and Venus are weak and hemmed.
+• Option A ties on the tally and the D7 count of two planets in the child house breaks the tie, the number of children has no validated rule in this engine.
+• Final answer B Two sons

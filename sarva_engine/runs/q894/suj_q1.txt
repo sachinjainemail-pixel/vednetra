@@ -1,0 +1,49 @@
+S0. INTAKE AND TIME FRAME
+Native Q894, female, born 8 December 1980 at 04 hours 38 minutes in Mehsana Gujarat, latitude 23.588 north, longitude 72.3693 east, time zone 5.5. Ayanamsha Lahiri 23.5954, whole sign houses, Libra Lagna 18.19 degrees, mean nodes. The Lagna is 1.8 degrees from a nakshatra boundary, so the birth time is flagged as sensitive.
+Question 1 Education, Educational Qualification. Options A Gynecologist, B Pediatrician, C Dentist, D Skin specialist. As of date 17 November 2026 from the system clock.
+
+S1. DOMINANT HOUSE
+Lagna chart. House 2 Scorpio is the dominant house with three planets, Sun 22.43 degrees Jyeshtha pada 2, Moon 26.49 degrees Jyeshtha pada 3 and Mercury 9.68 degrees Anuradha pada 2. House 12 Virgo is the secondary stellium with Jupiter and Saturn. The Moon chart and the Sun chart both show the same three planets as a stellium in their house 1 Scorpio, so the finding holds in all three charts.
+Sun is lord of 11 with natural soul, authority, bones, heart. Moon is lord of 10 with natural mind, mother, fluids, nourishment, debilitated and combust. Mercury is lord of 9 and 12 with natural intellect, speech, learning, combust. House 2 gives the area, wealth, family, speech, food, face and eyes, early childhood. The three planets deliver it by their own significations and the combust Moon and Mercury deliver weakly.
+Link to the question. The education house 4 Capricorn is not the dominant house, its lord Saturn sits in house 12. The dominant house planets lord houses 9, 10, 11 and 12 and so reach education through Mercury, lord of 9 and 12, in the dominant house, which the methodology counts as a link of the question house lord class. The dominant house 2 carries face, mouth and speech, which names the area of the work.
+
+S2. D1 ANALYSIS
+Libra Lagna, Lagna lord Venus in the Lagna in own sign, Malavya yoga, with Paap Kartari by Saturn in 12 and the Sun in 2. Medicine as the field is shown by Mars, lord of 2 and 7 in house 3 aspecting houses 6, 9 and 10, by Jupiter lord of 6 in the 12th hospital house with Vipreeta support, and by the Sun, Moon and Mercury in house 2. Mercury, lord of 9, and the Moon, lord of 10, are combust and the Moon is debilitated with Neechabhanga, so the degree is earned late and with effort.
+The four options are four specialities. The library holds no rule that names a speciality. The planets are mapped by the natural significations of significations.json. Gynecology maps to Venus women and the Moon fluids. Pediatrics maps to Jupiter children. Dentistry maps to house 2 face and mouth, so to Mars its lord and to the three occupants. Skin maps to Mercury and Venus beauty. Jupiter in an enemy sign in the 12th and the Moon debilitated and combust weaken the first two, and Venus is hemmed by Paap Kartari.
+RULES CITED LP-065-1, LP-072-3, S-N18-007, S-N18-008, S-N20-011. The library holds no rule that names a medical speciality, so the speciality is decided on the dominant house and the tally and this is stated as thin evidence.
+
+S3. D9 ANALYSIS
+Navamsa Lagna Pisces. Sun Capricorn house 11, Moon Aquarius house 12, Mars and Mercury together in Virgo house 7, Jupiter Venus and Saturn together in Taurus house 3, Rahu Capricorn house 11, Ketu Cancer house 5. Mercury is exalted in Virgo in D9 and so carries the strongest D9 dignity, the Sun is in an enemy sign and the Moon is in a neutral sign.
+D9 supports the medical field through Mars and Mercury together in the 7th house Virgo, the sign of health and treatment, and does not separate the four specialities.
+
+S4. SUBJECT DIVISIONAL CHART ANALYSIS
+D24 education chart. Lagna Libra with Mars in the Lagna, Mercury and Venus in the 5th Aquarius, Sun in 3rd Sagittarius, Moon in 7th Aries, Rahu and Ketu in the 2nd Scorpio, Jupiter in the 8th, Saturn in the 9th. The 2nd lord Mars sits in the D24 Lagna and the 2nd house of face and mouth holds the nodes, so the D24 repeats the house 2 theme. Mars and Mercury in good D24 houses, Jupiter in the 8th is weak.
+
+S5. PLANET STRENGTH AND CONFLICT RESOLUTION
+Real strength S from strength_tally.js, Sun 53.8, Moon 53.2, Mars 62, Mercury 72.1, Jupiter 38.9, Venus 48.3, Saturn 56.8. Rahu 53.2 takes the Moon and Ketu 49.4 takes Saturn. Shadbala percent Sun 108, Moon 98, Mars 147, Mercury 94, Jupiter 86, Venus 112, Saturn 130.
+Conflict between Venus and Moon for gynecology and the house 2 group of Mars, Sun, Mercury and Moon for dentistry. Venus 48.3 is carried down by the Paap Kartari harm of Saturn 56.8 and Sun 26.9. The house 2 group has the larger favour weight 73.7 against 18.7 of its own weakness. Mars at 62 is the strongest carrier and has no weakness flag. The more powerful side enforces its result.
+
+S6. DASHA AND TIME STATUS
+Past periods first. Mercury dasha to 1985, Ketu dasha 1985 to 1992, Venus dasha 1992 to 2012, Sun dasha 2012 to 2018. Running Moon Mahadasha 31 May 2018 to 30 May 2028, Venus Antardasha 31 March 2026 to 29 November 2027, Rahu Pratyantardasha 4 November 2026 to 3 February 2027, Rahu Sookshma, Moon Prana. Future Moon Sun Antardasha 29 November 2027 to 30 May 2028, then Mars Mahadasha from 30 May 2028.
+TIME STATUS ALREADY HAPPENED. The qualification was gained long ago, the age 19 to 28 windows in Venus Rahu, Venus Jupiter and Venus Saturn carry the 4th, 5th and 9th house significators.
+WINDOW SCAN strict scan of education found 98 windows, 80 past, 0 running, 18 future. The past grade A windows of ages 19.5 to 24.5 in Venus Rahu, Venus Jupiter and Venus Saturn were weighed and they fit a degree gained in the twenties. The 18 future windows from June 2027 are weighed as further study only. A window is a candidate and not proof.
+DASHA LORDS Moon Mahadasha neutral, Venus Antardasha sadhaka promoter, Rahu Pratyantardasha node neutral that doubles the result of Moon by LP-057-2, Rahu Sookshma node neutral, Moon Prana neutral. Sun is badhaka, Mercury and Saturn are the yogakarakas by LP-085-5, Jupiter is badhaka.
+
+S7. TRANSIT VALIDATION
+On 17 November 2026 Saturn is in Pisces retrograde, house 6 from the Lagna and house 5 from the Moon. Jupiter is in Leo, house 11 from the Lagna and house 10 from the Moon, and turns retrograde on 12 December 2026 before entering Cancer on 29 January 2027. Rahu is in Aquarius, house 5, and Ketu in Leo, house 11, both retrograde, and they change sign on 20 December 2026. The Sun is in Scorpio over the natal Sun Moon Mercury stellium.
+Jupiter in Leo in the 11th from the Lagna supports gains from the field in the running Venus period. The transit does not name a speciality.
+
+S8. RECONCILIATION OF SECTIONS
+Sections agreed that the field is medical, from Mars, Jupiter 6th lord and the dominant house group. They differ on the speciality. The dominant house rule carries the weight, because it counts the planets of house 2 as the carriers of the life theme and house 2 is the house of face and mouth, so the dentistry option collects the four dominant house planets while gynecology depends on two planets of which one is debilitated and combust and the other is hemmed.
+HYPOTHESIS SCORES from prepare.js, Education exists score 37 against null 43, z minus 0.7, below the null mean. The z reading is provisional and was found after known answers. It concerns whether education exists and does not rank the four specialities.
+EVIDENCE TALLY A 21, B 42, C 80, D 25
+COUNTER EVIDENCE The Moon, lord of 10, debilitated and combust, is the natural carrier of women and fluids and Scorpio is the sign of the reproductive organs, which points to gynecology, and the tally gives it only 21 because Venus is hemmed by Paap Kartari. The dentistry link rests on house 2 face and mouth, which is the analyst mapping and not a library rule.
+ENGINE VERSION 2.0 degree true, nakshatra true, node bands true
+
+S9. SUMMARY
+Analysis recap. S1 house 2 dominant with Sun, Moon, Mercury. S2 medical field by Mars, Jupiter and the stellium. S3 D9 Mars and Mercury in Virgo. S4 D24 Mars in Lagna and nodes in 2nd. S5 house 2 group stronger than the Venus and Moon pair. S6 qualification already gained. S7 Jupiter in 11th supports. S8 tally Dentist 80.
+FINAL ANSWER C
+
+• Dominant house 2 of face and mouth holds Sun, Moon and Mercury and its lord Mars is the strongest planet in the D24 Lagna.
+• Gynecology is held back by a debilitated combust Moon and a hemmed Venus, the evidence on the speciality is thin and the qualification itself is already complete.
+• Final answer C Dentist

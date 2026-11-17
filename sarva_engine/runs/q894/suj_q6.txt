@@ -1,0 +1,49 @@
+S0. INTAKE AND TIME FRAME
+Native Q894, female, born 8 December 1980 at 04 hours 38 minutes in Mehsana Gujarat, latitude 23.588 north, longitude 72.3693 east, time zone 5.5. Ayanamsha Lahiri 23.5954, whole sign houses, Libra Lagna 18.19 degrees, mean nodes. The Lagna is 1.8 degrees from a nakshatra boundary, so the birth time is flagged as sensitive.
+Question 6 Present status of the parents. Options A Only mother alive, B Only father alive, C Both alive. As of date 17 November 2026 from the system clock.
+
+S1. DOMINANT HOUSE
+Lagna chart. House 2 Scorpio is the dominant house with three planets, Sun 22.43 degrees Jyeshtha pada 2, Moon 26.49 degrees Jyeshtha pada 3 and Mercury 9.68 degrees Anuradha pada 2. House 12 Virgo is the secondary stellium with Jupiter and Saturn. The Moon chart and the Sun chart both show the same three planets as a stellium in their house 1 Scorpio, so the finding holds in all three charts.
+Sun is lord of 11 with natural soul, authority, bones, heart. Moon is lord of 10 with natural mind, mother, fluids, nourishment, debilitated and combust. Mercury is lord of 9 and 12 with natural intellect, speech, learning, combust. House 2 gives the area, wealth, family, speech, food, face and eyes, early childhood. The three planets deliver it by their own significations and the combust Moon and Mercury deliver weakly.
+Link to the question. The 4th house of the mother Capricorn and the 9th house of the father Gemini are not dominant. The Sun, karaka of the father, and the Moon, karaka of the mother, are two of the three planets of the dominant house 2, and the 9th lord Mercury sits there as well, so the dominant house planets carry both parents and the finding is a major weight.
+
+S2. D1 ANALYSIS
+Father. The 9th house Gemini is empty, its lord Mercury is combust in the 2nd, the Sun the karaka of the father sits in the 2nd and is aspected by Saturn from the 12th and Rahu from the 10th. The 10th from the 9th, the 6th house, holds no planet.
+Mother. The 4th house Capricorn holds Ketu and its lord Saturn is in the 12th. The Moon, karaka of the mother, is debilitated and combust in the 2nd with Neechabhanga, aspected by Saturn and Rahu. The natal indications of both parents are damaged and equal in kind. Jupiter, the natural protector, aspects the 4th house with Ketu and the 8th house, and Moon and Sun are in the same sign, so the damage is shared.
+RULES CITED LP-085-8, S-N18-007, S-N18-008. The library holds no rule that fixes whether a parent is alive on a given date, the status rests on the tally and the dasha test and is thin. The engine has no validated rule for parents.
+
+S3. D9 ANALYSIS
+Navamsa Lagna Pisces. Sun Capricorn house 11, Moon Aquarius house 12, Mars and Mercury together in Virgo house 7, Jupiter Venus and Saturn together in Taurus house 3, Rahu Capricorn house 11, Ketu Cancer house 5. Mercury is exalted in Virgo in D9 and so carries the strongest D9 dignity, the Sun is in an enemy sign and the Moon is in a neutral sign.
+D9 Sun in Capricorn house 11 and Moon in Aquarius house 12. The Moon in the 12th of D9 weakens the mother's karaka and the Sun in the 11th supports the father's karaka. Jupiter with Saturn and Venus in the 3rd Taurus.
+
+S4. SUBJECT DIVISIONAL CHART ANALYSIS
+D12 parents chart. Lagna Taurus. The Sun and Mars and Venus in the 3rd Cancer, the Moon and Ketu in the 5th Virgo, Mercury Jupiter and Saturn in the 10th Aquarius, Rahu in the 11th Pisces. The 4th house of D12 Leo is empty and the 9th house Capricorn is empty. Neither parent house of D12 is occupied by a malefic, so the D12 shows no loss in either house.
+
+S5. PLANET STRENGTH AND CONFLICT RESOLUTION
+Real strength S from strength_tally.js, Sun 53.8, Moon 53.2, Mars 62, Mercury 72.1, Jupiter 38.9, Venus 48.3, Saturn 56.8. Rahu 53.2 takes the Moon and Ketu 49.4 takes Saturn. Shadbala percent Sun 108, Moon 98, Mars 147, Mercury 94, Jupiter 86, Venus 112, Saturn 130.
+Conflict between Sun and Moon for each parent and Saturn and Rahu as the damaging planets. Saturn S 56.8 is the strongest damaging planet and aspects both karakas equally. Jupiter 38.9 protects both. Rahu has the strength of the Moon, 53.2. Because the harm falls on both karakas equally, it does not separate a parent that is lost from a parent that lives.
+
+S6. DASHA AND TIME STATUS
+Past periods first. Mercury dasha to 1985, Ketu dasha 1985 to 1992, Venus dasha 1992 to 2012, Sun dasha 2012 to 2018. Running Moon Mahadasha 31 May 2018 to 30 May 2028, Venus Antardasha 31 March 2026 to 29 November 2027, Rahu Pratyantardasha 4 November 2026 to 3 February 2027, Rahu Sookshma, Moon Prana. Future Moon Sun Antardasha 29 November 2027 to 30 May 2028, then Mars Mahadasha from 30 May 2028.
+TIME STATUS HAPPENING NOW. The status of the parents is a present state and the running Moon Venus Rahu period is the test period.
+WINDOW SCAN strict scan of father loss found 98 windows, 80 past, 0 running, 18 future, and strict scan of mother loss found 79 windows, 75 past, 0 running. Too many windows are past, so a window is only a candidate and not proof of loss. The running period has no strict window for either parent and the next one for the father opens on 4 June 2027.
+DASHA LORDS Moon Mahadasha neutral, Venus Antardasha sadhaka promoter, Rahu Pratyantardasha node neutral that doubles the result of Moon by LP-057-2, Rahu Sookshma node neutral, Moon Prana neutral. Sun is badhaka, Mercury and Saturn are the yogakarakas by LP-085-5, Jupiter is badhaka.
+
+S7. TRANSIT VALIDATION
+On 17 November 2026 Saturn is in Pisces retrograde, house 6 from the Lagna and house 5 from the Moon. Jupiter is in Leo, house 11 from the Lagna and house 10 from the Moon, and turns retrograde on 12 December 2026 before entering Cancer on 29 January 2027. Rahu is in Aquarius, house 5, and Ketu in Leo, house 11, both retrograde, and they change sign on 20 December 2026. The Sun is in Scorpio over the natal Sun Moon Mercury stellium.
+Saturn in Pisces in the 6th from the Lagna and 5th from the Moon and Jupiter in the 11th from the Lagna do not transit over the Sun or the Moon. Rahu in Aquarius and Ketu in Leo do not touch the parents karakas. No transit signals a loss now.
+
+S8. RECONCILIATION OF SECTIONS
+Sections agreed that both parents karakas are damaged equally by Saturn and Rahu and that no running window opens for either. They differ on nothing that separates the parents. The tally therefore gives the lead to the option in which both karakas are carriers and Jupiter protects both.
+HYPOTHESIS SCORES from prepare.js give no parents yes or no score for this question. The parents status has no validated rule in this engine.
+EVIDENCE TALLY A 12, B 27, C 47
+COUNTER EVIDENCE Saturn at S 56.8 and Rahu aspect the Sun, Moon and Mercury group and the 4th house holds Ketu, which points to a loss on at least one side, and no option reaches 50.
+ENGINE VERSION 2.0 degree true, nakshatra true, node bands true
+
+S9. SUMMARY
+Analysis recap. S1 both karakas in the dominant house. S2 equal damage on both. S3 D9 Moon weak. S4 D12 parent houses empty. S5 Saturn damages both equally. S6 present state, no running window. S7 no transit over the karakas. S8 tally C 47.
+FINAL ANSWER C
+
+• The Sun and Moon karakas share one sign and the same Saturn and Rahu damage, and no running window or transit opens a loss for either parent.
+• The evidence is thin, no option reaches 50 and the engine has no validated parents rule, the natal damage is capacity and not proof of loss.
+• Final answer C Both alive

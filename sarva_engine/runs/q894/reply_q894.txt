@@ -1,0 +1,199 @@
+INTAKE
+Native Q894, a woman, born 8 December 1980 at 04 hours 38 minutes 00 seconds in Mehsana Gujarat, latitude 23.588 north, longitude 72.3693 east, time zone 5.5 hours east. Libra Lagna at 18.19 degrees on Lahiri. The as of date is 17 November 2026 from the system clock. The running period is Moon Mahadasha, Venus Antardasha, Rahu Pratyantardasha. Six questions, Q1 education, Q2 present profession, Q3 number of brothers and sisters including the native, Q4 children, Q5 profession of the husband, Q6 present status of the parents.
+LIMITS Readings under each methodology and not certainties. The Lagna is 1.8 degrees from a nakshatra boundary, so the birth time is sensitive within about 7 minutes, and the time was not rectified. KCIL found 10 of 12 cusp sub sub lords unstable within 30 seconds, two of its six rectification tests fail and no relative birth dates were supplied. KP Pro was read at a grain of 300 seconds and no separate plus and minus 5 minute recast was run. BNN departments for education, profession, siblings, children and parents sit at or below their best fixed answer in the owner's record. The medical speciality options of Q1 and Q5 are not named in the rule base of KP Pro, KCIL, SUJ or BNN, so those cells rest on the nearest signification and carry thin evidence. Udu and Quad Dasha are not run, their rule files are not installed.
+
+QUESTION Q1 Education, A Gynecologist, B Pediatrician, C Dentist, D Skin specialist
+OPTIONS Q1 A B C D
+
+METHOD KPPRO Q1
+Placidus cusps on the KP ayanamsa. The 10th cusp sub lord is Venus in the star of Jupiter, signifying 6, 8 and 11 and ruling the female reproductive system. Higher education promise reads STRONG. The Sun and Moon stand in Jyeshtha, whose KP star table gives ovaries and genitals. Cusp 2 sub lord Mercury and cusp 5 sub lord Saturn do not point to teeth or children. Declared conflict, the KP Pro occurrence row reads not yet for higher education, while the question shows a completed degree, so the cell answers the branch only.
+EVIDENCE Q1 KPPRO 10th sub lord Venus signifies 6 8 11, education promise STRONG, branch by Venus and Jyeshtha star, MEDIUM, CHART DECIDED
+RESULT Q1 KPPRO A
+METHOD KCIL Q1
+Khullar chart, Lagna Libra, Lagna SSL Mars. Higher education main cusps 4 and 9 with 11 supporting. Cusp 4 SSL Jupiter reaches 1 2 4 8 9 10 12 by star, 7 by Rahu sub and 11 by Venus sub sub, and is the star lord of cusp 5. Cusp 9 SSL Moon reaches 2 5 6 11 by star. The subject table of KAL 118 gives gynaecology to cusps 5, 7 and 11, which three are reached, paediatrics only to 5, dentistry only to 2 and dermatology only to 8.
+EVIDENCE Q1 KCIL TWO CANDIDATES, cusp 4 SSL flips to Saturn in 5.3 seconds and cusp 9 SSL flips to Venus in 0.5 seconds, both keep cusps 5 and 11, the other candidate gives the same option
+RESULT Q1 KCIL A
+METHOD SUJ Q1
+Dominant house 2 Scorpio with Sun, Moon and Mercury, secondary house 12 with Jupiter and Saturn. Mars, lord of 2, in the D24 Lagna and the nodes in the D24 2nd. The house 2 group of face and mouth collects Mars, Sun, Mercury and Moon, 73.7 for against 18.7 against. Gynecology rests on Venus and a debilitated combust Moon with Venus hemmed by Paap Kartari. No library rule names a speciality, so the evidence is thin.
+SUJ FILE Q1 sarva_engine/runs/q894/suj_q1.txt
+EVIDENCE Q1 SUJ tally A 21, B 42, C 80, D 25, counter evidence is the Moon as 10th lord and natural carrier of women and fluids
+RESULT Q1 SUJ C
+METHOD CHAWDHRI Q1
+Education promise 31 Weak, adverse indicators 67 percent at medium trust, D24 62 Medium, Budha Aditya and Dharma Karmadhipati yogas present. The running dasha tie is 2.54 against a cutoff of 4.3, closed, and 6 past firing windows from age 9 to 36 show the degree could already be done. Natural words of the Moon in Jyeshtha are child, conception, impregnation and infants, and Chawdhri says the Moon governs the reproductive organs and child birth in a woman's chart and that the Moon in the 2nd benefits doctors. The Sutton layer gives no second opinion and is thin here.
+EVIDENCE Q1 CHAWDHRI Moon as 10th lord with reproductive and child birth words and the doctors rule for the Moon in the 2nd, promise 31 Weak and dasha gate read together, the branch is thin
+RESULT Q1 CHAWDHRI A
+METHOD BNN Q1
+Education karaka Mercury sits in Scorpio with Mars in the sign after it, which RAO-EDU-005 names as the subject of study. Mercury with Mars gives science, engineering and medicine by ARI-LIF-015. Mars governs teeth by AVA-HLT-006 and RAO-KRK-107. Mercury has the 12th place from it occupied by Venus and Mars in the 2nd, the broken education flags of RAO-EDU-001, RAO-EDU-002 and RAO-EDU-009 are not met in full. The rule base names no gynecology, pediatrics or skin register, so those options are not given the nearest planet silently.
+EVIDENCE Q1 BNN OPEN RAO-EDU-005 ARI-LIF-015 AVA-HLT-006 RAO-KRK-107, education is at or below its best fixed answer, the register names only the teeth link
+RESULT Q1 BNN C
+METHOD UDU Q1
+EVIDENCE Q1 UDU nine corpus files not installed
+RESULT Q1 UDU NOT RUN UDU RULES MISSING
+METHOD QUAD Q1
+EVIDENCE Q1 QUAD full methodology file not installed
+RESULT Q1 QUAD NOT RUN QUAD RULES MISSING
+
+QUESTION Q2 Present profession, A Private job, B Government job, C Own business
+OPTIONS Q2 A B C
+
+METHOD KPPRO Q2
+Career promise STRONG and occurrence happened. The 10th sub lord Venus stands in the star of Jupiter, which owns 3 and 6, sits in 11 and has Rahu in its sub, so the signified set is 6, 10, 11, 2 and 3, the service group. House 7 is not signified and the Sun is not linked to the 10th chain, so neither business nor government is shown.
+EVIDENCE Q2 KPPRO career promise STRONG, service group 6 10 11 without 7, no Sun link, LOW, CHART DECIDED
+RESULT Q2 KPPRO A
+METHOD KCIL Q2
+Profession main cusp 10 with 2, 6 and 11 supporting. Cusp 10 SSL Rahu reaches 1 2 5 6 9 10 11 12 by its star lord Mercury and has Positional Status. House 6 is service and house 10 is authority and government, house 7 as private company employment or business is absent. At the recorded time the SSL is Rahu.
+EVIDENCE Q2 KCIL TWO CANDIDATES, cusp 10 SSL flips to Mars in 14.2 seconds earlier and to Jupiter in 65.6 seconds later, the Mars candidate reaches 7 and gives own business, the cell is the recorded time candidate
+RESULT Q2 KCIL B
+METHOD SUJ Q2
+Dominant house 2 lords the 10th and 11th through Moon and Sun. Sun the natural planet of government and Rahu in the 10th carry the government reading, 66.4 for against 57.8 against. Saturn and Jupiter in the 12th lose weight for private service, and Venus is hemmed for business. D10 has the Sun in the 11th and Saturn with Rahu in the 6th. Strict window scan shows no running and no future window.
+SUJ FILE Q2 sarva_engine/runs/q894/suj_q2.txt
+EVIDENCE Q2 SUJ tally A 39, B 53, C 34, counter evidence is Venus in own sign and Mars lord of 7 for own enterprise
+RESULT Q2 SUJ B
+METHOD CHAWDHRI Q2
+Career promise 43 Weak, adverse indicators only 20 percent at low trust, D10 56 Medium. Rahu carries the natural word government and Chawdhri says Rahu in Cancer gives gain from Government, Sun in the 2nd in Scorpio gives an officer, well paid with a good position in a firm. The words business and financier come from Venus through the Jupiter star. The running tie is 4.24 against a cutoff of 4.21, so the period is just open, and the Sutton layer supports the Moon Venus window.
+EVIDENCE Q2 CHAWDHRI Rahu government word and the Sun in the 2nd officer rule against Venus business words, promise 43 Weak and the gate just open
+RESULT Q2 CHAWDHRI B
+METHOD BNN Q2
+Profession is read from Saturn by ARI-LIF-014 and RAO-PRF-002. Saturn stands in Virgo, its 2nd place Libra holds Venus, and the 7th Pisces and 12th Leo are empty. NEG-PRF-002 gives service to a frame with the Sun or Moon and own business to a frame with Venus, so the frame names Venus and own business. The Sun is not in the frame, which closes the government paths of SAK-SUN-005 and RAO-PRF-014.
+EVIDENCE Q2 BNN POSSIBLE NEG-PRF-002 ARI-LIF-014 RAO-PRF-002, profession is at or below its best fixed answer
+RESULT Q2 BNN C
+METHOD UDU Q2
+EVIDENCE Q2 UDU nine corpus files not installed
+RESULT Q2 UDU NOT RUN UDU RULES MISSING
+METHOD QUAD Q2
+EVIDENCE Q2 QUAD full methodology file not installed
+RESULT Q2 QUAD NOT RUN QUAD RULES MISSING
+
+QUESTION Q3 Number of brothers and sisters including the native, A One sister and one brother, B Two sisters and one brother, C One sister and two brothers
+OPTIONS Q3 A B C
+
+METHOD KPPRO Q3
+Sibling promise UNDECIDED in KP Pro. The 3rd sub lord Rahu does not signify 3 or 11. The KP Pro prior is flat over the three options at 11.5 percent each, so it cannot separate them. The significators of 3 are Mars, Venus and Jupiter and of 11 are Sun, Mercury, Venus, Jupiter and Saturn. Male planets outnumber the single female planet Venus, so a second brother is shown beside the native as the one sister.
+EVIDENCE Q3 KPPRO NET UNDECIDED, prior flat at 11.5 percent each, significator count of 3 and 11 only breaks the tie, LOW, PRIOR DOMINANT
+RESULT Q3 KPPRO C
+METHOD KCIL Q3
+Younger co-born from cusp 3 and elder from cusp 11. Cusp 3 SSL Rahu reaches 3 by its sub and cusp 11 SSL Mercury reaches 11, so both a younger and an elder co-born are promised. KTL 103 gives the sex from the sign and the half of the arc. Cusp 3 is a male sign with the arc at 0.62 percent, first half, a brother. Cusp 11 is a male sign with the arc at 39.21 percent, first half, a brother. The native is the sister.
+EVIDENCE Q3 KCIL TWO CANDIDATES, cusp 3 SSL flips to Moon in 0.5 seconds which would make the younger co-born a sister and give option B, the cell is the recorded time candidate
+RESULT Q3 KCIL C
+METHOD SUJ Q3
+Mars alone and unaspected in the 3rd, 3rd lord Jupiter weak in the 12th, Sun the 11th lord in the dominant house. D3 has Mars in own sign in the 3rd and the Sun and Moon in the 6th. Male planets Mars and Sun give C 41.9 for, against Jupiter and Sun weakness. All scores are low, the lead is 3 points, and the number of siblings has no validated rule.
+SUJ FILE Q3 sarva_engine/runs/q894/suj_q3.txt
+EVIDENCE Q3 SUJ tally A 18, B 29, C 32, counter evidence is the single planet in the 3rd and the weak 3rd lord pointing to the smallest family
+RESULT Q3 SUJ C
+METHOD CHAWDHRI Q3
+Sibling promise 35 Weak, adverse 50 percent at medium trust, D3 38 Weak, no event gate is computed for siblings. Mars alone in the 3rd in a masculine sign, Chawdhri says few brothers, brothers die, and devoid of brothers comforts for the 2nd and 7th lord in the 3rd. The 3rd lord Jupiter in the 12th. The Sutton layer gives no second opinion. The smallest family fits the weak promise.
+EVIDENCE Q3 CHAWDHRI promise 35 Weak with the few brothers rule for Mars in a masculine sign in the 3rd, no gate, thin
+RESULT Q3 CHAWDHRI A
+METHOD BNN Q3
+RAO-DOM-012 counts siblings from Mars, its own sign, 2nd, 7th, 8th, 10th and 12th, which holds Mars, Jupiter, Saturn, Sun, Moon and Mercury, raw count 6 with Ketu not counted. Nothing stands behind Jupiter in Leo, so by RAO-DOM-014 and RAO-DOM-019 the native is the eldest and all siblings are younger. RAO-DOM-033 names Venus, Mars and Mercury, Mars and Mercury stand in the frame and Venus does not. The frame has five male bodies and one female, so after the era scale of guide section 15 the count of two brothers fits better than a second sister.
+EVIDENCE Q3 BNN POSSIBLE RAO-DOM-012 RAO-DOM-014 RAO-DOM-019 RAO-DOM-033 BNG-DIR-003, siblings are at or below the best fixed answer
+RESULT Q3 BNN C
+METHOD UDU Q3
+EVIDENCE Q3 UDU nine corpus files not installed
+RESULT Q3 UDU NOT RUN UDU RULES MISSING
+METHOD QUAD Q3
+EVIDENCE Q3 QUAD full methodology file not installed
+RESULT Q3 QUAD NOT RUN QUAD RULES MISSING
+
+QUESTION Q4 Children, A One son, B Two sons, C Two daughters
+OPTIONS Q4 A B C
+
+METHOD KPPRO Q4
+KP Pro children promise reads ABSENT with a determinate verdict. The 5th sub lord Saturn signifies 2, 5 and 11 but also 4 and 10, which deny, so the chart allows at most a reduced result. The sign of the 5th cusp is Aquarius, an odd sign, and Saturn is a male planet, so a son is shown and no second child is shown. The question lists only options with children, so the cell takes the smallest male result.
+EVIDENCE Q4 KPPRO promise ABSENT with 2 5 11 against 4 10, reduced to one male child, LOW, CHART DECIDED
+RESULT Q4 KPPRO A
+METHOD KCIL Q4
+First child from cusp 5, second from cusp 7. Cusp 5 SSL Mercury reaches 5 and 11 but not 2, so the first child is promised in part. A child's sex has no rule register. The nearest real rule is the sex test of KCIL-KTL-103 applied to the child's cusp, cusp 5 is Aquarius a male sign with the arc at 76.36 percent, second half, which reads a daughter. Cusp 7 is Aries with the arc at 43.08 percent, first half, a son. The first child decides the first cell and only the daughter option holds a daughter.
+EVIDENCE Q4 KCIL NO RULE REGISTER for a child's sex, nearest rule KCIL-KTL-103 on cusp 5, the cusp 5 SSL also flips to Ketu in 16.6 seconds
+RESULT Q4 KCIL C
+METHOD SUJ Q4
+Children house 5 empty, its lord Saturn and the karaka Jupiter together in the 12th, both male planets. D7 5th house Gemini holds Jupiter and Saturn, two male planets in an odd sign, and the female planets Moon and Venus are weak and hemmed, 25.6 for against 92.7. One son and two sons tie at 48 and the D7 count of two planets breaks the tie. The number of children has no validated rule.
+SUJ FILE Q4 sarva_engine/runs/q894/suj_q4.txt
+EVIDENCE Q4 SUJ tally A 48, B 48, C 22, TIE BREAK by the two planets in the D7 5th, counter evidence is the weakness of Jupiter and Saturn in the 12th
+RESULT Q4 SUJ B
+METHOD CHAWDHRI Q4
+Children promise 45 Conditional, adverse indicators 100 percent at high trust, D7 54 Medium. Chawdhri says Rahu in the 10th gives few sons, the Moon in the 2nd words are child and infants, and Jupiter the male child significator is in the 12th. Past firing windows exist in Moon Rahu 2019 to 2021, so a child may be already born. The Sutton layer opposes at minus 0.27 and agrees on timing. Few sons gives one son.
+EVIDENCE Q4 CHAWDHRI promise 45 Conditional with the few sons rule for Rahu in the 10th, past window Moon Rahu, Sutton opposes
+RESULT Q4 CHAWDHRI A
+METHOD BNN Q4
+Guide 16.4. Marriage is taken as given by Q5. SAK-JUP-032 counts planets in and aspecting the 5th from Jupiter, which is Capricorn with Ketu not counted. Mars, Jupiter and Saturn aspect it and all three give sons by the sex rule, with Saturn and Mars not together so no child is removed. RAO-DOM-010 puts only Venus in the 2nd from Jupiter, one daughter indicator against three son indicators. After the era scale the count falls to two and the ratio is sons.
+EVIDENCE Q4 BNN POSSIBLE SAK-JUP-032 RAO-DOM-010 RAO-DOM-027 RAO-FND-026, children are at or below the best fixed answer
+RESULT Q4 BNN B
+METHOD UDU Q4
+EVIDENCE Q4 UDU nine corpus files not installed
+RESULT Q4 UDU NOT RUN UDU RULES MISSING
+METHOD QUAD Q4
+EVIDENCE Q4 QUAD full methodology file not installed
+RESULT Q4 QUAD NOT RUN QUAD RULES MISSING
+
+QUESTION Q5 Profession of the husband, A Physician, B Orthopedic surgeon, C General surgeon
+OPTIONS Q5 A B C
+
+METHOD KPPRO Q5
+The husband is read from the 7th cusp and his 10th is the native's 4th cusp. Cusp 4 is Capricorn, sign lord Saturn, star lord Moon, sub lord Ketu, which gives bones and joints with cutting. Cusp 7 sub lord is Rahu in the star of Venus. The 6th sub lord is the Sun, the KP planet of medicine. The sign of the husband's work points to the bone and joint side of surgery.
+EVIDENCE Q5 KPPRO husband 10th cusp 4 in Capricorn with sub lord Ketu and sign lord Saturn, 6th sub lord Sun for medicine, LOW, CHART DECIDED
+RESULT Q5 KPPRO B
+METHOD KCIL Q5
+Spouse frame rotates the 7th to the Lagna, so the husband's 10th is cusp 4, his 8th is cusp 2 and his 6th is cusp 12. The event matrix gives surgeons 8 and 10 with 2 and 11 supporting, and medical practitioners 6 or 8 with 10. Cusp 4 SSL Jupiter reaches cusps 2 and 4 by its star and 2 again by its sub, his 8th, 10th and 2nd, which is the surgeon row. The orthopaedic and general surgery split is not in the matrix.
+EVIDENCE Q5 KCIL TWO CANDIDATES, cusp 4 SSL flips to Saturn in 5.3 seconds and to Rahu 19.5 seconds earlier, both reach the same surgeon cusps
+RESULT Q5 KCIL C
+METHOD SUJ Q5
+The husband's 8th house is the dominant house 2 holding Sun, Moon and Mercury. Mars is lord of 7, the natural karaka of the husband and of surgery, strong at S 62 with no weakness flag, and sits in the D9 7th with Mercury exalted. Saturn for bones and Jupiter for medicine are both weak in the 12th. General surgeon 89, orthopedic 52, physician 51.
+SUJ FILE Q5 sarva_engine/runs/q894/suj_q5.txt
+EVIDENCE Q5 SUJ tally A 51, B 52, C 89, counter evidence is Saturn the husband's 10th lord in his 6th pointing to the bone side
+RESULT Q5 SUJ C
+METHOD CHAWDHRI Q5
+Marriage promise 47 Weak, favourable indicators 33 percent at low trust, D9 47 Weak. Chawdhri names Mars as the husband's significator in a woman's chart and gives it operations, cuts, wounds and surgery, and Mars is the 7th lord placed in the 3rd of skill. The Sutton layer is thin for this question. The books give no orthopaedic rule. Mars points to the surgeon.
+EVIDENCE Q5 CHAWDHRI Mars as husband significator with surgery words and 7th lord in the 3rd, promise 47 Weak, thin
+RESULT Q5 CHAWDHRI C
+METHOD BNN Q5
+The husband karaka of a woman is Mars by guide 16.3 and BNG-DIR-003. Rahu and Ketu both touch Mars by their retrograde aspect and Mars also looks at Ketu. NEG-DIC-445 and NEG-DIC-717 give Mars with Rahu surgery and doctors, and ARI-YOG-009 calls Mars the surgeon. Saturn does not touch Mars, so the bone side has no support. The register names no speciality, so a general surgeon is the nearest.
+EVIDENCE Q5 BNN OPEN NEG-DIC-445 NEG-DIC-717 ARI-YOG-009 BNG-DIR-003, no rule names a speciality of the doctor
+RESULT Q5 BNN C
+METHOD UDU Q5
+EVIDENCE Q5 UDU nine corpus files not installed
+RESULT Q5 UDU NOT RUN UDU RULES MISSING
+METHOD QUAD Q5
+EVIDENCE Q5 QUAD full methodology file not installed
+RESULT Q5 QUAD NOT RUN QUAD RULES MISSING
+
+QUESTION Q6 Present status of the parents, A Only mother alive, B Only father alive, C Both alive
+OPTIONS Q6 A B C
+
+METHOD KPPRO Q6
+The Mother row has promise PRESENT and the Father row promise UNDECIDED. The prior for a woman of this age and cohort is both alive 51.8 percent, mother only 20.2 and father only 20.2. Only the undecided father side lets the prior act, and the present mother side agrees with it.
+EVIDENCE Q6 KPPRO Mother promise PRESENT, Father UNDECIDED so the prior of 51.8 percent for both alive decides, MEDIUM, PRIOR DOMINANT
+RESULT Q6 KPPRO C
+METHOD KCIL Q6
+A relative's life span has no rule register. The nearest rule is the rotation of the parent as the Lagna with the maraka cusps counted from it. Father rotates to cusp 9 with marakas at cusps 10 and 3. Mother rotates to cusp 4 with marakas at cusps 5 and 10. The running dasa chain Moon, Venus, Rahu touches cusp 9 by Moon and Rahu and the father's marakas 10 and 3 by Venus, Rahu and Moon, while for the mother only cusp 10 is touched. The father is the parent in the window and the closing rule prefers the person still alive.
+EVIDENCE Q6 KCIL NO RULE REGISTER for a relative's life span, nearest rule the rotation lock of section 16.10 with the running chain on the father's cusps 9 10 and 3
+RESULT Q6 KCIL A
+METHOD SUJ Q6
+Sun and Moon, the karakas of both parents, sit in the same dominant house and take the same Saturn and Rahu aspect, Mercury the 9th lord is combust there. D12 has no malefic in the 4th or 9th. No strict window runs now. The engine has no validated parents rule. Both alive 47, no option reaches 50.
+SUJ FILE Q6 sarva_engine/runs/q894/suj_q6.txt
+EVIDENCE Q6 SUJ tally A 12, B 27, C 47, counter evidence is Saturn and Rahu on both karakas and Ketu in the 4th
+RESULT Q6 SUJ C
+METHOD CHAWDHRI Q6
+Mother promise 17 Weak and father promise 29 Weak, both adverse at 60 percent and medium trust. The running tie of the mother is 2.48 against a cutoff of 3.65 and of the father 3.78 against 3.9, so both loss periods are closed now. The engine gives no past windows for parents on purpose, so a past loss cannot be tested. Rahu in the 10th and the Moon debilitated are cautions for both. No running period opens, so both are read as living, with little support.
+EVIDENCE Q6 CHAWDHRI both running gates closed, mother 2.48 of 3.65 and father 3.78 of 3.9, promises Weak, past loss untested, thin
+RESULT Q6 CHAWDHRI C
+METHOD BNN Q6
+Father from the Sun and mother from the Moon by ARI-DOM-015 and RAO-DOM-015. SAK-SAT-136 puts the father at age 31 and SAK-SAT-147 the mother at age 30 for Saturn with the karaka in the 3rd, both ages are past. The guide calls a parent gone only when the age is past, the karaka is joined to Saturn, Rahu or Ketu in the first class and no Jupiter relief stands. Rahu is in the trine to both karakas but Jupiter and Saturn both stand in the 3rd and 11th class to the Sun and Moon, so relief is present for both by ARI-HLT-002 and RAO-JTC-034. RAO-DOM-026 has the Moon in the same sign as the Sun, so the mother lives separately and is not gone. Neither parent is declared gone.
+EVIDENCE Q6 BNN POSSIBLE SAK-SAT-136 SAK-SAT-147 ARI-HLT-002 RAO-JTC-034 RAO-DOM-026, parents are at or below the best fixed answer, the age table alone killed living parents in the owner's backtest
+RESULT Q6 BNN C
+METHOD UDU Q6
+EVIDENCE Q6 UDU nine corpus files not installed
+RESULT Q6 UDU NOT RUN UDU RULES MISSING
+METHOD QUAD Q6
+EVIDENCE Q6 QUAD full methodology file not installed
+RESULT Q6 QUAD NOT RUN QUAD RULES MISSING
+
+FINAL TABLE
+| Question | KP Pro | KCIL | SUJ engine | CHAWDHRI | BNN | Udu | Quad Dasha |
+|---|---|---|---|---|---|---|---|
+| Q1 | A | A | C | A | C | NOT RUN UDU RULES MISSING | NOT RUN QUAD RULES MISSING |
+| Q2 | A | B | B | B | C | NOT RUN UDU RULES MISSING | NOT RUN QUAD RULES MISSING |
+| Q3 | C | C | C | A | C | NOT RUN UDU RULES MISSING | NOT RUN QUAD RULES MISSING |
+| Q4 | A | C | B | A | B | NOT RUN UDU RULES MISSING | NOT RUN QUAD RULES MISSING |
+| Q5 | B | C | C | C | C | NOT RUN UDU RULES MISSING | NOT RUN QUAD RULES MISSING |
+| Q6 | C | A | C | C | C | NOT RUN UDU RULES MISSING | NOT RUN QUAD RULES MISSING |
