@@ -1,0 +1,3838 @@
+[
+ {
+  "id": "prf.pvt_job",
+  "cat": "profession",
+  "name": "Private sector job",
+  "aliases": [
+   "pvt job",
+   "pvt company",
+   "private company",
+   "private job",
+   "private service",
+   "company employee",
+   "प्राइवेट नौकरी",
+   "निजी नौकरी"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    10,
+    7
+   ],
+   "planets": [
+    "Saturn",
+    "Mercury",
+    "Venus"
+   ],
+   "signs": [
+    "Virgo",
+    "Capricorn"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    10,
+    11,
+    2
+   ],
+   "csl_planets": [
+    "Saturn",
+    "Mercury"
+   ],
+   "cards": [
+    "PRF.02",
+    "PRF.03"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    10,
+    6
+   ],
+   "supporting": [
+    7,
+    2,
+    11
+   ],
+   "ta_houses": [
+    7
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "job",
+   "service"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.02 10th CSL signifying 6 gives service, 6 and 7 both gives service and business, house 7 alone gives business."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 7 profession employment in private companies."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Service or business 10 with 6,7."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.govt_job",
+  "cat": "profession",
+  "name": "Government job",
+  "aliases": [
+   "govt job",
+   "govt service",
+   "govt",
+   "government employee",
+   "government service",
+   "sarkari naukri",
+   "public sector",
+   "PSU",
+   "सरकारी नौकरी"
+  ],
+  "vedic": {
+   "houses": [
+    10,
+    6,
+    11,
+    1
+   ],
+   "planets": [
+    "Sun",
+    "Moon",
+    "Rahu",
+    "Saturn",
+    "Jupiter"
+   ],
+   "signs": [
+    "Leo",
+    "Aries"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    10,
+    6,
+    11
+   ],
+   "csl_planets": [
+    "Sun",
+    "Jupiter",
+    "Moon"
+   ],
+   "cards": [
+    "PRF.11",
+    "PRF.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    10,
+    6
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    10
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "government",
+   "job"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.11 government job 10,11 + Sun,6 and PRF.01 10th CSL tied to 6 and conjoined the Sun gives government employment."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 10 government organisations."
+   },
+   {
+    "src": "BNN",
+    "text": "BNN NEG-PRF-002 Saturn with Sun gives service and a powerful Sun a government job."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.own_business",
+  "cat": "profession",
+  "name": "Own business",
+  "aliases": [
+   "self employed",
+   "own practice",
+   "own clinic",
+   "independent profession",
+   "स्वयं का व्यवसाय",
+   "खुद का व्यवसाय",
+   "क्लीनिक"
+  ],
+  "vedic": {
+   "houses": [
+    7,
+    10,
+    11,
+    2
+   ],
+   "planets": [
+    "Mercury",
+    "Venus",
+    "Mars",
+    "Saturn"
+   ],
+   "signs": [
+    "Gemini",
+    "Libra"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    7,
+    10,
+    11,
+    2
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Venus"
+   ],
+   "cards": [
+    "PRF.02",
+    "PRF.09"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    10,
+    7
+   ],
+   "supporting": [
+    11,
+    2
+   ],
+   "ta_houses": [
+    7,
+    10
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "business",
+   "own"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.02 10th CSL signifying 7 with 10 gives business and 2,7,10 an independent profession."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 10 self venture and house 7 private business."
+   },
+   {
+    "src": "BNN",
+    "text": "BNN NEG-PRF-002 Saturn with Venus gives own business."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.civil_servant",
+  "cat": "profession",
+  "name": "Civil servant or administrator",
+  "aliases": [
+   "IAS",
+   "IPS",
+   "IRS",
+   "administrative service",
+   "collector",
+   "सिविल सेवा"
+  ],
+  "vedic": {
+   "houses": [
+    10,
+    9,
+    1,
+    11
+   ],
+   "planets": [
+    "Sun",
+    "Jupiter",
+    "Saturn"
+   ],
+   "signs": [
+    "Leo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    10,
+    11,
+    6
+   ],
+   "csl_planets": [
+    "Sun",
+    "Jupiter",
+    "Saturn"
+   ],
+   "cards": [
+    "PRF.11"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    10
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "government",
+   "authority"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 10 government organisations and house 7 public administration."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.clerk",
+  "cat": "profession",
+  "name": "Clerk or office worker",
+  "aliases": [
+   "office assistant",
+   "data entry",
+   "babu",
+   "क्लर्क"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    3,
+    2
+   ],
+   "planets": [
+    "Mercury",
+    "Saturn"
+   ],
+   "signs": [
+    "Virgo",
+    "Gemini"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    6,
+    10
+   ],
+   "csl_planets": [
+    "Mercury"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    10,
+    6
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    3
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "clerk"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.01 common signs on 2,6,10 give middleman, agent, clerk, teacher, editor."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.bank",
+  "cat": "profession",
+  "name": "Bank employee or officer",
+  "aliases": [
+   "banker",
+   "banking",
+   "bank manager",
+   "बैंक"
+  ],
+  "vedic": {
+   "houses": [
+    2,
+    11,
+    6,
+    10
+   ],
+   "planets": [
+    "Jupiter",
+    "Mercury",
+    "Venus"
+   ],
+   "signs": [
+    "Taurus",
+    "Sagittarius"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    6,
+    10,
+    11
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Mercury"
+   ],
+   "cards": [
+    "PRF.01",
+    "WLT.03"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    10,
+    2
+   ],
+   "supporting": [
+    6,
+    11
+   ],
+   "ta_houses": [
+    2
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "bank",
+   "money"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 2 financial institutions."
+   },
+   {
+    "src": "KP",
+    "text": "KP PRF.01 Mars with Jupiter gives bank agent."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.police",
+  "cat": "profession",
+  "name": "Police or law enforcement",
+  "aliases": [
+   "police officer",
+   "inspector",
+   "constable",
+   "पुलिस"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    10,
+    8,
+    3
+   ],
+   "planets": [
+    "Mars",
+    "Saturn",
+    "Sun",
+    "Rahu"
+   ],
+   "signs": [
+    "Aries",
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    10,
+    8
+   ],
+   "csl_planets": [
+    "Mars"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    10,
+    8
+   ],
+   "supporting": [
+    6,
+    11
+   ],
+   "ta_houses": [
+    8,
+    12
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "police"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.01 police and military Mars as 10th CSL."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.army",
+  "cat": "profession",
+  "name": "Army or defence",
+  "aliases": [
+   "military",
+   "armed forces",
+   "soldier",
+   "सेना",
+   "फौज"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    6,
+    10
+   ],
+   "planets": [
+    "Mars",
+    "Sun"
+   ],
+   "signs": [
+    "Aries",
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    6,
+    10
+   ],
+   "csl_planets": [
+    "Mars"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    10
+   ],
+   "supporting": [
+    3,
+    6,
+    11
+   ],
+   "ta_houses": [
+    10
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "army",
+   "soldier"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.01 police military Mars."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.judge",
+  "cat": "profession",
+  "name": "Judge",
+  "aliases": [
+   "magistrate",
+   "न्यायाधीश"
+  ],
+  "vedic": {
+   "houses": [
+    9,
+    7,
+    10,
+    6
+   ],
+   "planets": [
+    "Jupiter",
+    "Saturn",
+    "Mercury"
+   ],
+   "signs": [
+    "Sagittarius",
+    "Libra"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    9,
+    10,
+    6
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Saturn"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    10,
+    9
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    7,
+    9
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "judge",
+   "court"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.01 law Saturn connected gives judge."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 7 judge."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.lawyer",
+  "cat": "profession",
+  "name": "Lawyer or advocate",
+  "aliases": [
+   "advocate",
+   "legal practitioner",
+   "barrister",
+   "वकील"
+  ],
+  "vedic": {
+   "houses": [
+    9,
+    6,
+    7,
+    10
+   ],
+   "planets": [
+    "Jupiter",
+    "Mercury",
+    "Mars",
+    "Sun"
+   ],
+   "signs": [
+    "Sagittarius",
+    "Libra"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    9,
+    10
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Mercury",
+    "Mars"
+   ],
+   "cards": [
+    "PRF.01",
+    "EDU.02"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    9
+   ],
+   "supporting": [
+    10,
+    2,
+    11
+   ],
+   "ta_houses": [
+    6,
+    7,
+    8,
+    9
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "law",
+   "lawyer"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.01 law 10th CSL Jupiter Mercury Mars or Sun linked to Libra Aquarius or Sagittarius."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Legal profession 6 or 9 with 10."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.teacher",
+  "cat": "profession",
+  "name": "School teacher",
+  "aliases": [
+   "teaching",
+   "tutor",
+   "lecturer",
+   "shikshak",
+   "शिक्षक",
+   "अध्यापक"
+  ],
+  "vedic": {
+   "houses": [
+    4,
+    5,
+    9,
+    2
+   ],
+   "planets": [
+    "Jupiter",
+    "Mercury",
+    "Moon"
+   ],
+   "signs": [
+    "Gemini",
+    "Sagittarius"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    9,
+    10,
+    2
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Mercury"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    4,
+    9
+   ],
+   "supporting": [
+    10,
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    5
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "teacher"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Teaching as a profession 4 or 9 with 10, supporting 2,6,10."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.professor",
+  "cat": "profession",
+  "name": "College professor or academic",
+  "aliases": [
+   "professor",
+   "lecturer",
+   "academic",
+   "प्रोफेसर"
+  ],
+  "vedic": {
+   "houses": [
+    9,
+    5,
+    4
+   ],
+   "planets": [
+    "Jupiter",
+    "Mercury"
+   ],
+   "signs": [
+    "Sagittarius"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    9,
+    4,
+    10
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Mercury"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    9,
+    4
+   ],
+   "supporting": [
+    10,
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    9
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "professor"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 9 university."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.researcher",
+  "cat": "profession",
+  "name": "Researcher or scientist",
+  "aliases": [
+   "scientist",
+   "research",
+   "scholar",
+   "वैज्ञानिक",
+   "शोध"
+  ],
+  "vedic": {
+   "houses": [
+    9,
+    12,
+    8
+   ],
+   "planets": [
+    "Ketu",
+    "Mercury",
+    "Saturn",
+    "Sun"
+   ],
+   "signs": [
+    "Aquarius",
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    9,
+    11,
+    8,
+    12
+   ],
+   "csl_planets": [
+    "Ketu",
+    "Saturn"
+   ],
+   "cards": [
+    "EDU.06"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    12
+   ],
+   "supporting": [
+    6,
+    11
+   ],
+   "ta_houses": [
+    9,
+    12
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "research"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Success in research 12 with 6,11."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.engineer_civil",
+  "cat": "profession",
+  "name": "Civil engineer",
+  "aliases": [
+   "civil engineering",
+   "construction engineer",
+   "सिविल इंजीनियर"
+  ],
+  "vedic": {
+   "houses": [
+    4,
+    10,
+    6
+   ],
+   "planets": [
+    "Mars",
+    "Saturn",
+    "Mercury"
+   ],
+   "signs": [
+    "Capricorn",
+    "Aries"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    10
+   ],
+   "csl_planets": [
+    "Mars",
+    "Saturn",
+    "Mercury"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    4,
+    10
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    4
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "engineer"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 4 civil engineers."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.engineer_mech",
+  "cat": "profession",
+  "name": "Mechanical engineer",
+  "aliases": [
+   "mechanical",
+   "machinery",
+   "मैकेनिकल"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    6,
+    10
+   ],
+   "planets": [
+    "Mars",
+    "Saturn",
+    "Mercury"
+   ],
+   "signs": [
+    "Aries",
+    "Capricorn"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    10
+   ],
+   "csl_planets": [
+    "Mars",
+    "Mercury"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    4,
+    10
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    4
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "machine"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.01 Mars plus Mercury engineer, Mars machine."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.engineer_elec",
+  "cat": "profession",
+  "name": "Electrical or electronics engineer",
+  "aliases": [
+   "electrical",
+   "electronics",
+   "EEE",
+   "ECE",
+   "इलेक्ट्रिकल"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    10,
+    11
+   ],
+   "planets": [
+    "Mars",
+    "Rahu",
+    "Mercury",
+    "Venus"
+   ],
+   "signs": [
+    "Aquarius",
+    "Gemini"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    10,
+    11
+   ],
+   "csl_planets": [
+    "Mars",
+    "Rahu",
+    "Mercury"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    3,
+    10
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    3
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "electric"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.01 Mars dominant electrical."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 3 electrical engineering electronics."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.it",
+  "cat": "profession",
+  "name": "Software or IT professional",
+  "aliases": [
+   "computer engineer",
+   "programmer",
+   "software developer",
+   "IT",
+   "कंप्यूटर",
+   "सॉफ्टवेयर"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    5,
+    10,
+    11
+   ],
+   "planets": [
+    "Rahu",
+    "Mercury",
+    "Venus",
+    "Saturn"
+   ],
+   "signs": [
+    "Gemini",
+    "Aquarius"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    6,
+    10,
+    11
+   ],
+   "csl_planets": [
+    "Venus",
+    "Mercury",
+    "Rahu",
+    "Saturn"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    3,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    3,
+    11
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "computer"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Computer programmer 3,10 with 2,11."
+   },
+   {
+    "src": "KP",
+    "text": "KP PRF.01 computer programmer Venus key with Mercury Mars Saturn on 2,6,10,11."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.engineer_chem",
+  "cat": "profession",
+  "name": "Chemical or petroleum engineer",
+  "aliases": [
+   "chemical",
+   "petroleum",
+   "refinery"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    10,
+    8
+   ],
+   "planets": [
+    "Venus",
+    "Saturn",
+    "Moon",
+    "Mars"
+   ],
+   "signs": [
+    "Scorpio",
+    "Pisces"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    10
+   ],
+   "csl_planets": [
+    "Venus",
+    "Saturn"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    6
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "chemical",
+   "oil"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 6 education chemistry."
+   },
+   {
+    "src": "KP",
+    "text": "KP PRF.01 Saturn Moon Venus petroleum."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.mining",
+  "cat": "profession",
+  "name": "Mining or geology",
+  "aliases": [
+   "geologist",
+   "mining engineer",
+   "खनन"
+  ],
+  "vedic": {
+   "houses": [
+    8,
+    4,
+    10
+   ],
+   "planets": [
+    "Saturn",
+    "Mars",
+    "Rahu"
+   ],
+   "signs": [
+    "Capricorn",
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    8,
+    10
+   ],
+   "csl_planets": [
+    "Saturn",
+    "Mars"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    8,
+    10
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    8
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "mine"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 8 geologists mining."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.aviation",
+  "cat": "profession",
+  "name": "Pilot or aviation",
+  "aliases": [
+   "air pilot",
+   "aeronautical",
+   "cabin crew",
+   "पायलट"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    9,
+    12
+   ],
+   "planets": [
+    "Rahu",
+    "Mercury",
+    "Venus"
+   ],
+   "signs": [
+    "Gemini",
+    "Aquarius"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    9,
+    12
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Venus",
+    "Saturn"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    9
+   ],
+   "supporting": [
+    3,
+    12
+   ],
+   "ta_houses": [
+    9
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "pilot",
+   "air"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 9 pilot."
+   },
+   {
+    "src": "KP",
+    "text": "KP PRF.01 air pilot airy signs 3,9,12."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.architect",
+  "cat": "profession",
+  "name": "Architect or interior designer",
+  "aliases": [
+   "architecture",
+   "interior design",
+   "vastu",
+   "आर्किटेक्ट"
+  ],
+  "vedic": {
+   "houses": [
+    4,
+    5,
+    10
+   ],
+   "planets": [
+    "Venus",
+    "Saturn",
+    "Mars"
+   ],
+   "signs": [
+    "Capricorn",
+    "Libra"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    5,
+    10
+   ],
+   "csl_planets": [
+    "Venus",
+    "Saturn"
+   ],
+   "cards": [
+    "EDU.02"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    4,
+    5
+   ],
+   "supporting": [
+    10,
+    2,
+    11
+   ],
+   "ta_houses": [
+    4,
+    5
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "design"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA houses 4 and 5."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.accountant",
+  "cat": "profession",
+  "name": "Chartered accountant or auditor",
+  "aliases": [
+   "CA",
+   "accountant",
+   "audit",
+   "tax consultant",
+   "सीए",
+   "लेखाकार"
+  ],
+  "vedic": {
+   "houses": [
+    2,
+    11,
+    6,
+    8
+   ],
+   "planets": [
+    "Mercury",
+    "Jupiter"
+   ],
+   "signs": [
+    "Virgo",
+    "Gemini"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    6,
+    11
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Jupiter"
+   ],
+   "cards": [
+    "PRF.01",
+    "EDU.02"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    2,
+    8
+   ],
+   "supporting": [
+    6,
+    11
+   ],
+   "ta_houses": [
+    2,
+    8
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "accounts"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 2 accountants and house 8 auditing."
+   },
+   {
+    "src": "KP",
+    "text": "KP EDU.02 Mercury commerce."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.finance",
+  "cat": "profession",
+  "name": "Finance or investment professional",
+  "aliases": [
+   "stock broker",
+   "trader",
+   "investment banker",
+   "fund manager",
+   "शेयर बाजार"
+  ],
+  "vedic": {
+   "houses": [
+    2,
+    5,
+    11
+   ],
+   "planets": [
+    "Mercury",
+    "Jupiter",
+    "Venus",
+    "Rahu"
+   ],
+   "signs": [
+    "Gemini",
+    "Sagittarius"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    5,
+    11
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Jupiter"
+   ],
+   "cards": [
+    "WLT.06"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    5,
+    2
+   ],
+   "supporting": [
+    11
+   ],
+   "ta_houses": [
+    5
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "stock"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 5 stock exchange."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.insurance",
+  "cat": "profession",
+  "name": "Insurance professional",
+  "aliases": [
+   "insurance agent",
+   "LIC",
+   "बीमा"
+  ],
+  "vedic": {
+   "houses": [
+    8,
+    2,
+    11
+   ],
+   "planets": [
+    "Saturn",
+    "Mercury",
+    "Jupiter"
+   ],
+   "signs": [
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    8,
+    2,
+    11
+   ],
+   "csl_planets": [
+    "Saturn",
+    "Jupiter"
+   ],
+   "cards": [
+    "WLT.07"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    8
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    8
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "insurance"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 8 insurance."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.manager",
+  "cat": "profession",
+  "name": "Manager or executive",
+  "aliases": [
+   "corporate manager",
+   "administrator",
+   "team lead",
+   "मैनेजर"
+  ],
+  "vedic": {
+   "houses": [
+    10,
+    1,
+    11
+   ],
+   "planets": [
+    "Sun",
+    "Saturn",
+    "Mercury",
+    "Jupiter"
+   ],
+   "signs": [
+    "Capricorn",
+    "Leo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    10,
+    6,
+    11
+   ],
+   "csl_planets": [
+    "Sun",
+    "Saturn"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    4,
+    10
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "manager"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA houses 4 and 10 managers."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.sales",
+  "cat": "profession",
+  "name": "Sales or marketing",
+  "aliases": [
+   "marketing",
+   "salesman",
+   "representative",
+   "मार्केटिंग"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    7,
+    11
+   ],
+   "planets": [
+    "Mercury",
+    "Venus",
+    "Moon"
+   ],
+   "signs": [
+    "Gemini",
+    "Libra"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    6,
+    11
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Venus"
+   ],
+   "cards": [
+    "PRF.22"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    3,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    3
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "sales"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Commission as business 10 with 3,11."
+   },
+   {
+    "src": "KP",
+    "text": "KP PRF.22 agency brokerage commission 2,3,6,10,11."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.hr",
+  "cat": "profession",
+  "name": "Human resources professional",
+  "aliases": [
+   "HR",
+   "recruiter",
+   "personnel"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    11,
+    3
+   ],
+   "planets": [
+    "Mercury",
+    "Saturn",
+    "Jupiter"
+   ],
+   "signs": [
+    "Virgo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    11
+   ],
+   "csl_planets": [
+    "Saturn",
+    "Jupiter",
+    "Mercury"
+   ],
+   "cards": [
+    "EDU.02"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    6
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "people"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP EDU.02 HR Saturn Jupiter Mercury 6th."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.journalist",
+  "cat": "profession",
+  "name": "Journalist or editor",
+  "aliases": [
+   "reporter",
+   "editor",
+   "news anchor",
+   "पत्रकार"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    11,
+    5
+   ],
+   "planets": [
+    "Mercury",
+    "Jupiter",
+    "Rahu"
+   ],
+   "signs": [
+    "Gemini"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    9,
+    10,
+    11
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Jupiter"
+   ],
+   "cards": [
+    "PRF.01",
+    "PRF.16"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    3,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    3,
+    11
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "writer",
+   "journal"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Publication as profession 3,10."
+   },
+   {
+    "src": "KP",
+    "text": "KP PRF.01 journalism 3rd CSL with Mercury and Jupiter."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.writer",
+  "cat": "profession",
+  "name": "Author or writer",
+  "aliases": [
+   "writing",
+   "novelist",
+   "poet",
+   "लेखक",
+   "कवि"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    5,
+    2
+   ],
+   "planets": [
+    "Mercury",
+    "Jupiter",
+    "Venus"
+   ],
+   "signs": [
+    "Gemini"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    10,
+    11
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Jupiter"
+   ],
+   "cards": [
+    "PRF.16"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    3,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    3
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "write"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.16 authorship + 3,10,11."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.actor",
+  "cat": "profession",
+  "name": "Actor or film professional",
+  "aliases": [
+   "cinema",
+   "acting",
+   "film",
+   "TV",
+   "अभिनेता"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    3,
+    10,
+    11
+   ],
+   "planets": [
+    "Venus",
+    "Moon",
+    "Mercury"
+   ],
+   "signs": [
+    "Libra",
+    "Leo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    5,
+    6,
+    10,
+    11
+   ],
+   "csl_planets": [
+    "Venus",
+    "Mercury",
+    "Moon"
+   ],
+   "cards": [
+    "PRF.18"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    5,
+    10
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    5
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "cinema"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Sports fine arts film speculation as profession 5,10."
+   },
+   {
+    "src": "KP",
+    "text": "KP PRF.01 and PRF.18 arts and entertainment 5,6,10,11."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.musician",
+  "cat": "profession",
+  "name": "Singer or musician",
+  "aliases": [
+   "singer",
+   "music",
+   "vocalist",
+   "गायक",
+   "संगीत"
+  ],
+  "vedic": {
+   "houses": [
+    2,
+    5,
+    3
+   ],
+   "planets": [
+    "Venus",
+    "Moon",
+    "Mercury",
+    "Jupiter"
+   ],
+   "signs": [
+    "Libra",
+    "Taurus"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    5,
+    10
+   ],
+   "csl_planets": [
+    "Venus",
+    "Moon",
+    "Mercury"
+   ],
+   "cards": [
+    "PRF.01",
+    "EDU.10"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    2,
+    5
+   ],
+   "supporting": [
+    10,
+    11
+   ],
+   "ta_houses": [
+    5
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "music",
+   "singer"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.01 earning by voice 2nd CSL in Libra, 2nd CSL signifying 2 and 5."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.dancer",
+  "cat": "profession",
+  "name": "Dancer or performer",
+  "aliases": [
+   "dance",
+   "performing arts",
+   "नर्तक"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    3,
+    7
+   ],
+   "planets": [
+    "Venus",
+    "Moon",
+    "Mars"
+   ],
+   "signs": [
+    "Libra"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    5,
+    10
+   ],
+   "csl_planets": [
+    "Venus",
+    "Mars"
+   ],
+   "cards": [
+    "PRF.18"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    5,
+    10
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    5
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "dance"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.18."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.artist",
+  "cat": "profession",
+  "name": "Painter or fine artist",
+  "aliases": [
+   "painting",
+   "sculptor",
+   "craft",
+   "चित्रकार"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    3,
+    2
+   ],
+   "planets": [
+    "Venus",
+    "Mercury"
+   ],
+   "signs": [
+    "Libra",
+    "Taurus"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    5,
+    10
+   ],
+   "csl_planets": [
+    "Venus",
+    "Mercury"
+   ],
+   "cards": [
+    "EDU.10",
+    "PRF.01"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    5
+   ],
+   "supporting": [
+    10,
+    2,
+    11
+   ],
+   "ta_houses": [
+    5
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "art"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Fine arts as a subject of study 4 with 5."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.designer",
+  "cat": "profession",
+  "name": "Fashion or graphic designer",
+  "aliases": [
+   "fashion",
+   "boutique designer",
+   "textile design",
+   "फैशन डिजाइनर"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    3,
+    2,
+    7
+   ],
+   "planets": [
+    "Venus",
+    "Mercury",
+    "Moon"
+   ],
+   "signs": [
+    "Libra",
+    "Taurus"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    5,
+    10
+   ],
+   "csl_planets": [
+    "Venus",
+    "Mercury"
+   ],
+   "cards": [
+    "EDU.02"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    5,
+    10
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    5
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "fashion"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP EDU.02 Venus fine arts computer science fashion."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.photographer",
+  "cat": "profession",
+  "name": "Photographer or media producer",
+  "aliases": [
+   "videographer",
+   "photography",
+   "फोटोग्राफर"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    5,
+    12
+   ],
+   "planets": [
+    "Rahu",
+    "Venus",
+    "Mercury"
+   ],
+   "signs": [
+    "Gemini"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    5
+   ],
+   "csl_planets": [
+    "Rahu",
+    "Venus"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    3,
+    5
+   ],
+   "supporting": [
+    10,
+    11
+   ],
+   "ta_houses": [
+    3
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "photo"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA planet Rahu and Ketu photography."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.sportsperson",
+  "cat": "profession",
+  "name": "Sportsperson or coach",
+  "aliases": [
+   "athlete",
+   "cricketer",
+   "trainer",
+   "खिलाड़ी"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    5,
+    6,
+    1
+   ],
+   "planets": [
+    "Mars",
+    "Sun",
+    "Jupiter"
+   ],
+   "signs": [
+    "Aries",
+    "Sagittarius"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    1,
+    5,
+    10,
+    11
+   ],
+   "csl_planets": [
+    "Mars",
+    "Jupiter"
+   ],
+   "cards": [
+    "PRF.19"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    5
+   ],
+   "supporting": [
+    6,
+    11
+   ],
+   "ta_houses": [
+    5
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "sport"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.19 sports talent + 1,5,10,11."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Success in sports 5 with 6,11."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.astrologer",
+  "cat": "profession",
+  "name": "Astrologer or occult practitioner",
+  "aliases": [
+   "jyotish",
+   "tantra",
+   "tarot",
+   "ज्योतिषी"
+  ],
+  "vedic": {
+   "houses": [
+    9,
+    12,
+    8
+   ],
+   "planets": [
+    "Jupiter",
+    "Mercury",
+    "Ketu",
+    "Saturn"
+   ],
+   "signs": [
+    "Pisces"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    9,
+    12,
+    2,
+    10,
+    11
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Mercury",
+    "Ketu"
+   ],
+   "cards": [
+    "PRF.15",
+    "EDU.08"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    9,
+    12
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    9,
+    12
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "astrolog"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.15 and PRF.01 astrology Asc CSL 9 and 12 and 10th CSL 2,9,10,11."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.priest",
+  "cat": "profession",
+  "name": "Priest or religious teacher",
+  "aliases": [
+   "pundit",
+   "purohit",
+   "pujari",
+   "पुजारी",
+   "पंडित"
+  ],
+  "vedic": {
+   "houses": [
+    9,
+    5,
+    12
+   ],
+   "planets": [
+    "Jupiter",
+    "Sun",
+    "Ketu",
+    "Moon"
+   ],
+   "signs": [
+    "Sagittarius",
+    "Pisces"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    9,
+    10,
+    12
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Sun"
+   ],
+   "cards": [
+    "SPR.05",
+    "PRF.01"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    9,
+    5
+   ],
+   "supporting": [
+    10
+   ],
+   "ta_houses": [
+    5,
+    9
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "priest",
+   "temple"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 5 religion teachers pundits and house 9 religious organisations."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.yoga",
+  "cat": "profession",
+  "name": "Yoga teacher or spiritual guide",
+  "aliases": [
+   "yoga instructor",
+   "spiritual teacher",
+   "guru",
+   "योग शिक्षक"
+  ],
+  "vedic": {
+   "houses": [
+    1,
+    9,
+    12
+   ],
+   "planets": [
+    "Ketu",
+    "Jupiter",
+    "Sun"
+   ],
+   "signs": [
+    "Pisces"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    1,
+    9,
+    12
+   ],
+   "csl_planets": [
+    "Ketu",
+    "Jupiter"
+   ],
+   "cards": [
+    "SPR.01"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    1
+   ],
+   "supporting": [
+    9,
+    12
+   ],
+   "ta_houses": [
+    1
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "yoga"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 1 yoga practitioner."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.social",
+  "cat": "profession",
+  "name": "Social worker or NGO",
+  "aliases": [
+   "charity",
+   "NGO",
+   "social service",
+   "समाज सेवा"
+  ],
+  "vedic": {
+   "houses": [
+    11,
+    12,
+    6
+   ],
+   "planets": [
+    "Jupiter",
+    "Saturn",
+    "Moon"
+   ],
+   "signs": [
+    "Pisces"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    11,
+    12,
+    6
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Saturn"
+   ],
+   "cards": [
+    "WLT.11"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    11
+   ],
+   "supporting": [
+    6,
+    12
+   ],
+   "ta_houses": [
+    11
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "charity"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 11 charitable institutions."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.hospitality",
+  "cat": "profession",
+  "name": "Hotel or restaurant professional",
+  "aliases": [
+   "chef",
+   "cook",
+   "hospitality",
+   "hotel management",
+   "होटल"
+  ],
+  "vedic": {
+   "houses": [
+    4,
+    2,
+    11
+   ],
+   "planets": [
+    "Venus",
+    "Moon",
+    "Mars"
+   ],
+   "signs": [
+    "Cancer",
+    "Taurus"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    2,
+    10
+   ],
+   "csl_planets": [
+    "Venus",
+    "Moon",
+    "Mars"
+   ],
+   "cards": [
+    "PRF.01",
+    "EDU.02"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    4
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    4
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "hotel",
+   "food"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.01 Venus Mars Moon hotel."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 4 restaurants."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.transport",
+  "cat": "profession",
+  "name": "Driver or transport worker",
+  "aliases": [
+   "driver",
+   "logistics",
+   "transport",
+   "ड्राइवर"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    9,
+    4
+   ],
+   "planets": [
+    "Mars",
+    "Saturn",
+    "Mercury",
+    "Rahu"
+   ],
+   "signs": [
+    "Gemini",
+    "Sagittarius"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    9,
+    4
+   ],
+   "csl_planets": [
+    "Mars",
+    "Mercury"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    3,
+    9
+   ],
+   "supporting": [
+    10,
+    11
+   ],
+   "ta_houses": [
+    3,
+    9
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "driver"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA houses 3 and 9."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.merchant_navy",
+  "cat": "profession",
+  "name": "Merchant navy or sailor",
+  "aliases": [
+   "sailor",
+   "marine",
+   "shipping",
+   "नौसेना"
+  ],
+  "vedic": {
+   "houses": [
+    12,
+    9,
+    4
+   ],
+   "planets": [
+    "Moon",
+    "Saturn",
+    "Mercury"
+   ],
+   "signs": [
+    "Pisces",
+    "Cancer"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    12,
+    9,
+    3
+   ],
+   "csl_planets": [
+    "Moon",
+    "Saturn"
+   ],
+   "cards": [
+    "EDU.02"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    12,
+    9
+   ],
+   "supporting": [
+    10,
+    2,
+    11
+   ],
+   "ta_houses": [
+    12
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "ship"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA subject Venus naval science."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.agri",
+  "cat": "profession",
+  "name": "Farmer or agriculturist",
+  "aliases": [
+   "farming",
+   "cultivation",
+   "kisan",
+   "किसान",
+   "खेती"
+  ],
+  "vedic": {
+   "houses": [
+    4,
+    11,
+    6
+   ],
+   "planets": [
+    "Moon",
+    "Venus",
+    "Saturn",
+    "Mars"
+   ],
+   "signs": [
+    "Taurus",
+    "Cancer"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    6,
+    11
+   ],
+   "csl_planets": [
+    "Moon",
+    "Venus",
+    "Saturn"
+   ],
+   "cards": [
+    "PRF.20"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    4
+   ],
+   "supporting": [
+    6,
+    11
+   ],
+   "ta_houses": [
+    4
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "farm",
+   "land"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.20 farming + 4,6,11."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 4 agriculturists."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.technician",
+  "cat": "profession",
+  "name": "Technician or tradesperson",
+  "aliases": [
+   "electrician",
+   "mechanic",
+   "plumber",
+   "carpenter",
+   "mason",
+   "welder",
+   "तकनीशियन"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    6,
+    10
+   ],
+   "planets": [
+    "Mars",
+    "Saturn",
+    "Mercury"
+   ],
+   "signs": [
+    "Aries",
+    "Capricorn"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    6,
+    10
+   ],
+   "csl_planets": [
+    "Mars",
+    "Saturn"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    6
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "worker"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 6 labour oriented jobs and repairing units."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.tailor",
+  "cat": "profession",
+  "name": "Tailor or boutique worker",
+  "aliases": [
+   "tailoring",
+   "stitching",
+   "दर्जी"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    2,
+    6
+   ],
+   "planets": [
+    "Venus",
+    "Mercury",
+    "Moon"
+   ],
+   "signs": [
+    "Gemini",
+    "Virgo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    2,
+    6
+   ],
+   "csl_planets": [
+    "Venus",
+    "Mercury"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    3,
+    6
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    3
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "tailor"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP EDU.02 Venus tailoring."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.beautician",
+  "cat": "profession",
+  "name": "Beautician or salon professional",
+  "aliases": [
+   "beauty parlour",
+   "hair stylist",
+   "सैलून",
+   "ब्यूटीशियन"
+  ],
+  "vedic": {
+   "houses": [
+    1,
+    2,
+    7
+   ],
+   "planets": [
+    "Venus",
+    "Mercury",
+    "Moon"
+   ],
+   "signs": [
+    "Libra",
+    "Taurus"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    1,
+    2,
+    10
+   ],
+   "csl_planets": [
+    "Venus"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    2
+   ],
+   "supporting": [
+    6,
+    11
+   ],
+   "ta_houses": [
+    2
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "beauty"
+  ],
+  "evidence": [
+   {
+    "src": "NOTE",
+    "text": "Venus beauty and aesthetics."
+   }
+  ],
+  "best_tier": "T4"
+ },
+ {
+  "id": "prf.jeweller",
+  "cat": "profession",
+  "name": "Jeweller or goldsmith",
+  "aliases": [
+   "jewellery",
+   "gold trade",
+   "gemmologist",
+   "सुनार",
+   "जौहरी"
+  ],
+  "vedic": {
+   "houses": [
+    2,
+    11
+   ],
+   "planets": [
+    "Venus",
+    "Jupiter",
+    "Sun"
+   ],
+   "signs": [
+    "Taurus",
+    "Leo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    11
+   ],
+   "csl_planets": [
+    "Venus",
+    "Jupiter"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    2
+   ],
+   "supporting": [
+    11
+   ],
+   "ta_houses": [
+    2
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "jewel",
+   "gold"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 2 jewellers and gemmologist."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.librarian",
+  "cat": "profession",
+  "name": "Librarian or archivist",
+  "aliases": [
+   "records",
+   "archives",
+   "libraries"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    6
+   ],
+   "planets": [
+    "Mercury",
+    "Saturn"
+   ],
+   "signs": [
+    "Virgo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    6
+   ],
+   "csl_planets": [
+    "Mercury"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    3
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    3
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "library"
+  ],
+  "evidence": [
+   {
+    "src": "NOTE",
+    "text": "Mercury records."
+   }
+  ],
+  "best_tier": "T4"
+ },
+ {
+  "id": "prf.homemaker",
+  "cat": "profession",
+  "name": "Homemaker",
+  "aliases": [
+   "housewife",
+   "home maker",
+   "not working",
+   "गृहिणी"
+  ],
+  "vedic": {
+   "houses": [
+    4,
+    2
+   ],
+   "planets": [
+    "Moon",
+    "Venus"
+   ],
+   "signs": [
+    "Cancer"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    2
+   ],
+   "csl_planets": [
+    "Moon",
+    "Venus"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    4
+   ],
+   "supporting": [
+    2
+   ],
+   "ta_houses": [
+    4
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "home"
+  ],
+  "evidence": [
+   {
+    "src": "SUJ",
+    "text": "SUJ methodology notes the 4th house dominant gives homemaker work."
+   }
+  ],
+  "best_tier": "T4"
+ },
+ {
+  "id": "prf.freelance",
+  "cat": "profession",
+  "name": "Freelancer or consultant",
+  "aliases": [
+   "consultant",
+   "advisor",
+   "freelance",
+   "सलाहकार"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    7,
+    10
+   ],
+   "planets": [
+    "Mercury",
+    "Jupiter"
+   ],
+   "signs": [
+    "Gemini"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    7,
+    10
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Jupiter"
+   ],
+   "cards": [
+    "PRF.22",
+    "PRF.30"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    10,
+    3
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    3
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "consult"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.30 contract work income."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.politician",
+  "cat": "profession",
+  "name": "Politician",
+  "aliases": [
+   "political leader",
+   "MLA",
+   "MP",
+   "राजनेता"
+  ],
+  "vedic": {
+   "houses": [
+    10,
+    9,
+    11,
+    1
+   ],
+   "planets": [
+    "Sun",
+    "Mars",
+    "Rahu",
+    "Jupiter"
+   ],
+   "signs": [
+    "Leo",
+    "Aries"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    10,
+    11,
+    6
+   ],
+   "csl_planets": [
+    "Sun",
+    "Mars",
+    "Rahu"
+   ],
+   "cards": [
+    "PRF.11"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    9,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    9,
+    10
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "politic"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Politics as a profession 9,10."
+   },
+   {
+    "src": "KP",
+    "text": "KP PRF.11."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.detective",
+  "cat": "profession",
+  "name": "Detective or intelligence",
+  "aliases": [
+   "investigator",
+   "CID",
+   "spy",
+   "जासूस"
+  ],
+  "vedic": {
+   "houses": [
+    8,
+    12,
+    6
+   ],
+   "planets": [
+    "Ketu",
+    "Rahu",
+    "Mars",
+    "Saturn"
+   ],
+   "signs": [
+    "Scorpio",
+    "Pisces"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    8,
+    12,
+    6
+   ],
+   "csl_planets": [
+    "Ketu",
+    "Rahu"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    12,
+    10
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    8,
+    12
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "detective"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Secret activities as profession 12,10 and TA houses 8 and 12."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "prf.hospital_admin",
+  "cat": "profession",
+  "name": "Hospital or clinic management",
+  "aliases": [
+   "nursing home owner",
+   "hospital owner",
+   "health administrator"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    12,
+    10
+   ],
+   "planets": [
+    "Jupiter",
+    "Moon",
+    "Sun"
+   ],
+   "signs": [
+    "Pisces",
+    "Virgo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    11,
+    12
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Sun"
+   ],
+   "cards": [
+    "PRF.21"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    12,
+    6
+   ],
+   "supporting": [
+    10
+   ],
+   "ta_houses": [
+    12
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "hospital"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.21 medical profession and running a nursing home or hospital + 4,11,12."
+   }
+  ],
+  "best_tier": "T1"
+ }
+]

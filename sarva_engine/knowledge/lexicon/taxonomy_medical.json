@@ -1,0 +1,4133 @@
+[
+ {
+  "id": "med.physician",
+  "cat": "medical",
+  "name": "General physician",
+  "aliases": [
+   "physician",
+   "general medicine",
+   "MD medicine",
+   "फिजिशियन",
+   "चिकित्सक",
+   "वैद्य",
+   "डॉक्टर"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    10,
+    11
+   ],
+   "planets": [
+    "Sun",
+    "Jupiter",
+    "Mercury"
+   ],
+   "signs": [
+    "Virgo",
+    "Leo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    10,
+    11
+   ],
+   "csl_planets": [
+    "Sun",
+    "Jupiter",
+    "Mercury"
+   ],
+   "cards": [
+    "PRF.01",
+    "EDU.02"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    5,
+    11
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "doctor",
+   "physician"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.01 Sun medicine, Jupiter physician materia medica, Mercury diagnosis."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA lists general physicians under houses 5 and 11."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.surgeon",
+  "cat": "medical",
+  "name": "General surgeon",
+  "aliases": [
+   "surgeon",
+   "MS surgery",
+   "general surgery",
+   "जनरल सर्जन",
+   "शल्य चिकित्सक",
+   "सर्जन"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    8,
+    10
+   ],
+   "planets": [
+    "Mars",
+    "Sun",
+    "Ketu",
+    "Rahu"
+   ],
+   "signs": [
+    "Aries",
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    8,
+    10
+   ],
+   "csl_planets": [
+    "Mars",
+    "Sun",
+    "Rahu",
+    "Ketu"
+   ],
+   "cards": [
+    "PRF.01",
+    "HLT.05"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    8,
+    10
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    8
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "surgeon",
+   "surgery"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.01 surgeon is the medical Sun linked to Rahu Ketu and Saturn owning 8, or Sun with Mars."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Surgeons 8,10 supporting 2,11."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.ortho",
+  "cat": "medical",
+  "name": "Orthopedic surgeon",
+  "aliases": [
+   "orthopaedic",
+   "orthopedics",
+   "bone surgeon",
+   "spine surgeon",
+   "knee replacement",
+   "ऑर्थोपेडिक",
+   "ऑर्थोपेडिक सर्जन",
+   "हड्डी रोग विशेषज्ञ"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    8,
+    10
+   ],
+   "planets": [
+    "Saturn",
+    "Mars",
+    "Sun"
+   ],
+   "signs": [
+    "Capricorn",
+    "Aquarius",
+    "Sagittarius"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    10,
+    8,
+    6
+   ],
+   "csl_planets": [
+    "Saturn",
+    "Mars",
+    "Sun"
+   ],
+   "cards": [
+    "HLT.01",
+    "HLT.05"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    8,
+    10
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    8,
+    10
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "bone",
+   "knee",
+   "fracture"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP house keys 10 bones and knees."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 8 education lists orthopaedics, house 10 diseases knees and spinal cord."
+   },
+   {
+    "src": "WEB",
+    "text": "A web source pairs Saturn with Mars."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.spine",
+  "cat": "medical",
+  "name": "Spine surgeon",
+  "aliases": [
+   "spine",
+   "spinal surgery",
+   "neurosurgery spine"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    8,
+    10
+   ],
+   "planets": [
+    "Saturn",
+    "Sun",
+    "Mars"
+   ],
+   "signs": [
+    "Leo",
+    "Capricorn"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    10,
+    8
+   ],
+   "csl_planets": [
+    "Saturn",
+    "Sun",
+    "Mars"
+   ],
+   "cards": [
+    "HLT.01"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    8,
+    10
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    5,
+    10
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "spine",
+   "back"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 10 spinal cord and back pain, house 5 spinal affections."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.neurology",
+  "cat": "medical",
+  "name": "Neurologist",
+  "aliases": [
+   "neurology",
+   "DM neurology",
+   "न्यूरोलॉजिस्ट",
+   "नस रोग"
+  ],
+  "vedic": {
+   "houses": [
+    1,
+    3,
+    6
+   ],
+   "planets": [
+    "Mercury",
+    "Moon",
+    "Rahu",
+    "Ketu"
+   ],
+   "signs": [
+    "Aries",
+    "Gemini"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    1,
+    3,
+    6
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Moon",
+    "Rahu"
+   ],
+   "cards": [
+    "HLT.20"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    1,
+    3
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "nerve",
+   "brain"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA houses 1 and 3 list neurologist."
+   },
+   {
+    "src": "KP",
+    "text": "KP HLT.20 neurological disease + 1,6,8,12."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.neurosurgery",
+  "cat": "medical",
+  "name": "Neurosurgeon",
+  "aliases": [
+   "neurosurgery",
+   "MCh neurosurgery",
+   "brain surgeon",
+   "न्यूरोसर्जन"
+  ],
+  "vedic": {
+   "houses": [
+    1,
+    8,
+    10
+   ],
+   "planets": [
+    "Mars",
+    "Mercury",
+    "Ketu"
+   ],
+   "signs": [
+    "Aries",
+    "Gemini"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    1,
+    8,
+    10
+   ],
+   "csl_planets": [
+    "Mars",
+    "Mercury",
+    "Ketu"
+   ],
+   "cards": [
+    "HLT.05",
+    "HLT.20"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    8,
+    10
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    1,
+    8
+   ],
+   "tier": "T4",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "brain"
+  ],
+  "evidence": [
+   {
+    "src": "NOTE",
+    "text": "Combines head and brain house 1 with surgery house 8."
+   }
+  ],
+  "best_tier": "T4"
+ },
+ {
+  "id": "med.psychiatry",
+  "cat": "medical",
+  "name": "Psychiatrist",
+  "aliases": [
+   "psychiatry",
+   "mental health doctor",
+   "मनोचिकित्सक",
+   "साइकेट्रिस्ट"
+  ],
+  "vedic": {
+   "houses": [
+    1,
+    4,
+    5,
+    8,
+    12
+   ],
+   "planets": [
+    "Moon",
+    "Mercury",
+    "Saturn"
+   ],
+   "signs": [
+    "Cancer",
+    "Gemini"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    1,
+    4,
+    12
+   ],
+   "csl_planets": [
+    "Moon",
+    "Mercury"
+   ],
+   "cards": [
+    "MIND.01",
+    "MIND.02",
+    "EDU.02"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    1
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "mind"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 1 psychiatrist and psychology."
+   },
+   {
+    "src": "KP",
+    "text": "KP EDU.02 Moon psychology."
+   },
+   {
+    "src": "WEB",
+    "text": "A web source gives Moon and Mercury with 4,8,12."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.psychology",
+  "cat": "medical",
+  "name": "Clinical psychologist",
+  "aliases": [
+   "psychology",
+   "counsellor",
+   "counselling",
+   "साइकोलॉजिस्ट",
+   "काउंसलर"
+  ],
+  "vedic": {
+   "houses": [
+    1,
+    4,
+    5
+   ],
+   "planets": [
+    "Moon",
+    "Mercury",
+    "Jupiter"
+   ],
+   "signs": [
+    "Cancer"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    1,
+    4,
+    5
+   ],
+   "csl_planets": [
+    "Moon",
+    "Mercury",
+    "Jupiter"
+   ],
+   "cards": [
+    "EDU.02"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    1
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "mind",
+   "counsel"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 1 education psychology counselling."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.cardiology",
+  "cat": "medical",
+  "name": "Cardiologist",
+  "aliases": [
+   "cardiology",
+   "heart specialist",
+   "DM cardiology",
+   "हृदय रोग विशेषज्ञ",
+   "कार्डियोलॉजिस्ट"
+  ],
+  "vedic": {
+   "houses": [
+    4,
+    5,
+    6
+   ],
+   "planets": [
+    "Sun",
+    "Jupiter",
+    "Venus",
+    "Saturn"
+   ],
+   "signs": [
+    "Leo",
+    "Cancer"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    6,
+    10
+   ],
+   "csl_planets": [
+    "Sun",
+    "Jupiter",
+    "Venus"
+   ],
+   "cards": [
+    "PRF.01",
+    "HLT.14"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    4
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "heart"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.01 cardiologist chain through Leo, Sun, Jupiter, Venus with Saturn as obstructor."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 4 cardiologist."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.cardiacsurgery",
+  "cat": "medical",
+  "name": "Cardiac surgeon",
+  "aliases": [
+   "cardiothoracic",
+   "heart surgeon",
+   "CTVS",
+   "हार्ट सर्जन"
+  ],
+  "vedic": {
+   "houses": [
+    4,
+    8,
+    10
+   ],
+   "planets": [
+    "Sun",
+    "Mars",
+    "Ketu"
+   ],
+   "signs": [
+    "Leo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    8
+   ],
+   "csl_planets": [
+    "Sun",
+    "Mars"
+   ],
+   "cards": [
+    "HLT.14",
+    "HLT.05"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    8,
+    10
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    4
+   ],
+   "tier": "T4",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "heart",
+   "surgery"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.01 heart 6th CSL on 8th cusp and Mars gives heart surgery."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.pulmonology",
+  "cat": "medical",
+  "name": "Chest physician",
+  "aliases": [
+   "pulmonologist",
+   "chest specialist",
+   "TB and chest",
+   "lungs doctor",
+   "छाती रोग विशेषज्ञ"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    4,
+    6
+   ],
+   "planets": [
+    "Mercury",
+    "Moon"
+   ],
+   "signs": [
+    "Gemini",
+    "Cancer"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    3,
+    6
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Moon"
+   ],
+   "cards": [
+    "HLT.17"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    3,
+    4
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "lung",
+   "chest"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA houses 3 and 4 list chest and lung specialists."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.ent",
+  "cat": "medical",
+  "name": "ENT specialist",
+  "aliases": [
+   "ENT",
+   "ear nose throat",
+   "otolaryngology",
+   "कान नाक गला विशेषज्ञ"
+  ],
+  "vedic": {
+   "houses": [
+    2,
+    3,
+    6
+   ],
+   "planets": [
+    "Mercury",
+    "Jupiter",
+    "Venus"
+   ],
+   "signs": [
+    "Gemini",
+    "Taurus"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    2,
+    6
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Jupiter"
+   ],
+   "cards": [
+    "HLT.08",
+    "HLT.19"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    3
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "ear",
+   "throat",
+   "nose"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 3 ENT."
+   },
+   {
+    "src": "KP",
+    "text": "KP house keys 3 hearing and throat."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.ophthalmology",
+  "cat": "medical",
+  "name": "Eye specialist",
+  "aliases": [
+   "ophthalmologist",
+   "eye doctor",
+   "optometry",
+   "नेत्र रोग विशेषज्ञ",
+   "आँखों के डॉक्टर"
+  ],
+  "vedic": {
+   "houses": [
+    2,
+    12
+   ],
+   "planets": [
+    "Sun",
+    "Moon",
+    "Venus"
+   ],
+   "signs": [
+    "Taurus",
+    "Pisces"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    12,
+    6
+   ],
+   "csl_planets": [
+    "Sun",
+    "Moon",
+    "Venus"
+   ],
+   "cards": [
+    "HLT.18"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    2
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "eye"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 2 ophthalmologist."
+   },
+   {
+    "src": "KP",
+    "text": "KP house keys 2 right eye and 12 left eye."
+   },
+   {
+    "src": "WEB",
+    "text": "A web source gives Sun with 2 and 12."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.dentistry",
+  "cat": "medical",
+  "name": "Dentist",
+  "aliases": [
+   "dentist",
+   "dental surgeon",
+   "BDS",
+   "MDS",
+   "dentistry",
+   "डेंटिस्ट",
+   "दंत चिकित्सक"
+  ],
+  "vedic": {
+   "houses": [
+    2,
+    6,
+    10
+   ],
+   "planets": [
+    "Mars",
+    "Saturn",
+    "Sun"
+   ],
+   "signs": [
+    "Taurus",
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    10,
+    2,
+    6
+   ],
+   "csl_planets": [
+    "Mars",
+    "Saturn"
+   ],
+   "cards": [
+    "HLT.08",
+    "HLT.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    2
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "teeth",
+   "tooth"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 2 dentist, teeth and oral cavity."
+   },
+   {
+    "src": "KP",
+    "text": "KP house keys 10 teeth and 2 face."
+   },
+   {
+    "src": "BNN",
+    "text": "BNN AVA-HLT-006 Mars governs teeth and NEG-DIC-236 Saturn teeth."
+   },
+   {
+    "src": "WEB",
+    "text": "Web sources give Mars Scorpio 6th and Saturn, one gives the 7th for dental disease."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.oralsurgery",
+  "cat": "medical",
+  "name": "Oral and maxillofacial surgeon",
+  "aliases": [
+   "maxillofacial",
+   "jaw surgery"
+  ],
+  "vedic": {
+   "houses": [
+    2,
+    8,
+    10
+   ],
+   "planets": [
+    "Mars",
+    "Saturn",
+    "Ketu"
+   ],
+   "signs": [
+    "Taurus"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    8,
+    10
+   ],
+   "csl_planets": [
+    "Mars",
+    "Ketu"
+   ],
+   "cards": [
+    "HLT.05"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    8,
+    10
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    2,
+    8
+   ],
+   "tier": "T4",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "jaw"
+  ],
+  "evidence": [
+   {
+    "src": "NOTE",
+    "text": "Combines face and mouth house 2 with surgery house 8."
+   }
+  ],
+  "best_tier": "T4"
+ },
+ {
+  "id": "med.dermatology",
+  "cat": "medical",
+  "name": "Skin specialist",
+  "aliases": [
+   "dermatologist",
+   "skin doctor",
+   "venereologist",
+   "स्किन स्पेशियालिस्ट",
+   "त्वचा रोग विशेषज्ञ"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    10
+   ],
+   "planets": [
+    "Mercury",
+    "Venus",
+    "Saturn",
+    "Ketu"
+   ],
+   "signs": [
+    "Capricorn",
+    "Libra"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    10,
+    6
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Venus",
+    "Saturn",
+    "Ketu"
+   ],
+   "cards": [
+    "HLT.22",
+    "PRF.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    8
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "skin"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 8 education lists dermatology."
+   },
+   {
+    "src": "KP",
+    "text": "KP house keys 10 skin."
+   },
+   {
+    "src": "KP",
+    "text": "KP PRF.01 skin and plastic surgeon Sun Saturn link, Mars and Ketu in lagna aspecting 7th."
+   },
+   {
+    "src": "BNN",
+    "text": "BNN ARI-HLT-003 Mercury skin and AVA-HLT-004 Ketu Varna Pitta skin."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.cosmetology",
+  "cat": "medical",
+  "name": "Cosmetologist or plastic surgeon",
+  "aliases": [
+   "plastic surgery",
+   "cosmetic surgeon",
+   "aesthetic medicine",
+   "कॉस्मेटोलॉजिस्ट"
+  ],
+  "vedic": {
+   "houses": [
+    1,
+    2,
+    7
+   ],
+   "planets": [
+    "Venus",
+    "Mercury",
+    "Mars"
+   ],
+   "signs": [
+    "Taurus",
+    "Libra"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    1,
+    2,
+    10
+   ],
+   "csl_planets": [
+    "Venus",
+    "Mars",
+    "Ketu"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    8,
+    10
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    2
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "beauty"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 2 education cosmetics and plastic surgery."
+   },
+   {
+    "src": "KP",
+    "text": "KP PRF.01 plastic surgeon."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.gynecology",
+  "cat": "medical",
+  "name": "Gynecologist",
+  "aliases": [
+   "gynaecologist",
+   "gynecology",
+   "obgyn",
+   "women specialist",
+   "स्त्री रोग विशेषज्ञ",
+   "गायनेकोलॉजिस्ट",
+   "प्रसूति"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    7,
+    8
+   ],
+   "planets": [
+    "Moon",
+    "Venus",
+    "Mars",
+    "Jupiter"
+   ],
+   "signs": [
+    "Cancer",
+    "Scorpio",
+    "Libra"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    7,
+    8,
+    5
+   ],
+   "csl_planets": [
+    "Moon",
+    "Venus",
+    "Mars"
+   ],
+   "cards": [
+    "HLT.25",
+    "PRG.06"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    5,
+    7,
+    11
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "uterus",
+   "female"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA lists gynaecology under houses 5, 7 and 11."
+   },
+   {
+    "src": "KP",
+    "text": "KP house keys 7 internal female organs and 8 genital organs."
+   },
+   {
+    "src": "WEB",
+    "text": "A web source gives Moon and Venus with 5th and 7th."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.obstetrics",
+  "cat": "medical",
+  "name": "Obstetrician",
+  "aliases": [
+   "obstetrics",
+   "delivery doctor",
+   "maternity",
+   "प्रसूति रोग"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    8,
+    2
+   ],
+   "planets": [
+    "Moon",
+    "Jupiter",
+    "Venus",
+    "Mars"
+   ],
+   "signs": [
+    "Cancer"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    5,
+    11,
+    8
+   ],
+   "csl_planets": [
+    "Moon",
+    "Jupiter",
+    "Mars"
+   ],
+   "cards": [
+    "PRG.06",
+    "HLT.11"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    5
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "delivery",
+   "child"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 5 obstetrics and matrix Caesarean 5 with 2,8."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.infertility",
+  "cat": "medical",
+  "name": "Infertility and IVF specialist",
+  "aliases": [
+   "IVF",
+   "fertility specialist",
+   "reproductive medicine"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    2,
+    8
+   ],
+   "planets": [
+    "Jupiter",
+    "Moon",
+    "Venus"
+   ],
+   "signs": [
+    "Cancer"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    5,
+    8,
+    12
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Moon"
+   ],
+   "cards": [
+    "PRG.05"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    5
+   ],
+   "tier": "T4",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "fertility"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRG.05 adoption IVF assisted conception 5,8,12."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.pediatrics",
+  "cat": "medical",
+  "name": "Pediatrician",
+  "aliases": [
+   "paediatrician",
+   "child specialist",
+   "children doctor",
+   "MD pediatrics",
+   "पीडियाट्रिशीयन",
+   "बाल रोग विशेषज्ञ",
+   "शिशु रोग"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    6,
+    2
+   ],
+   "planets": [
+    "Jupiter",
+    "Moon",
+    "Mercury"
+   ],
+   "signs": [
+    "Cancer",
+    "Pisces"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    5,
+    6
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Moon",
+    "Mercury"
+   ],
+   "cards": [
+    "PRG.07",
+    "EDU.02"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    5
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "children",
+   "child"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 5 lists paediatrician and paediatrics."
+   },
+   {
+    "src": "NOTE",
+    "text": "Natural karakas Jupiter for children, Moon for infants, Mercury for the young."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.neonatology",
+  "cat": "medical",
+  "name": "Neonatologist",
+  "aliases": [
+   "newborn specialist",
+   "NICU"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    2
+   ],
+   "planets": [
+    "Moon",
+    "Jupiter",
+    "Mercury"
+   ],
+   "signs": [
+    "Cancer"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    5,
+    2
+   ],
+   "csl_planets": [
+    "Moon",
+    "Jupiter"
+   ],
+   "cards": [
+    "PRG.07"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    5
+   ],
+   "tier": "T4",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "child"
+  ],
+  "evidence": [
+   {
+    "src": "NOTE",
+    "text": "Subset of paediatrics."
+   }
+  ],
+  "best_tier": "T4"
+ },
+ {
+  "id": "med.urology",
+  "cat": "medical",
+  "name": "Urologist",
+  "aliases": [
+   "urology",
+   "MCh urology",
+   "मूत्र रोग विशेषज्ञ"
+  ],
+  "vedic": {
+   "houses": [
+    7,
+    8
+   ],
+   "planets": [
+    "Venus",
+    "Mars",
+    "Saturn"
+   ],
+   "signs": [
+    "Libra",
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    7,
+    8
+   ],
+   "csl_planets": [
+    "Venus",
+    "Mars"
+   ],
+   "cards": [
+    "HLT.16"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    7,
+    8
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "urine",
+   "kidney"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 8 urologists and urology."
+   },
+   {
+    "src": "KP",
+    "text": "KP house keys 7 kidney bladder, 8 excretory organs."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.nephrology",
+  "cat": "medical",
+  "name": "Nephrologist",
+  "aliases": [
+   "nephrology",
+   "kidney specialist",
+   "DM nephrology",
+   "किडनी रोग विशेषज्ञ"
+  ],
+  "vedic": {
+   "houses": [
+    7,
+    6
+   ],
+   "planets": [
+    "Venus",
+    "Saturn"
+   ],
+   "signs": [
+    "Libra"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    7,
+    6,
+    8
+   ],
+   "csl_planets": [
+    "Venus",
+    "Saturn"
+   ],
+   "cards": [
+    "HLT.16"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    7
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "kidney"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 7 nephrologists and nephrology."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA planet Venus kidney failure."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.gastro",
+  "cat": "medical",
+  "name": "Gastroenterologist",
+  "aliases": [
+   "gastroenterology",
+   "stomach doctor",
+   "liver and stomach",
+   "पेट रोग विशेषज्ञ"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    6
+   ],
+   "planets": [
+    "Moon",
+    "Jupiter",
+    "Mercury",
+    "Mars"
+   ],
+   "signs": [
+    "Cancer",
+    "Virgo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    5,
+    12
+   ],
+   "csl_planets": [
+    "Moon",
+    "Jupiter",
+    "Mercury"
+   ],
+   "cards": [
+    "HLT.26"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    2,
+    6
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "stomach",
+   "intestine"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 2 gastroenterologist, house 5 and 6 digestive diseases."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.hepatology",
+  "cat": "medical",
+  "name": "Liver specialist",
+  "aliases": [
+   "hepatologist",
+   "liver doctor"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    9
+   ],
+   "planets": [
+    "Jupiter"
+   ],
+   "signs": [
+    "Sagittarius",
+    "Leo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    9,
+    6
+   ],
+   "csl_planets": [
+    "Jupiter"
+   ],
+   "cards": [
+    "HLT.26"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    5
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "liver"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP house keys 9 liver."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 5 liver disease."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.endocrine",
+  "cat": "medical",
+  "name": "Diabetologist or endocrinologist",
+  "aliases": [
+   "diabetes specialist",
+   "endocrinology",
+   "thyroid",
+   "मधुमेह विशेषज्ञ"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    2
+   ],
+   "planets": [
+    "Jupiter",
+    "Venus",
+    "Mercury"
+   ],
+   "signs": [
+    "Virgo",
+    "Libra"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    1,
+    8,
+    12
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Venus"
+   ],
+   "cards": [
+    "HLT.15"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    6
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "diabetes",
+   "thyroid"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.15 diabetes + 1,6,8,12."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 6 pancreas and diabetes."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.oncology",
+  "cat": "medical",
+  "name": "Oncologist",
+  "aliases": [
+   "cancer specialist",
+   "oncology",
+   "कैंसर विशेषज्ञ"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    8,
+    12
+   ],
+   "planets": [
+    "Rahu",
+    "Jupiter",
+    "Saturn",
+    "Moon"
+   ],
+   "signs": [
+    "Cancer",
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    8,
+    12,
+    1
+   ],
+   "csl_planets": [
+    "Rahu",
+    "Jupiter",
+    "Saturn"
+   ],
+   "cards": [
+    "HLT.13"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    8
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "cancer",
+   "tumour"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.13 cancer tumour + 1,6,8,12 and Rahu as the key symbol of morbid growth."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 8 tumours."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.hematology",
+  "cat": "medical",
+  "name": "Hematologist",
+  "aliases": [
+   "blood specialist",
+   "haematology"
+  ],
+  "vedic": {
+   "houses": [
+    11,
+    6
+   ],
+   "planets": [
+    "Mars",
+    "Moon",
+    "Jupiter"
+   ],
+   "signs": [
+    "Aries",
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    11,
+    6
+   ],
+   "csl_planets": [
+    "Mars",
+    "Moon"
+   ],
+   "cards": [
+    "HLT.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    5,
+    11
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "blood"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP house keys 11 blood."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 5 diseases due to blood cells."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.radiology",
+  "cat": "medical",
+  "name": "Radiologist",
+  "aliases": [
+   "radiology",
+   "imaging",
+   "sonography",
+   "रेडियोलॉजिस्ट"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    12,
+    8
+   ],
+   "planets": [
+    "Rahu",
+    "Ketu",
+    "Sun"
+   ],
+   "signs": [
+    "Aquarius"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    12,
+    8
+   ],
+   "csl_planets": [
+    "Rahu",
+    "Ketu"
+   ],
+   "cards": [
+    "EDU.02"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    6
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "x-ray",
+   "radiology"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 6 education radiology and planet Rahu and Ketu radiology photography."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.anaesthesia",
+  "cat": "medical",
+  "name": "Anaesthetist",
+  "aliases": [
+   "anesthesiologist",
+   "anaesthesiology",
+   "एनेस्थीसिया"
+  ],
+  "vedic": {
+   "houses": [
+    8,
+    12,
+    3
+   ],
+   "planets": [
+    "Rahu",
+    "Ketu",
+    "Saturn",
+    "Mercury"
+   ],
+   "signs": [
+    "Pisces"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    8,
+    12,
+    3
+   ],
+   "csl_planets": [
+    "Rahu",
+    "Ketu",
+    "Saturn",
+    "Sun",
+    "Mercury"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    3
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "anaesthesia"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.01 anaesthetist Sun or Mercury linked to Rahu Ketu Saturn."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 3 anaesthetist."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.pathology",
+  "cat": "medical",
+  "name": "Pathologist",
+  "aliases": [
+   "pathology",
+   "lab doctor",
+   "diagnostics",
+   "लैब"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    8
+   ],
+   "planets": [
+    "Mercury",
+    "Rahu",
+    "Ketu"
+   ],
+   "signs": [
+    "Virgo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6
+   ],
+   "csl_planets": [
+    "Mercury"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    6
+   ],
+   "tier": "T4",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "lab",
+   "test"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.01 Mercury diagnosis."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.microbiology",
+  "cat": "medical",
+  "name": "Microbiologist",
+  "aliases": [
+   "microbiology",
+   "virology"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    12
+   ],
+   "planets": [
+    "Ketu",
+    "Mercury"
+   ],
+   "signs": [
+    "Virgo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    12
+   ],
+   "csl_planets": [
+    "Ketu",
+    "Mercury"
+   ],
+   "cards": [
+    "HLT.09"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    6,
+    5
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "virus",
+   "infection"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 5 viral disease."
+   },
+   {
+    "src": "KP",
+    "text": "KP HLT.09 epidemic infection fever 6."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.emergency",
+  "cat": "medical",
+  "name": "Emergency and critical care physician",
+  "aliases": [
+   "casualty",
+   "ICU",
+   "intensivist"
+  ],
+  "vedic": {
+   "houses": [
+    8,
+    12,
+    6
+   ],
+   "planets": [
+    "Mars",
+    "Rahu",
+    "Saturn"
+   ],
+   "signs": [
+    "Aries"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    8,
+    12,
+    6
+   ],
+   "csl_planets": [
+    "Mars",
+    "Rahu"
+   ],
+   "cards": [
+    "HLT.06"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    12
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "emergency"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 12 hospitals."
+   },
+   {
+    "src": "KP",
+    "text": "KP HLT.06 accident injury 4,8,12 + Mars Rahu."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.geriatrics",
+  "cat": "medical",
+  "name": "Geriatric physician",
+  "aliases": [
+   "old age doctor"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    8
+   ],
+   "planets": [
+    "Saturn"
+   ],
+   "signs": [
+    "Capricorn"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    8
+   ],
+   "csl_planets": [
+    "Saturn"
+   ],
+   "cards": [
+    "HLT.07"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    6
+   ],
+   "tier": "T4",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "old age"
+  ],
+  "evidence": [
+   {
+    "src": "WEB",
+    "text": "A web source ties Saturn to geriatric and public health."
+   }
+  ],
+  "best_tier": "T3"
+ },
+ {
+  "id": "med.sexology",
+  "cat": "medical",
+  "name": "Sexologist or andrologist",
+  "aliases": [
+   "andrology",
+   "sexual medicine",
+   "venereal disease doctor"
+  ],
+  "vedic": {
+   "houses": [
+    7,
+    8
+   ],
+   "planets": [
+    "Venus",
+    "Mars"
+   ],
+   "signs": [
+    "Libra",
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    7,
+    8
+   ],
+   "csl_planets": [
+    "Venus",
+    "Mars"
+   ],
+   "cards": [
+    "HLT.23"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    7
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "sex"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 7 sexologists and doctors dealing in venereal diseases."
+   },
+   {
+    "src": "KP",
+    "text": "KP HLT.23 + 7,8."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.forensic",
+  "cat": "medical",
+  "name": "Forensic medicine specialist",
+  "aliases": [
+   "forensic pathologist",
+   "medico legal"
+  ],
+  "vedic": {
+   "houses": [
+    8,
+    6
+   ],
+   "planets": [
+    "Mars",
+    "Saturn",
+    "Ketu"
+   ],
+   "signs": [
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    8,
+    6,
+    12
+   ],
+   "csl_planets": [
+    "Mars",
+    "Ketu"
+   ],
+   "cards": [
+    "LIT.10"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    8
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "death",
+   "police"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 8 CID, criminology."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.publichealth",
+  "cat": "medical",
+  "name": "Public health specialist",
+  "aliases": [
+   "MPH",
+   "community medicine",
+   "epidemiology",
+   "जन स्वास्थ्य"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    11
+   ],
+   "planets": [
+    "Saturn",
+    "Mercury",
+    "Moon"
+   ],
+   "signs": [
+    "Virgo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    11
+   ],
+   "csl_planets": [
+    "Saturn",
+    "Moon"
+   ],
+   "cards": [
+    "HLT.09"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    6
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "public"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 6 public health department."
+   },
+   {
+    "src": "WEB",
+    "text": "A web source ties Saturn to public health."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.ayurveda",
+  "cat": "medical",
+  "name": "Ayurvedic doctor",
+  "aliases": [
+   "BAMS",
+   "ayurveda",
+   "vaidya",
+   "आयुर्वेद",
+   "वैद्य"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    9,
+    12
+   ],
+   "planets": [
+    "Jupiter",
+    "Sun",
+    "Moon",
+    "Ketu"
+   ],
+   "signs": [
+    "Pisces",
+    "Sagittarius"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    12
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Sun",
+    "Moon"
+   ],
+   "cards": [
+    "HLT.10",
+    "EDU.02"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    6
+   ],
+   "tier": "T4",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "herb"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.10 treatment choice 6 against 12 covers allopathy against ayurveda."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.homeopathy",
+  "cat": "medical",
+  "name": "Homeopathic doctor",
+  "aliases": [
+   "BHMS",
+   "homeopathy",
+   "होम्योपैथी"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    12
+   ],
+   "planets": [
+    "Moon",
+    "Mercury",
+    "Jupiter"
+   ],
+   "signs": [
+    "Cancer"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    12
+   ],
+   "csl_planets": [
+    "Moon",
+    "Mercury"
+   ],
+   "cards": [
+    "HLT.10"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    8
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "homeo"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 8 education lists old pathies."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.physio",
+  "cat": "medical",
+  "name": "Physiotherapist",
+  "aliases": [
+   "BPT",
+   "MPT",
+   "physiotherapy",
+   "फिजियोथेरेपी"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    6,
+    10
+   ],
+   "planets": [
+    "Saturn",
+    "Mars",
+    "Mercury"
+   ],
+   "signs": [
+    "Gemini",
+    "Capricorn"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    6,
+    10
+   ],
+   "csl_planets": [
+    "Saturn",
+    "Mars"
+   ],
+   "cards": [
+    "HLT.27"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    3
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "muscle",
+   "joint"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 3 physiotherapists and physiotherapy."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.pharmacy",
+  "cat": "medical",
+  "name": "Pharmacist",
+  "aliases": [
+   "B.Pharm",
+   "D.Pharm",
+   "pharmacy",
+   "chemist",
+   "दवा विक्रेता",
+   "फार्मासिस्ट"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    11,
+    9
+   ],
+   "planets": [
+    "Mercury",
+    "Jupiter",
+    "Moon"
+   ],
+   "signs": [
+    "Sagittarius",
+    "Virgo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    11
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Jupiter"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    6
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "medicine",
+   "drug"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.01 Sagittarius pharmacy and Scorpio drugs."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 6 chemists and drugs."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.nursing",
+  "cat": "medical",
+  "name": "Nurse",
+  "aliases": [
+   "nursing",
+   "GNM",
+   "B.Sc Nursing",
+   "नर्स"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    4
+   ],
+   "planets": [
+    "Moon",
+    "Venus",
+    "Jupiter"
+   ],
+   "signs": [
+    "Cancer"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    4
+   ],
+   "csl_planets": [
+    "Moon",
+    "Venus",
+    "Jupiter"
+   ],
+   "cards": [
+    "EDU.02",
+    "HLT.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    6
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "nurse"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP EDU.02 Moon nursing."
+   },
+   {
+    "src": "KP",
+    "text": "KP HLT.01 Venus or Jupiter in and owning the 6th gives excellent nursing."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 6 nurses."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.veterinary",
+  "cat": "medical",
+  "name": "Veterinary doctor",
+  "aliases": [
+   "BVSc",
+   "vet",
+   "animal doctor",
+   "पशु चिकित्सक"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    4
+   ],
+   "planets": [
+    "Mars",
+    "Venus",
+    "Moon"
+   ],
+   "signs": [
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    4
+   ],
+   "csl_planets": [
+    "Mars",
+    "Venus"
+   ],
+   "cards": [
+    "EDU.02"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    4,
+    6
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "animal"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA houses 4 and 6 veterinary."
+   },
+   {
+    "src": "KP",
+    "text": "KP EDU.02 Scorpio chemistry veterinary."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.audiology",
+  "cat": "medical",
+  "name": "Audiologist or speech therapist",
+  "aliases": [
+   "speech therapy",
+   "hearing"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    2
+   ],
+   "planets": [
+    "Mercury",
+    "Saturn"
+   ],
+   "signs": [
+    "Gemini"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    2
+   ],
+   "csl_planets": [
+    "Mercury"
+   ],
+   "cards": [
+    "HLT.19"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    2,
+    3
+   ],
+   "tier": "T4",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "speech",
+   "hearing"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.19 ear and speech defects + 2,3,6."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.rheumatology",
+  "cat": "medical",
+  "name": "Rheumatologist",
+  "aliases": [
+   "arthritis doctor"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    8,
+    10
+   ],
+   "planets": [
+    "Saturn",
+    "Mars"
+   ],
+   "signs": [
+    "Capricorn"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    8,
+    10
+   ],
+   "csl_planets": [
+    "Saturn"
+   ],
+   "cards": [
+    "HLT.27"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    10
+   ],
+   "tier": "T4",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "arthritis"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.27 rheumatism arthritis + 1,6,8,12."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.allergy",
+  "cat": "medical",
+  "name": "Allergy and immunology specialist",
+  "aliases": [
+   "allergist",
+   "immunology"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    8
+   ],
+   "planets": [
+    "Mercury",
+    "Rahu"
+   ],
+   "signs": [
+    "Virgo",
+    "Gemini"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    8
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Rahu"
+   ],
+   "cards": [
+    "HLT.12"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    5
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "allergy"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 5 allergist."
+   },
+   {
+    "src": "KP",
+    "text": "KP HLT.12 poisoning bites allergy 8,6."
+   },
+   {
+    "src": "BNN",
+    "text": "BNN ARI-HLT-003 Mercury allergies."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.proctology",
+  "cat": "medical",
+  "name": "Proctologist or colorectal surgeon",
+  "aliases": [
+   "piles surgeon",
+   "colorectal"
+  ],
+  "vedic": {
+   "houses": [
+    8,
+    6
+   ],
+   "planets": [
+    "Mars",
+    "Ketu"
+   ],
+   "signs": [
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    8,
+    6
+   ],
+   "csl_planets": [
+    "Mars",
+    "Ketu"
+   ],
+   "cards": [
+    "HLT.01"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    8,
+    10
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    8,
+    9
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "rectum",
+   "piles"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 9 colorectal surgery and house 8 rectum."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.sports",
+  "cat": "medical",
+  "name": "Sports medicine doctor",
+  "aliases": [
+   "sports physician"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    6,
+    3
+   ],
+   "planets": [
+    "Mars",
+    "Saturn"
+   ],
+   "signs": [
+    "Aries"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    5,
+    6
+   ],
+   "csl_planets": [
+    "Mars"
+   ],
+   "cards": [
+    "PRF.19"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    5
+   ],
+   "supporting": [
+    6,
+    11
+   ],
+   "ta_houses": [
+    5
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "sports"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix sports 5 with 6,11."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "med.yoga",
+  "cat": "medical",
+  "name": "Yoga and naturopathy doctor",
+  "aliases": [
+   "BNYS",
+   "naturopathy",
+   "yoga therapy"
+  ],
+  "vedic": {
+   "houses": [
+    1,
+    9,
+    12
+   ],
+   "planets": [
+    "Sun",
+    "Ketu",
+    "Jupiter"
+   ],
+   "signs": [
+    "Aries"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    1,
+    12
+   ],
+   "csl_planets": [
+    "Sun",
+    "Ketu"
+   ],
+   "cards": [
+    "EDU.08"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    1
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "yoga"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 1 yoga practitioner and yoga."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "deg.mbbs",
+  "cat": "medical",
+  "name": "MBBS",
+  "aliases": [
+   "MBBS",
+   "medical degree",
+   "doctor of medicine degree",
+   "एमबीबीएस"
+  ],
+  "vedic": {
+   "houses": [
+    4,
+    5,
+    9,
+    6
+   ],
+   "planets": [
+    "Sun",
+    "Jupiter",
+    "Mars",
+    "Mercury"
+   ],
+   "signs": [
+    "Leo",
+    "Virgo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    9,
+    11,
+    6
+   ],
+   "csl_planets": [
+    "Sun",
+    "Mars",
+    "Jupiter"
+   ],
+   "cards": [
+    "EDU.02"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    4,
+    9
+   ],
+   "supporting": [
+    11,
+    6
+   ],
+   "ta_houses": [
+    6
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "medicine",
+   "degree"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Medicine as a subject of study primary 4 supporting 6."
+   },
+   {
+    "src": "KP",
+    "text": "KP EDU.02 Sun or Mars as 4th CSL gives doctor."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "deg.md",
+  "cat": "medical",
+  "name": "MD or MS postgraduate",
+  "aliases": [
+   "MD",
+   "MS",
+   "postgraduate medical",
+   "DNB",
+   "एमडी",
+   "पोस्ट ग्रेजुएट"
+  ],
+  "vedic": {
+   "houses": [
+    9,
+    4,
+    11
+   ],
+   "planets": [
+    "Sun",
+    "Jupiter",
+    "Mercury"
+   ],
+   "signs": [
+    "Virgo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    9,
+    4,
+    11
+   ],
+   "csl_planets": [
+    "Sun",
+    "Jupiter"
+   ],
+   "cards": [
+    "EDU.02"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    4,
+    9
+   ],
+   "supporting": [
+    11,
+    6
+   ],
+   "ta_houses": [
+    6
+   ],
+   "tier": "T4",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "postgraduate"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP EDU.02 the 9th CSL carries the postgraduate line and both 4th and 9th CSL must link 4,9,11 for the top level."
+   },
+   {
+    "src": "BNN",
+    "text": "BNN ARI-LIF-015 Jupiter postgraduate and research."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "deg.dm",
+  "cat": "medical",
+  "name": "DM or MCh super speciality",
+  "aliases": [
+   "DM",
+   "MCh",
+   "super speciality"
+  ],
+  "vedic": {
+   "houses": [
+    9,
+    4,
+    11,
+    12
+   ],
+   "planets": [
+    "Jupiter",
+    "Sun",
+    "Mercury"
+   ],
+   "signs": [
+    "Sagittarius"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    9,
+    11,
+    8
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Sun"
+   ],
+   "cards": [
+    "EDU.06"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    4,
+    9
+   ],
+   "supporting": [
+    11,
+    6
+   ],
+   "ta_houses": [
+    6
+   ],
+   "tier": "T4",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "research"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP EDU.06 research PhD thesis 9,11,8."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "deg.bds",
+  "cat": "medical",
+  "name": "BDS or MDS",
+  "aliases": [
+   "BDS",
+   "MDS",
+   "dental degree"
+  ],
+  "vedic": {
+   "houses": [
+    2,
+    4,
+    9
+   ],
+   "planets": [
+    "Mars",
+    "Saturn"
+   ],
+   "signs": [
+    "Taurus"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    9,
+    2
+   ],
+   "csl_planets": [
+    "Mars"
+   ],
+   "cards": [
+    "EDU.02"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    4,
+    9
+   ],
+   "supporting": [
+    11,
+    6
+   ],
+   "ta_houses": [
+    2
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "dental"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 2 education dentistry."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "deg.pharmacy",
+  "cat": "medical",
+  "name": "Pharmacy degree",
+  "aliases": [
+   "B.Pharm",
+   "M.Pharm",
+   "Pharm.D"
+  ],
+  "vedic": {
+   "houses": [
+    4,
+    6,
+    9
+   ],
+   "planets": [
+    "Mercury",
+    "Jupiter"
+   ],
+   "signs": [
+    "Sagittarius",
+    "Virgo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    6
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Jupiter"
+   ],
+   "cards": [
+    "EDU.02"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    4,
+    9
+   ],
+   "supporting": [
+    11,
+    6
+   ],
+   "ta_houses": [
+    6
+   ],
+   "tier": "T1",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "pharmacy"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 6 education drugs and chemistry."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "deg.nursing",
+  "cat": "medical",
+  "name": "Nursing degree",
+  "aliases": [
+   "B.Sc Nursing",
+   "GNM",
+   "ANM"
+  ],
+  "vedic": {
+   "houses": [
+    4,
+    6
+   ],
+   "planets": [
+    "Moon",
+    "Venus"
+   ],
+   "signs": [
+    "Cancer"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    6
+   ],
+   "csl_planets": [
+    "Moon"
+   ],
+   "cards": [
+    "EDU.02"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    4,
+    9
+   ],
+   "supporting": [
+    11,
+    6
+   ],
+   "ta_houses": [
+    6
+   ],
+   "tier": "T4",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "nursing"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP EDU.02 Moon nursing."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "deg.ayush",
+  "cat": "medical",
+  "name": "AYUSH degree",
+  "aliases": [
+   "BAMS",
+   "BHMS",
+   "BUMS",
+   "BNYS"
+  ],
+  "vedic": {
+   "houses": [
+    4,
+    6,
+    9
+   ],
+   "planets": [
+    "Jupiter",
+    "Moon",
+    "Sun"
+   ],
+   "signs": [
+    "Pisces"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    6
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Moon"
+   ],
+   "cards": [
+    "EDU.02"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    4,
+    9
+   ],
+   "supporting": [
+    11,
+    6
+   ],
+   "ta_houses": [
+    6
+   ],
+   "tier": "T4",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "ayush"
+  ],
+  "evidence": [
+   {
+    "src": "NOTE",
+    "text": "See the matching speciality entries."
+   }
+  ],
+  "best_tier": "T4"
+ },
+ {
+  "id": "deg.paramedical",
+  "cat": "medical",
+  "name": "Paramedical or lab degree",
+  "aliases": [
+   "MLT",
+   "radiography",
+   "optometry",
+   "OT technician",
+   "DMLT"
+  ],
+  "vedic": {
+   "houses": [
+    4,
+    6
+   ],
+   "planets": [
+    "Mercury",
+    "Rahu"
+   ],
+   "signs": [
+    "Virgo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    6
+   ],
+   "csl_planets": [
+    "Mercury"
+   ],
+   "cards": [
+    "EDU.02"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    4,
+    9
+   ],
+   "supporting": [
+    11,
+    6
+   ],
+   "ta_houses": [
+    6
+   ],
+   "tier": "T4",
+   "note": "primary and supporting are the event matrix cusps, Medical practitioner 6 or 8 with 10 and Surgeons 8,10, or 4,9 for a degree. The speciality itself comes from ta_houses, the TA lists of professions and education per house."
+  },
+  "bnn_keywords": [
+   "lab"
+  ],
+  "evidence": [
+   {
+    "src": "NOTE",
+    "text": "Technician level."
+   }
+  ],
+  "best_tier": "T4"
+ }
+]

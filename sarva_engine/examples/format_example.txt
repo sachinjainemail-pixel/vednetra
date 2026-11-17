@@ -6,6 +6,7 @@ LIMITS Readings under each methodology, not certainties. Udu and Quad Dasha are 
 
 QUESTION Q1
 OPTIONS Q1 A B C D
+LEXICON Q1 NONE
 
 METHOD KPPRO Q1
 EVIDENCE Q1 KPPRO significator NET in the PRESENT band, CHART DECIDED, MEDIUM

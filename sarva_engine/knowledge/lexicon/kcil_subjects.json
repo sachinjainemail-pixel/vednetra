@@ -1,0 +1,138 @@
+{
+ "planet_subjects": [
+  {
+   "planet": "Sun",
+   "subjects": "due to fire, accident"
+  },
+  {
+   "planet": "Moon",
+   "subjects": "public place, drowning, shipwreck, public calamity"
+  },
+  {
+   "planet": "Mars",
+   "subjects": "sudden or violent death, by a weapon"
+  },
+  {
+   "planet": "Mercury",
+   "subjects": "by a fall"
+  },
+  {
+   "planet": "Saturn",
+   "subjects": "chronic and lingering disease, painful death, death due to hunger"
+  },
+  {
+   "planet": "Jupiter",
+   "subjects": "fever, damaged liver, pleasant death, over-production of fat"
+  },
+  {
+   "planet": "Venus",
+   "subjects": "indigestion, kidney failure"
+  },
+  {
+   "planet": "Moon",
+   "subjects": "the native **lacks boldness to take decisions**"
+  },
+  {
+   "planet": "Saturn",
+   "subjects": "calculative, cautious, industrious, but **lacks confidence and develops forgetfulness**"
+  },
+  {
+   "planet": "Mercury",
+   "subjects": "**dual mind** (\"to be or not to be\"), but **good memory**"
+  },
+  {
+   "planet": "Moon",
+   "subjects": "textiles, chemical engineering, psychology, hydraulics, water engineering, music, marketing, violin, veena"
+  },
+  {
+   "planet": "Sun",
+   "subjects": "medicine, chemistry, astrology, geography"
+  },
+  {
+   "planet": "Mars",
+   "subjects": "mechanical and civil engineering, surgery, structural design, physics, martial arts, military science"
+  },
+  {
+   "planet": "Mercury",
+   "subjects": "mathematics, engineering, astrology, puranic studies, logic, journalism, advertisement, public speaking"
+  },
+  {
+   "planet": "Venus",
+   "subjects": "chemistry, electronics, computer, agriculture, veterinary, chemical engineering, textiles, naval science, poetry, music, foreign literature, sexology, nephrology, ophthalmology"
+  },
+  {
+   "planet": "Jupiter",
+   "subjects": "law, medicine, military science, administration, instructional techniques, philosophy, religion, politics, international law, business management, banking, astrology"
+  },
+  {
+   "planet": "Saturn",
+   "subjects": "geology, petrochemical engineering, refinery techniques, civil and military engineering, electronics, labour law, black magic, industrial engineering"
+  },
+  {
+   "planet": "Rahu & Ketu",
+   "subjects": "radiology, photography, space science — **and the subjects of the planets they represent**"
+  },
+  {
+   "planet": "Saturn",
+   "subjects": "the disease becomes **CHRONIC**"
+  },
+  {
+   "planet": "Mars",
+   "subjects": "**acute, sudden and painful**, and **causes operations**"
+  },
+  {
+   "planet": "Mercury",
+   "subjects": "the disease **gets COMPLICATED**"
+  }
+ ],
+ "cusp_subjects": [
+  {
+   "cusp": "1",
+   "subjects": "brain, head, psychiatry, yoga"
+  },
+  {
+   "cusp": "2",
+   "subjects": "sound engineering, linguistics, economics, mathematics, dental, ophthalmology"
+  },
+  {
+   "cusp": "3",
+   "subjects": "electrical, electronics, communication, computer science, printing technology, physics, ENT, neurology, journalism, information technology"
+  },
+  {
+   "cusp": "4",
+   "subjects": "agriculture engineering, automobile engineering, mechanical engineering, machinery, civil engineering, geography, home science, cardiology, industrial engineering"
+  },
+  {
+   "cusp": "5",
+   "subjects": "architecture, film technology, sports, atomic energy, nuclear science, arts, music, paediatrics, gynaecology, obstetrics"
+  },
+  {
+   "cusp": "6",
+   "subjects": "textiles, chemistry, biology, medicine, law, radiology"
+  },
+  {
+   "cusp": "7",
+   "subjects": "public administration, business management, international law"
+  },
+  {
+   "cusp": "8",
+   "subjects": "surgical equipment, sanitary engineering, history, zoology, study of secret parts, urology, mining engineering"
+  },
+  {
+   "cusp": "9",
+   "subjects": "aeronautical engineering, space technology, Sanskrit, philosophy, law, colorectal surgery, genetic disorders"
+  },
+  {
+   "cusp": "10",
+   "subjects": "production technology, professional diseases, politics, administration"
+  },
+  {
+   "cusp": "11",
+   "subjects": "polymer technology, commerce, gynaecology, obstetrics"
+  },
+  {
+   "cusp": "12",
+   "subjects": "foreign languages, research, criminology"
+  }
+ ]
+}

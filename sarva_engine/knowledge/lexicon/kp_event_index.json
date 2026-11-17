@@ -1,0 +1,1280 @@
+[
+ {
+  "code": "EDU.01",
+  "matter": "Basic education, continuity / break",
+  "houses": "4,9,11 / 3,8,12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "EDU.02",
+  "matter": "Higher education / specialisation / subject",
+  "houses": "4,9,11 + karakas / 3,8",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "EDU.03",
+  "matter": "Pass / fail / rank in an examination",
+  "houses": "4,9,11 / 3,8,12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "EDU.04",
+  "matter": "Admission to college / course / abroad study",
+  "houses": "4,9,11,12 / 3,8",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "EDU.05",
+  "matter": "Competitive exam, interview result",
+  "houses": "6,10,11 / 5,9,12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "EDU.06",
+  "matter": "Research, PhD, thesis",
+  "houses": "9,11,8 / —",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "EDU.07",
+  "matter": "Scholarship / stipend for study",
+  "houses": "+ 2,4,6,11; − 3,5",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "EDU.08",
+  "matter": "Learning astrology / occult study and mastery",
+  "houses": "+ 9,12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "EDU.09",
+  "matter": "Distance / correspondence education; study while in service",
+  "houses": "+ 3,4,6,9,10,11; − 12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "EDU.10",
+  "matter": "Music and fine-arts aptitude and learning (talent, serious hobby)",
+  "houses": "+ 2,5; − 8,12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "EDU.11",
+  "matter": "Accreditation / recognition granted by an institution without examination",
+  "houses": "+ 6,10,11; − 7,12",
+  "card": "— none: use KP-1 generic house-group method"
+ },
+ {
+  "code": "FAM.01",
+  "matter": "Father: health, gain, death, relationship",
+  "houses": "9 and derived / N/H",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "FAM.02",
+  "matter": "Mother",
+  "houses": "4 and derived / N/H",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "FAM.03",
+  "matter": "Siblings: birth, welfare, disputes, help",
+  "houses": "3,11 / N/H",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "FAM.04",
+  "matter": "In-laws",
+  "houses": "8 (spouse's 2), 7 derived / N/H",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "FAM.05",
+  "matter": "Family harmony, joint family, separation",
+  "houses": "2 / N/H",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "FAM.06",
+  "matter": "Uncle / aunt / grandparents and other derived relatives",
+  "houses": "derived houses / N/H",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "FAM.07",
+  "matter": "Native given in adoption (being adopted)",
+  "houses": "+ 4,5,8",
+  "card": "— none: use KP-1 generic house-group method"
+ },
+ {
+  "code": "HLT.01",
+  "matter": "Will a disease occur / which disease / body part",
+  "houses": "6,8,12 / —",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HLT.02",
+  "matter": "Diagnosis of an existing complaint",
+  "houses": "1,6,8,12 / —",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HLT.03",
+  "matter": "Duration of illness; recovery / cure date",
+  "houses": "— / 1,5,11",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HLT.04",
+  "matter": "Hospitalisation, admission and discharge",
+  "houses": "12 / 1,5,11",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HLT.05",
+  "matter": "Surgery / operation, and its success",
+  "houses": "8,12 (4-8-12 trigon) / 1,5,11",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HLT.06",
+  "matter": "Accident, injury, fracture, burns",
+  "houses": "4,8,12 + Mars/Rahu / —",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HLT.07",
+  "matter": "Chronic disease (diabetes, BP, cancer, kidney, heart …)",
+  "houses": "6,8,12 / —",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HLT.08",
+  "matter": "Eyes / ears / teeth / speech (Axis-1 houses 2, 12, 3, 11)",
+  "houses": "2,3,11,12 / —",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HLT.09",
+  "matter": "Epidemic / infection / fever",
+  "houses": "6 / —",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HLT.10",
+  "matter": "Treatment choice: doctor, medicine, allopathy vs ayurveda",
+  "houses": "6 vs 12 / —",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HLT.11",
+  "matter": "Pregnancy complications, miscarriage, abortion",
+  "houses": "5,8,12 / 2,5,11",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HLT.12",
+  "matter": "Poisoning, bites, allergy",
+  "houses": "8,6 / —",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HLT.13",
+  "matter": "Cancer, tumour, leukaemia (malignant or space-occupying growth)",
+  "houses": "+ 1,6,8,12",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HLT.14",
+  "matter": "Heart disease and blood pressure (cardiac / cardiovascular)",
+  "houses": "+ 6,8,12",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HLT.15",
+  "matter": "Diabetes",
+  "houses": "+ 1,6,8,12",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HLT.16",
+  "matter": "Kidney, urinary tract and prostate disease",
+  "houses": "+ 6,7,8",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HLT.17",
+  "matter": "Respiratory disease: tuberculosis, asthma, lung disease, asphyxia",
+  "houses": "+ 1,6",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HLT.18",
+  "matter": "Eye disease, cataract, blindness",
+  "houses": "+ 2,6,12",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HLT.19",
+  "matter": "Ear and speech defects: deafness, dumbness, deaf-mute",
+  "houses": "+ 2,3,6",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HLT.20",
+  "matter": "Neurological disease: epilepsy, meningitis, nervous and brain disease, coma",
+  "houses": "+ 1,6,8,12",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HLT.21",
+  "matter": "Paralysis and polio",
+  "houses": "+ 1,6,8,12",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HLT.22",
+  "matter": "Skin disease and leprosy",
+  "houses": "+ 6,8,12",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HLT.23",
+  "matter": "Venereal disease, sexual disorders, impotence",
+  "houses": "+ 7,8; − 1,4,6,10,12",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HLT.24",
+  "matter": "Congenital defect, deformity, bodily defect",
+  "houses": "+ 1,6,8; − 4,5",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HLT.25",
+  "matter": "Gynaecological disease: uterus, leucorrhoea, hysterectomy",
+  "houses": "+ 6,7,8",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HLT.26",
+  "matter": "Digestive and abdominal disease: stomach, ulcer, liver, appendicitis, hernia",
+  "houses": "+ 6,12",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HLT.27",
+  "matter": "Rheumatism and arthritis",
+  "houses": "+ 1,6,8,12",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HLT.28",
+  "matter": "Amputation, mutilation, loss of a limb",
+  "houses": "+ 1,6,8,12",
+  "card": "— none: use KP-1 generic house-group method"
+ },
+ {
+  "code": "HLT.29",
+  "matter": "Puberty: onset and timing of menstruation",
+  "houses": "+ 5,8",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HLT.30",
+  "matter": "Medical fitness examination: pass / certificate",
+  "houses": "+ 4,7,11; − 6,8,12",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "HOR.LOST.01",
+  "matter": "Lost article: will it be found, where, when",
+  "houses": "2,11 vs 12 / H",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "HOR.LOST.02",
+  "matter": "Missing person: alive, whereabouts, return",
+  "houses": "2,4,11 vs 3,9,12 / H",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "HOR.LOST.03",
+  "matter": "Runaway / eloped person returns",
+  "houses": "2,4,11 / H",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "HOR.LOST.04",
+  "matter": "Hidden treasure / buried object",
+  "houses": "4,8 / H",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "HOR.LOST.05",
+  "matter": "Direction and distance of the object or person",
+  "houses": "sign / star directions / H",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "LIT.01",
+  "matter": "Litigation, and who wins the court case",
+  "houses": "1,6,11 (querent) vs 7,12,5 / —",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "LIT.02",
+  "matter": "Compromise / settlement",
+  "houses": "7,11 / —",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "LIT.03",
+  "matter": "Arrest, imprisonment, bail, release",
+  "houses": "2,3,8,12 / 1,5,11 / —",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "LIT.04",
+  "matter": "Theft: will stolen goods be recovered, thief's identity",
+  "houses": "2,6,11 vs 12 / —",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "LIT.05",
+  "matter": "Enemies, conspiracy, black magic suspicion",
+  "houses": "6,8,12 / —",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "LIT.06",
+  "matter": "Police case, FIR, government action",
+  "houses": "6,8,12,10 / —",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "LIT.07",
+  "matter": "Appeal to a higher court: success or loss",
+  "houses": "+ 6,9,11; − 5,12",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "LIT.08",
+  "matter": "Date of judgment / end of litigation",
+  "houses": "+ 1,4,6,9,11",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "LIT.09",
+  "matter": "Filing a suit / complaint in court, and when",
+  "houses": "+ 6,11",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "LIT.10",
+  "matter": "Murder, homicide, assassination",
+  "houses": "+ 8,12; − 1,5,11",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "LIT.11",
+  "matter": "Kidnapping, ransom and release of the kidnapped",
+  "houses": "+ 2,3,4,5,6,7,8,11,12",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "LIT.12",
+  "matter": "Violent attack: assault, looting, terror attack",
+  "houses": "+ 1,2,7,8,11; − 12",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "LIT.13",
+  "matter": "Sexual assault (victim)",
+  "houses": "+ 2,5,8,12",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "LON.01",
+  "matter": "Span of life (short / medium / long)",
+  "houses": "1,3,5,8,10 / maraka 2,7; badhaka",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "LON.02",
+  "matter": "Danger periods / balarishta",
+  "houses": "8,12, maraka, badhaka / —",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "LON.03",
+  "matter": "Death timing, manner, place",
+  "houses": "2,7,8,12 + badhaka / 1,5,11",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "LON.04",
+  "matter": "Death or illness of a relative (derived houses)",
+  "houses": "derived 2,7,12 / —",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "LON.05",
+  "matter": "Will the sick person survive (horary)",
+  "houses": "1,5,11 / 2,7,8,12",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "LON.06",
+  "matter": "(see card)",
+  "houses": "",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "MAR.01",
+  "matter": "Promise of marriage",
+  "houses": "2,7,11 / 1,6,10",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "MAR.02",
+  "matter": "Timing of marriage",
+  "houses": "2,7,11 (+5,8 for union) / 1,6,10",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "MAR.03",
+  "matter": "Delay / denial of marriage",
+  "houses": "6,10,12 / —",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "MAR.04",
+  "matter": "Love affair, and love vs arranged marriage",
+  "houses": "5,7,11 / 6,12",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "MAR.05",
+  "matter": "Nature, profession, direction and distance of the spouse",
+  "houses": "7 CSL, its star/sub / —",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "MAR.06",
+  "matter": "Marital harmony / disharmony",
+  "houses": "2,7,11 / 6,12,1,10",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "MAR.07",
+  "matter": "Separation, divorce, reunion",
+  "houses": "1,6,10,12 / 2,7,11",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "MAR.08",
+  "matter": "Second / multiple marriages",
+  "houses": "2,7,11 with dual signs, 9 / —",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "MAR.09",
+  "matter": "Marriage matching (compatibility by KP)",
+  "houses": "7 of each vs the other's 6/12 / —",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "MAR.10",
+  "matter": "Extra-marital affair, secret relationship",
+  "houses": "5,8,12 / —",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "MAR.11",
+  "matter": "Will the proposal / talks succeed (horary)",
+  "houses": "2,3,7,11 / 1,6,10,12",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "MAR.12",
+  "matter": "Engagement broken / called off",
+  "houses": "6,12 / —",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "MAR.13",
+  "matter": "Engagement / betrothal ceremony",
+  "houses": "+ 2,3,5,7,9,11; − 6,8,12",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "MAR.14",
+  "matter": "Dowry",
+  "houses": "+ 9,10,11; − 8,12",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "MAR.15",
+  "matter": "Inter-caste marriage",
+  "houses": "+ 2,5,7,11",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "MAR.16",
+  "matter": "Marriage abroad / going abroad for marriage",
+  "houses": "+ 2,3,6,7,9,11,12",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "MAR.17",
+  "matter": "Marriage fraud: cheated by partner, partner already married",
+  "houses": "+ 2,5,7,8,11,12",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "MIN.01",
+  "matter": "Will the expected person / letter / call / parcel arrive, and when",
+  "houses": "3,11 (+2) / H",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "MIN.02",
+  "matter": "Will the meeting / appointment happen",
+  "houses": "3,7,11 / H",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "MIN.03",
+  "matter": "Will the message / request / application be accepted",
+  "houses": "3,11 / H",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "MIN.04",
+  "matter": "Result of an application, file, approval, permission, licence",
+  "houses": "6,10,11 / H",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "MIN.05",
+  "matter": "Will the purchase / order be delivered",
+  "houses": "3,11 vs 12 / H",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "MIN.06",
+  "matter": "Will the function / event / trip go ahead as planned",
+  "houses": "11 vs 12 / H",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "MIN.07",
+  "matter": "Gift, favour, help from someone",
+  "houses": "11 / H",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "MIN.08",
+  "matter": "Pet / animal: health, lost pet",
+  "houses": "6,12 / H",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "MIN.09",
+  "matter": "Mobile, computer, gadget: repair, loss",
+  "houses": "3 (+4,8) / H",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "MIN.10",
+  "matter": "Rain / weather",
+  "houses": "3,4,11 (+ watery signs) / H",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "MIN.11",
+  "matter": "Competition, match, sports: who wins",
+  "houses": "1,6,11 vs 7,5,12 / H",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "MIN.12",
+  "matter": "Elections (candidate horary)",
+  "houses": "1,6,10,11 vs 5,12 / H",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "MIN.13",
+  "matter": "Choosing between options (A vs B)",
+  "houses": "per option / H",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "MIN.14",
+  "matter": "Yes/No questions in general",
+  "houses": "question house group / H",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "MIN.15",
+  "matter": "Signing of an agreement / contract, and when",
+  "houses": "+ 3,6,11",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "MIN.16",
+  "matter": "News, report, rumour or statement: will it come, is it true",
+  "houses": "+ 3",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "MIN.17",
+  "matter": "Count / quantity / number of items",
+  "houses": "+ 2,3,6,9,11; − 8",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "MIN.18",
+  "matter": "Success of a project, plan, venture or mission (incl. space launch)",
+  "houses": "+ 1,2,3,6,10,11; − 4,5,7,8,12",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "MIN.19",
+  "matter": "Negotiation: success, gain or loss",
+  "houses": "+ 6,11; − 5,12",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "MIN.20",
+  "matter": "Restoration of electric power supply",
+  "houses": "",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "MIN.21",
+  "matter": "War: will it occur, who wins",
+  "houses": "+ 2,4,7,9,10",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "MIND.01",
+  "matter": "Mental peace / anxiety / depression",
+  "houses": "4,1 / 6,8,12",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "MIND.02",
+  "matter": "Mental illness, psychiatric episode, recovery date",
+  "houses": "1,4,6,8,12 / 5,11",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "MIND.03",
+  "matter": "Addiction (alcohol, drugs, gambling) and de-addiction",
+  "houses": "6,8,12 / —",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "MIND.04",
+  "matter": "Suicide risk / tendency",
+  "houses": "8,12,1 / —",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "MIND.05",
+  "matter": "Criminal tendency / criminal traits",
+  "houses": "+ 5,6,8,10,12",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "MIND.06",
+  "matter": "Intellect: sharp or weak intelligence, quality of thinking",
+  "houses": "+ 1,3,4,5,9,10,11,12; − 6,8",
+  "card": "— none: use KP-1 generic house-group method"
+ },
+ {
+  "code": "PRF.01",
+  "matter": "Nature of profession (what field)",
+  "houses": "10 CSL + karakas / —",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.02",
+  "matter": "Service vs business",
+  "houses": "6 vs 7 / —",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.03",
+  "matter": "Getting a job / timing of first job",
+  "houses": "2,6,10,11 / 1,5,9,12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.04",
+  "matter": "Promotion, increment, raise",
+  "houses": "2,6,10,11 / 5,9",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.05",
+  "matter": "Transfer (place), and whether wanted",
+  "houses": "3,10,12 / —",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.06",
+  "matter": "Suspension, dismissal, job loss, break in service",
+  "houses": "5,8,9,12 / 2,6,10,11",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.07",
+  "matter": "Resignation / change of job",
+  "houses": "5,9 then 2,6,10,11 / —",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.08",
+  "matter": "Retirement, VRS, pension",
+  "houses": "5,9,12 / —",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.09",
+  "matter": "Start of a business, and its success or failure",
+  "houses": "7,10,11 / 5,8,12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.10",
+  "matter": "Partnership: formation, success, dispute, dissolution",
+  "houses": "7,11 vs 6,12 / —",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.11",
+  "matter": "Government job, political post, election win",
+  "houses": "10,11 + Sun, 6 / 5,12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.12",
+  "matter": "Contract, tender, deal will be won",
+  "houses": "7,10,11 / 12,8",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.13",
+  "matter": "Interview selection",
+  "houses": "6,10,11 / 5,12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.14",
+  "matter": "Work abroad",
+  "houses": "3,9,12 + 10,11 / —",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.15",
+  "matter": "Astrology as a profession / astrological aptitude",
+  "houses": "+ 9,12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.16",
+  "matter": "Writing, authorship and book publication",
+  "houses": "+ 3,10,11; − 2,5,8,9,12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.17",
+  "matter": "Launch of a product, website, TV show or film, and its success",
+  "houses": "+ 2,6,10,11; − 5,9",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.18",
+  "matter": "Arts and entertainment career: acting, cinema, film production, singing",
+  "houses": "+ 5,6,10,11; − 4,8,12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.19",
+  "matter": "Sports talent and sports career",
+  "houses": "+ 1,5,10,11; − 4,9",
+  "card": "— none: use KP-1 generic house-group method"
+ },
+ {
+  "code": "PRF.20",
+  "matter": "Farming / agriculture",
+  "houses": "+ 4,6,11",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.21",
+  "matter": "Medical profession; running a nursing home / hospital",
+  "houses": "+ 4,11,12",
+  "card": "— none: use KP-1 generic house-group method"
+ },
+ {
+  "code": "PRF.22",
+  "matter": "Agency, brokerage, commission work",
+  "houses": "+ 2,3,6,10,11",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.23",
+  "matter": "Export-import trade",
+  "houses": "+ 3,7,9,10,12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.24",
+  "matter": "Sale of goods / artwork: will the customer buy, bargaining",
+  "houses": "+ 5,6,11; − 8,12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.25",
+  "matter": "Advertisement and its return",
+  "houses": "+ 2,3,5,7,9,11; − 6,8,10,12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.26",
+  "matter": "Prosperity of an institution / organisation; organisational change",
+  "houses": "+ 6,12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.27",
+  "matter": "Business run with or in the name of a family member (spouse, father); spouse's business",
+  "houses": "+ 4,8",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.28",
+  "matter": "Labour dispute, union trouble, strike outcome",
+  "houses": "+ 11; − 5,12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.29",
+  "matter": "Relations with the boss; trouble or under-performance at work",
+  "houses": "+ 1,5,8,9,12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.30",
+  "matter": "Contract vs permanent job: confirmation, contract renewal, contract-work income",
+  "houses": "+ 2,6,10,11; − 1,5,9",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.31",
+  "matter": "Tenure / continuity in office or service (incl. caretaker period, government stability)",
+  "houses": "+ 1,2,4,8,12; − 10,11",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.32",
+  "matter": "Reinstatement / regaining lost office",
+  "houses": "+ 2,6,10,11; − 1,5,9,12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.33",
+  "matter": "Leave from service (incl. leave without pay)",
+  "houses": "+ 8,9,10,12; − 1,5",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.34",
+  "matter": "Place and direction of the job / posting",
+  "houses": "+ 4; − 3,9,12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.35",
+  "matter": "Dual / plural occupation",
+  "houses": "",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.36",
+  "matter": "Change of business premises",
+  "houses": "+ 3,12; − 4",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.37",
+  "matter": "Closure (sealing) or sale of a business / factory",
+  "houses": "+ 3,5,10",
+  "card": "— none: use KP-1 generic house-group method"
+ },
+ {
+  "code": "PRF.38",
+  "matter": "Coalition government / political alliance: forms, holds, breaks",
+  "houses": "+ 3,4,7,11; − 1,8,12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRF.39",
+  "matter": "Hiring staff, servants, helpers or volunteers",
+  "houses": "+ 6,11; − 8,12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRG.01",
+  "matter": "Promise of children",
+  "houses": "2,5,11 / 1,4,10",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "PRG.02",
+  "matter": "Timing of conception / childbirth",
+  "houses": "2,5,11 / 1,4,10",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "PRG.03",
+  "matter": "Sex of the child",
+  "houses": "5 CSL star/sub, odd/even / —",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "PRG.04",
+  "matter": "Number of children, twins",
+  "houses": "5 CSL, dual signs / —",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "PRG.05",
+  "matter": "Adoption, IVF / assisted conception",
+  "houses": "5,8,12 / —",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "PRG.06",
+  "matter": "Safe delivery / caesarean",
+  "houses": "5,11 vs 8,12 / —",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "PRG.07",
+  "matter": "Children's welfare, progress, disputes with children",
+  "houses": "5 and derived / —",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "PRG.08",
+  "matter": "Birth star and lagna of the coming child",
+  "houses": "",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "PRP.01",
+  "matter": "Purchase of land / house / flat",
+  "houses": "4,11,12 (+6 for loan) / 3,5,10",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRP.02",
+  "matter": "Sale of property",
+  "houses": "3,10,5 / 4",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRP.03",
+  "matter": "Construction, renovation, completion",
+  "houses": "4,11 / 3",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRP.04",
+  "matter": "Vehicle purchase / sale / accident",
+  "houses": "4,11 vs 3 / 8",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRP.05",
+  "matter": "Change of residence, shifting house",
+  "houses": "3,12 (and 10) / 4",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRP.06",
+  "matter": "Renting, tenant will vacate",
+  "houses": "4,7,11 / 3,10 / —",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRP.07",
+  "matter": "Property dispute",
+  "houses": "4,6,7,8 / —",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRP.08",
+  "matter": "Ancestral property",
+  "houses": "4,8,9 / —",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRP.09",
+  "matter": "Purchase of movables: appliances, electronics, furniture, household goods, machines, jewellery",
+  "houses": "+ 3,11,12; − 5,8,9,10",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRP.10",
+  "matter": "Residence in government quarters / loss of home to government",
+  "houses": "+ 4,11,12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "PRP.11",
+  "matter": "Water source: striking water, well / borewell, availability",
+  "houses": "",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "REL.01",
+  "matter": "Friendship, gain through friends",
+  "houses": "11 / 12",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "REL.02",
+  "matter": "Quarrel and reconciliation with a person",
+  "houses": "7,6 vs 11 / —",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "REL.03",
+  "matter": "Compatibility / harmony between two persons by chart comparison (KPRM): guru-shishya, employer-employee, parent-child, partners",
+  "houses": "+ 1",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "SELF.01",
+  "matter": "General fortune / overall trend of a period",
+  "houses": "1,11 / 12",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "SELF.02",
+  "matter": "Personality, temperament, appearance",
+  "houses": "1 / —",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "SELF.03",
+  "matter": "Fame, name, reputation, recognition, award",
+  "houses": "1,10,11 / 8,12",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "SELF.04",
+  "matter": "Scandal, defamation, loss of reputation",
+  "houses": "8,12 / 10,11",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "SELF.05",
+  "matter": "Birth-time rectification",
+  "houses": "RP, 1st CSL / —",
+  "card": "MAX-13-LIB-CARDS-LIFE.md"
+ },
+ {
+  "code": "SELF.06",
+  "matter": "Moral character, chastity",
+  "houses": "+ 5,8,12",
+  "card": "— none: use KP-1 generic house-group method"
+ },
+ {
+  "code": "SPR.01",
+  "matter": "Spiritual inclination, guru, initiation",
+  "houses": "9,12,5 / N",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "SPR.02",
+  "matter": "Renunciation / sannyasa",
+  "houses": "12,8 (+ Ketu, Saturn) / N",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "SPR.03",
+  "matter": "Mantra siddhi, occult ability",
+  "houses": "8,12,5 / N",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "SPR.04",
+  "matter": "Remedies: which planet to propitiate, when",
+  "houses": "significators / RP / N/H",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "SPR.05",
+  "matter": "Founding or building a temple, ashram or religious-charitable institution",
+  "houses": "+ 9,10,11,12; − 8",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "SPR.06",
+  "matter": "Religious rites and monastic observances: upanayana, Jain rites, chaturmasa, vihar, shastra study",
+  "houses": "+ 4,9,11",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "SPR.07",
+  "matter": "Selection as religious head / pontiff; conferment of padvi",
+  "houses": "+ 5,9,10",
+  "card": "MAX-14-LIB-CARDS-RELATIONS.md"
+ },
+ {
+  "code": "SPR.08",
+  "matter": "Moksha / rebirth",
+  "houses": "+ 12",
+  "card": "— none: use KP-1 generic house-group method"
+ },
+ {
+  "code": "TRV.01",
+  "matter": "Short journey",
+  "houses": "3 / 4",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "TRV.02",
+  "matter": "Long journey / pilgrimage",
+  "houses": "9,12 / 4",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "TRV.03",
+  "matter": "Foreign travel, visa, passport",
+  "houses": "3,9,12 / 4,11",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "TRV.04",
+  "matter": "Settlement abroad / permanent residence / citizenship",
+  "houses": "3,9,12 (4 negating) / 4",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "TRV.05",
+  "matter": "Return from abroad / return of a traveller",
+  "houses": "2,4,11 / 3,9,12",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "TRV.06",
+  "matter": "Safety of a journey",
+  "houses": "— / 8",
+  "card": "MAX-16-LIB-CARDS-TRAVEL-LIT-MINOR.md"
+ },
+ {
+  "code": "TRV.07",
+  "matter": "Destination country and purpose of a journey / foreign work",
+  "houses": "",
+  "card": "— none: use KP-1 generic house-group method"
+ },
+ {
+  "code": "TRV.08",
+  "matter": "Exile, wandering life, and return to homeland (incl. extradition)",
+  "houses": "+ 6,8,12",
+  "card": "— none: use KP-1 generic house-group method"
+ },
+ {
+  "code": "WLT.01",
+  "matter": "Wealth promise / level (poor to rich)",
+  "houses": "2,6,11 / 5,8,12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "WLT.02",
+  "matter": "Income flow, gain periods",
+  "houses": "2,11 / 12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "WLT.03",
+  "matter": "Loan sanction / borrowing",
+  "houses": "6 (+2,11) / 12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "WLT.04",
+  "matter": "Repayment of debt",
+  "houses": "12 (+8) / —",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "WLT.05",
+  "matter": "Recovery of money lent / dues / arrears",
+  "houses": "6,11 (+2) / 12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "WLT.06",
+  "matter": "Speculation, share market, lottery, gambling",
+  "houses": "2,5,11 / 8,12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "WLT.07",
+  "matter": "Inheritance, will, insurance, sudden gain",
+  "houses": "8,2,11 / —",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "WLT.08",
+  "matter": "Loss, bankruptcy, fraud, cheating",
+  "houses": "8,12 / 2,11",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "WLT.09",
+  "matter": "Tax, fine, penalty",
+  "houses": "6,8,12 / —",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "WLT.10",
+  "matter": "Market / commodity trend (mundane-financial horary)",
+  "houses": "2,11 vs 12 / —",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "WLT.11",
+  "matter": "Donations, charity and grants: giving, receiving, soliciting",
+  "houses": "+ 2,6,11; − 1,5,8,9,12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "WLT.12",
+  "matter": "Exchange / barter of goods",
+  "houses": "+ 2,6,11; − 5,8,12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "WLT.13",
+  "matter": "Investment (non-speculative, long-term, property) and its return",
+  "houses": "+ 6,11; − 5,8,9,12",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ },
+ {
+  "code": "WLT.14",
+  "matter": "Illegal income",
+  "houses": "+ 11",
+  "card": "MAX-15-LIB-CARDS-WORK-MONEY.md"
+ }
+]

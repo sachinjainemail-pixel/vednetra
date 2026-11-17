@@ -63,7 +63,7 @@ function check(text, opts) {
   const errors = [], warnings = [];
   const err = m => errors.push(m);
   const lines = text.split(/\r?\n/);
-  const options = {}, results = {}, evidence = {}, blocks = {}, sujFiles = {}, questions = [];
+  const options = {}, results = {}, evidence = {}, blocks = {}, sujFiles = {}, lexLines = {}, questions = [];
   const seenQ = q => { if (questions.indexOf(q) < 0) questions.push(q); };
 
   lines.forEach(raw => {
@@ -87,6 +87,8 @@ function check(text, opts) {
       evidence[m[1] + m[2]] = m[3];
     } else if ((m = l.match(/^SUJ FILE (Q\d+) (.+)$/))) {
       sujFiles[m[1]] = m[2].trim();
+    } else if ((m = l.match(/^LEXICON (Q\d+) (.+)$/))) {
+      lexLines[m[1]] = m[2].trim();
     }
   });
 
@@ -127,6 +129,7 @@ function check(text, opts) {
         if (HEDGE.test(r)) err(q + " " + c + " RESULT hedges or gives more than one answer: " + r);
       }
     });
+    if (fs.existsSync(path.join(KNOW, "lexicon", "taxonomy_medical.json")) && Array.isArray(options[q]) && !lexLines[q]) warnings.unshift(q + " has no LEXICON line. Run node sarva_engine/tools/sarva_lexicon.js --options on its options and write one line, LEXICON " + q + " followed by the entry ids, or NONE when no entry matches.");
     if (!sujFiles[q]) err(q + " has no SUJ FILE line.");
     else if (!fs.existsSync(sujFiles[q])) err(q + " SUJ FILE " + sujFiles[q] + " does not exist.");
     else if (!opts.noSujGuard) {
@@ -167,7 +170,7 @@ function check(text, opts) {
 
   lines.forEach((l, i) => {
     if (tStart >= 0 && i >= tStart && i <= tEnd) return;
-    if (/^(SUJ FILE|OPTIONS|RESULT|EVIDENCE|METHOD)/.test(l.trim()) && !BANNED.test(l.replace(/\//g, ""))) return;
+    if (/^(SUJ FILE|LEXICON|OPTIONS|RESULT|EVIDENCE|METHOD)/.test(l.trim()) && !BANNED.test(l.replace(/\//g, ""))) return;
     if (BANNED.test(l)) warnings.push("Line " + (i + 1) + " has a character the owner does not want in responses.");
   });
   return { errors, warnings: warnings.slice(0, 5), incomplete, questions, present };

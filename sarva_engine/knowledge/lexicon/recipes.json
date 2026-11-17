@@ -1,0 +1,88 @@
+{
+ "_note": "One recipe per question family. Each lists, per column, the source rules to run, taken from the owner corpora, and the pitfalls the scored cases showed. A recipe does not decide. The column still casts its own chart and applies its own rules, and the SARVA contract sections 2, 3 and 5 still bind.",
+ "speciality_or_degree": {
+  "applies_to": [
+   "medical",
+   "profession",
+   "business"
+  ],
+  "question_examples": "which medical speciality, which degree, which profession, which business",
+  "steps_common": [
+   "Look up every option with node sarva_engine/tools/sarva_lexicon.js and write down its houses, its planets and its signs before reading the chart.",
+   "Give every option the same kind of entries, the organ house, the speciality planets, the sign, and the same kind of counter entries. An option must not collect more planets only because the analyst listed more.",
+   "Check the option is a field of study and the question is the degree, or a present occupation and the question is the status."
+  ],
+  "KPPRO": "EDU.02 for the subject, the 4th CSL for the first degree and the 9th for the postgraduate line, then PRF.01 for the profession, 10th CSL sign star and sub, with the house keys of HLT.01 for the organ. Read the 10th sign as the field, the star lord as the kind of work, the sub lord as the sector. KP MAR.05 and the rotated 10th for a spouse.",
+  "KCIL": "KCIL TA house lists and the KAL 118 table of subjects by the linking cusp that holds the 4th or 9th relationship, then the event matrix row such as Medical practitioner 6 or 8 with 10 and Surgeons 8,10. Count how many cusps of the option are reached and prefer the option with the most.",
+  "SUJ": "Dominant house, natural and functional significations of each planet, D24 for education or D10 for profession. No library rule names a speciality, so say before the tally that the entries are the analyst mapping.",
+  "CHAWDHRI": "Use the signification of planets and of the nakshatra lords through the Chawdhri engine. Do not judge from houses alone. Chawdhri gives few speciality rules, say so.",
+  "BNN": "Name the option karaka from the retrieved rules and test it. RAO-EDU-005 names the subject by what stands second from Mercury, ARI-LIF-015 gives the pair table, ARI-HLT-003 and AVA-HLT-006 the body register. An option the register does not name is OPEN and is not given the nearest planet silently.",
+  "pitfalls": [
+   "K894. No column picked the pediatrician in Q1 and only KP Pro picked the orthopedic surgeon in Q5. In both, the true option was a speciality of the same field that the planet of the field, Mars or the dominant house, outvoted.",
+   "Mars as the planet of surgery wins every surgeon question by itself. Orthopedics needs Saturn and the 10th house of bones, so enter the bone evidence as evidence for the orthopedic option, not as counter evidence for the surgeon.",
+   "A tally scores 100 for an option with one planet and no counter entry. Give every option the same counter entries."
+  ]
+ },
+ "service_or_business_or_government": {
+  "applies_to": [
+   "profession",
+   "business",
+   "income"
+  ],
+  "question_examples": "private job, government job, own business, present work",
+  "KPPRO": "PRF.02. The 10th CSL signifying 6 is service, 7 with 10 is business, 6 and 7 both is both, 2 alone is own exertion. Government needs the Sun in the chain, PRF.11 10,11 with Sun and 6.",
+  "KCIL": "Matrix row Service or business, primary 10 with 6,7. House 7 in the TA list is employment in private companies and private business, house 10 is government organisations and self venture, house 6 is service.",
+  "SUJ": "Natural nature of the carriers, Sun and Rahu for government, Saturn for service, Venus Mercury Mars for business. Read the present dasha before the natal signature.",
+  "CHAWDHRI": "Natural words from the nakshatra lords, government, business, financier, then the dasha gate.",
+  "BNN": "NEG-PRF-002 and ARI-LIF-014 from Saturn frame, 2nd 7th and 12th from Saturn, Sun or Moon in the frame gives service, Venus gives own business, a powerful Sun a government job.",
+  "pitfalls": [
+   "K894 Q2. Four columns read the natal government signature as the present status. The native moved to another city and worked as an employee of a private clinic, truth private job. A natal signature is capacity. Ask what the person does now, whether the person moved, and read the running dasha lords and the D10 before the signature.",
+   "Doctors run their own clinic or work in a private hospital. The words own business and private job both fit, so the present dasha and the place decide."
+  ]
+ },
+ "disease_or_health": {
+  "applies_to": [
+   "disease",
+   "medical"
+  ],
+  "question_examples": "which disease, which part of the body",
+  "KPPRO": "HLT.01 and the card of the matching HLT code. The 6th CSL joined to 1, the planet joined to it names the nature, the sign and star of the 6th CSL name the part, the running dasha lord names the disease. KP will not name a death date.",
+  "KCIL": "Matrix Disease nature and part 6 with the cusp of the afflicted organ and the TA lists of diseases per house.",
+  "SUJ": "Dominant house and the karaka of the organ, with the 6th 8th and 12th as the harm houses. No death dating.",
+  "CHAWDHRI": "Use the engine health block with its not a medical finding notice.",
+  "BNN": "ARI-HLT-002 seven rules, ARI-HLT-003 body table, AVA-HLT-001 planet by sign matrix, guide 16.8. A named disease the register does not name is OPEN.",
+  "pitfalls": [
+   "Every disease answer is a tendency and not a medical finding."
+  ]
+ },
+ "relatives_and_family": {
+  "applies_to": [
+   "relationship"
+  ],
+  "question_examples": "father, mother, siblings, spouse, children, in laws",
+  "KPPRO": "Cards FAM.01 to FAM.06, MAR.01 to MAR.17 and PRG.01 to PRG.08. The sex of a child is the majority of male and female among the sign star and sub lords of the child cusp, the number follows the DBAs of 2,5,11 and a node as the 5th CSL restricts the number.",
+  "KCIL": "Rotation lock first. Spouse 7, mother 4, father 9, first child 5, second child 7, third child 9, elder co born 11, younger co born 3. Then the matrix row. The sex test of the child cusp is nearest rule only, a child sex has no rule register.",
+  "SUJ": "Natural karakas, the divisional chart of the relative D7 for children D3 for siblings D12 for parents D9 for spouse. The number of siblings and children has no validated rule.",
+  "CHAWDHRI": "Father is counted from the 9th by the user decision. Give no scores and no dates for longevity.",
+  "BNN": "Read the relative from the karaka, ARI-DOM-003 family map, RAO-DOM-012 sibling count, RAO-DOM-014 and RAO-DOM-019 birth order, SAK-JUP-032 and RAO-DOM-010 children, guide 16.4 to 16.6. A planet in the frame carries its own relation word, so the Moon in the frame of Mars is an elder sister even when nothing stands behind Jupiter.",
+  "pitfalls": [
+   "K894 Q3. BNN took the native as the eldest from RAO-DOM-019 and overrode the Moon elder sister word of ARI-DOM-003. The true family had an elder sister. Do not let an order rule overrule a relation word of a planet that stands in the frame.",
+   "K894 Q5. The husband profession is read from the spouse 10th, the native 4th, with the sign and lord of that cusp. Only KP Pro did this and was right.",
+   "K894 Q6. BNN called neither parent gone because Jupiter relief stood in the same class. Natal damage to the karakas is capacity and not proof of loss. Both parents were alive."
+  ]
+ },
+ "income_and_wealth": {
+  "applies_to": [
+   "income"
+  ],
+  "question_examples": "source of income, wealth level",
+  "KPPRO": "WLT.01 to WLT.14. Wealth 2,6,11 against 5,8,12, income flow 2,11 against 12, speculation 2,5,11 against 8,12, inheritance 8 with 2,11, investment 6,11 against 5,8,9,12.",
+  "KCIL": "Matrix rows Financial status 2 with 6,11, Unexpected gains 8 with 2,11, Gain in investment 12 with 2,6,11, Obtaining loans 2,6 with 11.",
+  "SUJ": "Dhana yogas of the 2nd and 11th lords with the 5th and 9th lords, the dasha lords of those houses.",
+  "CHAWDHRI": "The gain block of the engine, Dhana yogas and the natural words gain and wealth.",
+  "BNN": "Wealth is read from Jupiter and Venus karakas and Saturn frame, use the corpus search with the event word.",
+  "pitfalls": [
+   "Rental income has no house rule in the sources found. Read it from the 4th with the 11th and say so."
+  ]
+ }
+}

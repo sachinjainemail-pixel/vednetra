@@ -31,6 +31,10 @@ Non negotiable points
 - KCIL follows the owner's v2.6 summary in sarva_engine/knowledge/kcil, on Khullar settings only. Its evidence line says STABLE,
   TWO CANDIDATES or NO RULE REGISTER, and for two candidates the cell is the one its closing rule of section 16.30 prefers.
 - Never use the kpredict ask default output as a KP Pro or KCIL cell, it never lets the chart in.
+- Signification lexicon. For every question that names a speciality, degree, profession, business, disease, income source or a relative, run
+  node sarva_engine/tools/sarva_lexicon.js --options "texts" --family before reading the chart, and write a LEXICON Qn line. It translates options into houses, planets,
+  cusps, KP cards and BNN rule candidates. It is not a methodology and gives no verdict. A column cites only the T1 sentences of its own corpus, web and karaka hints are never cited,
+  an option with NO ENTRY is not given the nearest planet. ENGINE_CONTRACT.md section 12 and sarva_engine/knowledge/lexicon/README.md.
 - Start every SARVA session with node sarva_engine/tools/sarva_preflight.js. Udu and Quad Dasha are standing gaps, the owner will
   not supply their rule files, so their cells stay NOT RUN UDU RULES MISSING and NOT RUN QUAD RULES MISSING and the guard ends with
   exit code 3. That is expected. See ENGINE_CONTRACT.md section 10.

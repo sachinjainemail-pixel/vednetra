@@ -108,3 +108,13 @@ C. As of this round two of the seven columns cannot be filled, so every SARVA re
 
 The first full run of the routing on a real chart, 17 November 2026, six questions, replies in sarva_engine/runs/q894. All routes ran. kpredict needed a virtualenv install, CHAWDHRI cloned VedNetra on first run, the guard ended with exit code 3 as designed.
 Results were reported by the group the same day. Truth Q1 B, Q2 A, Q3 B, Q4 B, Q5 B, Q6 C. Score out of 6. KP Pro 3, KCIL 0, SUJ 2, CHAWDHRI 1, BNN 2. Udu and Quad Dasha not run. KP Pro got Q2, Q5 and Q6, KCIL none, SUJ and BNN Q4 and Q6, CHAWDHRI Q6. No column picked the pediatrician in Q1, and only KP Pro picked the orthopedic surgeon in Q5. Six questions prove nothing and no column was retuned. An earlier entry here scored the owner's submitted answers as truth by mistake, this entry replaces it.
+
+## Round 9, signification lexicon built on the owner's instruction
+
+The owner asked on 17 November 2026 for combinations for every medical degree and speciality, profession, business, disease, income source and relationship, and for the engine to use them on any later chart.
+Built. sarva_engine/knowledge/lexicon with 255 entries in six categories, the 202 KP PRO MAX cards and 213 row event index copied from KP-Pro-sutton, the KCIL event matrix and TA tables, core tables, one recipe per question family
+with the pitfalls of the K894 chart, and a source registry with tiers. sarva_engine/tools/sarva_lexicon.js looks up options in English and Hindi, prints per column only that column's own corpus text, searches the BNN csv, flags NO ENTRY and PARTIAL MATCH,
+and prints the recipe. Contract section 12, routing, template, CLAUDE.md, the guard warning for a missing LEXICON line and the preflight check were added. Tests in sarva_engine/tests/lexicon_test.js, 18 checks.
+Limits, stated in the README and the contract. 255 entries is not every type that exists. The web research gave blog grade claims only and no speciality table with a classical text. Every page fetch was refused by the network policy of the session,
+the owner approved a new environment with the hosts but the proxy had not picked it up, so all web claims are second hand summaries, tier T3, and cannot be cited. The medical speciality rows rest on KCIL TA lists, KP house keys and karaka lists from memory.
+Nothing in it has been shown to raise accuracy. It was built after K894 was scored, so K894 cannot test it. The next chart is the first test. No weight, band or rule of any methodology was changed.

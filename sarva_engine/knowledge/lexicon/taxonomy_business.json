@@ -1,0 +1,2240 @@
+[
+ {
+  "id": "biz.retail",
+  "cat": "business",
+  "name": "Retail shop",
+  "aliases": [
+   "shop",
+   "general store",
+   "kirana",
+   "दुकान",
+   "खुदरा"
+  ],
+  "vedic": {
+   "houses": [
+    7,
+    3,
+    11
+   ],
+   "planets": [
+    "Mercury",
+    "Venus"
+   ],
+   "signs": [
+    "Gemini",
+    "Libra"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    7,
+    10,
+    11,
+    3
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Venus"
+   ],
+   "cards": [
+    "PRF.09",
+    "PRF.24"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    10,
+    7
+   ],
+   "supporting": [
+    3,
+    11
+   ],
+   "ta_houses": [
+    7
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "shop"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.09 business 7,10,11 and PRF.24 sale of goods 5,6,11."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.wholesale",
+  "cat": "business",
+  "name": "Wholesale or trading",
+  "aliases": [
+   "trading",
+   "wholesaler",
+   "distributor",
+   "व्यापार"
+  ],
+  "vedic": {
+   "houses": [
+    7,
+    3,
+    11,
+    9
+   ],
+   "planets": [
+    "Mercury",
+    "Rahu"
+   ],
+   "signs": [
+    "Gemini"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    7,
+    10,
+    11,
+    3
+   ],
+   "csl_planets": [
+    "Mercury"
+   ],
+   "cards": [
+    "PRF.09",
+    "PRF.22"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    10,
+    7
+   ],
+   "supporting": [
+    3,
+    11
+   ],
+   "ta_houses": [
+    3
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "trade"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 3 traders and commission agents."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.commission",
+  "cat": "business",
+  "name": "Commission agent or broker",
+  "aliases": [
+   "agency",
+   "brokerage",
+   "dealer",
+   "दलाल"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    11,
+    7
+   ],
+   "planets": [
+    "Mercury",
+    "Rahu"
+   ],
+   "signs": [
+    "Gemini"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    3,
+    6,
+    10,
+    11
+   ],
+   "csl_planets": [
+    "Mercury"
+   ],
+   "cards": [
+    "PRF.22"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    10
+   ],
+   "supporting": [
+    3,
+    11
+   ],
+   "ta_houses": [
+    3
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "commission"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Commission as business 10 with 3,11."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.cloth",
+  "cat": "business",
+  "name": "Cloth and textile trade",
+  "aliases": [
+   "garments",
+   "textile business",
+   "readymade",
+   "कपड़ा"
+  ],
+  "vedic": {
+   "houses": [
+    2,
+    7,
+    3
+   ],
+   "planets": [
+    "Venus",
+    "Moon",
+    "Mercury"
+   ],
+   "signs": [
+    "Taurus",
+    "Libra"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    10,
+    11
+   ],
+   "csl_planets": [
+    "Moon",
+    "Mercury",
+    "Venus"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    6
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "cloth"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.01 Moon with Mercury textiles and Venus with Mars drapery."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 6 education textiles."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.jewellery",
+  "cat": "business",
+  "name": "Jewellery business",
+  "aliases": [
+   "gold silver",
+   "diamond trade",
+   "ज्वेलरी"
+  ],
+  "vedic": {
+   "houses": [
+    2,
+    11,
+    7
+   ],
+   "planets": [
+    "Venus",
+    "Jupiter",
+    "Sun"
+   ],
+   "signs": [
+    "Taurus",
+    "Leo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    7,
+    11
+   ],
+   "csl_planets": [
+    "Venus",
+    "Jupiter"
+   ],
+   "cards": [
+    "PRF.09"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    2,
+    10
+   ],
+   "supporting": [
+    11
+   ],
+   "ta_houses": [
+    2
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "jewel"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 2 jewellers."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.grain",
+  "cat": "business",
+  "name": "Grain and food trade",
+  "aliases": [
+   "agriculture produce",
+   "mandi",
+   "kirana grain",
+   "अनाज"
+  ],
+  "vedic": {
+   "houses": [
+    2,
+    4,
+    11
+   ],
+   "planets": [
+    "Moon",
+    "Venus",
+    "Saturn"
+   ],
+   "signs": [
+    "Taurus",
+    "Cancer"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    10,
+    11
+   ],
+   "csl_planets": [
+    "Moon",
+    "Venus"
+   ],
+   "cards": [
+    "PRF.20"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    4,
+    10
+   ],
+   "supporting": [
+    11
+   ],
+   "ta_houses": [
+    4
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "grain"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 4 agriculturists."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.food",
+  "cat": "business",
+  "name": "Restaurant or food business",
+  "aliases": [
+   "hotel",
+   "cafe",
+   "catering",
+   "sweet shop",
+   "खाने का व्यवसाय"
+  ],
+  "vedic": {
+   "houses": [
+    4,
+    2,
+    7
+   ],
+   "planets": [
+    "Moon",
+    "Venus",
+    "Mars"
+   ],
+   "signs": [
+    "Cancer",
+    "Taurus"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    7,
+    10,
+    11
+   ],
+   "csl_planets": [
+    "Venus",
+    "Moon",
+    "Mars"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    4,
+    10
+   ],
+   "supporting": [
+    7,
+    11
+   ],
+   "ta_houses": [
+    4
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "restaurant"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 4 restaurants."
+   },
+   {
+    "src": "KP",
+    "text": "KP PRF.01 hotel Venus Mars Moon."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.dairy",
+  "cat": "business",
+  "name": "Dairy or poultry",
+  "aliases": [
+   "milk",
+   "farm",
+   "poultry",
+   "fishery",
+   "डेयरी"
+  ],
+  "vedic": {
+   "houses": [
+    4,
+    6,
+    11
+   ],
+   "planets": [
+    "Moon",
+    "Venus",
+    "Mars"
+   ],
+   "signs": [
+    "Cancer"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    6,
+    11
+   ],
+   "csl_planets": [
+    "Moon",
+    "Venus"
+   ],
+   "cards": [
+    "PRF.20"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    4,
+    6
+   ],
+   "supporting": [
+    10,
+    11
+   ],
+   "ta_houses": [
+    4,
+    6
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "dairy"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA houses 4 dairy farming and 6 poultry farms."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.medical_store",
+  "cat": "business",
+  "name": "Medical store or pharmacy shop",
+  "aliases": [
+   "chemist shop",
+   "pharmacy",
+   "मेडिकल स्टोर"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    7,
+    11
+   ],
+   "planets": [
+    "Mercury",
+    "Jupiter",
+    "Moon"
+   ],
+   "signs": [
+    "Virgo",
+    "Sagittarius"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    7,
+    10,
+    11
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Jupiter"
+   ],
+   "cards": [
+    "PRF.09"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    7,
+    11
+   ],
+   "ta_houses": [
+    6
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "chemist"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 6 chemists."
+   },
+   {
+    "src": "KP",
+    "text": "KP PRF.01 Sagittarius pharmacy."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.clinic",
+  "cat": "business",
+  "name": "Clinic or nursing home",
+  "aliases": [
+   "private practice",
+   "diagnostic centre",
+   "hospital",
+   "क्लीनिक",
+   "नर्सिंग होम"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    7,
+    10,
+    12
+   ],
+   "planets": [
+    "Sun",
+    "Jupiter",
+    "Mars",
+    "Moon"
+   ],
+   "signs": [
+    "Leo",
+    "Virgo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    11,
+    12,
+    7,
+    10
+   ],
+   "csl_planets": [
+    "Sun",
+    "Jupiter"
+   ],
+   "cards": [
+    "PRF.21",
+    "PRF.02"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6,
+    10
+   ],
+   "supporting": [
+    7,
+    2,
+    11
+   ],
+   "ta_houses": [
+    6,
+    12
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "clinic",
+   "doctor"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.21 medical profession and running a nursing home + 4,11,12."
+   },
+   {
+    "src": "KP",
+    "text": "KP PRF.02 independent profession 2,7,10."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Medical practitioner 6 or 8 with 10."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.education",
+  "cat": "business",
+  "name": "Coaching or school business",
+  "aliases": [
+   "coaching",
+   "tuition",
+   "school owner",
+   "कोचिंग"
+  ],
+  "vedic": {
+   "houses": [
+    4,
+    5,
+    9,
+    7
+   ],
+   "planets": [
+    "Jupiter",
+    "Mercury"
+   ],
+   "signs": [
+    "Sagittarius"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    9,
+    7,
+    10
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Mercury"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    4,
+    9
+   ],
+   "supporting": [
+    10,
+    7
+   ],
+   "ta_houses": [
+    4,
+    9
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "school"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.01 10th CSL signifying 2,7,10 with Jupiter or Mercury gives principal or director of own school."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.real_estate",
+  "cat": "business",
+  "name": "Real estate or construction",
+  "aliases": [
+   "builder",
+   "property dealer",
+   "contractor",
+   "रियल एस्टेट"
+  ],
+  "vedic": {
+   "houses": [
+    4,
+    11,
+    7
+   ],
+   "planets": [
+    "Mars",
+    "Saturn",
+    "Venus"
+   ],
+   "signs": [
+    "Capricorn",
+    "Aries"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    10,
+    11,
+    7
+   ],
+   "csl_planets": [
+    "Mars",
+    "Saturn"
+   ],
+   "cards": [
+    "PRP.01",
+    "PRF.09"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    4
+   ],
+   "supporting": [
+    10,
+    11
+   ],
+   "ta_houses": [
+    4
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "land",
+   "property"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 4 real estate builders."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.manufacturing",
+  "cat": "business",
+  "name": "Manufacturing or factory",
+  "aliases": [
+   "industry",
+   "factory",
+   "production",
+   "कारखाना"
+  ],
+  "vedic": {
+   "houses": [
+    10,
+    3,
+    6
+   ],
+   "planets": [
+    "Mars",
+    "Saturn",
+    "Rahu"
+   ],
+   "signs": [
+    "Aries",
+    "Capricorn"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    10,
+    6,
+    3
+   ],
+   "csl_planets": [
+    "Mars",
+    "Saturn"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    4,
+    10
+   ],
+   "supporting": [
+    11
+   ],
+   "ta_houses": [
+    4,
+    10
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "factory"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA houses 4 manufacturers industrialists and 10 production houses."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.steel",
+  "cat": "business",
+  "name": "Iron, steel or hardware",
+  "aliases": [
+   "metal",
+   "hardware",
+   "machinery trade",
+   "लोहा"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    6,
+    10
+   ],
+   "planets": [
+    "Saturn",
+    "Mars"
+   ],
+   "signs": [
+    "Aries",
+    "Capricorn"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    10,
+    6
+   ],
+   "csl_planets": [
+    "Saturn",
+    "Mars"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    10
+   ],
+   "supporting": [
+    6,
+    11
+   ],
+   "ta_houses": [
+    6
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "iron"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.01 Saturn Mars in 10th iron steel hardware."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.chemical",
+  "cat": "business",
+  "name": "Chemical, plastic or petroleum",
+  "aliases": [
+   "petrol pump",
+   "chemicals",
+   "oil trade",
+   "प्लास्टिक"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    8,
+    10
+   ],
+   "planets": [
+    "Saturn",
+    "Venus",
+    "Moon",
+    "Rahu"
+   ],
+   "signs": [
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    10
+   ],
+   "csl_planets": [
+    "Saturn",
+    "Moon",
+    "Venus"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    10,
+    11
+   ],
+   "ta_houses": [
+    6
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "oil"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 6 dealers in plastics."
+   },
+   {
+    "src": "KP",
+    "text": "KP PRF.01 Saturn Moon Venus petroleum."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.electronics",
+  "cat": "business",
+  "name": "Electrical and electronics trade",
+  "aliases": [
+   "mobile shop",
+   "appliances",
+   "electronics",
+   "इलेक्ट्रॉनिक्स"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    11,
+    7
+   ],
+   "planets": [
+    "Rahu",
+    "Mercury",
+    "Venus",
+    "Saturn"
+   ],
+   "signs": [
+    "Aquarius",
+    "Gemini"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    11,
+    7
+   ],
+   "csl_planets": [
+    "Rahu",
+    "Saturn",
+    "Mars"
+   ],
+   "cards": [
+    "PRF.01",
+    "PRP.09"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    3,
+    11
+   ],
+   "supporting": [
+    10
+   ],
+   "ta_houses": [
+    3,
+    11
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "electronic"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 11 computer hardware."
+   },
+   {
+    "src": "KP",
+    "text": "KP PRF.01 Saturn and Ketu small electrical appliances."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.software",
+  "cat": "business",
+  "name": "Software or IT services",
+  "aliases": [
+   "IT company",
+   "app development",
+   "startup",
+   "आईटी कंपनी"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    11,
+    10
+   ],
+   "planets": [
+    "Rahu",
+    "Mercury",
+    "Venus"
+   ],
+   "signs": [
+    "Gemini",
+    "Aquarius"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    10,
+    11,
+    7
+   ],
+   "csl_planets": [
+    "Rahu",
+    "Mercury",
+    "Venus"
+   ],
+   "cards": [
+    "PRF.01",
+    "PRF.17"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    3,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    3
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "computer"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Computer programmer 3,10."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.media",
+  "cat": "business",
+  "name": "Media, publishing or printing",
+  "aliases": [
+   "printing press",
+   "publisher",
+   "advertising",
+   "मीडिया"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    5,
+    10
+   ],
+   "planets": [
+    "Mercury",
+    "Jupiter",
+    "Mars"
+   ],
+   "signs": [
+    "Gemini"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    10,
+    11,
+    7
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Jupiter",
+    "Mars"
+   ],
+   "cards": [
+    "PRF.01",
+    "PRF.25"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    3,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    3
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "print"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.01 printing press Mars and Mercury tied to the 10th and 10th linked to 7 owns the press."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.entertainment",
+  "cat": "business",
+  "name": "Entertainment or events",
+  "aliases": [
+   "film production",
+   "event management",
+   "wedding planner",
+   "इवेंट"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    7,
+    11
+   ],
+   "planets": [
+    "Venus",
+    "Moon",
+    "Rahu"
+   ],
+   "signs": [
+    "Libra",
+    "Leo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    5,
+    7,
+    10,
+    11
+   ],
+   "csl_planets": [
+    "Venus",
+    "Mercury"
+   ],
+   "cards": [
+    "PRF.17",
+    "PRF.18"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    5,
+    10
+   ],
+   "supporting": [
+    7,
+    11
+   ],
+   "ta_houses": [
+    5
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "event"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 5 cinema places of amusement."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.travel",
+  "cat": "business",
+  "name": "Travel and tourism",
+  "aliases": [
+   "travel agency",
+   "tour operator",
+   "ट्रैवल"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    9,
+    12
+   ],
+   "planets": [
+    "Mercury",
+    "Rahu",
+    "Moon"
+   ],
+   "signs": [
+    "Gemini",
+    "Sagittarius"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    9,
+    12,
+    7
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Rahu"
+   ],
+   "cards": [
+    "PRF.23"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    9
+   ],
+   "supporting": [
+    10,
+    3,
+    12
+   ],
+   "ta_houses": [
+    9
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "travel"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 9 travel agents."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.export",
+  "cat": "business",
+  "name": "Import export",
+  "aliases": [
+   "export import",
+   "international trade",
+   "एक्सपोर्ट"
+  ],
+  "vedic": {
+   "houses": [
+    9,
+    12,
+    7,
+    3
+   ],
+   "planets": [
+    "Mercury",
+    "Rahu",
+    "Moon"
+   ],
+   "signs": [
+    "Sagittarius",
+    "Pisces"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    7,
+    9,
+    10,
+    12
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Rahu"
+   ],
+   "cards": [
+    "PRF.23"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    12,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    9,
+    12
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "export"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Export business 12,10."
+   },
+   {
+    "src": "KP",
+    "text": "KP PRF.23 export import 3,7,9,10,12."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.transport",
+  "cat": "business",
+  "name": "Transport or logistics business",
+  "aliases": [
+   "taxi",
+   "trucks",
+   "courier",
+   "fleet",
+   "ट्रांसपोर्ट"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    4,
+    9
+   ],
+   "planets": [
+    "Mars",
+    "Saturn",
+    "Mercury"
+   ],
+   "signs": [
+    "Gemini"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    4,
+    10,
+    7
+   ],
+   "csl_planets": [
+    "Mars",
+    "Saturn"
+   ],
+   "cards": [
+    "PRP.04"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    3,
+    9
+   ],
+   "supporting": [
+    4,
+    10
+   ],
+   "ta_houses": [
+    3,
+    9
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "transport"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA houses 3 and 9."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.finance",
+  "cat": "business",
+  "name": "Financial services or lending",
+  "aliases": [
+   "money lending",
+   "NBFC",
+   "chit fund",
+   "finance company",
+   "फाइनेंस"
+  ],
+  "vedic": {
+   "houses": [
+    2,
+    11,
+    8
+   ],
+   "planets": [
+    "Jupiter",
+    "Saturn",
+    "Mercury"
+   ],
+   "signs": [
+    "Taurus",
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    6,
+    11
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Saturn"
+   ],
+   "cards": [
+    "WLT.03"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    2
+   ],
+   "supporting": [
+    6,
+    11
+   ],
+   "ta_houses": [
+    2
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "money"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 2 moneylenders and financial institutions."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.insurance_agency",
+  "cat": "business",
+  "name": "Insurance or investment agency",
+  "aliases": [
+   "LIC agent",
+   "mutual fund advisor",
+   "sub broker"
+  ],
+  "vedic": {
+   "houses": [
+    8,
+    2,
+    11
+   ],
+   "planets": [
+    "Saturn",
+    "Mercury",
+    "Jupiter"
+   ],
+   "signs": [
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    8,
+    2,
+    11,
+    10
+   ],
+   "csl_planets": [
+    "Saturn",
+    "Jupiter"
+   ],
+   "cards": [
+    "PRF.22"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    8,
+    10
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    8
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "insurance"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 8 insurance."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.beauty",
+  "cat": "business",
+  "name": "Beauty and wellness business",
+  "aliases": [
+   "salon",
+   "spa",
+   "parlour",
+   "ब्यूटी पार्लर"
+  ],
+  "vedic": {
+   "houses": [
+    1,
+    2,
+    7
+   ],
+   "planets": [
+    "Venus",
+    "Mercury",
+    "Moon"
+   ],
+   "signs": [
+    "Libra"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    1,
+    7,
+    10,
+    11
+   ],
+   "csl_planets": [
+    "Venus"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    2,
+    10
+   ],
+   "supporting": [
+    7,
+    11
+   ],
+   "ta_houses": [
+    2
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "beauty"
+  ],
+  "evidence": [
+   {
+    "src": "NOTE",
+    "text": "Venus."
+   }
+  ],
+  "best_tier": "T4"
+ },
+ {
+  "id": "biz.tailoring",
+  "cat": "business",
+  "name": "Boutique or tailoring",
+  "aliases": [
+   "tailoring",
+   "boutique",
+   "stitching unit"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    2,
+    7
+   ],
+   "planets": [
+    "Venus",
+    "Mercury"
+   ],
+   "signs": [
+    "Gemini",
+    "Virgo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    7,
+    10
+   ],
+   "csl_planets": [
+    "Venus",
+    "Mercury"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    3,
+    10
+   ],
+   "supporting": [
+    7,
+    11
+   ],
+   "ta_houses": [
+    3
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "tailor"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP EDU.02 Venus tailoring."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.mining",
+  "cat": "business",
+  "name": "Mining or quarry",
+  "aliases": [
+   "stone",
+   "marble",
+   "coal",
+   "खदान"
+  ],
+  "vedic": {
+   "houses": [
+    8,
+    4,
+    10
+   ],
+   "planets": [
+    "Saturn",
+    "Mars",
+    "Rahu"
+   ],
+   "signs": [
+    "Capricorn",
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    8,
+    4,
+    10
+   ],
+   "csl_planets": [
+    "Saturn",
+    "Mars"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    8,
+    10
+   ],
+   "supporting": [
+    11
+   ],
+   "ta_houses": [
+    8
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "mining"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 8 mining."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.furniture",
+  "cat": "business",
+  "name": "Furniture or timber",
+  "aliases": [
+   "wood",
+   "carpentry",
+   "interior contractor",
+   "फर्नीचर"
+  ],
+  "vedic": {
+   "houses": [
+    4,
+    3,
+    2
+   ],
+   "planets": [
+    "Mars",
+    "Venus",
+    "Saturn"
+   ],
+   "signs": [
+    "Taurus"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    10,
+    3
+   ],
+   "csl_planets": [
+    "Mars",
+    "Venus"
+   ],
+   "cards": [
+    "PRF.01"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    4,
+    10
+   ],
+   "supporting": [
+    11
+   ],
+   "ta_houses": [
+    4
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "timber"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 4 timber merchants interior decorator."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.partnership",
+  "cat": "business",
+  "name": "Partnership business",
+  "aliases": [
+   "partner firm",
+   "joint venture",
+   "साझेदारी"
+  ],
+  "vedic": {
+   "houses": [
+    7,
+    11,
+    10
+   ],
+   "planets": [
+    "Mercury",
+    "Venus",
+    "Jupiter"
+   ],
+   "signs": [
+    "Libra"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    7,
+    11,
+    10
+   ],
+   "csl_planets": [
+    "Venus",
+    "Mercury"
+   ],
+   "cards": [
+    "PRF.10"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    7
+   ],
+   "supporting": [
+    5,
+    11
+   ],
+   "ta_houses": [
+    7
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "partner"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.10 partnership 7,11 against 6,12."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Partnership 7 with 5,11."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.family",
+  "cat": "business",
+  "name": "Family or ancestral business",
+  "aliases": [
+   "hereditary business",
+   "father business",
+   "पारिवारिक व्यवसाय"
+  ],
+  "vedic": {
+   "houses": [
+    4,
+    9,
+    10
+   ],
+   "planets": [
+    "Sun",
+    "Moon",
+    "Saturn"
+   ],
+   "signs": [
+    "Cancer"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    8,
+    9,
+    10
+   ],
+   "csl_planets": [
+    "Sun",
+    "Saturn"
+   ],
+   "cards": [
+    "PRF.27",
+    "PRP.08"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    4,
+    9
+   ],
+   "supporting": [
+    10,
+    11
+   ],
+   "ta_houses": [
+    4
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "family"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.01 Cancer as 4th gives hereditary trade."
+   },
+   {
+    "src": "KP",
+    "text": "KP PRF.27 family member business 4,8."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "biz.online",
+  "cat": "business",
+  "name": "E-commerce or online business",
+  "aliases": [
+   "online selling",
+   "dropshipping",
+   "digital marketing",
+   "ऑनलाइन"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    11,
+    7
+   ],
+   "planets": [
+    "Rahu",
+    "Mercury",
+    "Venus"
+   ],
+   "signs": [
+    "Gemini",
+    "Aquarius"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    7,
+    11,
+    10
+   ],
+   "csl_planets": [
+    "Rahu",
+    "Mercury"
+   ],
+   "cards": [
+    "PRF.25"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    3,
+    10
+   ],
+   "supporting": [
+    7,
+    11
+   ],
+   "ta_houses": [
+    3
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "online"
+  ],
+  "evidence": [
+   {
+    "src": "NOTE",
+    "text": "Rahu technology and Mercury trade."
+   }
+  ],
+  "best_tier": "T4"
+ },
+ {
+  "id": "biz.coaching_practice",
+  "cat": "business",
+  "name": "Professional practice",
+  "aliases": [
+   "CA firm",
+   "law firm",
+   "consultancy",
+   "architect firm",
+   "प्रैक्टिस"
+  ],
+  "vedic": {
+   "houses": [
+    7,
+    10,
+    11,
+    2
+   ],
+   "planets": [
+    "Jupiter",
+    "Mercury",
+    "Sun"
+   ],
+   "signs": [
+    "Sagittarius"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    7,
+    10,
+    11
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Mercury"
+   ],
+   "cards": [
+    "PRF.02"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    10
+   ],
+   "supporting": [
+    7,
+    2,
+    11
+   ],
+   "ta_houses": [
+    7,
+    10
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "practice"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.02 10th CSL as a significator of 2,7,10 gives independent profession."
+   }
+  ],
+  "best_tier": "T1"
+ }
+]

@@ -207,3 +207,21 @@ supplied. The standing design is therefore this.
 
 These requirements are stored in the repository and loaded through CLAUDE.md. They hold in this session and in
 every new session. They change only when the owner changes them, and STATUS.md records each change.
+
+## 12. The signification lexicon
+
+Added on 17 November 2026 on the owner's instruction, after the first scored chart. Files in sarva_engine/knowledge/lexicon, tool sarva_engine/tools/sarva_lexicon.js.
+1. What it is. A dictionary of 255 entries in six categories, medical degrees and specialities, professions, businesses, diseases, sources of income, relationships and relatives,
+   with the 202 KP PRO MAX cards, the KCIL event matrix and TA tables, and a search of the BNN rule base. It turns an option into houses, planets, signs, cards and cusps.
+2. What it is not. It is not an eighth methodology and not a ninth column. It gives no verdict, no vote and no tie break. Section 1 and section 4 are unchanged.
+3. When to run it. At the start of every question whose options or text name a speciality, degree, profession, business, disease, source of income, or a relative or family matter.
+   Run node sarva_engine/tools/sarva_lexicon.js --options "texts" --family, and write one line LEXICON Qn with the entry ids, or LEXICON Qn NONE. The guard warns when the line is missing.
+4. Isolation, extends section 5. A column cites only the T1 sentences of its own corpus. KP Pro cites KP sentences and cards, KCIL cites KCIL, BNN cites rule ids it has read, CHAWDHRI and SUJ cite their own.
+   Use --column so that the tool prints only that column's corpus text. A KP sentence is never read by KCIL and the reverse. T3 web claims and T4 karaka lists are hints, they translate an option into houses and may never appear as the cited evidence of a cell.
+5. No silent nearest. An option with NO ENTRY is not given the nearest planet. A PARTIAL MATCH is checked for the words that did not match. BNN grades an option its register does not name OPEN.
+6. Symmetry. Every option gets the same kind of entries and the same kind of counter entries. A column must not prefer an option because its lexicon entry is longer, and the tally must not read a gap in entries as evidence.
+   A tally gives 100 to an option with a single planet and no counter entry, which is an artefact, see SUJ LEARNINGS case 5.
+7. Capacity is not status. A natal signature of a profession, a relative or an event shows capacity. For a present status, read what the person does now, the running periods and the facts of the question.
+8. Recipes. recipes.json holds one recipe per question family and column, taken from the owner corpora, with the pitfalls the scored chart showed. A recipe does not decide.
+9. Growth. Add lines to the DSL files and rebuild, see the README in the lexicon folder. No entry, weight or recipe is changed because of one chart. Record the chart in the case registry first.
+10. Honest record. The lexicon has not been shown to raise accuracy. Its coverage is 255 entries and the 202 cards, not every type that exists. The web sources were read as search summaries only, because no page could be fetched.

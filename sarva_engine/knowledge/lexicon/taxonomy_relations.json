@@ -1,0 +1,2524 @@
+[
+ {
+  "id": "rel.father",
+  "cat": "relationship",
+  "name": "Father",
+  "aliases": [
+   "pita",
+   "papa",
+   "पिता",
+   "पिताजी"
+  ],
+  "vedic": {
+   "houses": [
+    9,
+    4,
+    10
+   ],
+   "planets": [
+    "Sun",
+    "Jupiter"
+   ],
+   "signs": [
+    "Leo",
+    "Sagittarius"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    9,
+    2,
+    4,
+    8
+   ],
+   "csl_planets": [
+    "Sun"
+   ],
+   "cards": [
+    "FAM.01",
+    "LON.04"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    9
+   ],
+   "supporting": [
+    2,
+    4,
+    8
+   ],
+   "ta_houses": [
+    9
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "father"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL rotation father is the 9th as his Lagna and father's proneness to sickness 9 with 2,4,8."
+   },
+   {
+    "src": "KP",
+    "text": "KP FAM.01."
+   },
+   {
+    "src": "BNN",
+    "text": "BNN father from the Sun by ARI-DOM-015, Rahu paternal grandfather."
+   },
+   {
+    "src": "CHAWDHRI",
+    "text": "Chawdhri counts father from the 9th."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.mother",
+  "cat": "relationship",
+  "name": "Mother",
+  "aliases": [
+   "mata",
+   "maa",
+   "माता",
+   "माताजी",
+   "मां"
+  ],
+  "vedic": {
+   "houses": [
+    4,
+    9,
+    10
+   ],
+   "planets": [
+    "Moon",
+    "Venus"
+   ],
+   "signs": [
+    "Cancer"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    3,
+    9,
+    11
+   ],
+   "csl_planets": [
+    "Moon"
+   ],
+   "cards": [
+    "FAM.02"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    4
+   ],
+   "supporting": [
+    9,
+    11,
+    3
+   ],
+   "ta_houses": [
+    4
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "mother"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL rotation mother is the 4th and mother's proneness to sickness 4 with 9,11,3."
+   },
+   {
+    "src": "KP",
+    "text": "KP FAM.02."
+   },
+   {
+    "src": "BNN",
+    "text": "BNN mother from the Moon by ARI-DOM-015 and RAO-DOM-015, RAO-DOM-026 on the Moon in the 2nd or 7th from the Sun."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.parents_alive",
+  "cat": "relationship",
+  "name": "Parents alive or not",
+  "aliases": [
+   "parents status",
+   "living parents",
+   "माता पिता जीवित"
+  ],
+  "vedic": {
+   "houses": [
+    9,
+    4,
+    8
+   ],
+   "planets": [
+    "Sun",
+    "Moon",
+    "Saturn"
+   ],
+   "signs": [
+    "Leo",
+    "Cancer"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    9,
+    4,
+    8,
+    2
+   ],
+   "csl_planets": [
+    "Sun",
+    "Moon"
+   ],
+   "cards": [
+    "FAM.01",
+    "FAM.02",
+    "LON.04"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    9,
+    4
+   ],
+   "supporting": [
+    8,
+    2
+   ],
+   "ta_houses": [
+    9,
+    4
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "parent",
+   "death"
+  ],
+  "evidence": [
+   {
+    "src": "BNN",
+    "text": "BNN guide 13.2 and 16.5 call a parent gone only when the table age is past and the karaka is joined to Saturn Rahu or Ketu in the first class and no Jupiter relief stands, BNN SAK-SAT-134 to 156 are windows and not deaths."
+   },
+   {
+    "src": "NOTE",
+    "text": "SARVA does not date a death."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.elder_brother",
+  "cat": "relationship",
+  "name": "Elder brother",
+  "aliases": [
+   "bade bhai",
+   "बड़ा भाई"
+  ],
+  "vedic": {
+   "houses": [
+    11,
+    3
+   ],
+   "planets": [
+    "Saturn",
+    "Jupiter"
+   ],
+   "signs": [
+    "Aquarius"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    11
+   ],
+   "csl_planets": [
+    "Saturn",
+    "Jupiter"
+   ],
+   "cards": [
+    "FAM.03"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    11
+   ],
+   "supporting": [
+    3
+   ],
+   "ta_houses": [
+    11
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "elder brother"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL elder co-born is the 11th."
+   },
+   {
+    "src": "BNN",
+    "text": "BNN ARI-DOM-003 Saturn elder brother and RAO-DOM-014 and RAO-FND-024 planets in the sign behind Jupiter are elder."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.younger_brother",
+  "cat": "relationship",
+  "name": "Younger brother",
+  "aliases": [
+   "chhota bhai",
+   "छोटा भाई"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    11
+   ],
+   "planets": [
+    "Mars"
+   ],
+   "signs": [
+    "Aries",
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3
+   ],
+   "csl_planets": [
+    "Mars"
+   ],
+   "cards": [
+    "FAM.03"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    3
+   ],
+   "supporting": [
+    8,
+    10,
+    2
+   ],
+   "ta_houses": [
+    3
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "younger brother"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL younger co-born is the 3rd."
+   },
+   {
+    "src": "BNN",
+    "text": "BNN Mars younger sibling by ARI-DOM-003 and BNG-DIR-003."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.elder_sister",
+  "cat": "relationship",
+  "name": "Elder sister",
+  "aliases": [
+   "badi behen",
+   "बड़ी बहन",
+   "दीदी"
+  ],
+  "vedic": {
+   "houses": [
+    11,
+    3
+   ],
+   "planets": [
+    "Moon",
+    "Venus"
+   ],
+   "signs": [
+    "Cancer",
+    "Taurus"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    11
+   ],
+   "csl_planets": [
+    "Moon",
+    "Venus"
+   ],
+   "cards": [
+    "FAM.03"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    11
+   ],
+   "supporting": [
+    3
+   ],
+   "ta_houses": [
+    11
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "elder sister"
+  ],
+  "evidence": [
+   {
+    "src": "BNN",
+    "text": "BNN ARI-DOM-003 and BNG-DIR-003 Moon is the elder sister and mother in law."
+   },
+   {
+    "src": "NOTE",
+    "text": "A planet in the sign before Jupiter is elder by RAO-FND-024."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.younger_sister",
+  "cat": "relationship",
+  "name": "Younger sister",
+  "aliases": [
+   "chhoti behen",
+   "छोटी बहन"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    11
+   ],
+   "planets": [
+    "Venus",
+    "Mercury"
+   ],
+   "signs": [
+    "Libra"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3
+   ],
+   "csl_planets": [
+    "Venus"
+   ],
+   "cards": [
+    "FAM.03"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    3
+   ],
+   "supporting": [
+    8,
+    10,
+    2
+   ],
+   "ta_houses": [
+    3
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "younger sister"
+  ],
+  "evidence": [
+   {
+    "src": "BNN",
+    "text": "BNN RAO-DOM-033 the three sibling planets Venus Mars and Mercury, BNG-DIR-003 Mercury second younger brother or sister."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.siblings_count",
+  "cat": "relationship",
+  "name": "Number of brothers and sisters",
+  "aliases": [
+   "siblings count",
+   "co-borns",
+   "भाई बहनों की संख्या"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    11
+   ],
+   "planets": [
+    "Mars",
+    "Venus",
+    "Mercury"
+   ],
+   "signs": [
+    "Aries"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    11
+   ],
+   "csl_planets": [
+    "Mars"
+   ],
+   "cards": [
+    "FAM.03"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    3,
+    11
+   ],
+   "supporting": [
+    8,
+    10
+   ],
+   "ta_houses": [
+    3,
+    11
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "sibling",
+   "brother"
+  ],
+  "evidence": [
+   {
+    "src": "BNN",
+    "text": "BNN RAO-DOM-012 count from Mars its own sign and the 2nd 7th 8th 10th 12th with Ketu not counted, then the guide 15 era scale and RAO-DOM-014 and RAO-DOM-019 on the native being the eldest."
+   },
+   {
+    "src": "NOTE",
+    "text": "No validated rule in SUJ."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.spouse_husband",
+  "cat": "relationship",
+  "name": "Husband",
+  "aliases": [
+   "pati",
+   "shohar",
+   "पति"
+  ],
+  "vedic": {
+   "houses": [
+    7,
+    2,
+    11
+   ],
+   "planets": [
+    "Mars",
+    "Jupiter",
+    "Venus"
+   ],
+   "signs": [
+    "Aries",
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    7,
+    2,
+    11
+   ],
+   "csl_planets": [
+    "Mars",
+    "Jupiter"
+   ],
+   "cards": [
+    "MAR.01",
+    "MAR.05"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    7
+   ],
+   "supporting": [
+    5,
+    11
+   ],
+   "ta_houses": [
+    7
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "husband"
+  ],
+  "evidence": [
+   {
+    "src": "BNN",
+    "text": "BNN guide 16.3 the spouse karaka of a woman is Mars, ARI-DOM-001 and ARI-DOM-014 also Jupiter, BNG-DIR-003 Mars is husband."
+   },
+   {
+    "src": "CHAWDHRI",
+    "text": "Chawdhri Mars husband in a female chart."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.spouse_wife",
+  "cat": "relationship",
+  "name": "Wife",
+  "aliases": [
+   "patni",
+   "biwi",
+   "पत्नी"
+  ],
+  "vedic": {
+   "houses": [
+    7,
+    2,
+    11
+   ],
+   "planets": [
+    "Venus"
+   ],
+   "signs": [
+    "Libra",
+    "Taurus"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    7,
+    2,
+    11
+   ],
+   "csl_planets": [
+    "Venus"
+   ],
+   "cards": [
+    "MAR.01",
+    "MAR.05"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    7
+   ],
+   "supporting": [
+    5,
+    11
+   ],
+   "ta_houses": [
+    7
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "wife"
+  ],
+  "evidence": [
+   {
+    "src": "BNN",
+    "text": "BNN guide 16.3 the spouse karaka of a man is Venus."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.spouse_profession",
+  "cat": "relationship",
+  "name": "Spouse's profession",
+  "aliases": [
+   "husband occupation",
+   "wife occupation",
+   "पति का कार्यक्षेत्र",
+   "जीवनसाथी का पेशा"
+  ],
+  "vedic": {
+   "houses": [
+    4,
+    7,
+    10,
+    6
+   ],
+   "planets": [
+    "Saturn",
+    "Mars",
+    "Sun"
+   ],
+   "signs": [
+    "Capricorn"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    7,
+    10,
+    6
+   ],
+   "csl_planets": [
+    "Mars",
+    "Saturn",
+    "Sun"
+   ],
+   "cards": [
+    "MAR.05",
+    "PRF.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    4,
+    7
+   ],
+   "supporting": [
+    10,
+    2,
+    6,
+    8,
+    11
+   ],
+   "ta_houses": [
+    4
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "husband",
+   "profession"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL rotation lock 16.10 the 10th from the 7th is the 4th house, so the spouse's 10th is cusp 4 and the spouse's 6th is cusp 12 and the spouse's 8th is cusp 2."
+   },
+   {
+    "src": "KP",
+    "text": "KP MAR.05 describes the spouse from the 7th CSL with its sign star and sub, then apply the PRF.01 reading to the cusp-4 chain."
+   },
+   {
+    "src": "WEB",
+    "text": "Web sources agree that the 4th is the spouse's career house and a 10th lord in the 6th gives a service or healthcare spouse."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.spouse_nature",
+  "cat": "relationship",
+  "name": "Spouse's nature and looks",
+  "aliases": [
+   "spouse nature",
+   "direction",
+   "age gap",
+   "जीवनसाथी का स्वभाव"
+  ],
+  "vedic": {
+   "houses": [
+    7,
+    1
+   ],
+   "planets": [
+    "Venus",
+    "Mars",
+    "Jupiter"
+   ],
+   "signs": [
+    "Libra"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    7
+   ],
+   "csl_planets": [
+    "Venus",
+    "Mars"
+   ],
+   "cards": [
+    "MAR.05"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    7
+   ],
+   "supporting": [
+    5,
+    11
+   ],
+   "ta_houses": [
+    7
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "spouse"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP MAR.05 direction by the 7th CSL planet, age gap, distance and origin."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.marriage_status",
+  "cat": "relationship",
+  "name": "Marital status",
+  "aliases": [
+   "married",
+   "unmarried",
+   "divorced",
+   "widowed",
+   "शादीशुदा",
+   "तलाक"
+  ],
+  "vedic": {
+   "houses": [
+    7,
+    2,
+    11
+   ],
+   "planets": [
+    "Venus",
+    "Jupiter",
+    "Mars"
+   ],
+   "signs": [
+    "Libra"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    7,
+    11
+   ],
+   "csl_planets": [
+    "Venus",
+    "Jupiter"
+   ],
+   "cards": [
+    "MAR.01",
+    "MAR.03",
+    "MAR.07"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    7
+   ],
+   "supporting": [
+    5,
+    11
+   ],
+   "ta_houses": [
+    7
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "marriage"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP MAR.01 2,7,11 against 1,6,10 and MAR.07 separation divorce 1,6,10,12."
+   },
+   {
+    "src": "BNN",
+    "text": "BNN guide 16.3."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.love_marriage",
+  "cat": "relationship",
+  "name": "Love or arranged marriage",
+  "aliases": [
+   "love marriage",
+   "arranged",
+   "प्रेम विवाह"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    7,
+    11
+   ],
+   "planets": [
+    "Venus",
+    "Mars",
+    "Rahu"
+   ],
+   "signs": [
+    "Libra"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    5,
+    7,
+    11
+   ],
+   "csl_planets": [
+    "Venus",
+    "Rahu"
+   ],
+   "cards": [
+    "MAR.04"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    5
+   ],
+   "supporting": [
+    7,
+    11
+   ],
+   "ta_houses": [
+    5
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "love"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP MAR.04 love affair 5,7,11 against 6,12."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Love marriage 5 with 7,11."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.child_son",
+  "cat": "relationship",
+  "name": "Son",
+  "aliases": [
+   "putra",
+   "beta",
+   "बेटा",
+   "पुत्र"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    9
+   ],
+   "planets": [
+    "Jupiter",
+    "Sun",
+    "Mars",
+    "Saturn"
+   ],
+   "signs": [
+    "Leo",
+    "Sagittarius"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    5,
+    2,
+    11
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Sun",
+    "Mars"
+   ],
+   "cards": [
+    "PRG.03",
+    "PRG.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    5
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    5
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "son"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRG.03 majority vote of male against female among the sign star and sub lords of the 5th cusp."
+   },
+   {
+    "src": "BNN",
+    "text": "BNN guide 16.4 Sun Mars Mercury Jupiter Saturn Rahu give sons and Moon and Venus give daughters, Ketu not counted."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.child_daughter",
+  "cat": "relationship",
+  "name": "Daughter",
+  "aliases": [
+   "putri",
+   "beti",
+   "बेटी",
+   "पुत्री"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    9
+   ],
+   "planets": [
+    "Venus",
+    "Moon"
+   ],
+   "signs": [
+    "Libra",
+    "Cancer"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    5,
+    2,
+    11
+   ],
+   "csl_planets": [
+    "Venus",
+    "Moon"
+   ],
+   "cards": [
+    "PRG.03"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    5
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    5
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "daughter"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRG.03 a female planet in a female sign and star gives a girl, Mercury takes the gender of its companion."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.children_count",
+  "cat": "relationship",
+  "name": "Number of children",
+  "aliases": [
+   "how many children",
+   "twins",
+   "संतान की संख्या"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    9,
+    11
+   ],
+   "planets": [
+    "Jupiter"
+   ],
+   "signs": [
+    "Sagittarius"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    5,
+    7,
+    9
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Saturn"
+   ],
+   "cards": [
+    "PRG.04",
+    "PRG.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    5,
+    7,
+    9
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    5
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "children"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRG.04 the first child is the 5th, the second the 7th and the third the 9th and a node as 5th CSL restricts the number."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL rotation first child 5th, second 7th, third 9th."
+   },
+   {
+    "src": "BNN",
+    "text": "BNN SAK-JUP-032 count planets in and aspecting the 5th from Jupiter."
+   },
+   {
+    "src": "NOTE",
+    "text": "No validated rule in SUJ."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.first_child",
+  "cat": "relationship",
+  "name": "First child",
+  "aliases": [
+   "eldest child",
+   "पहली संतान"
+  ],
+  "vedic": {
+   "houses": [
+    5
+   ],
+   "planets": [
+    "Jupiter"
+   ],
+   "signs": [
+    "Leo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    5,
+    2,
+    11
+   ],
+   "csl_planets": [
+    "Jupiter"
+   ],
+   "cards": [
+    "PRG.01",
+    "PRG.03"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    5
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    5
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "first child"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL first child is the 5th, 2nd child 7th, 3rd child 9th and plus 2 thereafter."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.childbirth",
+  "cat": "relationship",
+  "name": "Child birth and its mode",
+  "aliases": [
+   "normal delivery",
+   "caesarean",
+   "सिजेरियन"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    8,
+    2
+   ],
+   "planets": [
+    "Moon",
+    "Jupiter",
+    "Mars"
+   ],
+   "signs": [
+    "Cancer"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    5,
+    11,
+    8,
+    12
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Moon",
+    "Mars"
+   ],
+   "cards": [
+    "PRG.06"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    5
+   ],
+   "supporting": [
+    2,
+    8
+   ],
+   "ta_houses": [
+    5
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "delivery"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Caesarean 5 with 2,8."
+   },
+   {
+    "src": "KP",
+    "text": "KP PRG.06 safe delivery 5,11 against 8,12."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.father_in_law",
+  "cat": "relationship",
+  "name": "Father in law",
+  "aliases": [
+   "sasur",
+   "ससुर"
+  ],
+  "vedic": {
+   "houses": [
+    8,
+    10,
+    2
+   ],
+   "planets": [
+    "Mercury",
+    "Sun"
+   ],
+   "signs": [
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    8,
+    3,
+    10
+   ],
+   "csl_planets": [
+    "Sun",
+    "Mercury"
+   ],
+   "cards": [
+    "FAM.04"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    3
+   ],
+   "supporting": [
+    8,
+    10
+   ],
+   "ta_houses": [
+    8
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "father in law"
+  ],
+  "evidence": [
+   {
+    "src": "NOTE",
+    "text": "The spouse's 9th is the native's 3rd."
+   },
+   {
+    "src": "NOTE",
+    "text": "BNG-DIR-003 Mercury father in law."
+   }
+  ],
+  "best_tier": "T4"
+ },
+ {
+  "id": "rel.mother_in_law",
+  "cat": "relationship",
+  "name": "Mother in law",
+  "aliases": [
+   "saas",
+   "सास"
+  ],
+  "vedic": {
+   "houses": [
+    10,
+    8
+   ],
+   "planets": [
+    "Moon",
+    "Venus"
+   ],
+   "signs": [
+    "Capricorn"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    10,
+    8
+   ],
+   "csl_planets": [
+    "Moon"
+   ],
+   "cards": [
+    "FAM.04"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    10
+   ],
+   "supporting": [
+    8
+   ],
+   "ta_houses": [
+    8
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "mother in law"
+  ],
+  "evidence": [
+   {
+    "src": "NOTE",
+    "text": "The spouse's 4th is the native's 10th."
+   },
+   {
+    "src": "BNN",
+    "text": "BNN ARI-DOM-003 Moon is the mother in law."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.sibling_in_law",
+  "cat": "relationship",
+  "name": "Brother or sister in law",
+  "aliases": [
+   "devar",
+   "jeth",
+   "nanad",
+   "bhabhi",
+   "साला",
+   "साली",
+   "देवर",
+   "जेठ",
+   "ननद",
+   "भाभी"
+  ],
+  "vedic": {
+   "houses": [
+    11,
+    3,
+    8
+   ],
+   "planets": [
+    "Mars",
+    "Venus",
+    "Mercury"
+   ],
+   "signs": [
+    "Aries"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    11,
+    3,
+    8
+   ],
+   "csl_planets": [
+    "Mars",
+    "Venus"
+   ],
+   "cards": [
+    "FAM.04"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    3,
+    11
+   ],
+   "supporting": [
+    8
+   ],
+   "ta_houses": [
+    8
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "in law"
+  ],
+  "evidence": [
+   {
+    "src": "NOTE",
+    "text": "Derived from the spouse's 3rd and 11th, which are the native's 9th and 5th."
+   },
+   {
+    "src": "WEB",
+    "text": "The 6th house for maternal uncle and the 8th for sister in law is one web convention."
+   }
+  ],
+  "best_tier": "T3"
+ },
+ {
+  "id": "rel.maternal_uncle",
+  "cat": "relationship",
+  "name": "Maternal uncle",
+  "aliases": [
+   "mama",
+   "मामा"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    4
+   ],
+   "planets": [
+    "Mercury"
+   ],
+   "signs": [
+    "Gemini",
+    "Virgo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    10
+   ],
+   "csl_planets": [
+    "Mercury"
+   ],
+   "cards": [
+    "FAM.06"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    10
+   ],
+   "ta_houses": [
+    6
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "maternal uncle"
+  ],
+  "evidence": [
+   {
+    "src": "WEB",
+    "text": "Web convention 6th from the 1st and the 3rd from the 4th."
+   },
+   {
+    "src": "BNN",
+    "text": "BNN ARI-DOM-003 Mercury maternal uncle."
+   },
+   {
+    "src": "NOTE",
+    "text": "Native counts 3rd from the mother."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.paternal_uncle",
+  "cat": "relationship",
+  "name": "Paternal uncle",
+  "aliases": [
+   "chacha",
+   "ताऊ",
+   "चाचा"
+  ],
+  "vedic": {
+   "houses": [
+    11,
+    9,
+    3
+   ],
+   "planets": [
+    "Mars",
+    "Saturn"
+   ],
+   "signs": [
+    "Aries"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    11
+   ],
+   "csl_planets": [
+    "Mars"
+   ],
+   "cards": [
+    "FAM.06"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    11
+   ],
+   "supporting": [
+    3
+   ],
+   "ta_houses": [
+    11
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "paternal uncle"
+  ],
+  "evidence": [
+   {
+    "src": "NOTE",
+    "text": "The father's 3rd and 11th, counted from the 9th, is the 11th and 7th."
+   },
+   {
+    "src": "BNN",
+    "text": "BNN ARI-DOM-003 Mars paternal uncle."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.grandparents",
+  "cat": "relationship",
+  "name": "Grandparents",
+  "aliases": [
+   "dada",
+   "dadi",
+   "nana",
+   "nani",
+   "दादा",
+   "नाना"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    12,
+    3
+   ],
+   "planets": [
+    "Rahu",
+    "Ketu",
+    "Sun",
+    "Moon"
+   ],
+   "signs": [
+    "Cancer"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    5,
+    12,
+    3
+   ],
+   "csl_planets": [
+    "Rahu",
+    "Ketu"
+   ],
+   "cards": [
+    "FAM.06"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    5
+   ],
+   "supporting": [
+    12
+   ],
+   "ta_houses": [
+    5
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "grandfather"
+  ],
+  "evidence": [
+   {
+    "src": "BNN",
+    "text": "BNN Rahu paternal grandfather and Ketu maternal grandfather by ARI-DOM-003."
+   },
+   {
+    "src": "NOTE",
+    "text": "The 5th from the 9th paternal, the 7th from the 4th maternal."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.friends",
+  "cat": "relationship",
+  "name": "Friends",
+  "aliases": [
+   "mitra",
+   "dost",
+   "दोस्त",
+   "मित्र"
+  ],
+  "vedic": {
+   "houses": [
+    11,
+    3,
+    5
+   ],
+   "planets": [
+    "Mercury",
+    "Jupiter",
+    "Venus"
+   ],
+   "signs": [
+    "Gemini"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    11,
+    3
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Jupiter"
+   ],
+   "cards": [
+    "REL.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    11
+   ],
+   "supporting": [
+    3
+   ],
+   "ta_houses": [
+    11
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "friend"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP REL.01 friendship gain through friends 11 against 12."
+   },
+   {
+    "src": "BNN",
+    "text": "BNN Mercury friends."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.enemies",
+  "cat": "relationship",
+  "name": "Enemies or opponents",
+  "aliases": [
+   "shatru",
+   "rival",
+   "दुश्मन",
+   "शत्रु"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    7,
+    8,
+    12
+   ],
+   "planets": [
+    "Mars",
+    "Saturn",
+    "Rahu"
+   ],
+   "signs": [
+    "Virgo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    8,
+    12
+   ],
+   "csl_planets": [
+    "Mars",
+    "Saturn"
+   ],
+   "cards": [
+    "LIT.05"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    7
+   ],
+   "supporting": [
+    8,
+    12
+   ],
+   "ta_houses": [
+    7
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "enemy"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP LIT.05 enemies 6,8,12."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Danger from opponents 7 with 8,12."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.boss",
+  "cat": "relationship",
+  "name": "Boss or employer",
+  "aliases": [
+   "employer",
+   "superior",
+   "मालिक",
+   "अफसर"
+  ],
+  "vedic": {
+   "houses": [
+    10,
+    9
+   ],
+   "planets": [
+    "Sun",
+    "Saturn",
+    "Jupiter"
+   ],
+   "signs": [
+    "Leo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    10,
+    9,
+    1
+   ],
+   "csl_planets": [
+    "Sun",
+    "Saturn"
+   ],
+   "cards": [
+    "PRF.29"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    10
+   ],
+   "supporting": [
+    1,
+    5,
+    8,
+    9
+   ],
+   "ta_houses": [
+    10
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "boss"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.29 relations with the boss + 1,5,8,9,12."
+   },
+   {
+    "src": "KP",
+    "text": "KP PRF.01 employer named from planets on the 10th."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.colleague",
+  "cat": "relationship",
+  "name": "Colleagues or subordinates",
+  "aliases": [
+   "staff",
+   "servant",
+   "नौकर",
+   "सहकर्मी"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    3,
+    11
+   ],
+   "planets": [
+    "Mercury",
+    "Saturn",
+    "Mars"
+   ],
+   "signs": [
+    "Virgo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    11,
+    3
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Saturn"
+   ],
+   "cards": [
+    "PRF.39"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    11
+   ],
+   "ta_houses": [
+    6
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "servant"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.39 hiring staff servants helpers 6,11 against 8,12."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.partner",
+  "cat": "relationship",
+  "name": "Business partner",
+  "aliases": [
+   "partner",
+   "sajhedar",
+   "साझेदार"
+  ],
+  "vedic": {
+   "houses": [
+    7,
+    11
+   ],
+   "planets": [
+    "Mercury",
+    "Venus",
+    "Jupiter"
+   ],
+   "signs": [
+    "Libra"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    7,
+    11
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Venus"
+   ],
+   "cards": [
+    "PRF.10"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    7
+   ],
+   "supporting": [
+    5,
+    11
+   ],
+   "ta_houses": [
+    7
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "partner"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.10 partnership 7,11 against 6,12."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.guru",
+  "cat": "relationship",
+  "name": "Teacher or guru",
+  "aliases": [
+   "guru",
+   "mentor",
+   "गुरु",
+   "शिक्षक"
+  ],
+  "vedic": {
+   "houses": [
+    9,
+    5,
+    12
+   ],
+   "planets": [
+    "Jupiter",
+    "Ketu"
+   ],
+   "signs": [
+    "Sagittarius"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    9,
+    5,
+    12
+   ],
+   "csl_planets": [
+    "Jupiter"
+   ],
+   "cards": [
+    "SPR.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    9
+   ],
+   "supporting": [
+    5,
+    11
+   ],
+   "ta_houses": [
+    9
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "guru"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP SPR.01 spiritual inclination guru initiation 9,12,5."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.neighbour",
+  "cat": "relationship",
+  "name": "Neighbours",
+  "aliases": [
+   "padosi",
+   "पड़ोसी"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    4
+   ],
+   "planets": [
+    "Mercury",
+    "Mars"
+   ],
+   "signs": [
+    "Gemini"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    4
+   ],
+   "csl_planets": [
+    "Mercury"
+   ],
+   "cards": [
+    "REL.02"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    3
+   ],
+   "supporting": [
+    4
+   ],
+   "ta_houses": [
+    3
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "neighbour"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 3 marriage through neighbours."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.adopted",
+  "cat": "relationship",
+  "name": "Adoption",
+  "aliases": [
+   "adopted child",
+   "गोद लेना"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    4,
+    8
+   ],
+   "planets": [
+    "Rahu",
+    "Saturn",
+    "Ketu"
+   ],
+   "signs": [
+    "Capricorn"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    5,
+    8,
+    12,
+    4
+   ],
+   "csl_planets": [
+    "Saturn",
+    "Rahu"
+   ],
+   "cards": [
+    "PRG.05",
+    "FAM.07"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    5
+   ],
+   "supporting": [
+    8,
+    12
+   ],
+   "ta_houses": [
+    5
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "adopt"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRG.05 and FAM.07 native given in adoption 4,5,8."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.affair",
+  "cat": "relationship",
+  "name": "Extra marital relationship",
+  "aliases": [
+   "affair",
+   "secret relationship",
+   "अफेयर"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    8,
+    12,
+    7
+   ],
+   "planets": [
+    "Rahu",
+    "Venus",
+    "Mars"
+   ],
+   "signs": [
+    "Libra"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    5,
+    8,
+    12
+   ],
+   "csl_planets": [
+    "Rahu",
+    "Venus"
+   ],
+   "cards": [
+    "MAR.10"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    11
+   ],
+   "supporting": [
+    7,
+    5
+   ],
+   "ta_houses": [
+    11
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "affair"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP MAR.10 extra marital affair 5,8,12."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Sexual relationship with a friend 11 with 7,5."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.second_marriage",
+  "cat": "relationship",
+  "name": "Second marriage",
+  "aliases": [
+   "remarriage",
+   "दूसरी शादी"
+  ],
+  "vedic": {
+   "houses": [
+    9,
+    7,
+    2
+   ],
+   "planets": [
+    "Jupiter",
+    "Venus"
+   ],
+   "signs": [
+    "Gemini",
+    "Sagittarius"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    7,
+    11,
+    9
+   ],
+   "csl_planets": [
+    "Venus",
+    "Jupiter"
+   ],
+   "cards": [
+    "MAR.08"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    9
+   ],
+   "supporting": [
+    7,
+    11
+   ],
+   "ta_houses": [
+    9
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "second marriage"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Second marriage 9 with 7,11."
+   },
+   {
+    "src": "BNN",
+    "text": "BNN SAK-JUP-070 and 071 Jupiter 7th in Gemini Sagittarius or Pisces."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.in_laws_house",
+  "cat": "relationship",
+  "name": "In law family",
+  "aliases": [
+   "sasural",
+   "ससुराल पक्ष"
+  ],
+  "vedic": {
+   "houses": [
+    8,
+    2,
+    7
+   ],
+   "planets": [
+    "Venus",
+    "Saturn"
+   ],
+   "signs": [
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    8,
+    7
+   ],
+   "csl_planets": [
+    "Venus"
+   ],
+   "cards": [
+    "FAM.04"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    8
+   ],
+   "supporting": [
+    7
+   ],
+   "ta_houses": [
+    8
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "in law"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP FAM.04 in laws 8 spouse's 2."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "rel.family_harmony",
+  "cat": "relationship",
+  "name": "Family harmony",
+  "aliases": [
+   "joint family",
+   "separation",
+   "घर की शांति"
+  ],
+  "vedic": {
+   "houses": [
+    2,
+    4
+   ],
+   "planets": [
+    "Moon",
+    "Venus",
+    "Jupiter"
+   ],
+   "signs": [
+    "Taurus",
+    "Cancer"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    4
+   ],
+   "csl_planets": [
+    "Moon",
+    "Jupiter"
+   ],
+   "cards": [
+    "FAM.05"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    2,
+    4
+   ],
+   "supporting": [
+    11
+   ],
+   "ta_houses": [
+    2
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "family"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP FAM.05."
+   }
+  ],
+  "best_tier": "T1"
+ }
+]

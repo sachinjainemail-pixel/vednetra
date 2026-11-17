@@ -1,0 +1,3455 @@
+[
+ {
+  "id": "dis.generic",
+  "cat": "disease",
+  "name": "Disease in general",
+  "aliases": [
+   "illness",
+   "sickness",
+   "health problem",
+   "रोग",
+   "बीमारी"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    8,
+    12,
+    1
+   ],
+   "planets": [
+    "Saturn",
+    "Mars",
+    "Rahu"
+   ],
+   "signs": [
+    "Virgo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    1,
+    6,
+    8,
+    12
+   ],
+   "csl_planets": [
+    "Saturn",
+    "Mars"
+   ],
+   "cards": [
+    "HLT.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    1,
+    8,
+    12
+   ],
+   "ta_houses": [
+    6
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "disease"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.01 link to lagna law, 6 with 1 is disease, 1,6,8 long term, 1,6,8,12 lifelong, 6,8,12 surgery."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Proneness to disease 1 with 6,8,12 and Disease nature and part 6 with the cusp of the organ."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.headache",
+  "cat": "disease",
+  "name": "Headache or migraine",
+  "aliases": [
+   "migraine",
+   "सिरदर्द"
+  ],
+  "vedic": {
+   "houses": [
+    1,
+    6
+   ],
+   "planets": [
+    "Sun",
+    "Mars",
+    "Mercury"
+   ],
+   "signs": [
+    "Aries"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    1,
+    6
+   ],
+   "csl_planets": [
+    "Mars",
+    "Sun"
+   ],
+   "cards": [
+    "HLT.20"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    1
+   ],
+   "ta_houses": [
+    1
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "head"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 1 diseases headache."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.brain",
+  "cat": "disease",
+  "name": "Brain disease or tumour",
+  "aliases": [
+   "meningitis",
+   "brain fever",
+   "brain tumour",
+   "दिमागी बुखार"
+  ],
+  "vedic": {
+   "houses": [
+    1,
+    6,
+    8
+   ],
+   "planets": [
+    "Mars",
+    "Sun",
+    "Rahu",
+    "Jupiter"
+   ],
+   "signs": [
+    "Aries"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    1,
+    6,
+    8,
+    12
+   ],
+   "csl_planets": [
+    "Mars",
+    "Rahu",
+    "Jupiter"
+   ],
+   "cards": [
+    "HLT.20",
+    "HLT.13"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    1,
+    8
+   ],
+   "ta_houses": [
+    1
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "brain"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 1 meningitis brain tumour brain fever."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.epilepsy",
+  "cat": "disease",
+  "name": "Epilepsy",
+  "aliases": [
+   "seizure",
+   "fits",
+   "मिर्गी"
+  ],
+  "vedic": {
+   "houses": [
+    1,
+    6,
+    8
+   ],
+   "planets": [
+    "Moon",
+    "Saturn",
+    "Rahu",
+    "Ketu"
+   ],
+   "signs": [
+    "Aries"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    1,
+    6,
+    8,
+    12
+   ],
+   "csl_planets": [
+    "Moon",
+    "Saturn",
+    "Rahu"
+   ],
+   "cards": [
+    "HLT.20"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    1,
+    8
+   ],
+   "ta_houses": [
+    1
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "epilepsy"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 1 epilepsy."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.stroke",
+  "cat": "disease",
+  "name": "Stroke or paralysis",
+  "aliases": [
+   "paralysis",
+   "palsy",
+   "hemiplegia",
+   "लकवा",
+   "पक्षाघात"
+  ],
+  "vedic": {
+   "houses": [
+    1,
+    6,
+    8,
+    9
+   ],
+   "planets": [
+    "Saturn",
+    "Mars",
+    "Rahu",
+    "Mercury"
+   ],
+   "signs": [
+    "Aries",
+    "Aquarius"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    1,
+    6,
+    8,
+    12
+   ],
+   "csl_planets": [
+    "Saturn",
+    "Mars"
+   ],
+   "cards": [
+    "HLT.21"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    1,
+    8,
+    9
+   ],
+   "ta_houses": [
+    9,
+    1
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "paralysis"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 9 paralysis and house 1 cerebral haemorrhage and Bell's palsy."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.depression",
+  "cat": "disease",
+  "name": "Depression or anxiety",
+  "aliases": [
+   "mental stress",
+   "anxiety",
+   "mood disorder",
+   "अवसाद",
+   "तनाव"
+  ],
+  "vedic": {
+   "houses": [
+    1,
+    4,
+    5,
+    8,
+    12
+   ],
+   "planets": [
+    "Moon",
+    "Mercury",
+    "Saturn",
+    "Rahu"
+   ],
+   "signs": [
+    "Cancer"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    1,
+    4,
+    6,
+    8,
+    12
+   ],
+   "csl_planets": [
+    "Moon",
+    "Saturn",
+    "Rahu"
+   ],
+   "cards": [
+    "MIND.01",
+    "MIND.02"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    8
+   ],
+   "supporting": [
+    1,
+    3,
+    12
+   ],
+   "ta_houses": [
+    1,
+    8
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "mind",
+   "depression"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Depression 8 with 1,3,12."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 1 depression."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.insomnia",
+  "cat": "disease",
+  "name": "Insomnia or sleep disorder",
+  "aliases": [
+   "sleeplessness",
+   "नींद की समस्या"
+  ],
+  "vedic": {
+   "houses": [
+    12,
+    4,
+    1
+   ],
+   "planets": [
+    "Moon",
+    "Mercury",
+    "Rahu",
+    "Ketu"
+   ],
+   "signs": [
+    "Pisces"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    12,
+    4,
+    1
+   ],
+   "csl_planets": [
+    "Moon",
+    "Rahu"
+   ],
+   "cards": [
+    "MIND.01"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    12
+   ],
+   "ta_houses": [
+    12
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "sleep"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 12 insomnia."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.addiction",
+  "cat": "disease",
+  "name": "Addiction",
+  "aliases": [
+   "alcohol",
+   "drugs",
+   "gambling",
+   "नशा"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    8,
+    12
+   ],
+   "planets": [
+    "Rahu",
+    "Venus",
+    "Moon",
+    "Saturn"
+   ],
+   "signs": [
+    "Pisces"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    8,
+    12
+   ],
+   "csl_planets": [
+    "Rahu",
+    "Venus"
+   ],
+   "cards": [
+    "MIND.03"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    8,
+    12
+   ],
+   "ta_houses": [
+    12
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "addiction"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP MIND.03 addiction 6,8,12."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.eye",
+  "cat": "disease",
+  "name": "Eye disease",
+  "aliases": [
+   "cataract",
+   "blindness",
+   "vision problem",
+   "आँख",
+   "मोतियाबिंद"
+  ],
+  "vedic": {
+   "houses": [
+    2,
+    12,
+    6
+   ],
+   "planets": [
+    "Sun",
+    "Moon",
+    "Venus",
+    "Mars"
+   ],
+   "signs": [
+    "Taurus",
+    "Pisces"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    6,
+    12
+   ],
+   "csl_planets": [
+    "Sun",
+    "Moon",
+    "Venus"
+   ],
+   "cards": [
+    "HLT.18"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    2,
+    12
+   ],
+   "ta_houses": [
+    2,
+    12
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "eye"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.18 + 2,6,12."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 2 eyes and house 12 left eye."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.ear",
+  "cat": "disease",
+  "name": "Ear disease or deafness",
+  "aliases": [
+   "hearing loss",
+   "deaf",
+   "कान",
+   "बहरापन"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    2,
+    6
+   ],
+   "planets": [
+    "Mercury",
+    "Saturn",
+    "Jupiter"
+   ],
+   "signs": [
+    "Gemini"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    3,
+    6
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Saturn"
+   ],
+   "cards": [
+    "HLT.19"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    3,
+    2
+   ],
+   "ta_houses": [
+    3,
+    11
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "ear"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.19 + 2,3,6."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 3 audio visual sensory organs and house 11 left ear."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.throat",
+  "cat": "disease",
+  "name": "Throat, tonsil or thyroid",
+  "aliases": [
+   "tonsillitis",
+   "goitre",
+   "voice problem",
+   "गला",
+   "थायराइड"
+  ],
+  "vedic": {
+   "houses": [
+    2,
+    3,
+    6
+   ],
+   "planets": [
+    "Venus",
+    "Mercury",
+    "Jupiter"
+   ],
+   "signs": [
+    "Taurus"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    3,
+    6
+   ],
+   "csl_planets": [
+    "Venus",
+    "Mercury"
+   ],
+   "cards": [
+    "HLT.08"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    2
+   ],
+   "ta_houses": [
+    2
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "throat"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 2 throat tongue tonsils neck."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.teeth",
+  "cat": "disease",
+  "name": "Dental disease",
+  "aliases": [
+   "tooth decay",
+   "gum disease",
+   "teeth",
+   "दाँत"
+  ],
+  "vedic": {
+   "houses": [
+    2,
+    6,
+    10
+   ],
+   "planets": [
+    "Mars",
+    "Saturn",
+    "Sun"
+   ],
+   "signs": [
+    "Taurus",
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    10,
+    6
+   ],
+   "csl_planets": [
+    "Mars",
+    "Saturn"
+   ],
+   "cards": [
+    "HLT.08"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    2
+   ],
+   "ta_houses": [
+    2
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "teeth"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 2 teeth gums oral cavity."
+   },
+   {
+    "src": "KP",
+    "text": "KP MAX HLT card teeth 2nd rules teeth, 2nd CSL in Aries Taurus or Scorpio afflicted gives ugly teeth and 6th CSL afflicted in the 7th gives dental disease."
+   },
+   {
+    "src": "BNN",
+    "text": "BNN AVA-HLT-006 Mars teeth and Saturn Rahu Mars decay."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.asthma",
+  "cat": "disease",
+  "name": "Asthma or respiratory disease",
+  "aliases": [
+   "bronchitis",
+   "breathing problem",
+   "COPD",
+   "दमा",
+   "सांस"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    4,
+    6
+   ],
+   "planets": [
+    "Mercury",
+    "Moon",
+    "Saturn",
+    "Rahu"
+   ],
+   "signs": [
+    "Gemini",
+    "Cancer"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    6,
+    1
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Moon",
+    "Saturn"
+   ],
+   "cards": [
+    "HLT.17"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    3,
+    4
+   ],
+   "ta_houses": [
+    3,
+    4
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "lung",
+   "asthma"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.17 + 1,6."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 3 bronchitis respiratory system and house 4 lungs."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.tb",
+  "cat": "disease",
+  "name": "Tuberculosis or lung infection",
+  "aliases": [
+   "TB",
+   "pneumonia",
+   "क्षय रोग"
+  ],
+  "vedic": {
+   "houses": [
+    4,
+    6,
+    8
+   ],
+   "planets": [
+    "Moon",
+    "Saturn",
+    "Mercury"
+   ],
+   "signs": [
+    "Cancer"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    6,
+    8,
+    1
+   ],
+   "csl_planets": [
+    "Moon",
+    "Saturn"
+   ],
+   "cards": [
+    "HLT.17"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    4,
+    8
+   ],
+   "ta_houses": [
+    4
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "tb",
+   "lung"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.17 tuberculosis."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.heart",
+  "cat": "disease",
+  "name": "Heart disease",
+  "aliases": [
+   "cardiac",
+   "heart attack",
+   "angina",
+   "हृदय रोग",
+   "दिल की बीमारी"
+  ],
+  "vedic": {
+   "houses": [
+    4,
+    5,
+    6
+   ],
+   "planets": [
+    "Sun",
+    "Saturn",
+    "Rahu",
+    "Moon"
+   ],
+   "signs": [
+    "Leo",
+    "Cancer"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    6,
+    8,
+    12
+   ],
+   "csl_planets": [
+    "Sun",
+    "Saturn",
+    "Rahu",
+    "Moon"
+   ],
+   "cards": [
+    "HLT.14"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    4,
+    5
+   ],
+   "ta_houses": [
+    4,
+    5
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "heart"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.01 heart 6th CSL connecting Cancer Leo or Aquarius the 4th house and Sun Moon Saturn Rahu."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 4 heart lungs blood vessels and house 5 heart troubles."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.bp",
+  "cat": "disease",
+  "name": "Blood pressure",
+  "aliases": [
+   "hypertension",
+   "high BP",
+   "low BP",
+   "रक्तचाप"
+  ],
+  "vedic": {
+   "houses": [
+    4,
+    6,
+    11
+   ],
+   "planets": [
+    "Mars",
+    "Sun",
+    "Jupiter",
+    "Venus"
+   ],
+   "signs": [
+    "Leo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    6,
+    11
+   ],
+   "csl_planets": [
+    "Mars",
+    "Jupiter",
+    "Saturn"
+   ],
+   "cards": [
+    "HLT.14"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    4,
+    11
+   ],
+   "ta_houses": [
+    4,
+    11
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "pressure"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.01 Jupiter subnormal BP and Mars afflicted in Leo overheated blood."
+   },
+   {
+    "src": "KP",
+    "text": "KP house keys 11 blood and BP."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.digestive",
+  "cat": "disease",
+  "name": "Digestive disorder",
+  "aliases": [
+   "acidity",
+   "gastritis",
+   "ulcer",
+   "indigestion",
+   "gas",
+   "पेट",
+   "पाचन"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    6
+   ],
+   "planets": [
+    "Moon",
+    "Jupiter",
+    "Mercury",
+    "Mars"
+   ],
+   "signs": [
+    "Cancer",
+    "Virgo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    5,
+    12
+   ],
+   "csl_planets": [
+    "Moon",
+    "Jupiter",
+    "Mercury",
+    "Mars"
+   ],
+   "cards": [
+    "HLT.26"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    5,
+    2
+   ],
+   "ta_houses": [
+    5,
+    6
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "stomach"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.26 digestive and abdominal disease + 6,12."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 5 intestinal and stomach problems and house 6 peptic ulcers colic."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.intestine",
+  "cat": "disease",
+  "name": "Intestinal disease or IBS",
+  "aliases": [
+   "colitis",
+   "constipation",
+   "diarrhoea",
+   "worms",
+   "आँत"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    5
+   ],
+   "planets": [
+    "Mercury",
+    "Moon",
+    "Saturn"
+   ],
+   "signs": [
+    "Virgo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Saturn"
+   ],
+   "cards": [
+    "HLT.26"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    5
+   ],
+   "ta_houses": [
+    5,
+    6
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "intestine"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 5 diarrhoea and house 6 large intestines worms."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.piles",
+  "cat": "disease",
+  "name": "Piles, fistula or rectal disease",
+  "aliases": [
+   "haemorrhoids",
+   "fissure",
+   "बवासीर",
+   "भगंदर"
+  ],
+  "vedic": {
+   "houses": [
+    8,
+    6
+   ],
+   "planets": [
+    "Mars",
+    "Saturn",
+    "Ketu"
+   ],
+   "signs": [
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    8,
+    6
+   ],
+   "csl_planets": [
+    "Mars",
+    "Saturn",
+    "Ketu"
+   ],
+   "cards": [
+    "HLT.01"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    8
+   ],
+   "ta_houses": [
+    8
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "piles",
+   "rectum"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 8 rectum piles fistula."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.appendix",
+  "cat": "disease",
+  "name": "Appendicitis or hernia",
+  "aliases": [
+   "appendix",
+   "hernia",
+   "अपेंडिक्स"
+  ],
+  "vedic": {
+   "houses": [
+    6
+   ],
+   "planets": [
+    "Mars",
+    "Mercury"
+   ],
+   "signs": [
+    "Virgo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    8
+   ],
+   "csl_planets": [
+    "Mars",
+    "Mercury"
+   ],
+   "cards": [
+    "HLT.26"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    5
+   ],
+   "ta_houses": [
+    6
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "appendix"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 6 appendicitis hernia."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.liver",
+  "cat": "disease",
+  "name": "Liver disease or jaundice",
+  "aliases": [
+   "hepatitis",
+   "fatty liver",
+   "gallstones",
+   "पीलिया",
+   "लिवर"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    9,
+    6
+   ],
+   "planets": [
+    "Jupiter",
+    "Mars",
+    "Sun"
+   ],
+   "signs": [
+    "Sagittarius",
+    "Leo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    9,
+    6,
+    5
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Mars"
+   ],
+   "cards": [
+    "HLT.26"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    5,
+    9
+   ],
+   "ta_houses": [
+    5
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "liver",
+   "jaundice"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP house keys 9 liver."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 5 liver and planet Jupiter damaged liver jaundice."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.diabetes",
+  "cat": "disease",
+  "name": "Diabetes",
+  "aliases": [
+   "sugar",
+   "blood sugar",
+   "मधुमेह",
+   "शुगर"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    2,
+    5
+   ],
+   "planets": [
+    "Jupiter",
+    "Venus",
+    "Mercury",
+    "Moon"
+   ],
+   "signs": [
+    "Libra",
+    "Virgo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    1,
+    8,
+    12
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Venus"
+   ],
+   "cards": [
+    "HLT.15"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    6
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "diabetes"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.15 + 1,6,8,12."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 6 pancreas and diabetes."
+   },
+   {
+    "src": "KP",
+    "text": "KP house keys 7 pancreas."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.thyroid",
+  "cat": "disease",
+  "name": "Thyroid disorder",
+  "aliases": [
+   "hypothyroid",
+   "hyperthyroid",
+   "goitre"
+  ],
+  "vedic": {
+   "houses": [
+    2,
+    6
+   ],
+   "planets": [
+    "Venus",
+    "Mercury"
+   ],
+   "signs": [
+    "Taurus"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    6
+   ],
+   "csl_planets": [
+    "Venus",
+    "Mercury"
+   ],
+   "cards": [
+    "HLT.08"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    2
+   ],
+   "ta_houses": [
+    2
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "thyroid"
+  ],
+  "evidence": [
+   {
+    "src": "NOTE",
+    "text": "Throat house 2."
+   }
+  ],
+  "best_tier": "T4"
+ },
+ {
+  "id": "dis.obesity",
+  "cat": "disease",
+  "name": "Obesity or weight problem",
+  "aliases": [
+   "overweight",
+   "weight gain",
+   "मोटापा"
+  ],
+  "vedic": {
+   "houses": [
+    1,
+    2,
+    6
+   ],
+   "planets": [
+    "Jupiter",
+    "Moon",
+    "Venus"
+   ],
+   "signs": [
+    "Sagittarius"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    1,
+    6
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Moon"
+   ],
+   "cards": [
+    "HLT.01"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    1
+   ],
+   "ta_houses": [
+    9
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "fat"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 9 diseases caused by increase of fat."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA planet Jupiter over production of fat."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.kidney",
+  "cat": "disease",
+  "name": "Kidney or urinary disease",
+  "aliases": [
+   "kidney stone",
+   "UTI",
+   "kidney failure",
+   "urine problem",
+   "गुर्दा",
+   "पथरी"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    7,
+    8
+   ],
+   "planets": [
+    "Venus",
+    "Saturn",
+    "Mars",
+    "Moon"
+   ],
+   "signs": [
+    "Libra",
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    7,
+    8
+   ],
+   "csl_planets": [
+    "Venus",
+    "Saturn",
+    "Mars"
+   ],
+   "cards": [
+    "HLT.16"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    7
+   ],
+   "ta_houses": [
+    7
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "kidney",
+   "urine"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.16 + 6,7,8."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 7 urinary system kidneys."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA planet Venus kidney failure."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.prostate",
+  "cat": "disease",
+  "name": "Prostate disease",
+  "aliases": [
+   "prostatitis",
+   "BPH"
+  ],
+  "vedic": {
+   "houses": [
+    7,
+    8,
+    6
+   ],
+   "planets": [
+    "Venus",
+    "Mars",
+    "Saturn"
+   ],
+   "signs": [
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    7,
+    8,
+    6
+   ],
+   "csl_planets": [
+    "Venus",
+    "Mars"
+   ],
+   "cards": [
+    "HLT.16"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    7,
+    8
+   ],
+   "ta_houses": [
+    7
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "prostate"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 7 prostate glands."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.femalegyn",
+  "cat": "disease",
+  "name": "Gynecological disorder",
+  "aliases": [
+   "menstrual problem",
+   "uterus disease",
+   "fibroid",
+   "PCOS",
+   "leucorrhoea",
+   "menopause",
+   "माहवारी",
+   "गर्भाशय"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    6,
+    7,
+    8
+   ],
+   "planets": [
+    "Moon",
+    "Venus",
+    "Mars",
+    "Jupiter"
+   ],
+   "signs": [
+    "Cancer",
+    "Scorpio",
+    "Libra"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    7,
+    8
+   ],
+   "csl_planets": [
+    "Moon",
+    "Venus",
+    "Mars"
+   ],
+   "cards": [
+    "HLT.25",
+    "HLT.29"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    7,
+    5
+   ],
+   "ta_houses": [
+    7
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "uterus",
+   "menses"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.25 + 6,7,8 and HLT.29 puberty menstruation 5,8."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 7 uterus ovaries menstrual disorders."
+   },
+   {
+    "src": "KP",
+    "text": "KP HLT.01 Moon with cardinal sign gives uterus."
+   },
+   {
+    "src": "CHAWDHRI",
+    "text": "Chawdhri Mars menstrual bleeding and Moon governs breasts stomach reproductive organs."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.pregnancy",
+  "cat": "disease",
+  "name": "Pregnancy complication or miscarriage",
+  "aliases": [
+   "abortion",
+   "miscarriage",
+   "caesarean",
+   "high risk pregnancy",
+   "गर्भपात"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    8,
+    12,
+    2
+   ],
+   "planets": [
+    "Moon",
+    "Mars",
+    "Saturn",
+    "Rahu"
+   ],
+   "signs": [
+    "Cancer"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    5,
+    8,
+    12
+   ],
+   "csl_planets": [
+    "Moon",
+    "Mars",
+    "Saturn"
+   ],
+   "cards": [
+    "HLT.11",
+    "PRG.06"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    5
+   ],
+   "supporting": [
+    2,
+    8
+   ],
+   "ta_houses": [
+    5
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "miscarriage"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.11 + 5,8,12 against 2,5,11."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Caesarean 5 with 2,8."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.infertility",
+  "cat": "disease",
+  "name": "Infertility or impotence",
+  "aliases": [
+   "sterility",
+   "male infertility",
+   "बांझपन",
+   "नपुंसकता"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    7,
+    8
+   ],
+   "planets": [
+    "Saturn",
+    "Rahu",
+    "Ketu",
+    "Mars",
+    "Venus"
+   ],
+   "signs": [
+    "Capricorn"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    5,
+    7,
+    8
+   ],
+   "csl_planets": [
+    "Saturn",
+    "Venus"
+   ],
+   "cards": [
+    "HLT.23",
+    "PRG.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    7
+   ],
+   "supporting": [
+    5,
+    8
+   ],
+   "ta_houses": [
+    7
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "sterile"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 7 impotence frigidity sterility."
+   },
+   {
+    "src": "KP",
+    "text": "KP HLT.23 venereal disease sexual disorders impotence + 7,8."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.venereal",
+  "cat": "disease",
+  "name": "Venereal or sexual disease",
+  "aliases": [
+   "STD",
+   "HIV",
+   "AIDS",
+   "गुप्त रोग"
+  ],
+  "vedic": {
+   "houses": [
+    7,
+    8,
+    6
+   ],
+   "planets": [
+    "Venus",
+    "Rahu",
+    "Mars"
+   ],
+   "signs": [
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    7,
+    8
+   ],
+   "csl_planets": [
+    "Venus",
+    "Rahu"
+   ],
+   "cards": [
+    "HLT.23"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    7,
+    8
+   ],
+   "supporting": [
+    6
+   ],
+   "ta_houses": [
+    7
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "venereal"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 7 venereal diseases and mode of death AIDS."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.skin",
+  "cat": "disease",
+  "name": "Skin disease",
+  "aliases": [
+   "eczema",
+   "psoriasis",
+   "allergy",
+   "acne",
+   "rash",
+   "itching",
+   "त्वचा रोग",
+   "एक्जिमा"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    10,
+    1
+   ],
+   "planets": [
+    "Mercury",
+    "Venus",
+    "Saturn",
+    "Ketu",
+    "Mars"
+   ],
+   "signs": [
+    "Capricorn",
+    "Libra"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    8,
+    12,
+    10
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Saturn",
+    "Ketu"
+   ],
+   "cards": [
+    "HLT.22"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    1,
+    10
+   ],
+   "ta_houses": [
+    8,
+    10
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "skin"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.22 skin disease and leprosy + 6,8,12 and house keys 10 skin."
+   },
+   {
+    "src": "BNN",
+    "text": "BNN ARI-HLT-003 Mercury skin and allergies and AVA-HLT-004 Ketu Varna Pitta skin."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.leprosy",
+  "cat": "disease",
+  "name": "Leprosy or chronic skin disease",
+  "aliases": [
+   "white patches",
+   "vitiligo",
+   "leucoderma",
+   "कुष्ठ",
+   "सफेद दाग"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    8,
+    12
+   ],
+   "planets": [
+    "Saturn",
+    "Rahu",
+    "Ketu",
+    "Venus"
+   ],
+   "signs": [
+    "Capricorn"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    8,
+    12
+   ],
+   "csl_planets": [
+    "Saturn",
+    "Rahu"
+   ],
+   "cards": [
+    "HLT.22"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    8,
+    12
+   ],
+   "ta_houses": [
+    8
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "leprosy",
+   "skin"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.22."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.hair",
+  "cat": "disease",
+  "name": "Hair loss or hair problem",
+  "aliases": [
+   "baldness",
+   "dandruff",
+   "बाल झड़ना"
+  ],
+  "vedic": {
+   "houses": [
+    1,
+    6
+   ],
+   "planets": [
+    "Saturn",
+    "Sun",
+    "Mars"
+   ],
+   "signs": [
+    "Aries"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    1,
+    6
+   ],
+   "csl_planets": [
+    "Saturn",
+    "Sun"
+   ],
+   "cards": [
+    "HLT.01"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    1
+   ],
+   "ta_houses": [
+    1
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "hair"
+  ],
+  "evidence": [
+   {
+    "src": "NOTE",
+    "text": "Saturn hair."
+   }
+  ],
+  "best_tier": "T4"
+ },
+ {
+  "id": "dis.arthritis",
+  "cat": "disease",
+  "name": "Arthritis or joint disease",
+  "aliases": [
+   "joint pain",
+   "rheumatism",
+   "gout",
+   "गठिया",
+   "जोड़ों का दर्द"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    8,
+    10
+   ],
+   "planets": [
+    "Saturn",
+    "Mars",
+    "Rahu"
+   ],
+   "signs": [
+    "Capricorn",
+    "Aquarius"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    1,
+    6,
+    8,
+    12,
+    10
+   ],
+   "csl_planets": [
+    "Saturn",
+    "Mars"
+   ],
+   "cards": [
+    "HLT.27"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    10
+   ],
+   "ta_houses": [
+    10
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "joint"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.27 + 1,6,8,12."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 10 knees."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.backpain",
+  "cat": "disease",
+  "name": "Back pain, spondylosis or sciatica",
+  "aliases": [
+   "slip disc",
+   "spine problem",
+   "कमर दर्द",
+   "स्पॉन्डिलाइटिस"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    10,
+    9
+   ],
+   "planets": [
+    "Saturn",
+    "Mars",
+    "Sun"
+   ],
+   "signs": [
+    "Leo",
+    "Capricorn"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    10,
+    6,
+    9
+   ],
+   "csl_planets": [
+    "Saturn",
+    "Mars"
+   ],
+   "cards": [
+    "HLT.27"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    10,
+    9
+   ],
+   "ta_houses": [
+    10,
+    9
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "back",
+   "spine"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 10 spinal cord back pain and house 9 sciatica."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.fracture",
+  "cat": "disease",
+  "name": "Fracture or injury",
+  "aliases": [
+   "accident",
+   "bone fracture",
+   "burns",
+   "wound",
+   "चोट",
+   "हड्डी टूटना"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    8,
+    4,
+    12
+   ],
+   "planets": [
+    "Mars",
+    "Saturn",
+    "Rahu",
+    "Ketu"
+   ],
+   "signs": [
+    "Aries"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    8,
+    12
+   ],
+   "csl_planets": [
+    "Mars",
+    "Rahu"
+   ],
+   "cards": [
+    "HLT.06"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    8
+   ],
+   "supporting": [
+    1,
+    4
+   ],
+   "ta_houses": [
+    8
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "accident",
+   "injury"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.06 accident injury fracture burns 4,8,12 + Mars Rahu."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Accident primary 1,8 with 4."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.knee",
+  "cat": "disease",
+  "name": "Knee or leg problem",
+  "aliases": [
+   "knee pain",
+   "varicose",
+   "calf",
+   "घुटना",
+   "पैर"
+  ],
+  "vedic": {
+   "houses": [
+    10,
+    11,
+    12
+   ],
+   "planets": [
+    "Saturn",
+    "Mars"
+   ],
+   "signs": [
+    "Capricorn",
+    "Aquarius",
+    "Pisces"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    10,
+    11,
+    12
+   ],
+   "csl_planets": [
+    "Saturn"
+   ],
+   "cards": [
+    "HLT.01"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    10,
+    11,
+    12
+   ],
+   "ta_houses": [
+    10,
+    11,
+    12
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "knee"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 10 knees, 11 lower legs tibia calf, 12 feet."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.anaemia",
+  "cat": "disease",
+  "name": "Anaemia or blood disorder",
+  "aliases": [
+   "low haemoglobin",
+   "blood disease",
+   "खून की कमी"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    11,
+    1
+   ],
+   "planets": [
+    "Mars",
+    "Moon",
+    "Venus"
+   ],
+   "signs": [
+    "Aries"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    11,
+    1
+   ],
+   "csl_planets": [
+    "Mars",
+    "Moon"
+   ],
+   "cards": [
+    "HLT.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    5,
+    11
+   ],
+   "ta_houses": [
+    5,
+    11
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "blood"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP house keys 11 blood."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 5 blood cells."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.cancer",
+  "cat": "disease",
+  "name": "Cancer or tumour",
+  "aliases": [
+   "carcinoma",
+   "leukaemia",
+   "lump",
+   "कैंसर",
+   "ट्यूमर"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    8,
+    12
+   ],
+   "planets": [
+    "Rahu",
+    "Jupiter",
+    "Saturn",
+    "Moon"
+   ],
+   "signs": [
+    "Cancer",
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    1,
+    6,
+    8,
+    12
+   ],
+   "csl_planets": [
+    "Rahu",
+    "Jupiter",
+    "Saturn"
+   ],
+   "cards": [
+    "HLT.13"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    8,
+    1
+   ],
+   "ta_houses": [
+    8
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "cancer"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.13 cancer tumour leukaemia + 1,6,8,12 and Rahu key symbol, Jupiter malignancy tumour abscess, Moon with Jupiter cancer like."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 8 tumours."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.fever",
+  "cat": "disease",
+  "name": "Fever or infection",
+  "aliases": [
+   "viral fever",
+   "dengue",
+   "malaria",
+   "typhoid",
+   "COVID",
+   "बुखार"
+  ],
+  "vedic": {
+   "houses": [
+    6
+   ],
+   "planets": [
+    "Sun",
+    "Mars",
+    "Ketu",
+    "Mercury"
+   ],
+   "signs": [
+    "Aries",
+    "Virgo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6
+   ],
+   "csl_planets": [
+    "Mars",
+    "Sun",
+    "Ketu"
+   ],
+   "cards": [
+    "HLT.09"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    1
+   ],
+   "ta_houses": [
+    5
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "fever"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.09 epidemic infection fever 6."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 5 viral disease."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.poison",
+  "cat": "disease",
+  "name": "Poisoning, snake bite or allergy",
+  "aliases": [
+   "venom",
+   "food poisoning",
+   "सांप का काटना"
+  ],
+  "vedic": {
+   "houses": [
+    8,
+    6
+   ],
+   "planets": [
+    "Rahu",
+    "Mars",
+    "Saturn"
+   ],
+   "signs": [
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    8,
+    6
+   ],
+   "csl_planets": [
+    "Rahu",
+    "Mars"
+   ],
+   "cards": [
+    "HLT.12"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    8
+   ],
+   "supporting": [
+    6
+   ],
+   "ta_houses": [
+    8
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "poison"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.12 poisoning bites allergy 8,6."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.congenital",
+  "cat": "disease",
+  "name": "Congenital defect or deformity",
+  "aliases": [
+   "birth defect",
+   "handicap",
+   "disability",
+   "जन्मजात"
+  ],
+  "vedic": {
+   "houses": [
+    1,
+    6,
+    8,
+    12
+   ],
+   "planets": [
+    "Saturn",
+    "Rahu",
+    "Ketu"
+   ],
+   "signs": [
+    "Pisces"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    1,
+    6,
+    8
+   ],
+   "csl_planets": [
+    "Saturn",
+    "Rahu",
+    "Ketu"
+   ],
+   "cards": [
+    "HLT.24"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    12
+   ],
+   "ta_houses": [
+    12
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "defect"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.24 + 1,6,8 against 4,5 and 12 the house of defect."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.amputation",
+  "cat": "disease",
+  "name": "Amputation or limb loss",
+  "aliases": [
+   "limb loss",
+   "mutilation"
+  ],
+  "vedic": {
+   "houses": [
+    8,
+    12,
+    1
+   ],
+   "planets": [
+    "Mars",
+    "Saturn",
+    "Rahu"
+   ],
+   "signs": [
+    "Aries"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    1,
+    6,
+    8,
+    12
+   ],
+   "csl_planets": [
+    "Mars",
+    "Saturn"
+   ],
+   "cards": [
+    "HLT.28"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    8
+   ],
+   "supporting": [
+    12
+   ],
+   "ta_houses": [
+    12
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "limb"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.28 + 1,6,8,12."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.mental",
+  "cat": "disease",
+  "name": "Serious mental illness",
+  "aliases": [
+   "schizophrenia",
+   "psychosis",
+   "insanity",
+   "पागलपन"
+  ],
+  "vedic": {
+   "houses": [
+    1,
+    4,
+    5,
+    8,
+    12
+   ],
+   "planets": [
+    "Moon",
+    "Mercury",
+    "Rahu",
+    "Saturn"
+   ],
+   "signs": [
+    "Cancer",
+    "Gemini"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    1,
+    4,
+    6,
+    8,
+    12
+   ],
+   "csl_planets": [
+    "Moon",
+    "Mercury",
+    "Saturn"
+   ],
+   "cards": [
+    "MIND.02"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    1,
+    4
+   ],
+   "ta_houses": [
+    1
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "insanity"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 1 insanity."
+   },
+   {
+    "src": "KP",
+    "text": "KP MIND.02."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.suicide",
+  "cat": "disease",
+  "name": "Suicidal tendency",
+  "aliases": [
+   "self harm"
+  ],
+  "vedic": {
+   "houses": [
+    8,
+    12,
+    1
+   ],
+   "planets": [
+    "Mars",
+    "Saturn",
+    "Rahu",
+    "Moon"
+   ],
+   "signs": [
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    8,
+    12,
+    1
+   ],
+   "csl_planets": [
+    "Mars",
+    "Saturn"
+   ],
+   "cards": [
+    "MIND.04"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    8
+   ],
+   "supporting": [
+    1,
+    12
+   ],
+   "ta_houses": [
+    1,
+    8
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "suicide"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA houses 1 and 8 mode of death suicide."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.chronic",
+  "cat": "disease",
+  "name": "Chronic or incurable disease",
+  "aliases": [
+   "long illness",
+   "lifestyle disease"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    8,
+    12
+   ],
+   "planets": [
+    "Saturn",
+    "Rahu"
+   ],
+   "signs": [
+    "Capricorn"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    8,
+    12
+   ],
+   "csl_planets": [
+    "Saturn"
+   ],
+   "cards": [
+    "HLT.07"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    8
+   ],
+   "supporting": [
+    6
+   ],
+   "ta_houses": [
+    8
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "chronic"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.01 Saturn joined to the 6th CSL gives chronic."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 8 incurable diseases."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.surgery",
+  "cat": "disease",
+  "name": "Surgery or operation",
+  "aliases": [
+   "operation",
+   "surgical procedure",
+   "ऑपरेशन"
+  ],
+  "vedic": {
+   "houses": [
+    8,
+    12,
+    6
+   ],
+   "planets": [
+    "Mars",
+    "Ketu",
+    "Rahu",
+    "Saturn"
+   ],
+   "signs": [
+    "Aries",
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    8,
+    12,
+    6
+   ],
+   "csl_planets": [
+    "Mars",
+    "Ketu"
+   ],
+   "cards": [
+    "HLT.05"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    8
+   ],
+   "supporting": [
+    5,
+    12
+   ],
+   "ta_houses": [
+    8
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "operation"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.05 surgery 8,12 and the 4-8-12 trigon against 1,5,11."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Disease nature recovery 6 with 5,11."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.hospital",
+  "cat": "disease",
+  "name": "Hospitalisation",
+  "aliases": [
+   "admission",
+   "bed rest",
+   "अस्पताल"
+  ],
+  "vedic": {
+   "houses": [
+    12,
+    6,
+    8
+   ],
+   "planets": [
+    "Saturn",
+    "Mars",
+    "Moon"
+   ],
+   "signs": [
+    "Pisces"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    12,
+    6,
+    1
+   ],
+   "csl_planets": [
+    "Saturn"
+   ],
+   "cards": [
+    "HLT.04"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    6
+   ],
+   "supporting": [
+    1,
+    12
+   ],
+   "ta_houses": [
+    12
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "hospital"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP HLT.01 6+1+12 bed ridden hospitalised."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 12 hospital."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "dis.longevity",
+  "cat": "disease",
+  "name": "Longevity or death",
+  "aliases": [
+   "lifespan",
+   "death",
+   "मृत्यु",
+   "आयु"
+  ],
+  "vedic": {
+   "houses": [
+    8,
+    3,
+    1
+   ],
+   "planets": [
+    "Saturn",
+    "Sun",
+    "Moon"
+   ],
+   "signs": [
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    1,
+    3,
+    5,
+    8,
+    10
+   ],
+   "csl_planets": [
+    "Saturn"
+   ],
+   "cards": [
+    "LON.01",
+    "LON.03"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    1,
+    3,
+    8
+   ],
+   "supporting": [
+    2,
+    7,
+    12
+   ],
+   "ta_houses": [
+    8
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "death"
+  ],
+  "evidence": [
+   {
+    "src": "NOTE",
+    "text": "Handled under the SARVA no death dating rule."
+   },
+   {
+    "src": "KP",
+    "text": "KP LON.01 span of life."
+   }
+  ],
+  "best_tier": "T1"
+ }
+]

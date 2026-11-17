@@ -1,0 +1,144 @@
+{
+ "_note": "Registry of every source behind the lexicon. T1 means the owner corpora in this repository or its sibling repositories. T3 means a claim from a web search summary. The pages themselves could not be fetched, every fetch was refused by the network policy, so no page was read and every T3 claim is second hand. T4 means the analyst wrote it from classical karaka lists without a page to cite. Only T1 may be cited as the evidence of a cell.",
+ "sources": [
+  {
+   "id": "KPMAX",
+   "tier": "T1",
+   "name": "KP PRO MAX rule library MAX-12 to MAX-16, 202 cards and the 213 row event index",
+   "path": "KP-Pro-sutton/knowledge/kp_pro_max",
+   "copied_to": "kp_cards.json, kp_event_index.json"
+  },
+  {
+   "id": "KCILM",
+   "tier": "T1",
+   "name": "KCIL event matrix KCIL-3, 110 rows",
+   "path": "KP-Pro-sutton/knowledge/kcil/KCIL-3-EVENT-MATRIX.md",
+   "copied_to": "kcil_event_matrix.json"
+  },
+  {
+   "id": "KCILTA",
+   "tier": "T1",
+   "name": "KCIL TA house significations KCIL-8 and subject tables of KCIL-5",
+   "path": "KP-Pro-sutton/knowledge/kcil",
+   "copied_to": "kcil_ta_houses.json, kcil_subjects.json"
+  },
+  {
+   "id": "BNNCSV",
+   "tier": "T1",
+   "name": "BNN rule base, 3073 rules, searched at run time",
+   "path": "sarva_engine/knowledge/bnn/BNN-RULES-5COLUMN.csv",
+   "copied_to": null
+  },
+  {
+   "id": "CHAWDHRI",
+   "tier": "T1",
+   "name": "CHAWDHRI engine knowledge and signification module, searched through the CHAWDHRI repo",
+   "path": "CHAWDHRI/engine",
+   "copied_to": null
+  },
+  {
+   "id": "SUJLIB",
+   "tier": "T1",
+   "name": "SUJ rule library of 1561 rules and the significations.json natural table",
+   "path": "suj_engine",
+   "copied_to": null
+  },
+  {
+   "id": "W1",
+   "tier": "T3",
+   "page_read": false,
+   "attribution": "explicit link in the search summary",
+   "name": "vedicmarga doctor surgeon combinations",
+   "url": "https://vedicmarga.com/doctor-surgeon-combinations-astrology/",
+   "claim": "Orthopaedics Saturn the bone planet joined with Mars. Strongest surgeon indicator links Mars to the 10th house, Mars to Ketu, and the 6th or 8th to the 10th. A career reading joins the 10th with the 6th and the D10."
+  },
+  {
+   "id": "W2",
+   "tier": "T3",
+   "page_read": false,
+   "attribution": "explicit link in the search summary",
+   "name": "astromedha doctor career",
+   "url": "https://astromedha.in/insights/career/doctor-astrology",
+   "claim": "Sun Jupiter Mars and Ketu are the main planets of a medical career, the 6th is disease and treatment, the 10th career. Specialty signs are tendencies that refine a chart that already shows a medical career."
+  },
+  {
+   "id": "W3",
+   "tier": "T3",
+   "page_read": false,
+   "attribution": "claim from the search summary, the link is one of the results of that search and is not confirmed as its source",
+   "name": "a Vedic site specialty hints",
+   "url": null,
+   "claim": "Eye care the Sun with the 2nd and 12th. Psychiatry the Moon and Mercury with the 4th, 8th and 12th. Radiology and research medicine Rahu. Geriatric and public health Saturn.",
+   "note": "The search summary gave the claim without a link, so the page is unlocated."
+  },
+  {
+   "id": "W4",
+   "tier": "T3",
+   "page_read": false,
+   "attribution": "claim from the search summary, the link is one of the results of that search and is not confirmed as its source",
+   "name": "a medical astrology article",
+   "url": "https://sites.google.com/view/vastu-expert/astrology/medical-astrology",
+   "claim": "Gynaecology and obstetrics under the Moon and Venus with the 5th and 7th houses."
+  },
+  {
+   "id": "W5",
+   "tier": "T3",
+   "page_read": false,
+   "attribution": "explicit link in the search summary",
+   "name": "astro guide on the 10th cusp sub lord",
+   "url": "https://www.ajmerastro.com/mr/blog/kp-career-job-prediction-10th-cusp",
+   "claim": "KP 10th sub lord signifying 2,6,10,11 is employment, 2,7,10,11 is business with 6 avoided, 6 service and 7 business."
+  },
+  {
+   "id": "W6",
+   "tier": "T3",
+   "page_read": false,
+   "attribution": "explicit link in the search summary",
+   "name": "a KP slide deck",
+   "url": "https://www.slideshare.net/slideshow/kp-astrolgy/73135068",
+   "claim": "Medical careers from the 9th cusp sub lord. Rahu Moon Sun general physician, Moon Rahu Mars surgeon, 9th sub lord signifying 3,4,9,11 with Saturn taking the 3rd a dentist.",
+   "note": "Not verified against a primary KP text. Conflicts with the KP PRO MAX PRF.01 which reads the 10th chain."
+  },
+  {
+   "id": "W7",
+   "tier": "T3",
+   "page_read": false,
+   "attribution": "claim from the search summary, the link is one of the results of that search and is not confirmed as its source",
+   "name": "income and dhana yoga pages",
+   "url": "https://dailypioneer.com/2025/state-editions/the-secret-of-wealth--fame--and-prestige--importance-of-the-lords-of-the-2nd--10th--and-11th-houses.html",
+   "claim": "The 2nd is accumulated wealth, the 11th gains and income, the 5th speculative gains, the 9th sudden gains. Dhana yoga is a link of the 2nd and 11th lords, stronger with the 5th and 9th lords. No source gave a rental income house."
+  },
+  {
+   "id": "W8",
+   "tier": "T3",
+   "page_read": false,
+   "attribution": "claim from the search summary, the link is one of the results of that search and is not confirmed as its source",
+   "name": "relatives karaka pages",
+   "url": "https://www.siva.sh/phaladeepika/15/21-25",
+   "claim": "Brihat Parashara karakas Sun father, Moon mother, Mars siblings, Venus spouse, Rahu paternal relatives, Ketu maternal relatives. The 3rd houses siblings, the 4th mother, the 7th spouse, the 9th father. One table gives the 6th for maternal uncle and the 8th for sister in law."
+  },
+  {
+   "id": "W9",
+   "tier": "T3",
+   "page_read": false,
+   "attribution": "claim from the search summary, the link is one of the results of that search and is not confirmed as its source",
+   "name": "spouse profession pages",
+   "url": "https://astromedha.in/insights/vedic/what-work-will-my-spouse-do",
+   "claim": "The 10th from the 7th is the 4th, the spouse career house. A 10th lord in the 6th points to a service or healthcare spouse. Mars aspecting the 7th points to an assertive or competitive profession. Weigh the 4th, the 10th and the D9."
+  },
+  {
+   "id": "W10",
+   "tier": "T3",
+   "page_read": false,
+   "attribution": "claim from the search summary, the link is one of the results of that search and is not confirmed as its source",
+   "name": "skin and dental pages",
+   "url": "https://astrosight.ai/horoscopes/medical-astrology-skin-problems",
+   "claim": "Mercury is the most direct skin karaka, Venus aesthetics and skin, a troubled Ketu in the 6th skin trouble. Dentistry Mars Scorpio 6th and Saturn in one source, the 7th ruling dental disease in another."
+  }
+ ],
+ "limits": [
+  "No source found gives a speciality by speciality table with a classical text behind it. The web results said the same, all marked as practitioner convention.",
+  "The coverage of the taxonomy is the 255 entries in taxonomy_*.json and the 202 KP cards, and it grows by adding lines to the DSL files and rebuilding. It is not every type that exists.",
+  "No part of the lexicon has been shown to raise accuracy. The only scored use so far is the K894 chart, where the first run of the engine scored 3 of 6 for KP Pro, 0 for KCIL, 2 for SUJ, 1 for CHAWDHRI and 2 for BNN, before this lexicon existed."
+ ]
+}

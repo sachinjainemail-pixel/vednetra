@@ -1,0 +1,186 @@
+{
+ "_note": "Core significations. Tier T4 means the analyst wrote it from classical karaka lists that are widely repeated, and it could not be re verified in this session because the web pages were blocked. Tier T1 entries quote the owner corpora. Use only to translate an option into houses planets and signs, never as the cited evidence of a cell.",
+ "kp_house_keys": {
+  "tier": "T1",
+  "src": "KP PRO MAX MAX-13 HLT.01 house keys",
+  "1": "body, head, brain",
+  "2": "face, right eye, speech, also maraka",
+  "3": "hearing, hands, throat, right hand",
+  "4": "heart, lungs, chest",
+  "5": "cure, upper abdomen",
+  "6": "disease, lower abdomen, intestines, kidneys, doctor, medicine",
+  "7": "kidney, bladder, pancreas, lower back, internal female organs",
+  "8": "surgery, excretory and genital organs, poison, epidemics",
+  "9": "liver, hips, thighs, healing after surgery",
+  "10": "bones, knees, teeth, skin",
+  "11": "lower legs, blood, BP, left hand, body seat only",
+  "12": "feet, left eye, hospital, defect, amputation"
+ },
+ "kcil_ta_house_note": "KCIL TA lists of profession, education and diseases per house are in kcil_ta_houses.json, tier T1.",
+ "houses_general": {
+  "tier": "T4",
+  "1": "self, body, health, identity",
+  "2": "wealth, family, speech, food, face, early childhood",
+  "3": "siblings younger, courage, skills, communication, short travel, hands",
+  "4": "mother, home, property, vehicles, schooling, heart, peace",
+  "5": "children, intelligence, education, creativity, speculation, romance",
+  "6": "disease, enemies, debt, service, daily work, maternal uncle",
+  "7": "spouse, partnership, trade, public dealings",
+  "8": "longevity, sudden events, inheritance, occult, in laws money, chronic illness",
+  "9": "father, fortune, higher education, dharma, long travel, guru",
+  "10": "profession, status, authority, government, action",
+  "11": "gains, income, elder siblings, friends, fulfilment of desires",
+  "12": "expenses, losses, foreign lands, hospitals, isolation, sleep, moksha"
+ },
+ "planets_natural": {
+  "tier": "T4",
+  "Sun": "soul, father, government, authority, medicine, bones, heart, right eye, gold, wood",
+  "Moon": "mind, mother, women, fluids, milk, public, nursing, breasts, womb, left eye, water products",
+  "Mars": "courage, brothers, husband in a woman chart, surgery, blood, muscle, teeth, accidents, army, police, engineering, land, iron",
+  "Mercury": "intellect, speech, trade, accounts, writing, skin, nerves, lungs, intestines, young people, maternal uncle, friends",
+  "Jupiter": "wisdom, children, teachers, law, banking, counsel, liver, fat, thighs, elders, husband karaka by some, physician",
+  "Venus": "spouse, women, arts, beauty, luxury, vehicles, reproductive system, kidneys, skin beauty, cosmetics, fashion, hotels",
+  "Saturn": "karma, service, labour, discipline, delay, bones, joints, teeth, chronic disease, old age, mines, iron, oil, leather, masses",
+  "Rahu": "foreign, technology, ambition, poison, allergy, cancer, radiology, anaesthesia, electronics, paternal grandfather, doubles its sign lord",
+  "Ketu": "research, occult, surgery, viral and skin disease, detachment, hidden work, maternal grandfather, doubles its sign lord"
+ },
+ "planets_gender": {
+  "tier": "T1",
+  "src": "BNN guide 16.4 and KP PRG.03",
+  "male": [
+   "Sun",
+   "Mars",
+   "Jupiter",
+   "Saturn",
+   "Rahu"
+  ],
+  "female": [
+   "Moon",
+   "Venus"
+  ],
+  "neuter": [
+   "Mercury takes the gender of its companion"
+  ],
+  "ketu": "BNN does not count Ketu for the sex of children"
+ },
+ "signs_kalapurusha": {
+  "tier": "T4",
+  "Aries": "head, brain, face",
+  "Taurus": "face, neck, throat, teeth, mouth",
+  "Gemini": "shoulders, arms, hands, lungs, nerves, ears",
+  "Cancer": "chest, breasts, stomach, womb",
+  "Leo": "heart, spine, upper back",
+  "Virgo": "intestines, digestive system, lower abdomen",
+  "Libra": "kidneys, lower back, skin, waist",
+  "Scorpio": "genitals, rectum, excretory and reproductive organs",
+  "Sagittarius": "thighs, hips, liver",
+  "Capricorn": "knees, bones, joints, skin",
+  "Aquarius": "shins, ankles, calves, circulation",
+  "Pisces": "feet, lymph, sleep"
+ },
+ "signs_nature": {
+  "tier": "T4",
+  "odd_male": [
+   "Aries",
+   "Gemini",
+   "Leo",
+   "Libra",
+   "Sagittarius",
+   "Aquarius"
+  ],
+  "even_female": [
+   "Taurus",
+   "Cancer",
+   "Virgo",
+   "Scorpio",
+   "Capricorn",
+   "Pisces"
+  ],
+  "movable": [
+   "Aries",
+   "Cancer",
+   "Libra",
+   "Capricorn"
+  ],
+  "fixed": [
+   "Taurus",
+   "Leo",
+   "Scorpio",
+   "Aquarius"
+  ],
+  "dual": [
+   "Gemini",
+   "Virgo",
+   "Sagittarius",
+   "Pisces"
+  ]
+ },
+ "kp_medicine_by_sign": {
+  "tier": "T1",
+  "src": "KP PRO MAX PRF.01 Medicine",
+  "text": "Sun Dhanwantari medicine, Jupiter materia medica and physician, Mercury diagnosis, Mars surgery, Rahu has a say in medical education. Signs Leo and Virgo treatment, Scorpio drugs, Pisces hospitals, Sagittarius pharmacy. Strongest profession significator in Ashwini Magha or Moola gives medical."
+ },
+ "derived_house_rule": {
+  "tier": "T1",
+  "src": "KCIL rotation lock section 16.10, KP MAX FAM and MAR cards",
+  "text": "For a relative, rotate first. The relative becomes the Lagna and his or her own houses are counted from it. The house n of a relative whose own house is R is the house R plus n minus 1, counted in the native chart with wrap at 12. Standing rotations spouse 7, mother 4, father 9, first child 5, second child 7, third child 9 and 2 more each after, elder co born 11, younger co born 3. Spouse profession is the spouse 10th, which is the native 4th. Spouse 6th is the native 12th, spouse 8th is the native 2nd, spouse 7th is the native Lagna. Father 10th is the native 6th. Mother 10th is the native 1st.",
+  "table": {
+   "spouse": {
+    "1": 7,
+    "2": 8,
+    "3": 9,
+    "4": 10,
+    "5": 11,
+    "6": 12,
+    "7": 1,
+    "8": 2,
+    "9": 3,
+    "10": 4,
+    "11": 5,
+    "12": 6
+   },
+   "father": {
+    "1": 9,
+    "2": 10,
+    "3": 11,
+    "4": 12,
+    "5": 1,
+    "6": 2,
+    "7": 3,
+    "8": 4,
+    "9": 5,
+    "10": 6,
+    "11": 7,
+    "12": 8
+   },
+   "mother": {
+    "1": 4,
+    "2": 5,
+    "3": 6,
+    "4": 7,
+    "5": 8,
+    "6": 9,
+    "7": 10,
+    "8": 11,
+    "9": 12,
+    "10": 1,
+    "11": 2,
+    "12": 3
+   },
+   "first_child": {
+    "1": 5,
+    "2": 6,
+    "3": 7,
+    "4": 8,
+    "5": 9,
+    "6": 10,
+    "7": 11,
+    "8": 12,
+    "9": 1,
+    "10": 2,
+    "11": 3,
+    "12": 4
+   }
+  }
+ }
+}

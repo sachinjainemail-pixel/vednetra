@@ -6,6 +6,11 @@ out next to this one. If a sibling is not attached to the session, say so and as
 Common first step. Run node sarva_engine/tools/sarva_preflight.js, it shows which of the seven columns can run in this session and what
 to fix. Then collect the inputs of ENGINE_CONTRACT.md section 8. Fix the as-of date from the system clock.
 
+Common second step, the lexicon. For every question that names a speciality, degree, profession, business, disease, income source or a relative, run
+    node sarva_engine/tools/sarva_lexicon.js --options "A text|B text|C text" --family
+then once per column with --column KPPRO, KCIL, SUJ, CHAWDHRI or BNN. It lists the houses, planets, cusps, KP cards and BNN rule candidates of each option and the recipe of the
+question family with its pitfalls. Write the LEXICON Qn line. ENGINE_CONTRACT.md section 12 binds. The lexicon translates, each column still decides by its own rules.
+
 Tested on 16 November 2026 with a sample native, every command below ran end to end, kpredict read, SUJ prepare.js, CHAWDHRI jyotish.sh,
 and the BNN, KCIL, Quad Dasha and Udu chart runners. The notes below come from that test. Skill paths use the glob
 ~/.claude/skills/synced/*/ because the folder name is account specific.

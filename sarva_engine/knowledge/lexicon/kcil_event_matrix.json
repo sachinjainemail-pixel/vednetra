@@ -1,0 +1,662 @@
+[
+ {
+  "matter": "Proneness to disease",
+  "primary": "1",
+  "supporting": "6, 8, 12",
+  "group": "Events relating to the FIRST HOUSE"
+ },
+ {
+  "matter": "Unnatural death",
+  "primary": "1, 8",
+  "supporting": "2, 7, Badhaka, 12 (8)",
+  "group": "Events relating to the FIRST HOUSE"
+ },
+ {
+  "matter": "Accident",
+  "primary": "1, 8",
+  "supporting": "4 (8)",
+  "group": "Events relating to the FIRST HOUSE"
+ },
+ {
+  "matter": "Success in self-efforts",
+  "primary": "1, 6",
+  "supporting": "11 (6)",
+  "group": "Events relating to the FIRST HOUSE"
+ },
+ {
+  "matter": "Status and respect",
+  "primary": "1",
+  "supporting": "10, 11",
+  "group": "Events relating to the FIRST HOUSE"
+ },
+ {
+  "matter": "Financial status",
+  "primary": "2",
+  "supporting": "6, 11",
+  "group": "Events relating to the SECOND HOUSE"
+ },
+ {
+  "matter": "Obtaining loans",
+  "primary": "2, 6",
+  "supporting": "11 (6)",
+  "group": "Events relating to the SECOND HOUSE"
+ },
+ {
+  "matter": "Investment / expenditure",
+  "primary": "2, 12",
+  "supporting": "*as per the nature of the investment* (12)",
+  "group": "Events relating to the SECOND HOUSE"
+ },
+ {
+  "matter": "Obtaining jewellery",
+  "primary": "2",
+  "supporting": "11",
+  "group": "Events relating to the SECOND HOUSE"
+ },
+ {
+  "matter": "Defect in speech, vision",
+  "primary": "2",
+  "supporting": "12, 8",
+  "group": "Events relating to the SECOND HOUSE"
+ },
+ {
+  "matter": "Insurance claims",
+  "primary": "2",
+  "supporting": "8, 11",
+  "group": "Events relating to the SECOND HOUSE"
+ },
+ {
+  "matter": "Medical claims",
+  "primary": "2",
+  "supporting": "6, 8, 11",
+  "group": "Events relating to the SECOND HOUSE"
+ },
+ {
+  "matter": "Opening a bank account",
+  "primary": "2",
+  "supporting": "6, 11",
+  "group": "Events relating to the SECOND HOUSE"
+ },
+ {
+  "matter": "Signing a contract",
+  "primary": "3",
+  "supporting": "6, 9, 11",
+  "group": "Events relating to the THIRD HOUSE"
+ },
+ {
+  "matter": "Meeting a bank officer for an overdraft",
+  "primary": "3",
+  "supporting": "6, 9, 11",
+  "group": "Events relating to the THIRD HOUSE"
+ },
+ {
+  "matter": "Filing a court case",
+  "primary": "3",
+  "supporting": "6, 11",
+  "group": "Events relating to the THIRD HOUSE"
+ },
+ {
+  "matter": "Getting passport, green card, visa",
+  "primary": "3",
+  "supporting": "9, 11, 12",
+  "group": "Events relating to the THIRD HOUSE"
+ },
+ {
+  "matter": "Starting a journey",
+  "primary": "3",
+  "supporting": "5, 9, 11",
+  "group": "Events relating to the THIRD HOUSE"
+ },
+ {
+  "matter": "Negotiations",
+  "primary": "3",
+  "supporting": "9, 11 and the cuspal position that represents the purpose",
+  "group": "Events relating to the THIRD HOUSE"
+ },
+ {
+  "matter": "Change of place / transfer",
+  "primary": "3",
+  "supporting": "10, 11, 12  *(B4: 10, 11)*",
+  "group": "Events relating to the THIRD HOUSE"
+ },
+ {
+  "matter": "Younger co-born's proneness to sickness",
+  "primary": "3",
+  "supporting": "8, 10, 2",
+  "group": "Events relating to the THIRD HOUSE"
+ },
+ {
+  "matter": "Computer programmer",
+  "primary": "3, 10",
+  "supporting": "2, 11 (10)",
+  "group": "Events relating to the THIRD HOUSE"
+ },
+ {
+  "matter": "Publication as profession",
+  "primary": "3, 10",
+  "supporting": "2, 11 (10)",
+  "group": "Events relating to the THIRD HOUSE"
+ },
+ {
+  "matter": "Basic education",
+  "primary": "4",
+  "supporting": "11",
+  "group": "Events relating to the FOURTH HOUSE"
+ },
+ {
+  "matter": "Purchase of property, vehicle, furniture",
+  "primary": "4",
+  "supporting": "9, 11, 12  *(B4: 11, 12)*",
+  "group": "Events relating to the FOURTH HOUSE"
+ },
+ {
+  "matter": "Sale of property etc.",
+  "primary": "4",
+  "supporting": "3, 5, 10",
+  "group": "Events relating to the FOURTH HOUSE"
+ },
+ {
+  "matter": "Taking possession of a flat, quarter etc.",
+  "primary": "4",
+  "supporting": "9, 11",
+  "group": "Events relating to the FOURTH HOUSE"
+ },
+ {
+  "matter": "Laying the foundation of a house",
+  "primary": "4",
+  "supporting": "11",
+  "group": "Events relating to the FOURTH HOUSE"
+ },
+ {
+  "matter": "Occupying a new house",
+  "primary": "4",
+  "supporting": "11",
+  "group": "Events relating to the FOURTH HOUSE"
+ },
+ {
+  "matter": "Mother's proneness to sickness",
+  "primary": "4",
+  "supporting": "9, 11, 3",
+  "group": "Events relating to the FOURTH HOUSE"
+ },
+ {
+  "matter": "Engineering as a subject of study",
+  "primary": "4 *(B4: 4 or 9, 10)*",
+  "supporting": "10",
+  "group": "Events relating to the FOURTH HOUSE"
+ },
+ {
+  "matter": "Medicine as a subject of study",
+  "primary": "4",
+  "supporting": "6",
+  "group": "Events relating to the FOURTH HOUSE"
+ },
+ {
+  "matter": "Law as a subject of study",
+  "primary": "4",
+  "supporting": "6 or 9",
+  "group": "Events relating to the FOURTH HOUSE"
+ },
+ {
+  "matter": "Fine arts as a subject of study",
+  "primary": "4",
+  "supporting": "5",
+  "group": "Events relating to the FOURTH HOUSE"
+ },
+ {
+  "matter": "Teaching as a profession",
+  "primary": "4 or 9, 10",
+  "supporting": "2, 6, 10 (9)",
+  "group": "Events relating to the FOURTH HOUSE"
+ },
+ {
+  "matter": "Child birth",
+  "primary": "5",
+  "supporting": "2, 11",
+  "group": "Events relating to the FIFTH HOUSE"
+ },
+ {
+  "matter": "Pregnancy",
+  "primary": "5",
+  "supporting": "2, 11",
+  "group": "Events relating to the FIFTH HOUSE"
+ },
+ {
+  "matter": "Love marriage",
+  "primary": "5",
+  "supporting": "7, 11",
+  "group": "Events relating to the FIFTH HOUSE"
+ },
+ {
+  "matter": "Rape *(victim of)*",
+  "primary": "5",
+  "supporting": "8, 12",
+  "group": "Events relating to the FIFTH HOUSE"
+ },
+ {
+  "matter": "Success in sports",
+  "primary": "5",
+  "supporting": "6, 11",
+  "group": "Events relating to the FIFTH HOUSE"
+ },
+ {
+  "matter": "Sports, fine arts, film, speculation as profession",
+  "primary": "5, 10",
+  "supporting": "2, 11 (10)",
+  "group": "Events relating to the FIFTH HOUSE"
+ },
+ {
+  "matter": "Caesarean",
+  "primary": "5",
+  "supporting": "2, 8",
+  "group": "Events relating to the FIFTH HOUSE"
+ },
+ {
+  "matter": "Disease — nature and part",
+  "primary": "6",
+  "supporting": "the involved cusp *(i.e. the cusp of the afflicted organ)*",
+  "group": "Events relating to the SIXTH HOUSE"
+ },
+ {
+  "matter": "Promise of a loan",
+  "primary": "6",
+  "supporting": "2, 11",
+  "group": "Events relating to the SIXTH HOUSE"
+ },
+ {
+  "matter": "Secret activities of partner",
+  "primary": "6",
+  "supporting": "5",
+  "group": "Events relating to the SIXTH HOUSE"
+ },
+ {
+  "matter": "Success in competition",
+  "primary": "6",
+  "supporting": "1, 11",
+  "group": "Events relating to the SIXTH HOUSE"
+ },
+ {
+  "matter": "Success in litigation",
+  "primary": "6",
+  "supporting": "1, 11",
+  "group": "Events relating to the SIXTH HOUSE"
+ },
+ {
+  "matter": "Recovery from disease",
+  "primary": "6",
+  "supporting": "5, 11",
+  "group": "Events relating to the SIXTH HOUSE"
+ },
+ {
+  "matter": "Disease unknown to medical science",
+  "primary": "6",
+  "supporting": "5, 11",
+  "group": "Events relating to the SIXTH HOUSE"
+ },
+ {
+  "matter": "Medical practitioner",
+  "primary": "6, 10",
+  "supporting": "2, 11 (10)",
+  "group": "Events relating to the SIXTH HOUSE"
+ },
+ {
+  "matter": "Legal profession",
+  "primary": "6 or 9, 10",
+  "supporting": "2, 11 (9, 10)",
+  "group": "Events relating to the SIXTH HOUSE"
+ },
+ {
+  "matter": "Marriage",
+  "primary": "7",
+  "supporting": "5, 11",
+  "group": "Events relating to the SEVENTH HOUSE"
+ },
+ {
+  "matter": "Second child",
+  "primary": "7",
+  "supporting": "2, 11",
+  "group": "Events relating to the SEVENTH HOUSE"
+ },
+ {
+  "matter": "Partnership",
+  "primary": "7",
+  "supporting": "5, 11",
+  "group": "Events relating to the SEVENTH HOUSE"
+ },
+ {
+  "matter": "Theft *(being robbed)*",
+  "primary": "7",
+  "supporting": "2, 12",
+  "group": "Events relating to the SEVENTH HOUSE"
+ },
+ {
+  "matter": "Danger from opponents",
+  "primary": "7",
+  "supporting": "8, 12",
+  "group": "Events relating to the SEVENTH HOUSE"
+ },
+ {
+  "matter": "Loans from a bank",
+  "primary": "7",
+  "supporting": "6, 2, 11",
+  "group": "Events relating to the SEVENTH HOUSE"
+ },
+ {
+  "matter": "Marriage — engagement",
+  "primary": "7",
+  "supporting": "3, 9, 11",
+  "group": "Events relating to the SEVENTH HOUSE"
+ },
+ {
+  "matter": "Criminality as profession",
+  "primary": "8, 10",
+  "supporting": "2, 11 (10)",
+  "group": "Events relating to the EIGHTH HOUSE"
+ },
+ {
+  "matter": "Unexpected gains",
+  "primary": "8",
+  "supporting": "2, 11",
+  "group": "Events relating to the EIGHTH HOUSE"
+ },
+ {
+  "matter": "Unexpected loss",
+  "primary": "8",
+  "supporting": "5, 12",
+  "group": "Events relating to the EIGHTH HOUSE"
+ },
+ {
+  "matter": "Receipt of gifts",
+  "primary": "8",
+  "supporting": "6, 11",
+  "group": "Events relating to the EIGHTH HOUSE"
+ },
+ {
+  "matter": "Ornaments or cash from inheritance",
+  "primary": "8",
+  "supporting": "2, 11",
+  "group": "Events relating to the EIGHTH HOUSE"
+ },
+ {
+  "matter": "Property, vehicle from inheritance",
+  "primary": "8",
+  "supporting": "4, 11",
+  "group": "Events relating to the EIGHTH HOUSE"
+ },
+ {
+  "matter": "Recovery of lost articles",
+  "primary": "8",
+  "supporting": "2, 6, 11",
+  "group": "Events relating to the EIGHTH HOUSE"
+ },
+ {
+  "matter": "Unnatural death",
+  "primary": "8",
+  "supporting": "1, 12",
+  "group": "Events relating to the EIGHTH HOUSE"
+ },
+ {
+  "matter": "Death due to sickness",
+  "primary": "8",
+  "supporting": "6, 12",
+  "group": "Events relating to the EIGHTH HOUSE"
+ },
+ {
+  "matter": "Death due to accident",
+  "primary": "8",
+  "supporting": "4, 12",
+  "group": "Events relating to the EIGHTH HOUSE"
+ },
+ {
+  "matter": "Depression",
+  "primary": "8",
+  "supporting": "1, 3, 12",
+  "group": "Events relating to the EIGHTH HOUSE"
+ },
+ {
+  "matter": "Committing rape",
+  "primary": "8",
+  "supporting": "5, 12",
+  "group": "Events relating to the EIGHTH HOUSE"
+ },
+ {
+  "matter": "Surgeons",
+  "primary": "8, 10",
+  "supporting": "2, 11 (10)",
+  "group": "Events relating to the EIGHTH HOUSE"
+ },
+ {
+  "matter": "Long journeys",
+  "primary": "9",
+  "supporting": "3, 12",
+  "group": "Events relating to the NINTH HOUSE"
+ },
+ {
+  "matter": "Higher education",
+  "primary": "4, 9",
+  "supporting": "11 (4)",
+  "group": "Events relating to the NINTH HOUSE"
+ },
+ {
+  "matter": "Second marriage",
+  "primary": "9",
+  "supporting": "7, 11",
+  "group": "Events relating to the NINTH HOUSE"
+ },
+ {
+  "matter": "Third child",
+  "primary": "9",
+  "supporting": "2, 11",
+  "group": "Events relating to the NINTH HOUSE"
+ },
+ {
+  "matter": "Father's proneness to sickness",
+  "primary": "9",
+  "supporting": "2, 4, 8",
+  "group": "Events relating to the NINTH HOUSE"
+ },
+ {
+  "matter": "Success in spiritual discipline",
+  "primary": "9",
+  "supporting": "6, 11",
+  "group": "Events relating to the NINTH HOUSE"
+ },
+ {
+  "matter": "Politics as profession",
+  "primary": "9, 10",
+  "supporting": "2, 6, 11 (10)",
+  "group": "Events relating to the NINTH HOUSE"
+ },
+ {
+  "matter": "Service or business",
+  "primary": "10",
+  "supporting": "6, 7",
+  "group": "Events relating to the TENTH HOUSE"
+ },
+ {
+  "matter": "Commission as business",
+  "primary": "10",
+  "supporting": "3, 11",
+  "group": "Events relating to the TENTH HOUSE"
+ },
+ {
+  "matter": "Name and fame",
+  "primary": "10",
+  "supporting": "1, 11",
+  "group": "Events relating to the TENTH HOUSE"
+ },
+ {
+  "matter": "Retirement",
+  "primary": "10",
+  "supporting": "5, 9",
+  "group": "Events relating to the TENTH HOUSE"
+ },
+ {
+  "matter": "Promotion in service or business",
+  "primary": "10",
+  "supporting": "2, 6, 11",
+  "group": "Events relating to the TENTH HOUSE"
+ },
+ {
+  "matter": "Break in service",
+  "primary": "10",
+  "supporting": "5, 9",
+  "group": "Events relating to the TENTH HOUSE"
+ },
+ {
+  "matter": "Problems in business or service",
+  "primary": "10",
+  "supporting": "5, 8",
+  "group": "Events relating to the TENTH HOUSE"
+ },
+ {
+  "matter": "Suspension in service",
+  "primary": "8, 10",
+  "supporting": "5, 6 (8)",
+  "group": "Events relating to the TENTH HOUSE"
+ },
+ {
+  "matter": "Compulsory retirement",
+  "primary": "8, 10",
+  "supporting": "5, 9 (8)",
+  "group": "Events relating to the TENTH HOUSE"
+ },
+ {
+  "matter": "Voluntary retirement",
+  "primary": "10",
+  "supporting": "1, 5, 9",
+  "group": "Events relating to the TENTH HOUSE"
+ },
+ {
+  "matter": "Removal from service",
+  "primary": "8, 10",
+  "supporting": "5, 9 (8)",
+  "group": "Events relating to the TENTH HOUSE"
+ },
+ {
+  "matter": "Export business",
+  "primary": "12, 10",
+  "supporting": "2, 6, 11 (12)",
+  "group": "Events relating to the TENTH HOUSE"
+ },
+ {
+  "matter": "Medical practitioner",
+  "primary": "6 or 8, 10",
+  "supporting": "2, 6, 11 (8)",
+  "group": "Events relating to the TENTH HOUSE"
+ },
+ {
+  "matter": "Publications as profession",
+  "primary": "3, 10",
+  "supporting": "2, 6, 11 (3)",
+  "group": "Events relating to the TENTH HOUSE"
+ },
+ {
+  "matter": "Legal profession",
+  "primary": "6 or 9, 10",
+  "supporting": "2, 6, 11 (9)",
+  "group": "Events relating to the TENTH HOUSE"
+ },
+ {
+  "matter": "Politics as profession",
+  "primary": "9, 10",
+  "supporting": "2, 6, 11 (9)",
+  "group": "Events relating to the TENTH HOUSE"
+ },
+ {
+  "matter": "Teaching as profession",
+  "primary": "4 or 9, 10",
+  "supporting": "2, 6, 11 (4, 9)",
+  "group": "Events relating to the TENTH HOUSE"
+ },
+ {
+  "matter": "Computer programmer",
+  "primary": "3, 10",
+  "supporting": "2, 6, 11 (3)",
+  "group": "Events relating to the TENTH HOUSE"
+ },
+ {
+  "matter": "Winning in love",
+  "primary": "11",
+  "supporting": "5, 7",
+  "group": "Events relating to the ELEVENTH HOUSE"
+ },
+ {
+  "matter": "Satisfaction of desires",
+  "primary": "11",
+  "supporting": "1",
+  "group": "Events relating to the ELEVENTH HOUSE"
+ },
+ {
+  "matter": "Sexual relationship with a friend",
+  "primary": "11",
+  "supporting": "7, 5",
+  "group": "Events relating to the ELEVENTH HOUSE"
+ },
+ {
+  "matter": "Repayment of a loan",
+  "primary": "12",
+  "supporting": "5, 8",
+  "group": "Events relating to the TWELFTH HOUSE"
+ },
+ {
+  "matter": "Recovery of a lost article",
+  "primary": "12",
+  "supporting": "2, 6, 11",
+  "group": "Events relating to the TWELFTH HOUSE"
+ },
+ {
+  "matter": "Secret activities as profession",
+  "primary": "12, 10",
+  "supporting": "2, 11 (10)",
+  "group": "Events relating to the TWELFTH HOUSE"
+ },
+ {
+  "matter": "Gain in investment",
+  "primary": "12",
+  "supporting": "2, 6, 11",
+  "group": "Events relating to the TWELFTH HOUSE"
+ },
+ {
+  "matter": "Loss in investment",
+  "primary": "12",
+  "supporting": "5, 8",
+  "group": "Events relating to the TWELFTH HOUSE"
+ },
+ {
+  "matter": "Danger from involvement in secret activities",
+  "primary": "12",
+  "supporting": "7, 8",
+  "group": "Events relating to the TWELFTH HOUSE"
+ },
+ {
+  "matter": "Imprisonment",
+  "primary": "12",
+  "supporting": "3, 8",
+  "group": "Events relating to the TWELFTH HOUSE"
+ },
+ {
+  "matter": "Receipt of secret documents",
+  "primary": "12",
+  "supporting": "4, 11",
+  "group": "Events relating to the TWELFTH HOUSE"
+ },
+ {
+  "matter": "Absconding",
+  "primary": "12",
+  "supporting": "3, 8",
+  "group": "Events relating to the TWELFTH HOUSE"
+ },
+ {
+  "matter": "Success in research",
+  "primary": "12 *(B4: 12, 10)*",
+  "supporting": "6, 11",
+  "group": "Events relating to the TWELFTH HOUSE"
+ },
+ {
+  "matter": "Export business",
+  "primary": "12, 10",
+  "supporting": "2, 11 (10)",
+  "group": "Events relating to the TWELFTH HOUSE"
+ }
+]

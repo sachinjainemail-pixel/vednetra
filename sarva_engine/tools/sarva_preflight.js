@@ -59,6 +59,10 @@ add("UDU", "vednetra-ududaya skill", SK && has(path.join(SK, "vednetra-ududaya",
 add("QUAD", "vednetra-quad skill", SK && has(path.join(SK, "vednetra-quad", "scripts", "run_quad_dasha.js")), "sync the vednetra-quad skill into the account");
 const quadFull = ["pdf", "txt", "md"].some(e => has(path.join(KNOW, "quad", "QUAD-FULL-METHODOLOGY." + e)));
 
+const lexTool = spawnSync(process.execPath, [path.join(__dirname, "sarva_lexicon.js"), "--check"], { encoding: "utf8", timeout: 20000 });
+const lexOk = lexTool.status === 0;
+if (!lexOk) console.log("LEXICON check failed. Fix, run node sarva_engine/tools/sarva_lexicon.js --check and rebuild with python3 sarva_engine/tools/lexicon_build/build_lexicon.py. " + String(lexTool.stdout || lexTool.stderr).trim().split("\n")[0]);
+else console.log("LEXICON " + String(lexTool.stdout).trim());
 const cols = ["KPPRO", "KCIL", "SUJ", "CHAWDHRI", "BNN", "UDU", "QUAD"];
 const names = { KPPRO: "KP Pro", KCIL: "KCIL", SUJ: "SUJ engine", CHAWDHRI: "CHAWDHRI", BNN: "BNN", UDU: "Udu", QUAD: "Quad Dasha" };
 let hard = 0;

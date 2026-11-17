@@ -14,6 +14,7 @@ Then for each question, Q1, Q2 and so on, in this order.
 
 QUESTION Q1
 OPTIONS Q1 A B C D       (or OPTIONS Q1 OPEN when no options are given)
+LEXICON Q1 med.gynecology med.pediatrics med.dentistry med.dermatology     (the entry ids of sarva_lexicon.js, or LEXICON Q1 NONE)
 
 METHOD KPPRO Q1
     The analysis in the KP Pro order. Promise, time status, the evidence for and against.

@@ -1,0 +1,1749 @@
+[
+ {
+  "id": "inc.salary",
+  "cat": "income",
+  "name": "Salary or wages",
+  "aliases": [
+   "monthly salary",
+   "pay",
+   "job income",
+   "वेतन",
+   "तनख्वाह"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    10,
+    11,
+    2
+   ],
+   "planets": [
+    "Saturn",
+    "Mercury",
+    "Sun"
+   ],
+   "signs": [
+    "Virgo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    6,
+    10,
+    11
+   ],
+   "csl_planets": [
+    "Saturn",
+    "Mercury"
+   ],
+   "cards": [
+    "PRF.02",
+    "PRF.04"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    10,
+    6
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    6
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "salary"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.02 service 6th or 10th CSL significator of 2,6,10 gives job."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Promotion in service or business 10 with 2,6,11."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "inc.business_profit",
+  "cat": "income",
+  "name": "Business profit",
+  "aliases": [
+   "trade profit",
+   "business income",
+   "व्यापार से आय"
+  ],
+  "vedic": {
+   "houses": [
+    7,
+    10,
+    11,
+    2
+   ],
+   "planets": [
+    "Mercury",
+    "Venus",
+    "Rahu"
+   ],
+   "signs": [
+    "Gemini"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    7,
+    10,
+    11
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Venus"
+   ],
+   "cards": [
+    "PRF.02",
+    "PRF.09"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    10,
+    7
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    7
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "profit"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.02 gain in business 7th CSL significator of 2,10,11."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "inc.professional_fee",
+  "cat": "income",
+  "name": "Professional fees",
+  "aliases": [
+   "consultation fees",
+   "practice income",
+   "doctor income",
+   "फीस"
+  ],
+  "vedic": {
+   "houses": [
+    2,
+    10,
+    11,
+    7
+   ],
+   "planets": [
+    "Jupiter",
+    "Sun",
+    "Mercury"
+   ],
+   "signs": [
+    "Leo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    7,
+    10,
+    11
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Sun"
+   ],
+   "cards": [
+    "PRF.02"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    2
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "fee"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.02 independent profession 2,7,10."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "inc.commission",
+  "cat": "income",
+  "name": "Commission or brokerage",
+  "aliases": [
+   "agency income",
+   "dalali",
+   "कमीशन"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    11,
+    2
+   ],
+   "planets": [
+    "Mercury",
+    "Rahu"
+   ],
+   "signs": [
+    "Gemini"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    3,
+    6,
+    10,
+    11
+   ],
+   "csl_planets": [
+    "Mercury"
+   ],
+   "cards": [
+    "PRF.22"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    10
+   ],
+   "supporting": [
+    3,
+    11
+   ],
+   "ta_houses": [
+    3
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "commission"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Commission as business 10 with 3,11."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "inc.rent",
+  "cat": "income",
+  "name": "Rental income",
+  "aliases": [
+   "house rent",
+   "property income",
+   "किराया"
+  ],
+  "vedic": {
+   "houses": [
+    4,
+    11,
+    2
+   ],
+   "planets": [
+    "Venus",
+    "Moon",
+    "Saturn",
+    "Mars"
+   ],
+   "signs": [
+    "Cancer",
+    "Capricorn"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    7,
+    11
+   ],
+   "csl_planets": [
+    "Saturn",
+    "Venus"
+   ],
+   "cards": [
+    "PRP.06"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    4
+   ],
+   "supporting": [
+    11,
+    2
+   ],
+   "ta_houses": [
+    4
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "rent"
+  ],
+  "evidence": [
+   {
+    "src": "WEB",
+    "text": "A web source found no house rule for rental income."
+   },
+   {
+    "src": "KP",
+    "text": "KP PRP.06 renting 4,7,11 against 3,10."
+   },
+   {
+    "src": "NOTE",
+    "text": "Rent is read from the 4th property with the 11th gain."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "inc.interest",
+  "cat": "income",
+  "name": "Interest or lending income",
+  "aliases": [
+   "moneylending",
+   "bank interest",
+   "FD",
+   "ब्याज"
+  ],
+  "vedic": {
+   "houses": [
+    2,
+    11,
+    8
+   ],
+   "planets": [
+    "Jupiter",
+    "Saturn",
+    "Mercury"
+   ],
+   "signs": [
+    "Taurus"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    6,
+    11
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Saturn"
+   ],
+   "cards": [
+    "WLT.03",
+    "WLT.13"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    2
+   ],
+   "supporting": [
+    6,
+    11
+   ],
+   "ta_houses": [
+    2
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "interest"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 2 moneylenders."
+   },
+   {
+    "src": "KP",
+    "text": "KP WLT.13 investment 6,11."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "inc.investment",
+  "cat": "income",
+  "name": "Investment returns",
+  "aliases": [
+   "mutual funds",
+   "long term investment",
+   "property investment",
+   "निवेश"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    11,
+    2
+   ],
+   "planets": [
+    "Jupiter",
+    "Venus",
+    "Mercury"
+   ],
+   "signs": [
+    "Sagittarius"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    11
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Venus"
+   ],
+   "cards": [
+    "WLT.13"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    12
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    12
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "invest"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP WLT.13 + 6,11 against 5,8,9,12."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Gain in investment 12 with 2,6,11 and loss 12 with 5,8."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "inc.speculation",
+  "cat": "income",
+  "name": "Share market or speculation gains",
+  "aliases": [
+   "stock market",
+   "trading profit",
+   "gambling",
+   "सट्टा",
+   "शेयर"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    11,
+    8,
+    9
+   ],
+   "planets": [
+    "Rahu",
+    "Mercury",
+    "Jupiter"
+   ],
+   "signs": [
+    "Leo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    5,
+    11
+   ],
+   "csl_planets": [
+    "Rahu",
+    "Mercury",
+    "Jupiter"
+   ],
+   "cards": [
+    "WLT.06"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    5
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    5
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "speculat"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP WLT.06 2,5,11 against 8,12."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 5 stock exchange."
+   },
+   {
+    "src": "WEB",
+    "text": "Web source 5th for speculative gains and 9th for sudden."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "inc.lottery",
+  "cat": "income",
+  "name": "Lottery or windfall",
+  "aliases": [
+   "sudden gain",
+   "prize",
+   "लॉटरी"
+  ],
+  "vedic": {
+   "houses": [
+    8,
+    5,
+    9,
+    11
+   ],
+   "planets": [
+    "Rahu",
+    "Jupiter"
+   ],
+   "signs": [
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    8,
+    2,
+    11
+   ],
+   "csl_planets": [
+    "Rahu",
+    "Jupiter"
+   ],
+   "cards": [
+    "WLT.07",
+    "WLT.06"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    8
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    8
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "lottery"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Unexpected gains 8 with 2,11 and loss 8 with 5,12."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "inc.inheritance",
+  "cat": "income",
+  "name": "Inheritance or ancestral wealth",
+  "aliases": [
+   "will",
+   "legacy",
+   "family property",
+   "पैतृक संपत्ति",
+   "विरासत"
+  ],
+  "vedic": {
+   "houses": [
+    8,
+    2,
+    4,
+    9
+   ],
+   "planets": [
+    "Saturn",
+    "Sun",
+    "Moon"
+   ],
+   "signs": [
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    8,
+    2,
+    11,
+    4,
+    9
+   ],
+   "csl_planets": [
+    "Saturn",
+    "Sun"
+   ],
+   "cards": [
+    "WLT.07",
+    "PRP.08"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    8
+   ],
+   "supporting": [
+    2,
+    4,
+    11
+   ],
+   "ta_houses": [
+    8
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "inherit"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Ornaments or cash from inheritance 8 with 2,11 and property or vehicle 8 with 4,11."
+   },
+   {
+    "src": "KP",
+    "text": "KP PRP.08 ancestral property 4,8,9."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "inc.gift",
+  "cat": "income",
+  "name": "Gifts or help from others",
+  "aliases": [
+   "gift",
+   "donation received",
+   "grant",
+   "उपहार"
+  ],
+  "vedic": {
+   "houses": [
+    8,
+    11,
+    2
+   ],
+   "planets": [
+    "Jupiter",
+    "Venus"
+   ],
+   "signs": [
+    "Libra"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    11,
+    2
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Venus"
+   ],
+   "cards": [
+    "MIN.07",
+    "WLT.11"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    8
+   ],
+   "supporting": [
+    6,
+    11
+   ],
+   "ta_houses": [
+    8
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "gift"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Receipt of gifts 8 with 6,11."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "inc.spouse",
+  "cat": "income",
+  "name": "Income through spouse",
+  "aliases": [
+   "husband income",
+   "wife income",
+   "spouse earning",
+   "पति की आय"
+  ],
+  "vedic": {
+   "houses": [
+    7,
+    2,
+    8,
+    11
+   ],
+   "planets": [
+    "Venus",
+    "Mars",
+    "Jupiter"
+   ],
+   "signs": [
+    "Libra"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    7,
+    8,
+    2,
+    11
+   ],
+   "csl_planets": [
+    "Venus",
+    "Mars"
+   ],
+   "cards": [
+    "MAR.01",
+    "FAM.04"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    7
+   ],
+   "supporting": [
+    8,
+    2,
+    11
+   ],
+   "ta_houses": [
+    7,
+    8
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "spouse"
+  ],
+  "evidence": [
+   {
+    "src": "NOTE",
+    "text": "The 8th house is the spouse's 2nd."
+   },
+   {
+    "src": "KP",
+    "text": "KP FAM.04 in-laws 8 (spouse's 2)."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "inc.inlaws",
+  "cat": "income",
+  "name": "Income through in-laws",
+  "aliases": [
+   "in-law support",
+   "dowry",
+   "ससुराल"
+  ],
+  "vedic": {
+   "houses": [
+    8,
+    2,
+    11
+   ],
+   "planets": [
+    "Venus",
+    "Saturn"
+   ],
+   "signs": [
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    8,
+    9,
+    10,
+    11
+   ],
+   "csl_planets": [
+    "Venus"
+   ],
+   "cards": [
+    "FAM.04",
+    "MAR.14"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    8
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    8
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "in-law"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP MAR.14 dowry 9,10,11 against 8,12."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "inc.agri",
+  "cat": "income",
+  "name": "Agricultural income",
+  "aliases": [
+   "farm income",
+   "crop",
+   "कृषि आय"
+  ],
+  "vedic": {
+   "houses": [
+    4,
+    11,
+    2
+   ],
+   "planets": [
+    "Moon",
+    "Venus",
+    "Saturn",
+    "Mars"
+   ],
+   "signs": [
+    "Taurus"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    4,
+    6,
+    11
+   ],
+   "csl_planets": [
+    "Moon",
+    "Venus",
+    "Saturn"
+   ],
+   "cards": [
+    "PRF.20"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    4
+   ],
+   "supporting": [
+    11
+   ],
+   "ta_houses": [
+    4
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "farm"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.20."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "inc.royalty",
+  "cat": "income",
+  "name": "Royalty or intellectual income",
+  "aliases": [
+   "book royalty",
+   "patent",
+   "copyright",
+   "रॉयल्टी"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    3,
+    11
+   ],
+   "planets": [
+    "Mercury",
+    "Jupiter",
+    "Sun"
+   ],
+   "signs": [
+    "Gemini"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    10,
+    11
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Jupiter"
+   ],
+   "cards": [
+    "PRF.16"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    3,
+    10
+   ],
+   "supporting": [
+    2,
+    6,
+    11
+   ],
+   "ta_houses": [
+    3
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "royalty"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.16 authorship."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "inc.pension",
+  "cat": "income",
+  "name": "Pension or retirement income",
+  "aliases": [
+   "pension",
+   "VRS",
+   "गोपनीय पेंशन"
+  ],
+  "vedic": {
+   "houses": [
+    5,
+    9,
+    12,
+    11
+   ],
+   "planets": [
+    "Sun",
+    "Saturn"
+   ],
+   "signs": [
+    "Leo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    5,
+    9,
+    12
+   ],
+   "csl_planets": [
+    "Sun",
+    "Saturn"
+   ],
+   "cards": [
+    "PRF.08"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    10
+   ],
+   "supporting": [
+    5,
+    9
+   ],
+   "ta_houses": [
+    8,
+    10
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "pension"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.08 retirement VRS pension 5,9,12."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 8 pension cells."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "inc.govt_grant",
+  "cat": "income",
+  "name": "Government grant or scholarship",
+  "aliases": [
+   "scholarship",
+   "subsidy",
+   "stipend",
+   "छात्रवृत्ति"
+  ],
+  "vedic": {
+   "houses": [
+    10,
+    11,
+    9
+   ],
+   "planets": [
+    "Sun",
+    "Jupiter"
+   ],
+   "signs": [
+    "Leo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    4,
+    6,
+    11
+   ],
+   "csl_planets": [
+    "Sun",
+    "Jupiter"
+   ],
+   "cards": [
+    "EDU.07",
+    "WLT.11"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    10
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    10
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "grant"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP EDU.07 scholarship + 2,4,6,11 against 3,5."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "inc.foreign",
+  "cat": "income",
+  "name": "Foreign income or remittance",
+  "aliases": [
+   "NRI income",
+   "overseas earning",
+   "विदेश से आय"
+  ],
+  "vedic": {
+   "houses": [
+    12,
+    9,
+    11,
+    3
+   ],
+   "planets": [
+    "Rahu",
+    "Saturn",
+    "Moon",
+    "Mercury"
+   ],
+   "signs": [
+    "Pisces"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    9,
+    12,
+    10,
+    11
+   ],
+   "csl_planets": [
+    "Rahu",
+    "Saturn"
+   ],
+   "cards": [
+    "PRF.14",
+    "TRV.04"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    12
+   ],
+   "supporting": [
+    9,
+    11
+   ],
+   "ta_houses": [
+    9,
+    12
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "foreign"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.14 work abroad 3,9,12 + 10,11."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL TA house 12 foreign countries and house 9 export houses."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "inc.side",
+  "cat": "income",
+  "name": "Side income or second source",
+  "aliases": [
+   "part time",
+   "second job",
+   "dual occupation",
+   "अतिरिक्त आय"
+  ],
+  "vedic": {
+   "houses": [
+    11,
+    3,
+    7
+   ],
+   "planets": [
+    "Mercury",
+    "Rahu"
+   ],
+   "signs": [
+    "Gemini"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    11,
+    3,
+    7
+   ],
+   "csl_planets": [
+    "Mercury"
+   ],
+   "cards": [
+    "PRF.35"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    11
+   ],
+   "supporting": [
+    3,
+    6
+   ],
+   "ta_houses": [
+    3
+   ],
+   "tier": "T4",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "side"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.35 dual or plural occupation."
+   },
+   {
+    "src": "KP",
+    "text": "KP PRF.02 Mercury as 10th CSL gives plural occupations."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "inc.sale_property",
+  "cat": "income",
+  "name": "Sale of property",
+  "aliases": [
+   "property sale",
+   "land sale",
+   "जमीन बेचना"
+  ],
+  "vedic": {
+   "houses": [
+    3,
+    10,
+    5,
+    4
+   ],
+   "planets": [
+    "Mars",
+    "Saturn"
+   ],
+   "signs": [
+    "Capricorn"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    3,
+    10,
+    5
+   ],
+   "csl_planets": [
+    "Mars"
+   ],
+   "cards": [
+    "PRP.02"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    4
+   ],
+   "supporting": [
+    3,
+    5,
+    10
+   ],
+   "ta_houses": [
+    4
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "sale"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Sale of property 4 with 3,5,10."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "inc.loan",
+  "cat": "income",
+  "name": "Loan or borrowing",
+  "aliases": [
+   "debt",
+   "borrowing",
+   "credit",
+   "कर्ज"
+  ],
+  "vedic": {
+   "houses": [
+    6,
+    12,
+    8
+   ],
+   "planets": [
+    "Saturn",
+    "Mars",
+    "Rahu"
+   ],
+   "signs": [
+    "Virgo"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    6,
+    2,
+    11
+   ],
+   "csl_planets": [
+    "Saturn"
+   ],
+   "cards": [
+    "WLT.03",
+    "WLT.04"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    2,
+    6
+   ],
+   "supporting": [
+    11
+   ],
+   "ta_houses": [
+    2,
+    6
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "loan",
+   "debt"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Obtaining loans 2,6 with 11 and Repayment of a loan 12 with 5,8."
+   },
+   {
+    "src": "KP",
+    "text": "KP WLT.03 6 with 2,11 and WLT.04 repayment 12 with 8."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "inc.insurance",
+  "cat": "income",
+  "name": "Insurance claim",
+  "aliases": [
+   "claim",
+   "maturity",
+   "बीमा दावा"
+  ],
+  "vedic": {
+   "houses": [
+    8,
+    2,
+    11
+   ],
+   "planets": [
+    "Saturn",
+    "Jupiter"
+   ],
+   "signs": [
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    8,
+    2,
+    11
+   ],
+   "csl_planets": [
+    "Saturn"
+   ],
+   "cards": [
+    "WLT.07"
+   ],
+   "tier": "T4"
+  },
+  "kcil": {
+   "primary": [
+    2
+   ],
+   "supporting": [
+    8,
+    11
+   ],
+   "ta_houses": [
+    8
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "insurance"
+  ],
+  "evidence": [
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Insurance claims 2 with 8,11."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "inc.illegal",
+  "cat": "income",
+  "name": "Illegal or unaccounted income",
+  "aliases": [
+   "black money",
+   "bribe",
+   "smuggling"
+  ],
+  "vedic": {
+   "houses": [
+    8,
+    12,
+    11
+   ],
+   "planets": [
+    "Rahu",
+    "Ketu",
+    "Saturn"
+   ],
+   "signs": [
+    "Scorpio"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    11,
+    8,
+    12
+   ],
+   "csl_planets": [
+    "Rahu"
+   ],
+   "cards": [
+    "WLT.14"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    8,
+    10
+   ],
+   "supporting": [
+    2,
+    11
+   ],
+   "ta_houses": [
+    8,
+    12
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "bribe"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP WLT.14 illegal income + 11."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Criminality as profession 8,10."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "inc.contract",
+  "cat": "income",
+  "name": "Contract or tender income",
+  "aliases": [
+   "tender",
+   "contractor income",
+   "ठेका"
+  ],
+  "vedic": {
+   "houses": [
+    7,
+    10,
+    11
+   ],
+   "planets": [
+    "Mercury",
+    "Mars",
+    "Saturn"
+   ],
+   "signs": [
+    "Libra"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    7,
+    10,
+    11
+   ],
+   "csl_planets": [
+    "Mercury",
+    "Mars"
+   ],
+   "cards": [
+    "PRF.12",
+    "PRF.30"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    3
+   ],
+   "supporting": [
+    6,
+    9,
+    11
+   ],
+   "ta_houses": [
+    3
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "contract"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP PRF.12 contract tender deal 7,10,11."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Signing a contract 3 with 6,9,11."
+   }
+  ],
+  "best_tier": "T1"
+ },
+ {
+  "id": "inc.wealth_level",
+  "cat": "income",
+  "name": "Overall wealth level",
+  "aliases": [
+   "rich or poor",
+   "financial status",
+   "आर्थिक स्थिति"
+  ],
+  "vedic": {
+   "houses": [
+    2,
+    11,
+    5,
+    9
+   ],
+   "planets": [
+    "Jupiter",
+    "Venus",
+    "Mercury"
+   ],
+   "signs": [
+    "Taurus"
+   ],
+   "tier": "T4"
+  },
+  "kp": {
+   "houses": [
+    2,
+    6,
+    11
+   ],
+   "csl_planets": [
+    "Jupiter",
+    "Venus"
+   ],
+   "cards": [
+    "WLT.01"
+   ],
+   "tier": "T1"
+  },
+  "kcil": {
+   "primary": [
+    2
+   ],
+   "supporting": [
+    6,
+    11
+   ],
+   "ta_houses": [
+    2
+   ],
+   "tier": "T1",
+   "note": ""
+  },
+  "bnn_keywords": [
+   "wealth"
+  ],
+  "evidence": [
+   {
+    "src": "KP",
+    "text": "KP WLT.01 2,6,11 against 5,8,12."
+   },
+   {
+    "src": "KCIL",
+    "text": "KCIL matrix Financial status 2 with 6,11."
+   },
+   {
+    "src": "WEB",
+    "text": "Web sources Dhana yoga link of the 2nd and 11th lords, with 5th and 9th lords."
+   }
+  ],
+  "best_tier": "T1"
+ }
+]
