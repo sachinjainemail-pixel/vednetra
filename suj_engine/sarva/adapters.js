@@ -133,7 +133,14 @@ function kpp(ctx) {
       let inOpts = false;
       lines.forEach(l => { if (/^options:/.test(l)) { inOpts = true; return; } if (inOpts) { const m = l.match(/^  (.+?)\s{2,}([\d.]+)%(\s+<== SELECTED)?\s*$/); if (m && m[3]) sel = q.options.find(o => same(o, m[1])); } });
       if (lines.some(l => /^INCOMPLETE/.test(l)) || lines.some(l => /could not map/.test(l))) flags.push("incomplete");
-      if (lines.some(l => /^SAME MEANING/.test(l))) flags.push("same meaning");
+      const sm = lines.find(l => /^SAME MEANING/.test(l));
+      if (sm) {
+        flags.push("same meaning");
+        // the engine prints the groups of options it cannot tell apart, A / B | C / D. The group of the pick is the tie, a pick inside it is a coin flip and not a hit
+        const groups = sm.replace(/^.*first listed was taken:\s*/, "").split(" | ").map(g => g.split(" / ").map(x => q.options.find(o => same(o, x.trim()))).filter(Boolean));
+        const g = groups.find(gr => sel && gr.some(o => same(o, sel)));
+        if (g && g.length > 1) g.forEach(o => tied.push(o));
+      }
     }
     if (!sel) { out[q.no] = { notRun: "no pick returned" }; return; }
     out[q.no] = { pick: sel, flags, tied, why: q.kind.key === "dated" ? "window coverage under both rules" : "prior of the quiz charts, chart weight 0" };

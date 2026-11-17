@@ -19,6 +19,8 @@ const SUJ = path.join(__dirname, "..", "..");
 function arg(name, def) { const i = process.argv.indexOf("--" + name); return i >= 0 ? process.argv[i + 1] : def; }
 function load(file) {
   const chart = JSON.parse(fs.readFileSync(file, "utf8"));
+  // truths, when the owner's post already carries the true answers, are shown beside the engines and can be used by score. A reader who has seen them cannot read blind.
+  if (arg("truths") && fs.existsSync(arg("truths")) && process.argv[2] === "table" && process.argv.includes("--show-truths")) chart.truths = JSON.parse(fs.readFileSync(arg("truths"), "utf8"));
   chart.questions.forEach((q, i) => { q.no = i + 1; q.kind = T.classify(q); });
   return chart;
 }

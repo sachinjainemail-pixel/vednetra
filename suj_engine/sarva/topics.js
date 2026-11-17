@@ -26,6 +26,8 @@ const RULES = [
   { key: "education", label: "Education", rx: /शिक्षा|education|degree|पढ़ाई|qualification|योग्यता/i },
   { key: "marriage", label: "Marriage", rx: /विवाह|शादी|marriage|marital|वैवाहिक/i },
   { key: "children", label: "Children", rx: /संतान|children|child|बच्च/i },
+  // the work of the spouse, a question about someone else. It must never fall into the native's own work, whose engines would answer a different question
+  { key: "spouse_work", label: "Spouse work", rx: /(पति|पत्नी|जीवनसाथी|spouse|husband|wife)\s*(का|की|के|\'s)?\s*(कार्य|व्यवसाय|काम|profession|work|occupation|job)/i },
   { key: "work", label: "Work", rx: /काम ?धंधा|व्यवसाय|career|profession|occupation|\bwork\b|नौकरी|आजीविका|कार्यक्षेत्र|livelihood/i },
   { key: "residence", label: "Residence", rx: /रहता|रहती|निवास|residence|\blives?\b|reside|वर्तमान में कहां/i },
   { key: "siblings", label: "Siblings", rx: /भाई|बहन|sibling/i },

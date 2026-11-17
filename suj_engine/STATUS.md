@@ -168,6 +168,14 @@
 - Still open, planet strength winner to event result mapping, the sibling brother and sister split, employed or not, and
   whether planet_strength.js should drop planets with fewer than three subject links and add derived houses.
 
+## Round 27. Kundali 894, a results post (done)
+
+- A chart arrived with its true answers already marked, a woman born 8 December 1980 at Mehsana. No blind SUJ answer exists, so it is recorded as K894 in cases.json with the 20 hypothesis scores and the truths, not blind. cases_report.js runs. The z reading, LEARNINGS H22, was right on 11 of 20, chance on the older types.
+- SARVA ran in the back end on the verbatim Hindi options. The three automatic engines were counted, the three reader columns say not run, answers known, because a reader who has seen the answers cannot read blind. The scoreboard suj_engine/cases/sarva_scores.json holds the first row. A true answers column was added to the table for such posts, with truths and show-truths.
+- Found and fixed. The work of the husband fell into the native's own work and was sent to the career engines, it is now its own topic, spouse_work, and the engines say not run. A KP Pro pick inside a group of options the engine cannot tell apart was counted as a hit, it is now a tie hit, the program reads the groups from the engine.
+- Chart 894 was added to the Poddar practice charts and to the KP Pro backtest, F10, where KCIL now beats the prior on 2 questions of 151 and loses on none, which is 1.3 points inside a standard error of 4.0.
+- Needs the owner. Whether to build frames for the work of the spouse and for a profession read from the education. The engines hold none.
+
 ## Round 26. SARVA made a program (done)
 
 The owner asked that the challenges of the first SARVA table never happen again for any chart or question. SARVA was a document that a reader executed by hand, which is how the options came to be translated, ties came to be read as picks and one answer came to rest on another. It is now suj_engine/sarva, four files and a registry, with a self test of 26 checks, all passing.

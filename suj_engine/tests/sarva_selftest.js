@@ -28,6 +28,9 @@ ok("the Hindi digits and months are read", T.dateIn("१० दिसंबर �
 ok("education, marriage and children are told apart", Q1.kind.key === "education" && Q2.kind.key === "marriage" && Q3.kind.key === "children");
 ok("the display text holds none of the unwanted characters", !T.STYLE.test(T.display("अपना कार्य/व्यापार एक पुत्र+एक पुत्री (x) a-b: c;")) );
 
+ok("the work of the husband is its own topic and not the native's work", T.classify({ text: "प्रश्न 5: पति का कार्यक्षेत्र ?", options: [] }).key === "spouse_work" && T.classify({ text: "वर्तमान कार्यक्षेत्र", options: [] }).key === "work" && T.classify({ text: "Spouse profession", options: [] }).key === "spouse_work");
+ok("siblings and parents are read from the Hindi wording", T.classify({ text: "भाई-बहनों की संख्या (जातिका सहित)", options: [] }).key === "siblings" && T.classify({ text: "माता पिता की स्थिति?", options: [] }).key === "parents");
+
 // the good table
 ok("a complete table with picks from the options passes", errs(full()).length === 0);
 const text = TB.render(chart, chart.questions, full());
@@ -70,6 +73,7 @@ ok("a no rule question flags every engine but the one that holds the rules", TB.
 const cells = full(c => { c.SJJ[1] = cellOf(Q1, "MA", { flags: ["tie"], tied: ["MA", "MBA"] }); c.KPP[1] = cellOf(Q1, "MBA"); c.POD[1] = cellOf(Q1, "MA", { second: "MBA" }); return c; });
 const sc = TB.scoreCells(chart, cells, { 1: "MBA" });
 ok("a tie that held the truth is a tie hit and not a hit", sc.SJJ.tieHit === 1 && sc.SJJ.hit === 0);
+ok("a pick inside a group the engine cannot tell apart is a tie hit and not a hit", (() => { const c = full(x => { x.KPP[1] = cellOf(Q1, "MA", { flags: ["same meaning"], tied: ["MA", "MBA"] }); return x; }); const r = TB.scoreCells(chart, c, { 1: "MA" }); return r.KPP.hit === 0 && r.KPP.tieHit === 1; })());
 ok("a first pick equal to the truth is a hit, a second place is counted apart", sc.KPP.hit === 1 && sc.POD.hit === 0 && sc.POD.secondHit === 1);
 ok("a column that was not run is not counted as wrong", sc.VSK.asked === 0 && sc.VSK.notRun === 1);
 

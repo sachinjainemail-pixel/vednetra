@@ -694,6 +694,125 @@
     }
    },
    "resultsReported": "2026-11-15"
+  },
+  {
+   "id": "K894",
+   "name": "Kundali 894",
+   "gender": "female",
+   "date": "1980-12-08",
+   "time": "04:38:00",
+   "tz": 5.5,
+   "lat": 23.588,
+   "lon": 72.3693,
+   "place": "Mehsana, Gujarat",
+   "asOf": "2026-11-17",
+   "blind": false,
+   "blindNote": "A results post. The true answers were in the same post as the chart, so no SUJ answer was given and the case carries only the hypothesis scores, which the engine computes without any reader. The date was read day first, 8 December 1980.",
+   "questions": [],
+   "hypotheses": [
+    {
+     "name": "Father alive",
+     "truth": true,
+     "score": 43
+    },
+    {
+     "name": "Mother alive",
+     "truth": true,
+     "score": 37
+    },
+    {
+     "name": "Has a child",
+     "truth": true,
+     "score": 48
+    },
+    {
+     "name": "Married",
+     "truth": true,
+     "score": 35
+    },
+    {
+     "name": "Working",
+     "truth": true,
+     "score": 31
+    },
+    {
+     "name": "Private job",
+     "truth": true,
+     "score": 34
+    },
+    {
+     "name": "Education exists",
+     "truth": true,
+     "score": 37
+    },
+    {
+     "name": "Doctor",
+     "truth": true,
+     "score": 27
+    },
+    {
+     "name": "Has siblings",
+     "truth": true,
+     "score": 8
+    },
+    {
+     "name": "Own business",
+     "truth": false,
+     "score": 36
+    },
+    {
+     "name": "Government job",
+     "truth": false,
+     "score": 24
+    },
+    {
+     "name": "Unemployed",
+     "truth": false,
+     "score": 33
+    },
+    {
+     "name": "CA",
+     "truth": false,
+     "score": 36
+    },
+    {
+     "name": "B Tech",
+     "truth": false,
+     "score": 43
+    },
+    {
+     "name": "BBA",
+     "truth": false,
+     "score": 44
+    },
+    {
+     "name": "Lawyer",
+     "truth": false,
+     "score": 34
+    },
+    {
+     "name": "Astrologer",
+     "truth": false,
+     "score": 30
+    },
+    {
+     "name": "Lives at birth place",
+     "truth": false,
+     "score": 44
+    },
+    {
+     "name": "Lives abroad",
+     "truth": false,
+     "score": 31
+    },
+    {
+     "name": "Lives in another state",
+     "truth": false,
+     "score": 15
+    }
+   ],
+   "truthsNote": "Pediatrician, MBBS and a master's degree, an employee of a pediatrician in Ahmedabad after running her own clinic in Deesa with her husband, an orthopaedic surgeon. Three siblings including her, two sons, both parents alive. Lives in Ahmedabad, not at the birth place and not abroad. Residence was not asked, it is from the post.",
+   "resultsReported": "2026-11-17"
   }
  ]
 }

@@ -92,8 +92,9 @@ function render(chart, qs, cells) {
   });
   for (let i = 0; i < cols.length; i += w) {
     const part = cols.slice(i, i + w);
-    const rows = qs.map(q => [q.no + " " + (q.kind.key === "dated" ? T.display(fmtDate(q.kind.date)) : q.kind.label)].concat(part.map(c => { const cell = cells[c.id][q.no]; (cell.flags || []).forEach(f => used.add(f)); return cellText(cell); })));
-    const head = [T.display(chart.name || chart.id || "Chart")].concat(part.map(c => c.label));
+    const tr = chart.truths || null;
+    const rows = qs.map(q => [q.no + " " + (q.kind.key === "dated" ? T.display(fmtDate(q.kind.date)) : q.kind.label)].concat(tr ? [tr[q.no] === undefined ? "" : T.display(tr[q.no])] : []).concat(part.map(c => { const cell = cells[c.id][q.no]; (cell.flags || []).forEach(f => used.add(f)); return cellText(cell); })));
+    const head = [T.display(chart.name || chart.id || "Chart")].concat(tr ? ["True answer"] : []).concat(part.map(c => c.label));
     const width = head.map((h, k) => Math.max(h.length, ...rows.map(r => r[k].length)) + 2);
     const line = r => r.map((x, k) => x.padEnd(width[k])).join("").trimEnd();
     blocks.push("```\n" + [line(head), "=".repeat(width.reduce((a, b) => a + b, 0) - 2)].concat(rows.map(line)).join("\n") + "\n```");
@@ -122,7 +123,7 @@ function scoreCells(chart, cells, truths) {
       if (cell.notRun) { r.notRun++; return; }
       if ((cell.flags || []).includes("seen")) { r.seen++; return; }
       r.asked++;
-      const tied = (cell.flags || []).includes("tie");
+      const tied = (cell.flags || []).includes("tie") || (cell.tied || []).length > 1;
       if (!tied && same(cell.pick, tr)) r.hit++;
       else if (tied && (cell.tied || []).some(o => same(o, tr))) r.tieHit++;
       else if (cell.second && same(cell.second, tr)) r.secondHit++;

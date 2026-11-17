@@ -1,0 +1,68 @@
+{
+ "note": "SARVA scoreboard. hit is a first pick that equals the truth, tieHit a tie that contained the truth, secondHit a second place that was the truth. chance is the expected hits of a random pick. A table is not an accuracy claim.",
+ "runs": [
+  {
+   "id": "K894",
+   "asOf": "2026-11-17",
+   "chance": 1.92,
+   "per": {
+    "SUJ": {
+     "asked": 0,
+     "hit": 0,
+     "tieHit": 0,
+     "notRun": 6,
+     "secondHit": 0,
+     "seen": 0
+    },
+    "SJJ": {
+     "asked": 4,
+     "hit": 1,
+     "tieHit": 1,
+     "notRun": 2,
+     "secondHit": 2,
+     "seen": 0
+    },
+    "CHW": {
+     "asked": 0,
+     "hit": 0,
+     "tieHit": 0,
+     "notRun": 6,
+     "secondHit": 0,
+     "seen": 0
+    },
+    "POD": {
+     "asked": 5,
+     "hit": 1,
+     "tieHit": 3,
+     "notRun": 1,
+     "secondHit": 1,
+     "seen": 0
+    },
+    "KPP": {
+     "asked": 4,
+     "hit": 2,
+     "tieHit": 2,
+     "notRun": 2,
+     "secondHit": 0,
+     "seen": 0
+    },
+    "VKP": {
+     "asked": 0,
+     "hit": 0,
+     "tieHit": 0,
+     "notRun": 6,
+     "secondHit": 0,
+     "seen": 0
+    },
+    "VSK": {
+     "asked": 0,
+     "hit": 0,
+     "tieHit": 0,
+     "notRun": 6,
+     "secondHit": 0,
+     "seen": 0
+    }
+   }
+  }
+ ]
+}
