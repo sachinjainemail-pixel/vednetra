@@ -202,3 +202,7 @@ The owner asked to update the engine with all the learnings and merge it so that
 6. The README of this repository records that 52 pre registered tests of classical interpretation rules came
    out at chance level. The engine will always give one definitive answer as required. A confidence grade
    inside the closing summary is proposed so the definitive answer is not mistaken for a proven one.
+
+## Round 23. Prashna chart 894 run under SARVA, results reported (done)
+
+Six SUJ answers written and guarded, files in sarva_engine/runs/q894. The owner reported 17 November 2026 for questions 1, 2, 3, 5 and 6. SUJ 4 of 5. Case K894 added to cases.json, cases_report.js run, LEARNINGS.md updated. Question 4 is pending. No weight, band or rule was changed.

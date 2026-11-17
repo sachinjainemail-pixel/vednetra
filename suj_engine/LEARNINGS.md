@@ -229,3 +229,11 @@ answer on those rests on the chain evidence only and must not claim more.
 - None of this has been shown to raise accuracy. It makes the process auditable and removes the specific habits that
   produced the misses. The README of this repository records that 52 pre registered tests of classical rules came
   out at chance level, and the engine's first score is consistent with that.
+
+## Case 5. Prashna chart 894, female, 8 December 1980, 04:38, Mehsana. Reported 17 November 2026
+
+SUJ answered 4 of 5 reported questions, education speciality wrong, profession, siblings, husband profession and parents right. Question 4 on children is still pending.
+Nothing was retuned. What the miss shows, as a hypothesis for the next charts and not a rule.
+- The library holds no rule that names a medical speciality. The dentist answer came from the analyst mapping house 2 face and mouth to dentistry and from entering a Paap Kartari harm against the options that lean on Venus. Both choices were the analyst's. Tag invented_rule. When options are specialities the answer should say before the tally that the evidence entries are the analyst's mapping, and should enter the same type of harm for every option.
+- A tally where one option has a single planet and no weakness scores 100. The tool reads that as a strong option. The Q1 dentist 80 and the Q5 general surgeon 89 both come from options with fewer counter entries, not from more evidence. Watch for this.
+- The parents answer, both alive, rested on reading natal damage as capacity and not as proof of loss, and it was right. The siblings count was right on a 3 point lead, which says nothing about the count rule.

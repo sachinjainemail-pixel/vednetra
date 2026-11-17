@@ -103,3 +103,8 @@ C. As of this round two of the seven columns cannot be filled, so every SARVA re
    prior dominant. The routing therefore reads the per method opinion of the read command with the methodology's
    own rules. A dedicated per method option mapper is a candidate for the next round.
 4. The sibling repositories must be attached to the session. If one is missing the engine says so and asks.
+
+## Round 8, first live SARVA run and first scoring, prashna chart 894
+
+The first full run of the routing on a real chart, 17 November 2026, six questions, replies in sarva_engine/runs/q894. All routes ran. kpredict needed a virtualenv install, CHAWDHRI cloned VedNetra on first run, the guard ended with exit code 3 as designed.
+The owner reported true answers for Q1, Q2, Q3, Q5 and Q6, Q4 is not reported. Score out of 5. KP Pro 3, KCIL 4, SUJ 4, CHAWDHRI 4, BNN 3. Udu and Quad Dasha not run. Misses. KP Pro Q2 and Q5. KCIL Q6. SUJ Q1. CHAWDHRI Q3. BNN Q1 and Q2. Five questions per column prove nothing, no column was retuned. Q3, Q5 and Q6 had a majority of columns right and Q1 had KP Pro, KCIL and CHAWDHRI right against SUJ and BNN. The agreement of the columns was not a vote and no combined answer was used.
