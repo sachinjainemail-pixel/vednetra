@@ -101,7 +101,7 @@ BNN procedure. ENGINE_CONTRACT.md section 7 has the grade rules and the missing 
 
 ## 6. Udu (code UDU)
 
-Promise layer, from 17 November 2026, ENGINE_CONTRACT.md section 13. Run once for the whole chart, together with Quad, node sarva_engine/tools/promise_layer.js '{config with the questions}'. It prints the METHOD UDU and METHOD QUAD blocks of every question with EVIDENCE and RESULT lines, marked PROVISIONAL. Use them as printed. The corpus path below applies again when the nine files are installed.
+The Udu corpus is installed, ENGINE_CONTRACT.md section 14. Run once for the whole chart, together with Quad, node sarva_engine/tools/promise_layer.js '{config with the questions}'. It prints the METHOD UDU and METHOD QUAD blocks of every question with EVIDENCE and RESULT lines, marked PROVISIONAL. Use them as printed. Read the cited rules with node sarva_engine/tools/udu_rules.js --id ID before you send. The authored layer of section 13 runs for Udu only if the corpus is absent, or with the flag authoredUdu.
 
 Method. sarva_engine/knowledge/udu/UDU_PROCEDURE.md, then the document sections it names in UDU-METHODOLOGY.txt through
 UDU-METHODOLOGY.index.tsv. Rules. The nine corpus files UDU-*.md in sarva_engine/knowledge/udu, routed by question as in

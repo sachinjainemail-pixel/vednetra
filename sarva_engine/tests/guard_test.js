@@ -1,7 +1,7 @@
 // Run with: node sarva_engine/tests/guard_test.js
 const assert = require("assert");
 const fs = require("fs");
-const { check, METHODS, NOT_RUN } = require("../tools/sarva_guard");
+const { check, METHODS, NOT_RUN, sources } = require("../tools/sarva_guard");
 
 const EVID = { KCIL: " STABLE", KPPRO: " CHART DECIDED MEDIUM", BNN: " POSSIBLE RAO-FND-009", UDU: " ASH-1467", QUAD: " COMPUTED" };
 const PROV = { UDU: " PROVISIONAL, no Udu corpus rules were used, rules SARVA-UDU-P-U1 to U6, weighted sums A 1.0, B 2.0", QUAD: " PROVISIONAL, Rule of 10 layers SARVA-QUAD-P-L1 to L10, satisfied A 2, B 3, COMPUTED" };
@@ -76,8 +76,10 @@ assert.ok(run(draft({ prov: true }), ALL).errors.some(e => /UDU.*Rule ID/.test(e
 // the shipped format example must pass the guard as valid but incomplete, exit code 3 while Udu and Quad rules are absent
 const cp = require("child_process"), path = require("path");
 const ex = cp.spawnSync("node", [path.join(__dirname, "..", "tools", "sarva_guard.js"), path.join(__dirname, "..", "examples", "format_example.txt"), "--no-suj-guard"], { encoding: "utf8", cwd: path.join(__dirname, "..", "..") });
-const udu = ["vivah-sambandh","karya-dhan","arogya-ayu","vidya-swabhav","santan-parivar","dharma-upay","samay-muhurat","yatra-shatru","mool-tattva"].every(n => fs.existsSync(path.join(__dirname, "..", "knowledge", "udu", "UDU-" + n + ".md")));
-if (!udu) assert.strictEqual(ex.status, 0, "the format example with provisional Udu and Quad cells passes while the corpus is absent");
+const udu = sources().UDU, quad = sources().QUAD;
+if (!quad) assert.strictEqual(ex.status, 0, "the format example passes with a corpus Udu cell and a provisional Quad cell while the Quad READ rules are absent");
 const ex2 = cp.spawnSync("node", [path.join(__dirname, "..", "tools", "sarva_guard.js"), path.join(__dirname, "..", "examples", "format_example_not_run.txt"), "--no-suj-guard"], { encoding: "utf8", cwd: path.join(__dirname, "..", "..") });
 if (!udu) assert.strictEqual(ex2.status, 3, "the not run fallback example is valid but incomplete while the Udu corpus is absent");
+if (udu) assert.strictEqual(ex2.status, 1, "a NOT RUN Udu cell is an error once the Udu corpus is installed");
+assert.strictEqual(sources().UDU, true, "the guard sees the installed Udu corpus");
 console.log("sarva guard tests passed");

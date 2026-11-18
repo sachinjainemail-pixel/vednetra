@@ -23,10 +23,10 @@ Non negotiable points
 - BNN rules are never read from memory. The BNN rule base is sarva_engine/knowledge/bnn/BNN-RULES-5COLUMN.csv, read with
   node sarva_engine/tools/bnn_rules.js, and the BNN evidence line cites Rule IDs. Only if the csv is absent from the
   session use the cell text NOT RUN BNN RULES MISSING, see ENGINE_CONTRACT.md section 7.
-- Udu answers from its own corpus and Quad Dasha by its own READ rules when those files are installed. Their files are in
-  sarva_engine/knowledge/udu and sarva_engine/knowledge/quad and are not yet supplied. Until then both columns fire through the provisional promise
-  layers of node sarva_engine/tools/promise_layer.js, which give one option per question, say PROVISIONAL in the evidence line, cite no Udu rule id and are not the corpus
-  or the READ rules. NOT RUN UDU RULES MISSING and NOT RUN QUAD RULES MISSING stay only as the fallback when the layer cannot run. See ENGINE_CONTRACT.md sections 7b, 7c and 13.
+- Udu answers from its own corpus, installed on 18 November 2026 in sarva_engine/knowledge/udu/ukn, 16,008 rules in 21 life event files plus the KN timing corpus. Run node sarva_engine/tools/promise_layer.js, it fires the Udu
+  column on the corpus, cites Udu rule ids and prints the arithmetic, read the cited rules with node sarva_engine/tools/udu_rules.js --id ID. A UDU rule is never cited for timing and a KN rule never for a nakshatra claim.
+  Quad Dasha fires through its provisional promise layer, marked PROVISIONAL, until its READ rules are supplied. NOT RUN UDU RULES MISSING is an error while the corpus is installed.
+  See ENGINE_CONTRACT.md sections 7b, 7c, 13 and 14.
 - KP Pro follows the owner's v15 booklet in sarva_engine/knowledge/kppro. Its own prior may decide only when its NET band is
   UNDECIDED, and the KP Pro evidence line then says PRIOR DOMINANT with a HIGH, MEDIUM or LOW word.
 - KCIL follows the owner's v2.6 summary in sarva_engine/knowledge/kcil, on Khullar settings only. Its evidence line says STABLE,
@@ -36,9 +36,9 @@ Non negotiable points
   node sarva_engine/tools/sarva_lexicon.js --options "texts" --family before reading the chart, and write a LEXICON Qn line. It translates options into houses, planets,
   cusps, KP cards and BNN rule candidates. It is not a methodology and gives no verdict. A column cites only the T1 sentences of its own corpus, web and karaka hints are never cited,
   an option with NO ENTRY is not given the nearest planet. ENGINE_CONTRACT.md section 12 and sarva_engine/knowledge/lexicon/README.md.
-- Start every SARVA session with node sarva_engine/tools/sarva_preflight.js. All seven columns fire for every question. Udu and Quad Dasha come from the
-  provisional promise layers until their rule files are supplied, the guard then exits 0 with a NOTE naming them, exit code 3 only if a cell falls back to NOT RUN.
-  See ENGINE_CONTRACT.md sections 10 and 13.
+- Start every SARVA session with node sarva_engine/tools/sarva_preflight.js. All seven columns fire for every question. Udu runs on its corpus and Quad Dasha comes from the
+  provisional promise layer until its READ rules are supplied, the guard then exits 0 with a NOTE naming Quad, exit code 3 only if a cell falls back to NOT RUN.
+  See ENGINE_CONTRACT.md sections 10, 13 and 14.
 - Write the draft reply to a file and run node sarva_engine/tools/sarva_guard.js on it before sending. sarva_engine/examples shows the layout.
 - Under SARVA the SUJ rules below apply inside the SUJ column. For any question not named SARVA, the SUJ section
   below still governs.

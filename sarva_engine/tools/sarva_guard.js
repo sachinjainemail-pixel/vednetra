@@ -39,17 +39,18 @@ const HEDGE = /\b(cannot|can't|unable|undecided|undetermined|equal|tie|either|ne
 const BANNED = /[();:—“”‘’!#*~\/]|\s-\s/;
 
 // A source is present only when its rule files are in the knowledge folder.
+function uduCorpusInstalled() { try { return require("./udu_rules.js").present(); } catch (e) { return false; } }
 function sources() {
   const has = f => fs.existsSync(path.join(KNOW, f));
   return {
     BNN: has("bnn/BNN-RULES-5COLUMN.csv"),
-    UDU: UDU_FILES.every(f => has("udu/" + f)),
+    UDU: UDU_FILES.every(f => has("udu/" + f)) || uduCorpusInstalled(),
     QUAD: ["pdf", "txt", "md"].some(e => has("quad/QUAD-FULL-METHODOLOGY." + e)),
     KPPRO: has("kppro/KP-PRO-METHODOLOGY.txt"),
     KCIL: has("kcil/KCIL-METHODOLOGY-V2.6.txt")
   };
 }
-const UDU_ID = /\b[A-Z]{3}(-[A-Z0-9])?-\d{4}\b/;
+const UDU_ID = /\b(?:ASH|AVA-2|NAT|RBS-[12]|TAM-RA|TRI|[A-Z]{3}(?:-[A-Z0-9])?)-\d{4}[a-z]?\b/;
 const BNN_ID = /\b[A-Z]{3}-[A-Z0-9]{3}-\d{3}\b/;
 const BNN_GRADE = /\b(CONFIRMED|INDICATED|POSSIBLE|OPEN|DENIED)\b/;
 const QUAD_WORD = /\b(COMPUTED|CLASSICAL|UNSTABLE|VACUOUS)\b/;
@@ -197,4 +198,4 @@ if (require.main === module) {
   if (r.provisional && r.provisional.length) console.log("NOTE " + r.provisional.join(" and ") + " cells come from the provisional promise layers of promise_layer.js, not from the Udu corpus or the Quad READ rules. Say so to the owner.");
   console.log("GUARD PASSED, " + r.questions.length + " questions, seven methodologies each, final table matches.");
 }
-module.exports = { check, METHODS, HEADER, NOT_RUN };
+module.exports = { check, METHODS, HEADER, NOT_RUN, sources };

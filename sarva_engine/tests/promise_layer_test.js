@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Tests of promise_layer.js. Run from the repository root, node sarva_engine/tests/promise_layer_test.js
+// Tests of promise_layer.js, with the authored Udu layer forced because the Udu corpus is installed, the corpus path is tested in udu_corpus_test.js. Run from the repository root, node sarva_engine/tests/promise_layer_test.js
 const assert = require("assert");
 const { fire, parseOption } = require("../tools/promise_layer.js");
 let n = 0; const ok = (name, c, d) => { assert.ok(c, name + (d ? " " + String(d).slice(0, 300) : "")); n++; console.log("PASS " + name); };
@@ -12,7 +12,7 @@ const cfg = { name: "T", gender: "female", date: "1980-12-08", time: "04:38:00",
   { id: "Q6", text: "present status of parents", options: ["A केवल माताजी जीवित हैं।", "B केवल पिताजी जीवित हैं।", "C माता-पिता दोनों जीवित हैं।"] },
   { id: "Q7", text: "unknown", options: ["A Zebra trainer qwerty", "B Xylophone fixer zzz"] }
 ] };
-const r1 = fire(cfg), r2 = fire(cfg);
+const r1 = fire(cfg, { authoredUdu: true }), r2 = fire(cfg, { authoredUdu: true });
 ok("deterministic", r1.text === r2.text);
 ok("both columns fire for every question", cfg.questions.every(q => new RegExp("METHOD UDU " + q.id).test(r1.text) && new RegExp("METHOD QUAD " + q.id).test(r1.text)));
 cfg.questions.forEach(q => {
@@ -31,6 +31,6 @@ const p3 = parseOption("A One son"); ok("english son parse", p3.type === "childr
 const p4 = parseOption("A केवल माताजी जीवित हैं।"); ok("mother only parse", p4.type === "parents" && p4.mother === true && p4.father === false, JSON.stringify(p4));
 const p5 = parseOption("C माता-पिता दोनों जीवित हैं।"); ok("both parents parse", p5.type === "parents" && p5.mother && p5.father, JSON.stringify(p5));
 const p6 = parseOption("B Orthopedic surgeon"); ok("an ordinary option is an entry", p6.type === "entry", JSON.stringify(p6));
-const rules = fire({ gender: "male", date: "1990-01-01", time: "10:00:00", tz: 5.5, lat: 28.6, lon: 77.2, asOf: "2026-11-17", questions: [{ id: "Q1", text: "t", options: ["A Government job", "B Own business"] }] }, { rules: true });
+const rules = fire({ gender: "male", date: "1990-01-01", time: "10:00:00", tz: 5.5, lat: 28.6, lon: 77.2, asOf: "2026-11-17", questions: [{ id: "Q1", text: "t", options: ["A Government job", "B Own business"] }] }, { rules: true, authoredUdu: true });
 ok("the rule table can be printed", /RULE TABLE/.test(rules.text) && /SARVA-QUAD-P-L10/.test(rules.text) && /SARVA-UDU-P-U6/.test(rules.text));
 console.log("PROMISE LAYER TESTS PASSED " + n);

@@ -54,7 +54,10 @@ add("CHAWDHRI", "jyotish.sh present", chRepo && has(path.join(chRepo, "jyotish.s
 add("BNN", "BNN rule csv and method guide", has(path.join(KNOW, "bnn", "BNN-RULES-5COLUMN.csv")) && has(path.join(KNOW, "bnn", "BNN-METHOD-GUIDE.txt")), "restore knowledge files");
 add("BNN", "vednetra-bnn skill", SK && has(path.join(SK, "vednetra-bnn", "scripts", "run_bnn_export.js")), "sync the vednetra-bnn skill into the account");
 const uduFiles = ["UDU-vivah-sambandh.md", "UDU-karya-dhan.md", "UDU-arogya-ayu.md", "UDU-vidya-swabhav.md", "UDU-santan-parivar.md", "UDU-dharma-upay.md", "UDU-samay-muhurat.md", "UDU-yatra-shatru.md", "UDU-mool-tattva.md"];
-const uduCorpus = uduFiles.every(f => has(path.join(KNOW, "udu", f)));
+const uduCorpusLegacy = uduFiles.every(f => has(path.join(KNOW, "udu", f)));
+const uduChk = has(path.join(__dirname, "udu_rules.js")) ? run(process.execPath, [path.join(__dirname, "udu_rules.js"), "--check"]) : { status: 1, stdout: "" };
+const uduUkn = uduChk.status === 0;
+const uduCorpus = uduCorpusLegacy || uduUkn;
 add("UDU", "vednetra-ududaya skill", SK && has(path.join(SK, "vednetra-ududaya", "scripts", "run_ududaya_export.js")), "sync the vednetra-ududaya skill into the account");
 add("QUAD", "vednetra-quad skill", SK && has(path.join(SK, "vednetra-quad", "scripts", "run_quad_dasha.js")), "sync the vednetra-quad skill into the account");
 const quadFull = ["pdf", "txt", "md"].some(e => has(path.join(KNOW, "quad", "QUAD-FULL-METHODOLOGY." + e)));
@@ -74,7 +77,7 @@ console.log("");
 cols.forEach(c => {
   const tools = checks.filter(x => (x.col === c || x.col === "ALL") && !x.ok).length === 0;
   let state = tools ? "CAN RUN" : "TOOLS MISSING";
-  if (c === "UDU") state = tools ? (uduCorpus ? "CAN RUN" : (layerOk ? "RUNS THE PROVISIONAL PROMISE LAYER, the nine corpus files are not installed, the cell is marked PROVISIONAL" : "STANDING GAP, the promise layer failed its self run, cell is NOT RUN UDU RULES MISSING")) : "TOOLS MISSING";
+  if (c === "UDU") state = tools ? (uduCorpus ? (uduUkn ? "CAN RUN on the corpus, " + String(uduChk.stdout).trim().replace("UDU CORPUS CHECK PASSED, ", "") : "CAN RUN") : (layerOk ? "RUNS THE PROVISIONAL PROMISE LAYER, the nine corpus files are not installed, the cell is marked PROVISIONAL" : "STANDING GAP, the promise layer failed its self run, cell is NOT RUN UDU RULES MISSING")) : "TOOLS MISSING";
   if (c === "QUAD") state = tools ? (quadFull ? "CAN RUN" : (layerOk ? "RUNS THE PROVISIONAL PROMISE LAYER, the Quad READ rules are not installed, the cell is marked PROVISIONAL" : "STANDING GAP, the promise layer failed its self run, cell is NOT RUN QUAD RULES MISSING")) : "TOOLS MISSING";
   console.log(names[c].padEnd(11) + state);
 });

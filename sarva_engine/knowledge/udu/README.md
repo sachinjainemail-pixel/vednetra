@@ -12,3 +12,5 @@ then the Udu cell reads NOT RUN UDU RULES MISSING, as the Udu method itself forb
 A lookup tool like tools/bnn_rules.js should be built once the real file layout is in hand, it was not built blind.
 
 Update of 17 November 2026. While these files are missing the Udu column fires through the provisional promise layer of sarva_engine/tools/promise_layer.js, ENGINE_CONTRACT.md section 13. The layer is authored by the SARVA engine author, is not this corpus, and its cells say PROVISIONAL. Placing the nine files here switches the column back to the corpus rules.
+
+Update of 18 November 2026. The Udu corpus is installed in the ukn folder, 16,008 rules in 21 life event files by life event, plus the KN timing corpus. See ukn/README.md and ENGINE_CONTRACT.md section 14. The Udu column now runs on the corpus. The nine file layout above is no longer needed.

@@ -15,6 +15,8 @@
 const path = require("path");
 const { loadVedicCore } = require("../../suj_engine/tools/vednetra_loader");
 const LEX = require("./sarva_lexicon.js");
+const UR = require("./udu_rules.js");
+const UE = require("./udu_engine.js");
 
 const SIGNN = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
 const LORDN = ["Mars", "Venus", "Mercury", "Moon", "Sun", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Saturn", "Jupiter"];
@@ -82,7 +84,7 @@ function profileOf(L, opt) {
   const ms = LEX.match(L, opt.text, null, 1);
   if (!ms.length) return null;
   const e = ms[0].e;
-  return { id: e.id, name: e.name, houses: e.vedic.houses, planets: e.vedic.planets };
+  return { id: e.id, name: e.name, cat: e.cat, aliases: e.aliases, bnn_keywords: e.bnn_keywords, houses: e.vedic.houses, planets: e.vedic.planets };
 }
 
 // ------------------------------------------------------------------ UDU promise layer
@@ -326,7 +328,36 @@ function fire(cfg, opts) {
     const mode = q.mode || (/(present|current|now|अभी|वर्तमान)/i.test(q.text || "") ? "now" : "to_date");
     const labels = q.options.map(o => parseOption(o).label || "?");
     out.push("");
+    let uduDone = null;
+    const parentWarn = opts_hasParents(q) ? ", WEAK HANDLER the owner's BNN backtest called four living parents gone by a damage and age rule of this kind, read this cell as the least reliable" : "";
     // UDU
+    const corpus = UR.present() && !opts.authoredUdu;
+    if (corpus) {
+      const cu = UE.runUduCorpus(C, L, q, mode, { parseOption, profileOf, promiseSet });
+      const pk = UE.pickBest(cu.out);
+      const fireN = cu.coll.fired.size, nearN = cu.coll.nearly.size;
+      out.push("METHOD UDU " + q.id);
+      out.push("    Udu corpus reading. Chart on Lahiri, Moon in " + C.P.Moon.nakshatra + " pada " + C.P.Moon.pada + ", Lagna " + SIGNN[C.lagna] + ". Files read " + Array.from(new Set([].concat.apply([], cu.out.map(x => x.route)))).join(", ") + ". Rules that fired " + fireN + ", nearly fired and left out " + nearN + " because an IF condition could not be tested.");
+      cu.out.forEach(r => {
+        out.push("    OPTION " + r.o.label + " " + r.o.text + (r.prof ? "  profile " + r.prof.id + " graha set " + r.S.join(",") : "  type " + r.o.type) + "  direct " + r.direct.length + " link " + r.link.length);
+        r.rows.sort((x, y) => Math.abs(y.r.w * y.agree) - Math.abs(x.r.w * x.agree)).slice(0, 6).forEach(x => out.push("        " + x.r.id + " " + x.kind + " " + x.r.pol + "/" + x.r.conf + " x " + x.r.spec + (x.agree !== 1 ? " x agree " + x.agree : "") + " = " + (x.r.w * x.agree >= 0 ? "+" : "") + UE.f2(x.r.w * x.agree) + "  " + x.r.if.slice(0, 70) + "  THEN " + x.r.then.slice(0, 90)));
+        if (r.rows.length > 6) out.push("        and " + (r.rows.length - 6) + " more rules in the sum");
+        r.named.slice(0, 3).forEach(n => out.push("        " + n));
+        out.push("        direct sum " + UE.f2(r.dsum) + ", link sum " + UE.f2(r.lsum) + ", counted " + UE.f2(r.total) + " by " + r.basis);
+      });
+      const best = pk.r; const none = cu.out.every(x => x.rows.length === 0);
+      let cite = best.rows.filter(x => x.r.w !== 0).sort((x, y) => Math.abs(y.r.w * y.agree) - Math.abs(x.r.w * x.agree)).slice(0, 4).map(x => x.r.id);
+      let silent = "";
+      if (!cite.length) { const nr = UE.nearest(C, cu.coll, best.route); cite = nr.map(x => x.r.id); silent = ", CORPUS SILENT on the options, nearest rules are the janma nakshatra rules of the routed files and they do not separate the options"; if (!cite.length) { const any = Array.from(cu.coll.fired.values()).slice(0, 2); cite = any.map(x => x.r.id); } }
+      const g3 = best.prof ? lawThree(C, { set: best.S, total: best.total }, mode) : null;
+      if (g3) out.push("    Law 3 period test, adds no weight and cites no Udu rule for timing. " + g3);
+      const sums = cu.out.map(r => r.o.label + " " + UE.f2(r.total)).join(", ");
+      const parentWarn2 = opts_hasParents(q) ? ", WEAK HANDLER a parent is called gone only by a malefic rule that names death, loss or separation, the owner's BNN backtest called four living parents gone by a similar table rule" : "";
+      out.push("    EVIDENCE " + q.id + " UDU corpus rules " + (cite.join(" ") || "none") + ", counted sums " + sums + " by " + best.basis + ", band " + UE.bandOf(best.total) + (pk.tie ? ", TIE FORCED PICK the first listed of the tied options, no rule of the corpus separates them" : pk.law3 ? ", LAW 3 NO PROMISE OF LOSS no decisive rule of death or loss fired for either parent so the option with both alive is read" : pk.byPada ? ", tie settled by the pada level rule" : "") + silent + ", pada level rules in the winner " + best.pada + ", nearly fired left out " + nearN + parentWarn2 + ", no accuracy has been measured for Udu");
+      out.push("    RESULT " + q.id + " UDU " + best.o.label);
+      uduDone = { label: best.o.label, sums };
+    }
+    if (!corpus) {
     const u = runUdu(C, L, q, mode);
     u.forEach(r => { r.label = r.o.label; });
     const pu = pick(u, "total", "padaRules");
@@ -342,9 +373,10 @@ function fire(cfg, opts) {
       out.push("        total " + (r.total === null ? "none" : f2(r.total)));
     });
     if (g3) out.push("    Law 3 gate, adds no weight. " + g3);
-    const parentWarn = opts_hasParents(q) ? ", WEAK HANDLER the owner's BNN backtest called four living parents gone by a damage and age rule of this kind, read this cell as the least reliable" : "";
     out.push("    EVIDENCE " + q.id + " UDU PROVISIONAL, no Udu corpus rules were used and no Udu rule id is cited, rules SARVA-UDU-P-U1 to U6 and F1 F2 P1, weighted sums " + sums + ", band " + bandTxt + (pu.tie ? ", TIE FORCED PICK the first listed" : pu.byPada ? ", tie settled by the pada level rule" : "") + parentWarn + ", no accuracy has been measured for Udu");
     out.push("    RESULT " + q.id + " UDU " + pu.r.label);
+    uduDone = { label: pu.r.label, sums };
+    }
     // QUAD
     const Qd = runQuad(C, L, q, mode);
     const pq = pick(Qd.res, "score");
@@ -360,12 +392,12 @@ function fire(cfg, opts) {
     const lead = sc.length > 1 ? sc[0] - sc[1] : sc[0];
     out.push("    EVIDENCE " + q.id + " QUAD PROVISIONAL, no Quad READ rules were used, Rule of 10 layers SARVA-QUAD-P-L1 to L10 fixed before the chart, satisfied " + Qd.res.map(r => r.o.label + " " + (r.score === null ? "none" : r.score)).join(", ") + ", lead " + lead + (lead < 2 ? " narrow" : "") + ", COMPUTED dasha facts, UNSTABLE " + (Qd.unst.length ? Qd.unst.join(" ") : "none") + ", VACUOUS " + (Qd.vac.length ? Qd.vac.join(" ") : "none") + (pq.tie ? ", TIE FORCED PICK the first listed" : "") + parentWarn + ", no validated hit rate");
     out.push("    RESULT " + q.id + " QUAD " + pq.r.o.label);
-    data.push({ id: q.id, udu: pu.r.label, quad: pq.r.o.label, uduSums: sums, quadScores: Qd.res.map(r => r.score) });
+    data.push({ id: q.id, udu: uduDone.label, quad: pq.r.o.label, uduSums: uduDone.sums, quadScores: Qd.res.map(r => r.score) });
   });
   if (opts.rules) { out.push("", "RULE TABLE"); UDU_RULES.forEach(r => out.push("  SARVA-UDU-P-" + r[0] + " specificity " + r[1] + " " + r[2])); QUAD_LAYERS.forEach(l => out.push("  SARVA-QUAD-P-" + l[0] + " " + l[2])); }
   return { text: out.join("\n"), data };
 }
-module.exports = { fire, cast, parseOption, band };
+module.exports = { fire, cast, parseOption, band, profileOf, promiseSet };
 
 if (require.main === module) {
   const a = process.argv.slice(2);
