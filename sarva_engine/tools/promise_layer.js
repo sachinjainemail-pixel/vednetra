@@ -17,6 +17,8 @@ const { loadVedicCore } = require("../../suj_engine/tools/vednetra_loader");
 const LEX = require("./sarva_lexicon.js");
 const UR = require("./udu_rules.js");
 const UE = require("./udu_engine.js");
+const QRM = require("./quad_rules.js");
+const QE = require("./quad_engine.js");
 
 const SIGNN = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
 const LORDN = ["Mars", "Venus", "Mercury", "Moon", "Sun", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Saturn", "Jupiter"];
@@ -56,7 +58,7 @@ function cast(c) {
   const run = Q.runningAt(ch, X, age);
   const stab = Q.stability(ch, { latitude: input.lat, longitude: input.lon, timezone: tz }, age, [5, 15]);
   const kar = E.karakas(X.deg);
-  return { ch, P, lagna, houseSign, houseLord, signHouse, occ, grahaAsp, rashiAsp, link, rows, run, stab, age, kar, E, X, input };
+  return { ch, P, lagna, houseSign, houseLord, signHouse, occ, grahaAsp, rashiAsp, link, rows, run, stab, age, kar, E, X, input, VC, cfg: c, asOfDate: asOf, birth };
 }
 // periods that count for a question. now means the running period only, to_date means every period from birth to the as of date
 const live = (rows, age, mode) => rows.filter(r => mode === "now" ? (r.a <= age && age < r.b) : r.a < age);
@@ -378,6 +380,12 @@ function fire(cfg, opts) {
     uduDone = { label: pu.r.label, sums };
     }
     // QUAD
+    if (QRM.present() && !opts.provisionalQuad) {
+      const qc = QE.runQuadColumn(C, L, q, mode, { parseOption, profileOf });
+      qc.lines.forEach(l => out.push(l));
+      data.push({ id: q.id, udu: uduDone.label, quad: qc.label, uduSums: uduDone.sums, quadSat: qc.sat, quadPoints: qc.points, quadSecond: qc.second, quadNarrow: qc.narrow, quadEvent: qc.event, quadAgree: qc.agree });
+      return;
+    }
     const Qd = runQuad(C, L, q, mode);
     const pq = pick(Qd.res, "score");
     out.push("METHOD QUAD " + q.id);

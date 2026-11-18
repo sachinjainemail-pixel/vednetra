@@ -1,3 +1,5 @@
+> Written on 17 November 2026 from the two page intro and the report contract. The full methodology was installed on 18 November 2026, see QUAD-RULES-MAP.md and ENGINE_CONTRACT.md section 15. Where this summary differs from the full file, the full file binds. The section that says the Rule of 10 text was not supplied is out of date, the Rule of 10 is section 13 of the full file.
+
 # Quad Dasha procedure for the SARVA engine
 
 Sources in this folder. QUAD-METHODOLOGY-INTRO.pdf, a 2 page file titled the full detailed Quad Dasha methodology file, dated

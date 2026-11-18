@@ -1,0 +1,8 @@
+{"name":"FixtureA","gender":"female","date":"1980-12-08","time":"04:38:00","tz":5.5,"lat":23.588,"lon":72.3693,"asOf":"2026-11-17","questions":[
+ {"id":"Q1","text":"Education","options":["A Gynecologist","B Pediatrician","C Dentist","D Skin specialist"]},
+ {"id":"Q2","text":"present profession","options":["A Private job","B Government job","C Own business"]},
+ {"id":"Q3","text":"siblings including the native","options":["A One sister and one brother","B Two sisters and one brother","C One sister and two brothers"]},
+ {"id":"Q4","text":"Children","options":["A One son","B Two sons","C Two daughters"]},
+ {"id":"Q5","text":"profession of the husband","options":["A Physician","B Orthopedic surgeon","C General surgeon"]},
+ {"id":"Q6","text":"present status of parents","options":["A केवल माताजी जीवित हैं।","B केवल पिताजी जीवित हैं।","C माता-पिता दोनों जीवित हैं।"]}
+]}

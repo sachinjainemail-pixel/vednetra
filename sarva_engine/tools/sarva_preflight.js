@@ -63,6 +63,8 @@ add("QUAD", "vednetra-quad skill", SK && has(path.join(SK, "vednetra-quad", "scr
 const quadFull = ["pdf", "txt", "md"].some(e => has(path.join(KNOW, "quad", "QUAD-FULL-METHODOLOGY." + e)));
 const layerOk = has(path.join(__dirname, "promise_layer.js")) && (() => { try { const r = run(process.execPath, [path.join(__dirname, "promise_layer.js"), JSON.stringify({ gender: "female", date: "1990-01-01", time: "10:00:00", tz: 5.5, lat: 28.6, lon: 77.2, asOf: "2026-11-17", questions: [{ id: "Q1", text: "t", options: ["A Government job", "B Own business"] }] })]); return r.status === 0 && /RESULT Q1 QUAD/.test(r.stdout); } catch (e) { return false; } })();
 
+const quadChk = has(path.join(__dirname, "quad_rules.js")) ? run(process.execPath, [path.join(__dirname, "quad_rules.js"), "--check"]) : { status: 1, stdout: "" };
+const quadRules = quadFull && quadChk.status === 0;
 const lexTool = spawnSync(process.execPath, [path.join(__dirname, "sarva_lexicon.js"), "--check"], { encoding: "utf8", timeout: 20000 });
 const lexOk = lexTool.status === 0;
 if (!lexOk) console.log("LEXICON check failed. Fix, run node sarva_engine/tools/sarva_lexicon.js --check and rebuild with python3 sarva_engine/tools/lexicon_build/build_lexicon.py. " + String(lexTool.stdout || lexTool.stderr).trim().split("\n")[0]);
@@ -78,9 +80,10 @@ cols.forEach(c => {
   const tools = checks.filter(x => (x.col === c || x.col === "ALL") && !x.ok).length === 0;
   let state = tools ? "CAN RUN" : "TOOLS MISSING";
   if (c === "UDU") state = tools ? (uduCorpus ? (uduUkn ? "CAN RUN on the corpus, " + String(uduChk.stdout).trim().replace("UDU CORPUS CHECK PASSED, ", "") : "CAN RUN") : (layerOk ? "RUNS THE PROVISIONAL PROMISE LAYER, the nine corpus files are not installed, the cell is marked PROVISIONAL" : "STANDING GAP, the promise layer failed its self run, cell is NOT RUN UDU RULES MISSING")) : "TOOLS MISSING";
-  if (c === "QUAD") state = tools ? (quadFull ? "CAN RUN" : (layerOk ? "RUNS THE PROVISIONAL PROMISE LAYER, the Quad READ rules are not installed, the cell is marked PROVISIONAL" : "STANDING GAP, the promise layer failed its self run, cell is NOT RUN QUAD RULES MISSING")) : "TOOLS MISSING";
+  if (c === "QUAD") state = tools ? (quadRules && layerOk ? "CAN RUN the Rule of 10 on the full methodology, " + String(quadChk.stdout).trim().replace(/^OK /, "") + ", the guard needs the Quad evidence line of ENGINE_CONTRACT.md section 15" : quadFull ? "TOOLS MISSING, the full methodology is installed but quad_rules.js --check fails or the promise layer self run failed. " + String(quadChk.stdout).trim().split("\n")[0] : (layerOk ? "RUNS THE PROVISIONAL PROMISE LAYER, the Quad READ rules are not installed, the cell is marked PROVISIONAL" : "STANDING GAP, the promise layer failed its self run, cell is NOT RUN QUAD RULES MISSING")) : "TOOLS MISSING";
+  if (false) state = tools ? (quadFull ? "CAN RUN" : (layerOk ? "RUNS THE PROVISIONAL PROMISE LAYER, the Quad READ rules are not installed, the cell is marked PROVISIONAL" : "STANDING GAP, the promise layer failed its self run, cell is NOT RUN QUAD RULES MISSING")) : "TOOLS MISSING";
   console.log(names[c].padEnd(11) + state);
 });
 console.log("");
-console.log("Expected guard result for a complete reply with the provisional promise layers, exit code 0 with a NOTE naming UDU and QUAD. Exit code 3 only if a cell falls back to NOT RUN.");
+console.log("Expected guard result for a complete reply with Udu on its corpus and Quad on its full methodology, exit code 0. Exit code 3 only if a cell falls back to NOT RUN.");
 process.exit(hard ? 1 : 0);

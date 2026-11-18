@@ -130,7 +130,17 @@ function check(text, opts) {
         if (c === "BNN" && !BNN_ID.test(ev)) err(q + " BNN EVIDENCE line must cite at least one Rule ID from the BNN rule base, for example RAO-FND-009.");
         else if (c === "BNN" && !BNN_GRADE.test(ev)) err(q + " BNN EVIDENCE line must carry the BNN grade, one of CONFIRMED, INDICATED, POSSIBLE, OPEN, DENIED.");
         if (c === "UDU" && !UDU_ID.test(ev)) err(q + " UDU EVIDENCE line must cite at least one Udu Rule ID such as ASH-1467 or RBS-1-0943.");
-        if (c === "QUAD" && !QUAD_WORD.test(ev)) err(q + " QUAD EVIDENCE line must use the confidence words COMPUTED, CLASSICAL, UNSTABLE or VACUOUS.");
+        if (c === "QUAD") {
+          if (!QUAD_WORD.test(ev)) err(q + " QUAD EVIDENCE line must use the confidence words COMPUTED, CLASSICAL, UNSTABLE or VACUOUS.");
+          if (/\bPROVISIONAL\b/.test(ev)) err(q + " QUAD EVIDENCE line says PROVISIONAL but the Quad full methodology is installed. Run the Rule of 10 of quad_engine.js through promise_layer.js.");
+          if (!/Rule of 10/.test(ev)) err(q + " QUAD EVIDENCE line must name the Rule of 10 leader, section 14.3 S12.");
+          if (!/second place/i.test(ev)) err(q + " QUAD EVIDENCE line must print the second place, section 14.1 S8.");
+          if (!/prior 1 of \d+/.test(ev)) err(q + " QUAD EVIDENCE line must print the blind prior as prior 1 of k, section 14.1 S1.");
+          if (!/\bQR-[A-Z]+-\d\d\b/.test(ev) && !/READ none/.test(ev)) err(q + " QUAD EVIDENCE line must cite a Quad rule id such as QR-MAR-01 or say READ none, section 15.1 rule 4.");
+          if (!/HAND ARITHMETIC/.test(ev)) err(q + " QUAD EVIDENCE line must say what is HAND ARITHMETIC, the layer scores and the pratyantar and transit are not printed by the Quad report, section 13.3.");
+          if (!/no validated hit rate/i.test(ev)) err(q + " QUAD EVIDENCE line must say no validated hit rate, section 11.2.");
+          if (/\b(accurate|accuracy of|proven|validated accuracy|higher accuracy)\b/i.test(ev.replace(/no validated hit rate/ig, ""))) err(q + " QUAD EVIDENCE line claims accuracy. Section 11.2 and 15.3 forbid it, the Rule of 10 is a process and not a measure.");
+        }
       }
       const o = options[q];
       if (Array.isArray(o)) {

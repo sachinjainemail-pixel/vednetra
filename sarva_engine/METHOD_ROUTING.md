@@ -115,10 +115,13 @@ and said so.
 
 ## 7. Quad Dasha (code QUAD)
 
-Promise layer, the same promise_layer.js run as for Udu, ENGINE_CONTRACT.md section 13. The compute layer below still runs inside it, with the stability gate. The READ rules path applies again when the full methodology file is installed.
-
-Method. sarva_engine/knowledge/quad/QUAD_PROCEDURE.md and QUAD-REPORT-CONTRACT.md. Rules. Sections 3 to 19 of the Quad methodology
-file, not yet supplied, see knowledge/quad/README.md, so the cell is NOT RUN QUAD RULES MISSING.
+Run once for the whole chart, together with Udu, node sarva_engine/tools/promise_layer.js with every question. The Quad part is sarva_engine/tools/quad_engine.js, ENGINE_CONTRACT.md section 15. Verify the rule table with node sarva_engine/tools/quad_rules.js --check.
+The full methodology, 86 pages, is installed in knowledge/quad/QUAD-FULL-METHODOLOGY.pdf and .txt, the English map is QUAD-RULES-MAP.md. The older QUAD_PROCEDURE.md and QUAD-REPORT-CONTRACT.md stay in force where the full file does not differ, section 15 point 8 lists where it does.
+Per question the run prints, in this order, PRIORS with the blind 1 of k and the population estimate, the LAYERS of every option written before the chart, the SCORES of every layer, the READ board of the four systems for the event of the question, then the EVIDENCE line and the RESULT line. The cell is the Rule of 10 leader. For the NO RULE fields the cell is the population estimate.
+Before the run check the birth data as the file asks, section 3. The time zone of the era (India +5.5 after 1906, +6.5 from 1 September 1942 to 15 October 1945), a time that reads as both morning and afternoon, a place with the wrong state, coordinates given and not taken from the skill table, and a rounded birth time. Write the finding in the INTAKE line. A rounded time makes the pratyantar a possible month and not a boundary.
+When the question asks for a date, the section 12 window table is not built. Give the running periods, the board and the Rule of 10 of the event, and say so.
+In the reply write the Quad EVIDENCE line as printed, then the one or two sentence status once near the end, that the compute layer is verified and the reading layer is not, 51.8 percent against 45.3 percent without a chart, p 0.21. Never say the Rule of 10 raises accuracy.
+The provisional layer of ENGINE_CONTRACT.md section 13 is only a fallback when the rule table is absent.
 
 Chart and dashas. The vednetra-quad skill runner.
     node ~/.claude/skills/synced/*/vednetra-quad/scripts/run_quad_dasha.js --selftest

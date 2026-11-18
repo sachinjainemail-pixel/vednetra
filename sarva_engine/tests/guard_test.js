@@ -3,7 +3,7 @@ const assert = require("assert");
 const fs = require("fs");
 const { check, METHODS, NOT_RUN, sources } = require("../tools/sarva_guard");
 
-const EVID = { KCIL: " STABLE", KPPRO: " CHART DECIDED MEDIUM", BNN: " POSSIBLE RAO-FND-009", UDU: " ASH-1467", QUAD: " COMPUTED" };
+const EVID = { KCIL: " STABLE", KPPRO: " CHART DECIDED MEDIUM", BNN: " POSSIBLE RAO-FND-009", UDU: " ASH-1467", QUAD: " Rule of 10 leader B, second place C, prior 1 of 4, READ rules fired QR-MAR-01, HAND ARITHMETIC scores, no validated hit rate, COMPUTED" };
 const PROV = { UDU: " PROVISIONAL, no Udu corpus rules were used, rules SARVA-UDU-P-U1 to U6, weighted sums A 1.0, B 2.0", QUAD: " PROVISIONAL, Rule of 10 layers SARVA-QUAD-P-L1 to L10, satisfied A 2, B 3, COMPUTED" };
 const BASE = { KPPRO: "B", KCIL: "B", SUJ: "C", CHAWDHRI: "B", BNN: "A", UDU: "B", QUAD: "C" };
 fs.writeFileSync("/tmp/none.txt", "x");
@@ -52,6 +52,15 @@ assert.ok(run(draft().replace(" RAO-FND-009", "")).errors.some(e => /BNN.*Rule I
 assert.ok(run(draft().replace(" POSSIBLE", "")).errors.some(e => /BNN.*grade/.test(e)), "BNN needs a grade");
 assert.ok(run(draft().replace(" ASH-1467", "")).errors.some(e => /UDU.*Rule ID/.test(e)), "UDU needs a rule id");
 assert.ok(run(draft().replace(" COMPUTED", "")).errors.some(e => /QUAD.*confidence/.test(e)), "QUAD needs a confidence word");
+assert.ok(run(draft().replace("Rule of 10 leader B, ", "")).errors.some(e => /QUAD.*Rule of 10/.test(e)), "QUAD needs the Rule of 10 leader");
+assert.ok(run(draft().replace("second place C, ", "")).errors.some(e => /QUAD.*second place/.test(e)), "QUAD needs the second place");
+assert.ok(run(draft().replace("prior 1 of 4, ", "")).errors.some(e => /QUAD.*prior 1 of k/.test(e)), "QUAD needs the blind prior");
+assert.ok(run(draft().replace("READ rules fired QR-MAR-01, ", "")).errors.some(e => /QUAD.*rule id/.test(e)), "QUAD needs a Quad rule id or READ none");
+assert.ok(run(draft().replace("READ rules fired QR-MAR-01, ", "READ none, ")).errors.length === 0, "READ none is allowed");
+assert.ok(run(draft().replace("HAND ARITHMETIC scores, ", "")).errors.some(e => /QUAD.*HAND ARITHMETIC/.test(e)), "QUAD needs the hand arithmetic disclosure");
+assert.ok(run(draft().replace("no validated hit rate, ", "")).errors.some(e => /QUAD.*no validated hit rate/.test(e)), "QUAD must say no validated hit rate");
+assert.ok(run(draft().replace("COMPUTED", "COMPUTED, proven accuracy of the Rule of 10")).errors.some(e => /QUAD.*claims accuracy/.test(e)), "QUAD may not claim accuracy");
+assert.ok(run(draft().replace("COMPUTED", "COMPUTED PROVISIONAL")).errors.some(e => /QUAD.*PROVISIONAL but the Quad full methodology is installed/.test(e)), "a provisional Quad cell fails while the full methodology is installed");
 assert.ok(run(draft().replace(" CHART DECIDED", "")).errors.some(e => /KPPRO.*CHART DECIDED/.test(e)), "KPPRO needs a basis word");
 assert.ok(run(draft().replace(" STABLE", "")).errors.some(e => /KCIL.*STABLE/.test(e)), "KCIL needs a determinacy mark");
 assert.ok(run(draft().replace(" STABLE", " TWO CANDIDATES")).errors.length === 0, "KCIL two candidates mark is allowed");
@@ -77,7 +86,8 @@ assert.ok(run(draft({ prov: true }), ALL).errors.some(e => /UDU.*Rule ID/.test(e
 const cp = require("child_process"), path = require("path");
 const ex = cp.spawnSync("node", [path.join(__dirname, "..", "tools", "sarva_guard.js"), path.join(__dirname, "..", "examples", "format_example.txt"), "--no-suj-guard"], { encoding: "utf8", cwd: path.join(__dirname, "..", "..") });
 const udu = sources().UDU, quad = sources().QUAD;
-if (!quad) assert.strictEqual(ex.status, 0, "the format example passes with a corpus Udu cell and a provisional Quad cell while the Quad READ rules are absent");
+assert.strictEqual(ex.status, 0, "the format example passes with a corpus Udu cell and a Rule of 10 Quad cell, " + ex.stdout);
+assert.strictEqual(quad, true, "the guard sees the installed Quad full methodology");
 const ex2 = cp.spawnSync("node", [path.join(__dirname, "..", "tools", "sarva_guard.js"), path.join(__dirname, "..", "examples", "format_example_not_run.txt"), "--no-suj-guard"], { encoding: "utf8", cwd: path.join(__dirname, "..", "..") });
 if (!udu) assert.strictEqual(ex2.status, 3, "the not run fallback example is valid but incomplete while the Udu corpus is absent");
 if (udu) assert.strictEqual(ex2.status, 1, "a NOT RUN Udu cell is an error once the Udu corpus is installed");

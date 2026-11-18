@@ -1,0 +1,3 @@
+{"name":"FixtureB","gender":"male","date":"1991-12-01","time":"01:15:00","tz":5.5,"lat":28.9931,"lon":77.0151,"asOf":"2026-11-17","questions":[
+ {"id":"Q1","text":"present profession","options":["A Private job","B Government job","C Own business"]}
+]}

@@ -2,7 +2,7 @@ FORMAT EXAMPLE ONLY. This file shows the layout the guard accepts. It is not a r
 
 INTAKE
 Native Sample, male, born 1991-12-01 01:15:00 at Sonipat, latitude 28.9931, longitude 77.0151, time zone 5.5. As of date 2026-11-16.
-LIMITS Readings under each methodology, not certainties. Udu runs on its corpus. Quad Dasha comes from the provisional promise layer, its READ rules are not installed.
+LIMITS Readings under each methodology, not certainties. Udu runs on its corpus. Quad Dasha runs the Rule of 10 of its full methodology, no hit rate has been validated for it.
 
 QUESTION Q1
 OPTIONS Q1 A B C D
@@ -28,7 +28,7 @@ METHOD UDU Q1
 EVIDENCE Q1 UDU corpus rules AVA-2-2753 ASH-1075, counted sums A 0.00, B 3.50, C 1.20 by direct rules, band yes certain, pada level rules in the winner 0, nearly fired left out 30, no accuracy has been measured for Udu
 RESULT Q1 UDU B
 METHOD QUAD Q1
-EVIDENCE Q1 QUAD PROVISIONAL, no Quad READ rules were used, Rule of 10 layers SARVA-QUAD-P-L1 to L10, satisfied A 3, B 4, C 2, COMPUTED dasha facts, UNSTABLE L10, VACUOUS none, no validated hit rate
+EVIDENCE Q1 QUAD Rule of 10 on the full methodology, Rule of 10 leader B, layers satisfied A 3, B 6, C 4, D 5, points A 3.6, B 7.5, C 4.9, D 6.1, lead 1.4 points NARROW, second place D, prior 1 of 4, READ rules fired QR-MAR-01 QR-MAR-03, the board fires the field MAR, it names the field only, Rule of 10 and the board agree, COMPUTED dasha facts, CLASSICAL reading, UNSTABLE none, VACUOUS none, HAND ARITHMETIC scale SARVA-R10-SCALE-1 pratyantar transit and layer scores, no validated hit rate, 51.8 percent against 45.3 percent without a chart and p 0.21
 RESULT Q1 QUAD B
 
 | Question | KP Pro | KCIL | SUJ engine | CHAWDHRI | BNN | Udu | Quad Dasha |
