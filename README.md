@@ -143,3 +143,37 @@ confirmed event dates and scored against length-weighted local nulls, came out a
 (mean lift 0.960, smallest p 0.110). The **casting and period arithmetic are validated**;
 the **interpretation is classical and unvalidated**, and §13 of every report says so and
 carries the base rates. No report dates a death.
+
+
+## Ashtottari Dasha
+
+The **Ashtottari Dasha** report calculates the 108-year cycle, the birth balance,
+full mahadashas, and the mahadasha, antardasha and pratyantar at a chosen instant.
+It is also available as a chart report in the app and from the browser-free API:
+
+```bash
+node tools/ashtottari-selftest.js
+node tools/run-nobrowser.js '{"date":"1988-03-06","time":"07:42:00","tz":5.5,"lat":28.6139,"lon":77.209,"report":"ashtottari","enquiryISO":"2018-11-08T12:00:00Z"}'
+```
+
+`VedicCore.reportFor(spec, "ashtottari")` uses `spec.asOfISO` as an instant;
+omitting it uses the current time. Dates printed in the report are UTC; the
+first mahadasha may start before birth because its elapsed portion is retained
+when calculating antardashas. The report covers two complete cycles and fails
+clearly for dates before birth or beyond the computed range.
+
+The implemented convention starts at Ardra and assigns 28 stars in groups of
+4,3,4,3,4,3,4,3 to Sun, Moon, Mars, Mercury, Saturn, Jupiter, Rahu and Venus,
+with 6,15,8,17,10,19,12,21 years respectively. Abhijit spans 276°40′ to
+280°53′20″, taking the last quarter of Uttara Ashadha and the first fifteenth
+of Shravana. Each star in a lord's group contributes an equal share of that
+lord's period; the birth Moon's longitude gives the proportion elapsed within
+its star. Subperiods use parent length × lord years / 108 and begin with the
+parent lord. A year is fixed at 365.25 days. This is a stated convention, not a
+claim that other start, balance, Abhijit, year-length or applicability methods
+are equivalent. Consult [BPHS chapter 46](https://www.astrosumitbajaj.com/wp-content/uploads/2020/04/Brihat-Parasara-Hora-Shastra.pdf)
+and [Ashtottari calculation notes](https://www.livepanditji.com/blog/ashtottari-dasha-nakshatra-table/).
+
+This report does not adjudicate conditional applicability and does not predict
+events. It has arithmetic and integration tests but has not been independently
+validated against an authoritative worked birth chart or another calculator.
