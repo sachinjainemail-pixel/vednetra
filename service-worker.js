@@ -1,10 +1,11 @@
-const CACHE_NAME = "vednetra-v130";
+const CACHE_NAME = "vednetra-v131";
 const APP_ASSETS = [
   "./",
   "index.html",
   "styles.css",
   "app.js",
   "quad-dasha.js",
+  "ashtottari-dasha.js",
   "trinetra-rules.js",
   "manifest.webmanifest",
   "icon.svg",
