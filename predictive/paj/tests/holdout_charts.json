@@ -1,0 +1,125 @@
+{
+  "note": "Holdout set, kept separate from verified_charts.json. AA rated birth times from Astrotheme. Event dates from Wikipedia, with IMDb and press sources where Wikipedia gave no year. Windows are whole calendar years, widened by one year around ceremony dates. Negative windows are years with no recorded event of that type. Time zone offsets were computed from the IANA zone rules for each birth date, so wartime and local DST rules are applied. Profession is null where no option in the six option list fits (Madonna is a musician). Left out for lack of a sourced year: Serena Williams marriage, Denzel Washington children, Clint Eastwood children, Madonna first Grammy.",
+  "options": ["sports and athletics", "acting film and OTT", "politics and government", "writing journalism and media", "banking finance and business", "medicine and healthcare"],
+  "charts": [
+    {"name": "Denzel Washington", "gender": "male", "date": "1954-12-28", "time": "00:09", "tz": -5, "lat": 40.9126, "lon": -73.8371,
+     "careerStart": "1977-01-01", "profession": "acting film and OTT",
+     "events": [
+       {"event": "marriage", "from": "1982-01-01", "to": "1984-12-31", "truth": true, "note": "married Pauletta Pearson 25 June 1983"},
+       {"event": "marriage", "from": "1965-01-01", "to": "1967-12-31", "truth": false, "note": "childhood"},
+       {"event": "career milestone", "from": "1976-01-01", "to": "1978-12-31", "truth": true, "note": "first screen role Wilma 1977"},
+       {"event": "career milestone", "from": "1960-01-01", "to": "1962-12-31", "truth": false, "note": "childhood"},
+       {"event": "career milestone", "from": "2001-01-01", "to": "2002-12-31", "truth": true, "note": "Academy Award Best Actor for Training Day, ceremony 2002"}]},
+
+    {"name": "Harrison Ford", "gender": "male", "date": "1942-07-13", "time": "11:41", "tz": -5, "lat": 41.8781, "lon": -87.6298,
+     "careerStart": "1966-01-01", "profession": "acting film and OTT",
+     "events": [
+       {"event": "marriage", "from": "1982-01-01", "to": "1984-12-31", "truth": true, "note": "married Melissa Mathison 1983"},
+       {"event": "marriage", "from": "2009-01-01", "to": "2011-12-31", "truth": true, "note": "married Calista Flockhart 2010"},
+       {"event": "marriage", "from": "1975-01-01", "to": "1977-12-31", "truth": false, "note": "no marriage recorded"},
+       {"event": "children", "from": "1986-01-01", "to": "1988-12-31", "truth": true, "note": "son with Melissa Mathison 1987"},
+       {"event": "children", "from": "1975-01-01", "to": "1977-12-31", "truth": false, "note": "no child born"},
+       {"event": "career milestone", "from": "1965-01-01", "to": "1967-12-31", "truth": true, "note": "first film role 1966 uncredited"},
+       {"event": "career milestone", "from": "1950-01-01", "to": "1952-12-31", "truth": false, "note": "childhood"}]},
+
+    {"name": "Michael Jordan", "gender": "male", "date": "1963-02-17", "time": "13:40", "tz": -5, "lat": 40.6782, "lon": -73.9442,
+     "careerStart": "1984-01-01", "profession": "sports and athletics",
+     "events": [
+       {"event": "career milestone", "from": "1983-01-01", "to": "1985-12-31", "truth": true, "note": "NBA debut 1984"},
+       {"event": "career milestone", "from": "1968-01-01", "to": "1970-12-31", "truth": false, "note": "childhood"},
+       {"event": "career milestone", "from": "1990-01-01", "to": "1992-12-31", "truth": true, "note": "first NBA championship 1991"},
+       {"event": "marriage", "from": "1988-01-01", "to": "1990-12-31", "truth": true, "note": "married Juanita Vanoy 2 Sept 1989"},
+       {"event": "marriage", "from": "1975-01-01", "to": "1977-12-31", "truth": false, "note": "childhood"},
+       {"event": "children", "from": "1987-01-01", "to": "1989-12-31", "truth": true, "note": "son Jeffrey born 18 Nov 1988"},
+       {"event": "children", "from": "1975-01-01", "to": "1977-12-31", "truth": false, "note": "no child born"}]},
+
+    {"name": "Madonna", "gender": "female", "date": "1958-08-16", "time": "07:05", "tz": -5, "lat": 43.5945, "lon": -83.8889,
+     "careerStart": "1983-01-01", "profession": null,
+     "events": [
+       {"event": "career milestone", "from": "1982-01-01", "to": "1984-12-31", "truth": true, "note": "debut album Madonna 1983"},
+       {"event": "career milestone", "from": "1966-01-01", "to": "1968-12-31", "truth": false, "note": "childhood"},
+       {"event": "marriage", "from": "1984-01-01", "to": "1986-12-31", "truth": true, "note": "married Sean Penn 1985"},
+       {"event": "marriage", "from": "1975-01-01", "to": "1977-12-31", "truth": false, "note": "childhood"},
+       {"event": "marriage", "from": "1999-01-01", "to": "2001-12-31", "truth": true, "note": "married Guy Ritchie 2000"},
+       {"event": "children", "from": "1999-01-01", "to": "2001-12-31", "truth": true, "note": "son Rocco born 2000"},
+       {"event": "children", "from": "1975-01-01", "to": "1977-12-31", "truth": false, "note": "no child born"}]},
+
+    {"name": "Meryl Streep", "gender": "female", "date": "1949-06-22", "time": "08:05", "tz": -4, "lat": 40.7159, "lon": -74.3643,
+     "careerStart": "1977-01-01", "profession": "acting film and OTT",
+     "events": [
+       {"event": "career milestone", "from": "1976-01-01", "to": "1978-12-31", "truth": true, "note": "first film role Julia 1977"},
+       {"event": "career milestone", "from": "1960-01-01", "to": "1962-12-31", "truth": false, "note": "childhood"},
+       {"event": "career milestone", "from": "1978-01-01", "to": "1980-12-31", "truth": true, "note": "Academy Award for Kramer vs Kramer, ceremony 1980"},
+       {"event": "career milestone", "from": "1968-01-01", "to": "1970-12-31", "truth": false, "note": "no award recorded"},
+       {"event": "marriage", "from": "1977-01-01", "to": "1979-12-31", "truth": true, "note": "married Don Gummer 1978"},
+       {"event": "marriage", "from": "1965-01-01", "to": "1967-12-31", "truth": false, "note": "childhood"}]},
+
+    {"name": "Matt Damon", "gender": "male", "date": "1970-10-08", "time": "15:22", "tz": -4, "lat": 42.3601, "lon": -71.0589,
+     "careerStart": "1988-01-01", "profession": "acting film and OTT",
+     "events": [
+       {"event": "career milestone", "from": "1987-01-01", "to": "1989-12-31", "truth": true, "note": "first film role Mystic Pizza 1988"},
+       {"event": "career milestone", "from": "1975-01-01", "to": "1977-12-31", "truth": false, "note": "childhood"},
+       {"event": "career milestone", "from": "1997-01-01", "to": "1999-12-31", "truth": true, "note": "Academy Award for Good Will Hunting 1998"},
+       {"event": "career milestone", "from": "1985-01-01", "to": "1987-12-31", "truth": false, "note": "childhood"},
+       {"event": "marriage", "from": "2004-01-01", "to": "2006-12-31", "truth": true, "note": "married Luciana Barroso 2005"},
+       {"event": "marriage", "from": "1985-01-01", "to": "1987-12-31", "truth": false, "note": "childhood"},
+       {"event": "children", "from": "2005-01-01", "to": "2007-12-31", "truth": true, "note": "daughter Isabella born 2006"},
+       {"event": "children", "from": "1985-01-01", "to": "1987-12-31", "truth": false, "note": "childhood"}]},
+
+    {"name": "Serena Williams", "gender": "female", "date": "1981-09-26", "time": "20:28", "tz": -4, "lat": 43.4195, "lon": -83.9508,
+     "careerStart": "1998-01-01", "profession": "sports and athletics",
+     "events": [
+       {"event": "career milestone", "from": "1998-01-01", "to": "2000-12-31", "truth": true, "note": "first Grand Slam singles title US Open 1999"},
+       {"event": "career milestone", "from": "1985-01-01", "to": "1987-12-31", "truth": false, "note": "childhood"},
+       {"event": "children", "from": "2016-01-01", "to": "2018-12-31", "truth": true, "note": "daughter Olympia born 1 Sept 2017"},
+       {"event": "children", "from": "1995-01-01", "to": "1997-12-31", "truth": false, "note": "no child born"}]},
+
+    {"name": "Tiger Woods", "gender": "male", "date": "1975-12-30", "time": "22:50", "tz": -8, "lat": 33.7701, "lon": -118.1937,
+     "careerStart": "1996-01-01", "profession": "sports and athletics",
+     "events": [
+       {"event": "career milestone", "from": "1995-01-01", "to": "1997-12-31", "truth": true, "note": "first PGA Tour win 1996"},
+       {"event": "career milestone", "from": "1980-01-01", "to": "1982-12-31", "truth": false, "note": "childhood"},
+       {"event": "career milestone", "from": "1996-01-01", "to": "1998-12-31", "truth": true, "note": "first Masters win 1997"},
+       {"event": "marriage", "from": "2003-01-01", "to": "2005-12-31", "truth": true, "note": "married Elin Nordegren 2004"},
+       {"event": "marriage", "from": "1985-01-01", "to": "1987-12-31", "truth": false, "note": "childhood"},
+       {"event": "children", "from": "2006-01-01", "to": "2008-12-31", "truth": true, "note": "daughter Sam Alexis born 2007"},
+       {"event": "children", "from": "2008-01-01", "to": "2010-12-31", "truth": true, "note": "son Charlie Axel born 2009"},
+       {"event": "children", "from": "1985-01-01", "to": "1987-12-31", "truth": false, "note": "childhood"}]},
+
+    {"name": "Clint Eastwood", "gender": "male", "date": "1930-05-31", "time": "17:35", "tz": -8, "lat": 37.7749, "lon": -122.4194,
+     "careerStart": "1955-01-01", "profession": "acting film and OTT",
+     "events": [
+       {"event": "career milestone", "from": "1954-01-01", "to": "1956-12-31", "truth": true, "note": "first film role 1955"},
+       {"event": "career milestone", "from": "1940-01-01", "to": "1942-12-31", "truth": false, "note": "childhood"},
+       {"event": "career milestone", "from": "1992-01-01", "to": "1994-12-31", "truth": true, "note": "Academy Awards for Unforgiven, ceremony 1993"},
+       {"event": "career milestone", "from": "1975-01-01", "to": "1977-12-31", "truth": false, "note": "no award recorded"},
+       {"event": "marriage", "from": "1952-01-01", "to": "1954-12-31", "truth": true, "note": "married Maggie Johnson 1953"},
+       {"event": "marriage", "from": "1965-01-01", "to": "1967-12-31", "truth": false, "note": "no marriage recorded"}]},
+
+    {"name": "George Clooney", "gender": "male", "date": "1961-05-06", "time": "02:58", "tz": -5, "lat": 38.0406, "lon": -84.5037,
+     "careerStart": "1988-01-01", "profession": "acting film and OTT",
+     "events": [
+       {"event": "career milestone", "from": "1987-01-01", "to": "1989-12-31", "truth": true, "note": "first film role Return of the Killer Tomatoes 1988"},
+       {"event": "career milestone", "from": "1970-01-01", "to": "1972-12-31", "truth": false, "note": "childhood"},
+       {"event": "career milestone", "from": "2005-01-01", "to": "2007-12-31", "truth": true, "note": "Academy Award for Syriana, ceremony 2006"},
+       {"event": "career milestone", "from": "1985-01-01", "to": "1987-12-31", "truth": false, "note": "no award recorded"},
+       {"event": "marriage", "from": "1988-01-01", "to": "1990-12-31", "truth": true, "note": "married Talia Balsam 1989"},
+       {"event": "marriage", "from": "1970-01-01", "to": "1972-12-31", "truth": false, "note": "childhood"},
+       {"event": "marriage", "from": "2013-01-01", "to": "2015-12-31", "truth": true, "note": "married Amal Alamuddin 2014"},
+       {"event": "marriage", "from": "1975-01-01", "to": "1977-12-31", "truth": false, "note": "childhood"},
+       {"event": "children", "from": "2016-01-01", "to": "2018-12-31", "truth": true, "note": "twins born 2017"},
+       {"event": "children", "from": "1985-01-01", "to": "1987-12-31", "truth": false, "note": "no child born"}]},
+
+    {"name": "Hillary Clinton", "gender": "female", "date": "1947-10-26", "time": "18:45", "tz": -6, "lat": 41.8781, "lon": -87.6298,
+     "careerStart": "1993-01-01", "profession": "politics and government",
+     "events": [
+       {"event": "marriage", "from": "1974-01-01", "to": "1976-12-31", "truth": true, "note": "married Bill Clinton 1975"},
+       {"event": "marriage", "from": "1960-01-01", "to": "1962-12-31", "truth": false, "note": "childhood"},
+       {"event": "children", "from": "1979-01-01", "to": "1981-12-31", "truth": true, "note": "daughter Chelsea born 1980"},
+       {"event": "children", "from": "1965-01-01", "to": "1967-12-31", "truth": false, "note": "childhood"},
+       {"event": "career milestone", "from": "1999-01-01", "to": "2001-12-31", "truth": true, "note": "first elected to US Senate 2000"},
+       {"event": "career milestone", "from": "1985-01-01", "to": "1987-12-31", "truth": false, "note": "no office held"},
+       {"event": "career milestone", "from": "2008-01-01", "to": "2010-12-31", "truth": true, "note": "appointed Secretary of State 2009"},
+       {"event": "career milestone", "from": "1965-01-01", "to": "1967-12-31", "truth": false, "note": "childhood"}]}
+  ]
+}
