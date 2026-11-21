@@ -1,0 +1,586 @@
+{
+  "professions": {
+    "sports and athletics": {
+      "hi": "खेल और एथलेटिक्स",
+      "planets": [
+        "Ma",
+        "Su"
+      ],
+      "houses": [
+        3,
+        6,
+        10
+      ]
+    },
+    "acting film and OTT": {
+      "hi": "अभिनय, फ़िल्म और OTT",
+      "planets": [
+        "Ve",
+        "Mo",
+        "Ra"
+      ],
+      "houses": [
+        5,
+        10
+      ]
+    },
+    "politics and government": {
+      "hi": "राजनीति और सरकारी सेवा",
+      "planets": [
+        "Su",
+        "Sa"
+      ],
+      "houses": [
+        9,
+        10,
+        11
+      ]
+    },
+    "writing journalism and media": {
+      "hi": "लेखन, पत्रकारिता और मीडिया",
+      "planets": [
+        "Me",
+        "Ju"
+      ],
+      "houses": [
+        3,
+        10
+      ]
+    },
+    "banking finance and business": {
+      "hi": "बैंकिंग, वित्त और व्यापार",
+      "planets": [
+        "Me",
+        "Ju",
+        "Ve"
+      ],
+      "houses": [
+        2,
+        10,
+        11
+      ]
+    },
+    "medicine and healthcare": {
+      "hi": "चिकित्सा और स्वास्थ्य सेवा",
+      "planets": [
+        "Ju",
+        "Mo",
+        "Su"
+      ],
+      "houses": [
+        6,
+        10
+      ]
+    },
+    "software IT and AI": {
+      "hi": "सॉफ़्टवेयर, IT और AI",
+      "planets": [
+        "Me",
+        "Ra"
+      ],
+      "houses": [
+        6,
+        10
+      ]
+    },
+    "engineering and construction": {
+      "hi": "इंजीनियरिंग और निर्माण",
+      "planets": [
+        "Ma",
+        "Sa"
+      ],
+      "houses": [
+        6,
+        10
+      ]
+    },
+    "law and judiciary": {
+      "hi": "कानून और न्यायपालिका",
+      "planets": [
+        "Ju",
+        "Sa"
+      ],
+      "houses": [
+        9,
+        10
+      ]
+    },
+    "teaching and edtech": {
+      "hi": "शिक्षण और एडटेक",
+      "planets": [
+        "Ju",
+        "Me"
+      ],
+      "houses": [
+        5,
+        9,
+        10
+      ]
+    },
+    "military and police": {
+      "hi": "सेना और पुलिस",
+      "planets": [
+        "Ma",
+        "Su"
+      ],
+      "houses": [
+        6,
+        10
+      ]
+    },
+    "aviation and tourism": {
+      "hi": "विमानन और पर्यटन",
+      "planets": [
+        "Ra",
+        "Mo",
+        "Ve"
+      ],
+      "houses": [
+        3,
+        9,
+        10
+      ]
+    },
+    "fashion design and arts": {
+      "hi": "फ़ैशन, डिज़ाइन और कला",
+      "planets": [
+        "Ve",
+        "Mo"
+      ],
+      "houses": [
+        5,
+        10
+      ]
+    },
+    "spiritual and astrology": {
+      "hi": "आध्यात्म और ज्योतिष",
+      "planets": [
+        "Ju",
+        "Ke"
+      ],
+      "houses": [
+        9,
+        10
+      ]
+    },
+    "stock trading and crypto": {
+      "hi": "शेयर ट्रेडिंग और क्रिप्टो",
+      "planets": [
+        "Ra",
+        "Me",
+        "Ju"
+      ],
+      "houses": [
+        8,
+        11
+      ]
+    },
+    "real estate": {
+      "hi": "रियल एस्टेट",
+      "planets": [
+        "Ma",
+        "Ve",
+        "Sa"
+      ],
+      "houses": [
+        4,
+        10
+      ]
+    },
+    "pharma and biotech research": {
+      "hi": "फ़ार्मा और बायोटेक रिसर्च",
+      "planets": [
+        "Me",
+        "Ke",
+        "Ju"
+      ],
+      "houses": [
+        6,
+        10
+      ]
+    }
+  },
+  "courses": {
+    "computer science and AI": {
+      "hi": "कंप्यूटर साइंस और AI",
+      "planets": [
+        "Me",
+        "Ra"
+      ],
+      "houses": [
+        5,
+        9
+      ]
+    },
+    "mechanical or civil engineering": {
+      "hi": "मैकेनिकल या सिविल इंजीनियरिंग",
+      "planets": [
+        "Ma",
+        "Sa"
+      ],
+      "houses": [
+        5,
+        9
+      ]
+    },
+    "MBBS and medicine": {
+      "hi": "MBBS और चिकित्सा",
+      "planets": [
+        "Ju",
+        "Mo",
+        "Su"
+      ],
+      "houses": [
+        5,
+        6,
+        9
+      ]
+    },
+    "nursing and paramedical": {
+      "hi": "नर्सिंग और पैरामेडिकल",
+      "planets": [
+        "Mo",
+        "Ve"
+      ],
+      "houses": [
+        5,
+        6
+      ]
+    },
+    "BBA MBA and management": {
+      "hi": "BBA, MBA और मैनेजमेंट",
+      "planets": [
+        "Me",
+        "Ve",
+        "Ju"
+      ],
+      "houses": [
+        2,
+        5,
+        11
+      ]
+    },
+    "CA accounts and finance": {
+      "hi": "CA, अकाउंट्स और फ़ाइनेंस",
+      "planets": [
+        "Me",
+        "Sa"
+      ],
+      "houses": [
+        2,
+        11
+      ]
+    },
+    "law LLB": {
+      "hi": "LLB और कानून",
+      "planets": [
+        "Ju",
+        "Sa"
+      ],
+      "houses": [
+        5,
+        9
+      ]
+    },
+    "journalism and mass communication": {
+      "hi": "पत्रकारिता और मास कम्युनिकेशन",
+      "planets": [
+        "Me",
+        "Mo"
+      ],
+      "houses": [
+        3,
+        5
+      ]
+    },
+    "design fashion and arts": {
+      "hi": "डिज़ाइन, फ़ैशन और आर्ट्स",
+      "planets": [
+        "Ve",
+        "Mo"
+      ],
+      "houses": [
+        5
+      ]
+    },
+    "psychology and counselling": {
+      "hi": "मनोविज्ञान और काउंसलिंग",
+      "planets": [
+        "Mo",
+        "Me",
+        "Ju"
+      ],
+      "houses": [
+        4,
+        5
+      ]
+    },
+    "data science and statistics": {
+      "hi": "डेटा साइंस और स्टैटिस्टिक्स",
+      "planets": [
+        "Me",
+        "Ra",
+        "Sa"
+      ],
+      "houses": [
+        5,
+        11
+      ]
+    },
+    "aviation pilot training": {
+      "hi": "एविएशन और पायलट ट्रेनिंग",
+      "planets": [
+        "Ra",
+        "Ma"
+      ],
+      "houses": [
+        3,
+        9
+      ]
+    },
+    "pharmacy and biotechnology": {
+      "hi": "फ़ार्मेसी और बायोटेक्नोलॉजी",
+      "planets": [
+        "Me",
+        "Ke",
+        "Ju"
+      ],
+      "houses": [
+        5,
+        6
+      ]
+    },
+    "agriculture": {
+      "hi": "कृषि विज्ञान",
+      "planets": [
+        "Mo",
+        "Ju"
+      ],
+      "houses": [
+        4,
+        9
+      ]
+    }
+  },
+  "diseases": {
+    "heart and cardiac disease": {
+      "hi": "हृदय रोग",
+      "planets": [
+        "Su",
+        "Ma"
+      ],
+      "houses": [
+        6,
+        8
+      ]
+    },
+    "diabetes mellitus": {
+      "hi": "डायबिटीज़ यानी मधुमेह",
+      "planets": [
+        "Ju",
+        "Ve"
+      ],
+      "houses": [
+        6
+      ]
+    },
+    "thyroid disorder": {
+      "hi": "थायरॉइड विकार",
+      "planets": [
+        "Su",
+        "Ju"
+      ],
+      "houses": [
+        6
+      ]
+    },
+    "asthma and respiratory allergy": {
+      "hi": "अस्थमा और श्वसन एलर्जी",
+      "planets": [
+        "Me",
+        "Mo"
+      ],
+      "houses": [
+        6
+      ]
+    },
+    "depression and anxiety": {
+      "hi": "डिप्रेशन और एंग्ज़ायटी",
+      "planets": [
+        "Mo",
+        "Sa",
+        "Me"
+      ],
+      "houses": [
+        6,
+        12
+      ]
+    },
+    "arthritis and joint disorders": {
+      "hi": "गठिया और जोड़ों की बीमारी",
+      "planets": [
+        "Sa"
+      ],
+      "houses": [
+        6,
+        8
+      ]
+    },
+    "kidney and urinary disorders": {
+      "hi": "किडनी और मूत्र रोग",
+      "planets": [
+        "Ve",
+        "Sa"
+      ],
+      "houses": [
+        6
+      ]
+    },
+    "liver disorder": {
+      "hi": "लिवर रोग",
+      "planets": [
+        "Ju"
+      ],
+      "houses": [
+        6
+      ]
+    },
+    "skin disorder": {
+      "hi": "त्वचा रोग",
+      "planets": [
+        "Me",
+        "Ve"
+      ],
+      "houses": [
+        6
+      ]
+    },
+    "viral infection and fever": {
+      "hi": "वायरल संक्रमण और बुखार",
+      "planets": [
+        "Ra",
+        "Ke"
+      ],
+      "houses": [
+        6
+      ]
+    },
+    "surgery or injury": {
+      "hi": "सर्जरी या चोट",
+      "planets": [
+        "Ma",
+        "Ke"
+      ],
+      "houses": [
+        6,
+        8
+      ]
+    },
+    "stroke and neurological disorder": {
+      "hi": "स्ट्रोक और न्यूरोलॉजिकल रोग",
+      "planets": [
+        "Ra",
+        "Sa"
+      ],
+      "houses": [
+        6,
+        8
+      ]
+    },
+    "hormonal and fertility disorder": {
+      "hi": "हार्मोनल और प्रजनन संबंधी समस्या",
+      "planets": [
+        "Mo",
+        "Ve"
+      ],
+      "houses": [
+        5,
+        6,
+        8
+      ]
+    }
+  },
+  "events": {
+    "marriage": {
+      "hi": "विवाह",
+      "houses": [
+        7
+      ],
+      "karaka_male": "Ve",
+      "karaka_female": "Ju",
+      "jaimini": "DK"
+    },
+    "children": {
+      "hi": "संतान",
+      "houses": [
+        5
+      ],
+      "karaka_male": "Ju",
+      "karaka_female": "Ju",
+      "jaimini": "PK"
+    },
+    "career milestone": {
+      "hi": "करियर में बड़ी उपलब्धि",
+      "houses": [
+        10
+      ],
+      "karaka_male": "Su",
+      "karaka_female": "Su",
+      "jaimini": "AmK"
+    },
+    "foreign travel or settlement": {
+      "hi": "विदेश यात्रा या विदेश में बसना",
+      "houses": [
+        9,
+        12
+      ],
+      "karaka_male": "Ra",
+      "karaka_female": "Ra",
+      "jaimini": "AK"
+    },
+    "property purchase": {
+      "hi": "संपत्ति की खरीद",
+      "houses": [
+        4
+      ],
+      "karaka_male": "Ma",
+      "karaka_female": "Ve",
+      "jaimini": "AK"
+    },
+    "wealth gain": {
+      "hi": "धन लाभ",
+      "houses": [
+        2,
+        11
+      ],
+      "karaka_male": "Ju",
+      "karaka_female": "Ju",
+      "jaimini": "AK"
+    }
+  },
+  "planetHi": {
+    "Su": "सूर्य",
+    "Mo": "चंद्र",
+    "Ma": "मंगल",
+    "Me": "बुध",
+    "Ju": "गुरु",
+    "Ve": "शुक्र",
+    "Sa": "शनि",
+    "Ra": "राहु",
+    "Ke": "केतु"
+  },
+  "signHi": [
+    "मेष",
+    "वृषभ",
+    "मिथुन",
+    "कर्क",
+    "सिंह",
+    "कन्या",
+    "तुला",
+    "वृश्चिक",
+    "धनु",
+    "मकर",
+    "कुंभ",
+    "मीन"
+  ]
+}
