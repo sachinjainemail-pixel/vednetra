@@ -1,0 +1,61 @@
+{
+  "note": "AA rated birth times from Astrotheme (birth certificate or record). Event dates from Wikipedia. Event windows are whole calendar years. Negative windows are years with no recorded event of that type.",
+  "options": ["sports and athletics", "acting film and OTT", "politics and government", "writing journalism and media", "banking finance and business", "medicine and healthcare"],
+  "charts": [
+    {"name": "Rami Malek", "gender": "male", "date": "1981-05-12", "time": "08:41", "tz": -7, "lat": 33.8358, "lon": -118.3406,
+     "careerStart": "2004-01-01", "profession": "acting film and OTT",
+     "events": [
+       {"event": "career milestone", "from": "2018-01-01", "to": "2020-12-31", "truth": true, "note": "Academy Award Best Actor 24 Feb 2019"},
+       {"event": "career milestone", "from": "1985-01-01", "to": "1987-12-31", "truth": false, "note": "childhood"}]},
+    {"name": "Dale Davis", "gender": "male", "date": "1969-03-25", "time": "15:52", "tz": -5, "lat": 34.5776, "lon": -83.3349,
+     "careerStart": "1991-01-01", "profession": "sports and athletics",
+     "events": [
+       {"event": "career milestone", "from": "1990-01-01", "to": "1992-12-31", "truth": true, "note": "professional career began 1991"},
+       {"event": "career milestone", "from": "1972-01-01", "to": "1974-12-31", "truth": false, "note": "childhood"}]},
+    {"name": "David Chokachi", "gender": "male", "date": "1968-01-16", "time": "13:03", "tz": -5, "lat": 41.9584, "lon": -70.6673,
+     "careerStart": "1995-01-01", "profession": "acting film and OTT",
+     "events": [
+       {"event": "marriage", "from": "2003-01-01", "to": "2005-12-31", "truth": true, "note": "married 2004"},
+       {"event": "marriage", "from": "1985-01-01", "to": "1987-12-31", "truth": false, "note": "no marriage recorded"}]},
+    {"name": "Leonardo DiCaprio", "gender": "male", "date": "1974-11-11", "time": "02:47", "tz": -8, "lat": 34.0522, "lon": -118.2437,
+     "careerStart": "1989-01-01", "profession": "acting film and OTT",
+     "events": [
+       {"event": "career milestone", "from": "2015-01-01", "to": "2017-12-31", "truth": true, "note": "Academy Award Best Actor for The Revenant, 88th ceremony 2016"},
+       {"event": "career milestone", "from": "1982-01-01", "to": "1984-12-31", "truth": false, "note": "childhood"}]},
+    {"name": "Barack Obama", "gender": "male", "date": "1961-08-04", "time": "19:24", "tz": -10, "lat": 21.3069, "lon": -157.8583,
+     "careerStart": "2004-01-01", "profession": "politics and government",
+     "events": [
+       {"event": "marriage", "from": "1991-01-01", "to": "1993-12-31", "truth": true, "note": "married 3 Oct 1992"},
+       {"event": "marriage", "from": "1975-01-01", "to": "1977-12-31", "truth": false, "note": "childhood"},
+       {"event": "children", "from": "1997-01-01", "to": "1999-12-31", "truth": true, "note": "first daughter born 1998"},
+       {"event": "children", "from": "1978-01-01", "to": "1980-12-31", "truth": false, "note": "no children"}]},
+    {"name": "Tom Hanks", "gender": "male", "date": "1956-07-09", "time": "11:17", "tz": -7, "lat": 37.9780, "lon": -122.0311,
+     "careerStart": "1980-01-01", "profession": "acting film and OTT",
+     "events": [
+       {"event": "marriage", "from": "1987-01-01", "to": "1989-12-31", "truth": true, "note": "married Rita Wilson 1988"},
+       {"event": "marriage", "from": "1972-01-01", "to": "1974-12-31", "truth": false, "note": "childhood"},
+       {"event": "career milestone", "from": "1993-01-01", "to": "1995-12-31", "truth": true, "note": "Academy Awards for Philadelphia and Forrest Gump"},
+       {"event": "career milestone", "from": "1972-01-01", "to": "1974-12-31", "truth": false, "note": "childhood"}]},
+    {"name": "Julia Roberts", "gender": "female", "date": "1967-10-28", "time": "00:16", "tz": -4, "lat": 33.7490, "lon": -84.3880,
+     "careerStart": "1987-01-01", "profession": "acting film and OTT",
+     "events": [
+       {"event": "marriage", "from": "2001-01-01", "to": "2003-12-31", "truth": true, "note": "married Danny Moder 4 Jul 2002"},
+       {"event": "marriage", "from": "1985-01-01", "to": "1987-12-31", "truth": false, "note": "no marriage recorded"},
+       {"event": "career milestone", "from": "2000-01-01", "to": "2002-12-31", "truth": true, "note": "Academy Award Best Actress for Erin Brockovich, 73rd ceremony 2001"},
+       {"event": "career milestone", "from": "1973-01-01", "to": "1975-12-31", "truth": false, "note": "childhood"}]},
+    {"name": "Jodie Foster", "gender": "female", "date": "1962-11-19", "time": "08:14", "tz": -8, "lat": 34.0522, "lon": -118.2437,
+     "careerStart": "1972-01-01", "profession": "acting film and OTT",
+     "events": [
+       {"event": "children", "from": "1997-01-01", "to": "1999-12-31", "truth": true, "note": "son Charlie born 1998"},
+       {"event": "children", "from": "1985-01-01", "to": "1987-12-31", "truth": false, "note": "no children recorded"},
+       {"event": "career milestone", "from": "1991-01-01", "to": "1993-12-31", "truth": true, "note": "Academy Award Best Actress for The Silence of the Lambs, 64th ceremony 1992"},
+       {"event": "career milestone", "from": "1965-01-01", "to": "1967-12-31", "truth": false, "note": "early childhood"}]},
+    {"name": "Kevin Costner", "gender": "male", "date": "1955-01-18", "time": "21:40", "tz": -8, "lat": 33.9034, "lon": -118.2112,
+     "careerStart": "1985-01-01", "profession": "acting film and OTT",
+     "events": [
+       {"event": "marriage", "from": "2003-01-01", "to": "2005-12-31", "truth": true, "note": "married Christine Baumgartner 25 Sep 2004"},
+       {"event": "marriage", "from": "1960-01-01", "to": "1962-12-31", "truth": false, "note": "childhood"},
+       {"event": "career milestone", "from": "1990-01-01", "to": "1992-12-31", "truth": true, "note": "Academy Awards for Dances with Wolves, 1991 ceremony"},
+       {"event": "career milestone", "from": "1960-01-01", "to": "1962-12-31", "truth": false, "note": "childhood"}]}
+  ]
+}

@@ -20,7 +20,8 @@ Antardashas are split from the mahadasha in proportion to the lord's years, whic
 - `kb.json` holds the modern knowledge base: professions, courses, diseases and yes or no life events. Each entry lists the significator planets and the houses it relates to. These mappings are rule choices and are open to review by a qualified astrologer.
 - `engine.js` scores options and evaluates event windows.
 - `paj.js` is the command line entry point.
-- `tests/backtest.js` runs the engine on verified AA rated charts.
+- `tests/verified_charts.json` holds 9 AA rated charts with dated events and their sources.
+- `tests/backtest.js` runs the engine on those charts and prints every answer.
 
 ## Scoring
 
@@ -45,7 +46,8 @@ The answer is in Hindi. It gives the chosen option and one or two lines of astro
 
 - The engine does not give dates of death or lifespan. There is no longevity domain.
 - Not yet included: Shadbala strength, gochara (transit) dates, Jaimini chara dasha in scoring, graha drishti, and the Rahu and Ketu rules.
-- The knowledge base is small and is not validated. A backtest on three charts gave 0 of 3 for profession and 4 of 6 for event windows, which is no better than chance. Treat the output as rule output, not as verified prediction.
+- The knowledge base is small and is not validated. Backtest on 9 verified AA charts (tests/verified_charts.json): profession 1 of 9 correct against chance of about 17 percent, and event windows 17 of 28 correct against chance of 50 percent (one sided p about 0.13). Treat the output as rule output, not as verified prediction.
+- Known structural bias: options that list more houses gain more points. Banking (houses 2, 10, 11) was chosen for 6 of 9 charts. A per house normalisation is the next change to test, on a fresh set of charts so that the same charts are not used to both tune and score.
 
 ## Run
 

@@ -1,42 +1,34 @@
 "use strict";
-// Backtest on verified AA rated charts. Birth times come from Astrotheme (birth certificate or record).
-// Event dates come from Wikipedia. Profession questions use the career start year as the as-of date.
+// Backtest of the PAJ engine on verified AA rated charts (verified_charts.json).
+// The engine sees only the birth record, the option list and the as-of date. The true answers are used only for scoring.
+const fs = require("fs");
+const path = require("path");
 const { cast, answerDomain, eventWindow } = require("../engine.js");
 
-const CHARTS = [
-  { name: "Rami Malek", gender: "male", date: "1981-05-12", time: "08:41", tz: -7, lat: 33.8358, lon: -118.3406,
-    careerStart: "2004-01-01", profession: "acting film and OTT",
-    events: [
-      { event: "career milestone", from: "2018-01-01", to: "2020-12-31", truth: true, note: "Academy Award 24 Feb 2019" },
-      { event: "career milestone", from: "1985-01-01", to: "1987-12-31", truth: false, note: "childhood window" }] },
-  { name: "Dale Davis", gender: "male", date: "1969-03-25", time: "15:52", tz: -5, lat: 34.5776, lon: -83.3349,
-    careerStart: "1991-01-01", profession: "sports and athletics",
-    events: [
-      { event: "career milestone", from: "1990-01-01", to: "1992-12-31", truth: true, note: "career began 1991" },
-      { event: "career milestone", from: "1972-01-01", to: "1974-12-31", truth: false, note: "childhood window" }] },
-  { name: "David Chokachi", gender: "male", date: "1968-01-16", time: "13:03", tz: -5, lat: 41.9584, lon: -70.6673,
-    careerStart: "1995-01-01", profession: "acting film and OTT",
-    events: [
-      { event: "marriage", from: "2003-01-01", to: "2005-12-31", truth: true, note: "married 2004" },
-      { event: "marriage", from: "1985-01-01", to: "1987-12-31", truth: false, note: "early window" }] },
-];
-const PROFESSION_OPTIONS = ["sports and athletics", "acting film and OTT", "politics and government",
-  "writing journalism and media", "banking finance and business", "medicine and healthcare"];
+const data = JSON.parse(fs.readFileSync(path.join(__dirname, "verified_charts.json"), "utf8"));
+const OPTIONS = data.options;
+const rows = [];
+let profHit = 0, profN = 0;
+let evN = 0, evHit = 0, yesN = 0, yesHit = 0, noN = 0, noHit = 0;
 
-let profHit = 0, evHit = 0, evN = 0, evYes = 0, evYesHit = 0;
-for (const t of CHARTS) {
+for (const t of data.charts) {
   const c = cast(t);
-  c.birthIso = c.birthIso;
-  const r = answerDomain(c, "profession", PROFESSION_OPTIONS, t.careerStart);
+  const r = answerDomain(c, "profession", OPTIONS, t.careerStart);
   const ok = r.choice === t.profession;
-  profHit += ok ? 1 : 0;
-  console.log(`${t.name} profession chosen ${r.choice} truth ${t.profession} hit ${ok}`);
+  profN++; profHit += ok ? 1 : 0;
+  rows.push([t.name, "profession", r.hi, t.profession, ok ? "hit" : "miss"]);
   for (const e of t.events) {
     const w = eventWindow(c, e.event, e.from, e.to, t.gender);
-    evN++; if (w.hit === e.truth) evHit++;
-    if (e.truth) { evYes++; if (w.hit) evYesHit++; }
-    console.log(`  ${e.event} ${e.from.slice(0, 4)} to ${e.to.slice(0, 4)} engine ${w.hit ? "yes" : "no"} truth ${e.truth ? "yes" : "no"} hit ${w.hit === e.truth} (${e.note})`);
+    const hit = w.hit === e.truth;
+    evN++; evHit += hit ? 1 : 0;
+    if (e.truth) { yesN++; yesHit += w.hit ? 1 : 0; } else { noN++; noHit += w.hit ? 0 : 1; }
+    rows.push([t.name, `${e.event} ${e.from.slice(0, 4)} to ${e.to.slice(0, 4)}`, w.hit ? "yes" : "no", e.truth ? "yes" : "no", hit ? "hit" : "miss"]);
   }
 }
-console.log(`profession accuracy ${profHit}/${CHARTS.length} chance ${(1 / PROFESSION_OPTIONS.length).toFixed(2)}`);
-console.log(`event accuracy ${evHit}/${evN} chance 0.50, yes answers caught ${evYesHit}/${evYes}`);
+
+for (const r of rows) console.log(r.join(" | "));
+console.log("");
+console.log(`profession ${profHit}/${profN} correct, chance ${(100 / OPTIONS.length).toFixed(1)} percent`);
+console.log(`events ${evHit}/${evN} correct, chance 50 percent`);
+console.log(`true yes windows caught ${yesHit}/${yesN}`);
+console.log(`true no windows rejected ${noHit}/${noN}`);
