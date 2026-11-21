@@ -87,7 +87,8 @@ function answerDomain(c, domain, options, asOf) {
     const entry = table[label];
     if (!entry) throw new Error(`विकल्प ज्ञान आधार में नहीं है: ${label}`);
     const raw = scorePlanets(c, entry.planets, entry.houses, KARAKA_FOR[domain], dasha);
-    const norm = raw.score / Math.max(entry.planets.length, 1);
+    // Per-house normalisation: an option that spans more houses cannot gain points just by listing them.
+    const norm = raw.score / Math.max(entry.houses.length, 1);
     rows.push({ label, hi: entry.hi, score: Math.round(norm * 100) / 100, reasons: raw.reasons });
   }
   // Highest score wins. A tie goes to the option listed first.

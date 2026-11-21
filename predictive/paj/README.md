@@ -20,8 +20,9 @@ Antardashas are split from the mahadasha in proportion to the lord's years, whic
 - `kb.json` holds the modern knowledge base: professions, courses, diseases and yes or no life events. Each entry lists the significator planets and the houses it relates to. These mappings are rule choices and are open to review by a qualified astrologer.
 - `engine.js` scores options and evaluates event windows.
 - `paj.js` is the command line entry point.
-- `tests/verified_charts.json` holds 9 AA rated charts with dated events and their sources.
-- `tests/backtest.js` runs the engine on those charts and prints every answer.
+- `tests/verified_charts.json` holds 9 AA rated charts with dated events. It was used to diagnose the scoring bias, so it is a tuning set.
+- `tests/holdout_charts.json` holds 11 further AA rated charts. Its results are the only ones that judge a rule change.
+- `tests/backtest.js [file]` runs the engine on a chart file and prints every answer.
 
 ## Scoring
 
@@ -34,7 +35,8 @@ For each option in a profession, course or disease question:
 - +2 if the planet is the Jaimini karaka for the domain
 - +1 if the planet's Ashtakavarga bindus in the option houses average 4 or more
 
-The raw total is divided by the number of significator planets, so options with more planets are not favoured. A tie goes to the option listed first.
+The raw total is divided by the number of houses in the option (per house normalisation, the rule on the `paj-per-house-normalisation` branch). A tie goes to the option listed first.
+On branch `parashari-ashtakavarga-jaimini-engine` (commit 2353d68) the divisor was the number of significator planets. Both versions are reported below.
 
 For a yes or no event in a date window, every antardasha that overlaps the window is scored. The window is a yes when one period scores 2 or more.
 
@@ -46,8 +48,23 @@ The answer is in Hindi. It gives the chosen option and one or two lines of astro
 
 - The engine does not give dates of death or lifespan. There is no longevity domain.
 - Not yet included: Shadbala strength, gochara (transit) dates, Jaimini chara dasha in scoring, graha drishti, and the Rahu and Ketu rules.
-- The knowledge base is small and is not validated. Backtest on 9 verified AA charts (tests/verified_charts.json): profession 1 of 9 correct against chance of about 17 percent, and event windows 17 of 28 correct against chance of 50 percent (one sided p about 0.17). Treat the output as rule output, not as verified prediction.
-- Known structural bias: options that list more houses gain more points. Banking (houses 2, 10, 11) was chosen for 6 of 9 charts. A per house normalisation is the next change to test, on a fresh set of charts so that the same charts are not used to both tune and score.
+- The knowledge base is small and is not validated. Treat the output as rule output, not as verified prediction.
+- Known structural bias found on the tuning set: options that list more houses gain more points. Banking (houses 2, 10, 11) was chosen for 6 of 9 verified charts. Per house normalisation was added to address it.
+
+### Results
+
+Holdout set, 11 charts, judged once. Madonna has no music option, so she is left out of profession scoring (10 scored).
+
+| Rule | Profession (holdout) | Event windows (holdout) | Yes windows caught | No windows rejected |
+| --- | --- | --- | --- | --- |
+| Divisor = significator planets (commit 2353d68) | 1 of 10, chance 16.7 percent | 32 of 76, chance 50 percent | 16 of 41 | 16 of 35 |
+| Divisor = houses in option (branch) | 2 of 10, chance 16.7 percent | 32 of 76, chance 50 percent | 16 of 41 | 16 of 35 |
+
+The per house divisor moved profession from 1 to 2 correct on the holdout set. That difference is within chance (exact binomial probability of 2 or more correct at chance is about 0.52), so it is not evidence that the rule helps. Event windows do not use this divisor, so their count is unchanged.
+
+On the tuning set the same change moved profession from 1 of 9 to 3 of 9, and event windows stayed at 17 of 28. Those numbers are not used as a judgment.
+
+Event windows are below chance on the holdout set (32 of 76). The event rule is the weakest part of the engine. Any further change to it needs a new set of charts that has not been used before.
 
 ## Run
 
