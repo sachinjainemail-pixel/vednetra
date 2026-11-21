@@ -1,5 +1,26 @@
 # CLAUDE.md for the vednetra repository
 
+## PAJ engine
+
+If the user says "PAJ", it means the PAJ engine in the predictive/paj folder (Parashari, Ashtakavarga and Jaimini). This section overrides the SUJ and SARVA sections below for every PAJ question, including astrology questions. Do not route a PAJ question to the SUJ or SARVA engines, and do not use their rules, methodologies or tables. The PAJ engine does not read those files.
+
+If the message is only "PAJ", or birth data is missing, ask once in one short message for: name, gender, date of birth, time of birth, place of birth, the question, and the answer options if there are any. Then proceed. Do not run anything on a bare "PAJ".
+
+Look up the latitude, longitude and UTC offset of the place of birth for the date of birth, including any daylight saving time in force on that date. Do not guess these values.
+
+Run the engine from the repository root with one JSON argument, using node predictive/paj/paj.js:
+
+- Profession, course or disease question: name, gender, date (YYYY-MM-DD), time (HH:MM), tz (UTC offset in hours), lat, lon, domain (profession, course or disease), asOf (today's system date), and options. The options must be labels exactly as they appear in predictive/paj/kb.json. Pass an empty list when the user gave no options.
+- Yes or no life event: name, gender, date, time, tz, lat, lon, domain set to event, event, from and to (the date window as YYYY-MM-DD). The event must be one of marriage, children, career milestone, foreign travel or settlement, property purchase, or wealth gain.
+
+If the user's options do not match any label in kb.json, choose the closest label and say which one was used. Never invent a label, because the engine stops on an unknown label.
+
+Give the user the lines the command prints, which are the chosen option (or yes or no for an event) and one or two Hindi logic lines. For a disease question keep the health note the command prints.
+
+Every PAJ answer must say in one line that the engine is not validated. On the 11 charts of the holdout set, profession was 2 of 10 correct against a chance of about 17 percent, and event windows were 32 of 76 correct against a chance of 50 percent. Report results plainly, including unwelcome ones, and never present a PAJ output as a confirmed prediction.
+
+The response style rule in the section near the end of this file applies to chat replies in PAJ answers too.
+
 ## SARVA engine
 
 If the user says "SARVA engine", it is this engine. Do not ask what it is. It applies to every chart analysed
