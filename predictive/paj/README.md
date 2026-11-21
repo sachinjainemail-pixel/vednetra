@@ -46,7 +46,7 @@ The answer is in Hindi. It gives the chosen option and one or two lines of astro
 
 - The engine does not give dates of death or lifespan. There is no longevity domain.
 - Not yet included: Shadbala strength, gochara (transit) dates, Jaimini chara dasha in scoring, graha drishti, and the Rahu and Ketu rules.
-- The knowledge base is small and is not validated. Backtest on 9 verified AA charts (tests/verified_charts.json): profession 1 of 9 correct against chance of about 17 percent, and event windows 17 of 28 correct against chance of 50 percent (one sided p about 0.13). Treat the output as rule output, not as verified prediction.
+- The knowledge base is small and is not validated. Backtest on 9 verified AA charts (tests/verified_charts.json): profession 1 of 9 correct against chance of about 17 percent, and event windows 17 of 28 correct against chance of 50 percent (one sided p about 0.17). Treat the output as rule output, not as verified prediction.
 - Known structural bias: options that list more houses gain more points. Banking (houses 2, 10, 11) was chosen for 6 of 9 charts. A per house normalisation is the next change to test, on a fresh set of charts so that the same charts are not used to both tune and score.
 
 ## Run
