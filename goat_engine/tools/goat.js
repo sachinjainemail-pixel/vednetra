@@ -334,12 +334,14 @@ function analyseTopic(ctx, topicKey, label) {
   const occD9 = ctx.planets.filter(q => q.navamsaSign === P.sL).map(q => q.name);
   const S = new Set([P.lordName].concat(occH, occD9, P.karakas));
   const targets = [P.sL, lordP.sign].concat(P.karakas.map(k => ctx.by[k].sign));
-  const promiseYes = P.net > 0;
+  // Adverse events, such as illness or job loss, are promised by affliction, so the test is inverted.
+  const adverse = T.polarity === "adverse";
+  const promiseYes = adverse ? P.net < 0 : P.net > 0;
   const windows = findWindows(ctx, S, targets);
   const valid = bestWindow(windows);
   const best = valid.length ? valid[0] : null;
   let decision, yes, reason;
-  if (!promiseYes) { yes = false; decision = "NO"; reason = "The natal promise is not there, net " + fmt(P.net) + "."; }
+  if (!promiseYes) { yes = false; decision = "NO"; reason = adverse ? "The affliction promise is not there, net " + fmt(P.net) + "." : "The natal promise is not there, net " + fmt(P.net) + "."; }
   else if (!best) { yes = false; decision = "NO"; reason = "The promise is there but no dasha window in the search range is validated by a double transit of Jupiter and Saturn."; }
   else { yes = true; decision = "YES"; reason = "The promise is there, and the best window is validated by a double transit of Jupiter and Saturn."; }
   const pos = P.comps.filter(c => c.contribution > 0).sort((a, b) => b.contribution - a.contribution);
@@ -351,23 +353,29 @@ function analyseTopic(ctx, topicKey, label) {
     relevantPlanets: Array.from(S), transitTargetSigns: targets,
     windowsFound: windows.length, validatedWindows: valid.length, topWindows: valid.slice(0, 5),
     best, yes, decision, reason, asOf: ctx.asOf, from: ctx.from, to: ctx.to,
-    hindi: null
+    adverse, hindi: null
   };
   result.hindi = hindiLine(ctx, result);
-  result.score = (yes ? 1000 : 0) + (best ? GRADE_RANK[best.grade] * 10 : 0) + P.net;
+  result.score = (yes ? 1000 : 0) + (best ? GRADE_RANK[best.grade] * 10 : 0) + (adverse ? -P.net : P.net);
   return result;
 }
+// Hindi names of planets for the astrological text. Anything not in the table is left as written.
+const hiP = p => HI_PLANET[p] || p;
+const absTxt = x => Math.abs(x).toFixed(2);
+// Astrological Hindi sentence. House, lord, karakas, planets in the house, the dasha of the window and the
+// transit support all come from the chart, so the sentence states the reason for the answer.
 function hindiLine(ctx, r) {
-  const occ = ctx.planets.filter(q => q.sign === r.lagnaSign).map(q => HI_PLANET[q.name]);
-  const lordHi = HI_PLANET[r.lord] || r.lord;
-  const occHi = occ.length ? occ.join(" और ") : "कोई ग्रह नहीं";
-  const parts = [];
-  parts.push(`${r.hi} के लिए भाव ${r.house} का स्वामी ${lordHi} है और भाव में ${occHi} है`);
-  parts.push(`लग्न चंद्र और नवांश के संयुक्त तर्क से वचन ${r.net > 0 ? "सकारात्मक" : "नकारात्मक"} है`);
-  parts.push(`गोचर में गुरु और शनि का दोहरा समर्थन ${r.best ? "मिलता है" : "नहीं मिलता"}`);
-  if (r.yes && r.best) parts.push(`अतः निर्णय हाँ है और समय ${fmtDate(r.best.start)} से ${fmtDate(r.best.end)} तक का है`);
-  else parts.push("अतः निर्णय नहीं है");
-  return parts.join(", ") + "।";
+  const occ = ctx.planets.filter(q => q.sign === r.lagnaSign).map(q => hiP(q.name));
+  const occTxt = occ.length ? `भाव ${r.house} में ${occ.join(" और ")}` : `भाव ${r.house} खाली है`;
+  const kTxt = r.karakas.map(hiP).join(" और ");
+  const strength = `${r.adverse ? "पाप वचन" : "शुभ वचन"} का बल ${absTxt(r.net)} है और ${r.promiseYes ? "वचन मौजूद है" : "वचन अनुपस्थित है"}`;
+  const dasha = r.best
+    ? `${hiP(r.best.md)} महादशा, ${hiP(r.best.ad)} अंतरदशा और ${hiP(r.best.pd)} प्रत्यंतरदशा में गोचर से गुरु और शनि का दोहरा ${r.best.grade === "A" ? "पूरा" : "आंशिक"} समर्थन`
+    : "किसी मान्य दशा में गोचर का दोहरा समर्थन नहीं मिलता";
+  const end = r.yes && r.best
+    ? `अतः निर्णय हाँ है, समय ${fmtDate(r.best.start)} से ${fmtDate(r.best.end)} तक`
+    : (r.adverse ? "अतः निर्णय नहीं है, यह घटना इस समय के योग से नहीं बनती" : "अतः निर्णय नहीं है");
+  return `${r.hi} का भाव ${r.house}, उसका स्वामी ${hiP(r.lord)}, कारक ${kTxt}, ${occTxt}। ${strength}। ${dasha}। ${end}।`;
 }
 
 // ---- life area quality. Afflictions, event evidence and outcome, for any topic --------------------
@@ -473,11 +481,16 @@ function qualityAnalysis(ctx, topicKey, options) {
     options: tagged.map(o => ({ label: o.label, state: o.state })), chosen, closestUsed,
     thresholds: { mild_percent: q.mild_percent, severe_percent: q.severe_percent, very_severe_percent: q.very_severe_percent }
   };
-  const parts = [`${T.hi} के लिए वचन ${promiseYes ? "मौजूद है" : "नहीं है"}`];
-  parts.push(event ? `घटना के संकेत ${fmtDate(event.start)} से दिखते हैं` : "घटना के संकेत दशा और गोचर में नहीं मिलते");
-  parts.push(`कष्ट का स्तर ${aff.pct} प्रतिशत है और सक्रिय दशा अवधि ${active.length}`);
-  parts.push(outcome === "NOT SHOWN" ? "अतः गुणवत्ता का निर्णय नहीं हो सकता" : `अतः स्थिति ${outcome} है`);
-  res.hindi = parts.join(", ") + "।";
+  const affTxt = aff.afflicters.length ? aff.afflicters.map(hiP).join(" और ") : "कोई पाप ग्रह नहीं";
+  const parts = [];
+  parts.push(`${T.hi} का भाव ${P.H}, उसका स्वामी ${hiP(P.lordName)}, कारक ${P.karakas.map(hiP).join(" और ")}`);
+  parts.push(`${promiseYes ? "शुभ वचन मौजूद है" : "शुभ वचन अनुपस्थित है"}, भाव पर पाप प्रभाव ${affTxt}, कष्ट ${aff.pct} प्रतिशत`);
+  parts.push(event
+    ? `${hiP(event.md)} महादशा, ${hiP(event.ad)} अंतरदशा और ${hiP(event.pd)} प्रत्यंतरदशा में ${fmtDate(event.start)} से घटना के संकेत मिलते हैं`
+    : "दशा और गोचर में घटना के संकेत नहीं मिलते");
+  parts.push(`${q.activation_lookback_years} वर्ष में पाप ग्रह की सक्रिय दशा ${active.length}`);
+  parts.push(outcome === "NOT SHOWN" ? "अतः स्थिति का निर्णय नहीं हो सकता" : `अतः स्थिति ${OUTCOME_HI[outcome]} है`);
+  res.hindi = parts.join("। ") + "।";
   return res;
 }
 function renderQuality(res) {
@@ -602,10 +615,69 @@ function ruleAnalysis(ctx, topicKey, options) {
     out.propertyType = TYPES.propertyType[strongest];
     out.lines.push(hit ? `The strongest promise planet ${strongest} matches option ${hit.label}.` : `No option is tagged with ${strongest}, so the option tagged with the strongest planet among the options is closest.`);
     out.lines.push(`The strongest promise planet is ${strongest}, which points to ${out.propertyType}.`);
+  } else if (T.rule === "occupation") {
+    // Occupation. The 10th house and its lord, with Saturn and the Sun as karakas, decide the field of work.
+    // Each option kind scores by the natal condition of its planets, plus the planets that are active in the
+    // current dasha. When no career dasha is active and the 10th house promise is negative, the unemployed
+    // option is chosen. The kinds and the rule are in data/types.json and are provisional.
+    const targets = [P.sL, ctx.by[P.lordName].sign].concat(P.karakas.map(k => ctx.by[k].sign));
+    const winsC = findWindows(ctx, new Set(sigSet), targets);
+    const validC = winsC.filter(w => w.validated && w.dashaCount >= W.quality.event_min_dasha_count);
+    const careerNow = validC.filter(w => w.status === "NOW");
+    const careerPast = validC.filter(w => w.status === "PAST");
+    const activeLords = new Set(careerNow.reduce((a, w) => a.concat([w.md, w.ad, w.pd]), []));
+    const pastLords = new Set(careerPast.reduce((a, w) => a.concat([w.md, w.ad, w.pd]), []));
+    const kindScore = {};
+    Object.keys(TYPES.occupationKinds).forEach(k => {
+      const ps = TYPES.occupationKinds[k];
+      const base = sum(ps.map(p => pvOf[p] || 0)) / ps.length;
+      kindScore[k] = round2(base + (ps.some(p => activeLords.has(p)) ? 1 : 0) + (ps.some(p => pastLords.has(p)) ? 0.5 : 0));
+    });
+    const unemployedOpt = options.find(o => o.kind === "unemployed");
+    const noCareerNow = careerNow.length === 0;
+    let chosenOpt;
+    if (noCareerNow && P.net < 0 && unemployedOpt) {
+      chosenOpt = unemployedOpt;
+      out.occupationReason = "no career dasha is active now and the 10th house promise is negative, so the unemployed option is chosen";
+    } else {
+      const kindOpts = options.filter(o => o.kind && TYPES.occupationKinds[o.kind]);
+      kindOpts.sort((a, b) => kindScore[b.kind] - kindScore[a.kind]);
+      chosenOpt = kindOpts[0] || unemployedOpt || options[0];
+      out.occupationReason = "the best scoring kind of work, from its planets in the chart and in the active career dasha";
+    }
+    out.chosen = { label: chosenOpt.label, kind: chosenOpt.kind || null };
+    out.kindScore = kindScore;
+    out.careerNow = careerNow.length;
+    out.careerPast = careerPast.length;
+    out.lines.push(`Career dasha windows now ${careerNow.length}, in the past ${careerPast.length}, with at least ${W.quality.event_min_dasha_count} career lords.`);
+    out.lines.push(`Kind scores ${Object.keys(kindScore).map(k => k + " " + kindScore[k]).join(", ")}.`);
+    out.lines.push(`Rule. ${out.occupationReason}.`);
   } else {
-    throw new Error("Topic " + topicKey + " has no ordinal, count or type rule");
+    throw new Error("Topic " + topicKey + " has no ordinal, count, type or occupation rule");
   }
+  out.hindi = ruleHindi(ctx, out, P, pvOf, strongest, sigSet);
   return out;
+}
+// Astrological Hindi sentence for a rule answer. It names the planets that decide the answer.
+function ruleHindi(ctx, r, P, pvOf, strongest, sigSet) {
+  const kTxt = r.relevant.map(hiP).join(", ");
+  const head = `${r.hi} के लिए भाव ${P.H}, उसका स्वामी ${hiP(P.lordName)}, कारक ${P.karakas.map(hiP).join(" और ")}, संबंधित ग्रह ${kTxt}`;
+  if (r.rule === "ordinal") {
+    return `${head}। सबसे बलवान कारक ${hiP(strongest)} है और वचन का बल ${absTxt(r.net)}, इसलिए स्तर ${r.index} में से ${r.of} और क्षेत्र ${r.stream}। अतः विकल्प ${r.chosen.label} चुना गया।`;
+  }
+  if (r.rule === "count") {
+    return `${head}। वचन का बल ${absTxt(r.net)}, कुल ${r.total}, भाई ${r.brothersTarget} और बहन ${r.sistersTarget}। अतः विकल्प ${r.chosen.label} चुना गया।`;
+  }
+  if (r.rule === "type") {
+    return `${head}। सबसे बलवान कारक ${hiP(strongest)} है, इसलिए संपत्ति का प्रकार ${r.propertyType}। अतः विकल्प ${r.chosen.label} चुना गया।`;
+  }
+  // occupation
+  const now = r.careerNow > 0 ? `वर्तमान में ${r.careerNow} कर्म दशा सक्रिय है` : "वर्तमान में कोई कर्म दशा सक्रिय नहीं है";
+  const sc = Object.keys(r.kindScore).map(k => `${TYPES.occupationKindHi[k] || k} ${absTxt(r.kindScore[k])}`).join(", ");
+  const why = r.chosen.kind === "unemployed"
+    ? "कोई कर्म दशा सक्रिय न होने और दसवें भाव के नकारात्मक वचन के कारण बेरोजगारी का योग बनता है, भले ही कुछ कर्म ग्रहों का स्कोर अधिक हो"
+    : "सबसे अधिक स्कोर वाले कर्म के ग्रहों के बल और सक्रिय कर्म दशा के कारण";
+  return `${head}। ${now}, वचन का बल ${absTxt(r.net)}। व्यवसाय के स्कोर ${sc}। ${why}, अतः विकल्प ${r.chosen.label} चुना गया।`;
 }
 function renderRule(res) {
   const r = res.rule;
@@ -623,7 +695,7 @@ function renderRule(res) {
   L.push("FINAL ANSWER");
   L.push(`Chosen option ${r.chosen.label}. This is the closest option by the rule, because the rule always selects one option from the list.`);
   L.push("Hindi one liner.");
-  L.push(`${r.hi} के लिए वचन की प्रबलता ${r.strength >= 0 ? "अधिक" : "कम"} है और ग्रहों के आधार पर विकल्प ${r.chosen.label} चुना गया है।`);
+  L.push(r.hindi);
   L.push("");
   L.push("HINDI SUMMARY");
   hindiSummaryLines(res).forEach(l => L.push(l));
@@ -707,21 +779,12 @@ function hindiSummaryLines(res) {
   const out = [];
   if (res.mode === "quality") {
     const r = res.quality;
-    out.push(r.chosen
-      ? `${r.hi} के लिए निर्णय ${r.chosen.label} है, स्थिति ${OUTCOME_HI[r.outcome] || r.outcome}।`
-      : `${r.hi} के लिए घटना नहीं दिखती, इसलिए कोई विकल्प नहीं चुना गया।`);
+    out.push(r.hindi);
   } else if (res.mode === "rule") {
-    const r = res.rule;
-    if (r.rule === "ordinal") out.push(`${r.hi} के लिए स्तर ${r.index} में से ${r.of} है, विकल्प ${r.chosen.label} और क्षेत्र ${r.stream}।`);
-    else if (r.rule === "count") out.push(`${r.hi} के लिए कुल ${r.total} में से भाई ${r.brothersTarget} और बहन ${r.sistersTarget}, विकल्प ${r.chosen.label}।`);
-    else out.push(`${r.hi} के लिए संपत्ति का प्रकार ${r.propertyType}, विकल्प ${r.chosen.label}।`);
+    out.push(res.rule.hindi);
   } else {
     const list = res.mode === "options" ? res.results : [res.chosen];
-    list.forEach(r => {
-      const subject = res.mode === "options" ? r.label : r.hi;
-      const when = r.best ? `समय ${fmtDate(r.best.start)} से ${fmtDate(r.best.end)} तक` : "कोई मान्य दशा अवधि नहीं";
-      out.push(`${subject} के लिए निर्णय ${r.decision === "YES" ? "हाँ" : "नहीं"} है, वचन ${r.promiseYes ? "मौजूद" : "अनुपस्थित"}, ${when}।`);
-    });
+    list.forEach(r => out.push(r.hindi));
   }
   return out;
 }

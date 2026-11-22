@@ -134,4 +134,17 @@ check("quality report has a Hindi summary line", () => {
   assert.ok(text.split("HINDI SUMMARY\n")[1].trim().length > 0);
 });
 
+// 12. Adverse events are promised by affliction, and occupation picks one of the options by its kind.
+check("adverse topic promise is the affliction, net below 0", () => {
+  const r = G.run(Object.assign({}, base, { options: [{ label: "Job loss", topic: "job_loss" }], asOf: "2026-11-22", fromISO: "2016-03-04", toISO: "2016-03-04" }));
+  assert.strictEqual(r.results[0].adverse, true);
+  assert.strictEqual(r.results[0].promiseYes, r.results[0].net < 0);
+});
+check("occupation rule returns one of the options", () => {
+  const opts = [{ label: "Teacher", kind: "teaching" }, { label: "Priest", kind: "religious" }, { label: "Marketing", kind: "commerce" }, { label: "Unemployed", kind: "unemployed" }];
+  const r = G.run(Object.assign({}, base, { topic: "occupation", asOf: "2026-11-22", options: opts }));
+  assert.ok(opts.map(o => o.label).indexOf(r.rule.chosen.label) >= 0);
+  assert.ok(r.rule.hindi && r.rule.hindi.length > 0);
+});
+
 console.log("\n" + pass + " checks passed" + (process.exitCode ? ", some failed" : ""));

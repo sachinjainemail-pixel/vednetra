@@ -1,6 +1,16 @@
 {
   "_note": "Planet tables for the ordinal, count and type rules. gender follows Parashari practice, where Sun Mars and Jupiter are male, Moon and Venus are female, and Mercury Saturn Rahu and Ketu are neuter. stream gives the field of study a planet points to. propertyType gives the kind of property a planet points to. These follow the natural significations used in the engine and the owner can change them.",
-  "gender": { "Sun": "male", "Mars": "male", "Jupiter": "male", "Moon": "female", "Venus": "female", "Mercury": "neuter", "Saturn": "neuter", "Rahu": "neuter", "Ketu": "neuter" },
+  "gender": {
+    "Sun": "male",
+    "Mars": "male",
+    "Jupiter": "male",
+    "Moon": "female",
+    "Venus": "female",
+    "Mercury": "neuter",
+    "Saturn": "neuter",
+    "Rahu": "neuter",
+    "Ketu": "neuter"
+  },
   "stream": {
     "Sun": "administration, government service, medicine and leadership",
     "Moon": "nursing, psychology, hospitality and public service",
@@ -22,5 +32,30 @@
     "Saturn": "old or inherited property and industrial premises",
     "Rahu": "foreign or unconventional property",
     "Ketu": "remote or hidden property"
-  }
+  },
+  "occupationKinds": {
+    "teaching": [
+      "Jupiter",
+      "Mercury"
+    ],
+    "religious": [
+      "Jupiter",
+      "Ketu"
+    ],
+    "commerce": [
+      "Mercury",
+      "Venus"
+    ],
+    "service": [
+      "Sun",
+      "Saturn"
+    ]
+  },
+  "occupationKindHi": {
+    "teaching": "शिक्षण",
+    "religious": "धार्मिक कार्य और पुजारी",
+    "commerce": "व्यापार और मार्केटिंग",
+    "service": "सरकारी सेवा"
+  },
+  "_occupation_note": "Occupation kinds map each kind of work to the planets that signify it. An option carries a kind tag. The option tagged unemployed is chosen when no career dasha is active now and the 10th house promise is negative. Provisional, the owner can change these."
 }

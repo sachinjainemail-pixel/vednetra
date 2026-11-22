@@ -1,0 +1,19 @@
+{
+  "name": "Kundali 858",
+  "gender": "male",
+  "date": "1988-05-14",
+  "time": "05:40:00",
+  "tz": 5.5,
+  "lat": 23.544,
+  "lon": 74.4389,
+  "place": "Banswara, Rajasthan",
+  "asOf": "2016-03-04",
+  "fromISO": "2016-03-04",
+  "toISO": "2016-03-04",
+  "options": [
+    { "label": "Santan hui", "topic": "children" },
+    { "label": "Tabiyat kharab hui", "topic": "illness" },
+    { "label": "Naukri se nikala gaya", "topic": "job_loss" },
+    { "label": "Vivah hua", "topic": "marriage" }
+  ]
+}
