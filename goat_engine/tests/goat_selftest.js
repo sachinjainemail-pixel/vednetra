@@ -119,4 +119,19 @@ check("quality report has no forbidden characters and no NaN", () => {
   assert.ok(text.indexOf("NaN") < 0 && text.indexOf("undefined") < 0);
 });
 
+// 11. Hindi summary. One line per finalized answer at the end of every report.
+check("options report ends with a Hindi summary line per option", () => {
+  const cfg = Object.assign({}, base, { options: [{ label: "Marriage", topic: "marriage" }, { label: "Career", topic: "career" }], asOf: "2026-11-22" });
+  const text = G.renderRun(G.run(cfg));
+  const tail = text.split("HINDI SUMMARY\n")[1];
+  assert.ok(tail, "no HINDI SUMMARY section");
+  assert.strictEqual(tail.trim().split("\n").length, 2);
+  assert.ok(/[\u0900-\u097F]/.test(tail));
+});
+check("quality report has a Hindi summary line", () => {
+  const cfg = Object.assign({}, base, { mode: "quality", topic: "marriage", asOf: "2026-11-22", options: [{ label: "Happy", state: "positive" }, { label: "Divorce case", state: "severe" }] });
+  const text = G.renderRun(G.run(cfg));
+  assert.ok(text.split("HINDI SUMMARY\n")[1].trim().length > 0);
+});
+
 console.log("\n" + pass + " checks passed" + (process.exitCode ? ", some failed" : ""));

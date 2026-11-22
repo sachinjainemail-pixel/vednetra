@@ -534,6 +534,9 @@ function renderQuality(res) {
   }
   L.push("Hindi one liner.");
   L.push(r.hindi);
+  L.push("");
+  L.push("HINDI SUMMARY");
+  hindiSummaryLines(res).forEach(l => L.push(l));
   return plain(L.join("\n"));
 }
 
@@ -621,6 +624,9 @@ function renderRule(res) {
   L.push(`Chosen option ${r.chosen.label}. This is the closest option by the rule, because the rule always selects one option from the list.`);
   L.push("Hindi one liner.");
   L.push(`${r.hi} के लिए वचन की प्रबलता ${r.strength >= 0 ? "अधिक" : "कम"} है और ग्रहों के आधार पर विकल्प ${r.chosen.label} चुना गया है।`);
+  L.push("");
+  L.push("HINDI SUMMARY");
+  hindiSummaryLines(res).forEach(l => L.push(l));
   return plain(L.join("\n"));
 }
 
@@ -695,6 +701,30 @@ function ctxOccNames(r) {
   const f = a => a.length ? a.map(x => x.name).join(", ") : "none";
   return { lagna: f(lagna), d9: f(d9) };
 }
+// One line in Hindi for each answer finalized by the engine. Used at the end of every report and in --json.
+const OUTCOME_HI = { positive: "सुखी और स्थिर", challenged: "तनावपूर्ण पर साथ रहना", separated: "अलग रहना", severe: "टूटन या तलाक", "NOT SHOWN": "घटना नहीं दिखती" };
+function hindiSummaryLines(res) {
+  const out = [];
+  if (res.mode === "quality") {
+    const r = res.quality;
+    out.push(r.chosen
+      ? `${r.hi} के लिए निर्णय ${r.chosen.label} है, स्थिति ${OUTCOME_HI[r.outcome] || r.outcome}।`
+      : `${r.hi} के लिए घटना नहीं दिखती, इसलिए कोई विकल्प नहीं चुना गया।`);
+  } else if (res.mode === "rule") {
+    const r = res.rule;
+    if (r.rule === "ordinal") out.push(`${r.hi} के लिए स्तर ${r.index} में से ${r.of} है, विकल्प ${r.chosen.label} और क्षेत्र ${r.stream}।`);
+    else if (r.rule === "count") out.push(`${r.hi} के लिए कुल ${r.total} में से भाई ${r.brothersTarget} और बहन ${r.sistersTarget}, विकल्प ${r.chosen.label}।`);
+    else out.push(`${r.hi} के लिए संपत्ति का प्रकार ${r.propertyType}, विकल्प ${r.chosen.label}।`);
+  } else {
+    const list = res.mode === "options" ? res.results : [res.chosen];
+    list.forEach(r => {
+      const subject = res.mode === "options" ? r.label : r.hi;
+      const when = r.best ? `समय ${fmtDate(r.best.start)} से ${fmtDate(r.best.end)} तक` : "कोई मान्य दशा अवधि नहीं";
+      out.push(`${subject} के लिए निर्णय ${r.decision === "YES" ? "हाँ" : "नहीं"} है, वचन ${r.promiseYes ? "मौजूद" : "अनुपस्थित"}, ${when}।`);
+    });
+  }
+  return out;
+}
 function renderRun(res) {
   if (res.mode === "rule") return renderRule(res);
   if (res.mode === "quality") return renderQuality(res);
@@ -720,6 +750,9 @@ function renderRun(res) {
     L.push(`${c.decision}.`);
   }
   L.push(c.reason);
+  L.push("");
+  L.push("HINDI SUMMARY");
+  hindiSummaryLines(res).forEach(l => L.push(l));
   return plain(L.join("\n"));
 }
 
@@ -752,10 +785,11 @@ if (require.main === module) {
   try {
     const res = run(readConfig(argv));
     if (argv.indexOf("--json") >= 0) {
-      if (res.mode === "rule" || res.mode === "quality") text = toPlainJson(res);
+      if (res.mode === "rule" || res.mode === "quality") { res.hindiSummary = hindiSummaryLines(res); text = toPlainJson(res); }
       else {
         const j = Object.assign({}, res, { results: res.results.map(r => Object.assign({}, r, { best: r.best ? Object.assign({}, r.best, { start: r.best.start.toISOString(), end: r.best.end.toISOString() }) : null, topWindows: r.topWindows.map(w => Object.assign({}, w, { start: w.start.toISOString(), end: w.end.toISOString() })) })) });
         j.chosen = j.results[0]; j.asOf = res.asOf.toISOString(); j.from = res.from.toISOString(); j.to = res.to.toISOString();
+        j.hindiSummary = hindiSummaryLines(res);
         text = JSON.stringify(j, null, 2) + "\n";
       }
     } else {
