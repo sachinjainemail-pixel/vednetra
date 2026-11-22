@@ -905,57 +905,93 @@ function comboCount(ctx, combo) {
 }
 // Strength of the signifiers, used only to break ties between kinds with the same count.
 function signifierStrength(ctx, names) { return sum(names.map(n => pvAt(ctx, n, ctx.by[n].sign, false).v)); }
-// ---- combination choice within one life area. Houses, planets and karakas in D1, Moon and rotated D9. ----
+// ---- life combinations. Option schema in data life_combos.json. ----
+// A chart passes when all required houses are active, every link holds, and every karaka link holds.
+// A house is active when a signifier sits in it or relates to its lord. A link holds when the two house lords
+// connect, or one lord sits in the other house. Chandra Lagna is the Moon reference: chartRef is the natal Moon sign.
+// Timing needs a dasha window whose AD or PD lord is linked to the main house lord, the distinguishing lord or a
+// signifier, with MD, AD and PD together covering both the main and the distinguishing lord. Transit ranks windows.
+// Output states. SUPPORTED needs enough passing charts and a timing window. UNRESOLVED covers ties, missing timing or
+// insufficient differentiation. NOT SUPPORTED means the engine finds no passing combination.
 function houseOfChart(ctx, c, s) { return houseFrom(chartPos(ctx, c, s), chartRef(ctx, c)); }
-// An option is supported in a chart when enough of its houses and its karaka link are active. A house is active
-// when a signifier sits in it or relates to its lord. The option counts when at least min_charts_agree charts support it.
-function comboSupport(ctx, combo) {
-  const perChart = {};
-  let charts = 0, total = 0;
-  const karakas = combo.karakas || [];
-  CHARTS.forEach(c => {
-    const hitsH = combo.houses.filter(h => {
-      const L = chartLord(ctx, c, h);
-      return combo.planets.some(sg => houseOfChart(ctx, c, sg) === h || (sg !== L && chartRelation(ctx, c, sg, L)));
-    });
-    const kar = karakas.length > 0 && karakas.some(k => combo.planets.some(sg => sg !== k && chartRelation(ctx, c, sg, k)));
-    const count = hitsH.length + (kar ? 1 : 0);
-    const need = Math.min(2, combo.houses.length + karakas.length);
-    perChart[c] = { count, houses: hitsH, karaka: kar };
-    if (count >= need) charts++;
-    total += count;
-  });
-  const score = charts >= W.combination.min_charts_agree ? total : 0;
-  return { score, charts, perChart };
+function houseActive(ctx, c, h, planets) {
+  const L = chartLord(ctx, c, h);
+  return planets.some(sg => houseOfChart(ctx, c, sg) === h || (sg !== L && chartRelation(ctx, c, sg, L)));
+}
+function linkHolds(ctx, c, a, b) {
+  const La = chartLord(ctx, c, a), Lb = chartLord(ctx, c, b);
+  if (La === Lb) return [a, b].indexOf(houseOfChart(ctx, c, La)) >= 0;
+  return chartRelation(ctx, c, La, Lb) || houseOfChart(ctx, c, La) === b || houseOfChart(ctx, c, Lb) === a;
+}
+function chartPass(ctx, c, combo) {
+  const mand = combo.mandatory || combo.houses;
+  const activeN = combo.houses.filter(h => houseActive(ctx, c, h, combo.planets)).length;
+  const allHouses = mand.every(h => houseActive(ctx, c, h, combo.planets)) && activeN >= Math.min(2, combo.houses.length);
+  const links = (combo.links || []).every(([a, b]) => linkHolds(ctx, c, a, b));
+  const kars = (combo.karakas || []).every(k => combo.planets.indexOf(k) >= 0 || combo.planets.some(sg => chartRelation(ctx, c, sg, k)));
+  return allHouses && links && kars;
+}
+function comboTiming(ctx, combo) {
+  const lordMain = SIGN_LORD[signAtHouse(ctx.lagna, combo.main)];
+  const lordDist = SIGN_LORD[signAtHouse(ctx.lagna, combo.distinguish)];
+  const S = new Set([lordMain, lordDist].concat(combo.planets));
+  const targets = { d1: [signAtHouse(ctx.lagna, combo.main), signAtHouse(ctx.lagna, combo.distinguish), ctx.by[lordMain].sign, ctx.by[lordDist].sign], d9: null };
+  const windows = findWindows(ctx, S, targets);
+  const link = new Set([lordMain, lordDist].concat(combo.planets));
+  const qual = windows.filter(w => w.status !== "FUTURE" && (link.has(w.ad) || link.has(w.pd)) &&
+    [w.md, w.ad, w.pd].indexOf(lordMain) >= 0 && [w.md, w.ad, w.pd].indexOf(lordDist) >= 0);
+  const rank = w => (GRADE_RANK[w.grade] || 0) * 100 + (w.jupiterSamples + w.saturnSamples) * 2 + (w.validated ? 1 : 0);
+  qual.sort((a, b) => rank(b) - rank(a) || (b.start - a.start));
+  const best = qual.length ? qual[0] : null;
+  return { status: best ? "SUPPORTED" : "UNRESOLVED", best, lordMain, lordDist, windowsFound: windows.length, qualifying: qual.length };
 }
 function lifeCombo(key) {
   const [area, opt] = String(key).split(".");
   if (!LIFE[area] || !LIFE[area][opt]) throw new Error("Unknown combination " + key + ". See data life_combos.json");
-  return LIFE[area][opt];
+  return Object.assign({ area, opt }, LIFE[area][opt]);
+}
+function evaluateOption(ctx, o) {
+  if (!o.combo_key) return { label: o.label, key: null, decision: "UNRESOLVED", reason: "No combination rule for this option.", charts: [], timing: null, score: 0 };
+  const combo = lifeCombo(o.combo_key);
+  const charts = combo.charts || ["D1", "Moon"];
+  const passing = charts.filter(c => chartPass(ctx, c, combo));
+  const minCharts = Math.min(W.combination.min_charts_agree, charts.length);
+  const refsOk = passing.length >= minCharts;
+  const timing = comboTiming(ctx, combo);
+  let decision = "NOT SUPPORTED";
+  if (refsOk && timing.status === "SUPPORTED") decision = "SUPPORTED";
+  else if (refsOk) decision = "UNRESOLVED";
+  const firstLink = (combo.links || []).find(([a, b]) => linkHolds(ctx, passing[0] || charts[0], a, b));
+  const score = passing.length + (timing.best ? (GRADE_RANK[timing.best.grade] || 0) : 0);
+  return { label: o.label, key: o.combo_key, decision, passing, charts, strongest: firstLink ? `link ${firstLink[0]} to ${firstLink[1]}` : null, timing, score, combo };
 }
 function comboChoice(ctx, options) {
-  const results = options.map(o => {
-    const combo = o.combo_key ? lifeCombo(o.combo_key) : null;
-    const sup = combo ? comboSupport(ctx, combo) : { score: 0, charts: 0, perChart: {} };
-    return { label: o.label, key: o.combo_key || null, score: sup.score, charts: sup.charts, perChart: sup.perChart };
-  });
-  const sorted = results.slice().sort((a, b) => b.score - a.score);
-  const chosen = sorted[0] && sorted[0].score > 0 ? sorted[0] : null;
-  const hi = chosen ? `${chosen.label} के पक्ष में ${chosen.charts} चार्ट में समर्थन मिला, कुल स्कोर ${chosen.score}। अतः विकल्प ${chosen.label} चुना गया।` : "किसी विकल्प को दो चार्ट में पर्याप्त समर्थन नहीं मिला, इसलिए निर्णय नहीं हो सकता।";
-  return { results: sorted, chosen, hindi: hi };
+  const results = options.map(o => evaluateOption(ctx, o));
+  const supported = results.filter(r => r.decision === "SUPPORTED").sort((a, b) => b.score - a.score);
+  let chosen = null, hi;
+  if (supported.length === 1 || (supported.length > 1 && supported[0].score > supported[1].score)) {
+    chosen = supported[0];
+    hi = `${chosen.label} के पक्ष में ${chosen.passing.length} चार्ट और समय-खिड़की का समर्थन मिला, अतः निर्णय यही है।`;
+  } else if (supported.length > 1) {
+    hi = "दो या अधिक विकल्प समान बल पर हैं, इसलिए निर्णय अनिर्णीत है।";
+  } else {
+    hi = "किसी विकल्प को पर्याप्त संयोजन और समय-खिड़की का समर्थन नहीं मिला, इसलिए निर्णय अनिर्णीत है।";
+  }
+  return { results, chosen: chosen ? { label: chosen.label, decision: "SUPPORTED" } : null, decisionState: chosen ? "SUPPORTED" : "UNRESOLVED", hindi: hi };
 }
 function renderCombo(res) {
   const L = [];
   L.push(`GOAT ENGINE COMBINATION REPORT for ${res.name}`);
-  L.push(`Lagna is sign index ${res.lagnaSign} and Moon sign index ${res.moonSign}. Charts used D1, Moon and rotated D9 only.`);
+  L.push(`Lagna sign index ${res.lagnaSign}, Chandra Lagna sign index ${res.moonSign}. Moon reference is the natal Moon sign as house 1.`);
   L.push("");
   res.combo.results.forEach((r, i) => {
-    const pc = CHARTS.map(c => `${c} ${r.perChart[c] ? r.perChart[c].count : 0}`).join(", ");
-    L.push(`${i + 1}. ${r.label}, score ${r.score}, supported in ${r.charts} charts, counts ${pc}.`);
+    const t = r.timing;
+    L.push(`${i + 1}. ${r.label}, decision ${r.decision}, charts passing ${r.passing ? r.passing.join(" and ") || "none" : "none"}, strongest link ${r.strongest || "none"}.`);
+    if (t) L.push(`   Timing ${t.status}, qualifying windows ${t.qualifying} of ${t.windowsFound}${t.best ? ", best " + fmtDate(t.best.start) + " to " + fmtDate(t.best.end) + " " + t.best.md + "/" + t.best.ad + "/" + t.best.pd + ", transit grade " + t.best.grade : ""}.`);
   });
   L.push("");
   L.push("DEFINITIVE FINAL ANSWER");
-  L.push(res.combo.chosen ? `Chosen option ${res.combo.chosen.label}.` : "NO ANSWER. No option has enough support in two charts.");
+  L.push(res.combo.chosen ? `SUPPORTED. Chosen option ${res.combo.chosen.label}.` : `UNRESOLVED. ${res.combo.hindi}`);
   L.push("Hindi summary");
   L.push(res.combo.hindi);
   return plain(L.join("\n"));
@@ -1068,7 +1104,7 @@ function renderRun(res) {
   return plain(L.join("\n"));
 }
 
-module.exports = { run, renderCombo, comboSupport, renderRun, renderRule, renderQuality, plain, analyseTopic, ruleAnalysis, qualityAnalysis, afflictionProfile, classifyQuality, parseSiblings, makeContext, natureOf, houseFrom, signAtHouse, mod12, SIGN_LORD, placeD9, bestWindow, TOPICS, W };
+module.exports = { run, renderCombo, evaluateOption, comboTiming, renderRun, renderRule, renderQuality, plain, analyseTopic, ruleAnalysis, qualityAnalysis, afflictionProfile, classifyQuality, parseSiblings, makeContext, natureOf, houseFrom, signAtHouse, mod12, SIGN_LORD, placeD9, bestWindow, TOPICS, W };
 
 // Command line. Use --file for the config so that no shell quoting is needed on Windows, macOS, Linux or a
 // phone terminal. Use --out to write the report as UTF-8 so that Hindi text is kept intact on any console.

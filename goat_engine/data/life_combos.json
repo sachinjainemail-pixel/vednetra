@@ -1,53 +1,222 @@
 {
-  "_note": "Owner supplied combinations, D1, Moon and rotated D9 only. Divisional charts and Jaimini points are not used. Each entry lists houses that must be active, planets that signify the event, and karakas. One house may serve several roles. Medical, death, pregnancy outcome and speculative outcomes are not in this file.",
+  "_note": "Schema per option. charts: references used. houses: all must be active. links: pairs of houses whose lords must connect. planets: signifiers. karakas: karaka links. main and distinguish: houses for timing. Divisional charts are not used. Transcribed from the owner's supplement, approximations flagged in _source where a row was read loosely. Chandra Lagna is the Moon reference. mandatory lists the houses that must be active. A chart needs all mandatory houses, at least two distinct active houses from the houses list when it has two or more, all links, and all karaka links.",
   "education": {
+    "BSc": {
+      "charts": [
+        "D1"
+      ],
+      "houses": [
+        5,
+        9
+      ],
+      "links": [
+        [
+          5,
+          9
+        ]
+      ],
+      "planets": [
+        "Mercury"
+      ],
+      "main": 5,
+      "distinguish": 9,
+      "_source": "Supplement row 5+9+(8 or 3), Mercury mandatory. The 8 or 3 alternative is not required here.",
+      "mandatory": [
+        5,
+        9
+      ]
+    },
+    "BTech": {
+      "charts": [
+        "D1"
+      ],
+      "houses": [
+        9,
+        10
+      ],
+      "links": [
+        [
+          9,
+          10
+        ]
+      ],
+      "planets": [
+        "Mars",
+        "Mercury"
+      ],
+      "main": 9,
+      "distinguish": 10,
+      "_source": "Row 5+9+10 with Mars linked to 5 or 9. Link 5-9 is not in this encoding, see review.",
+      "mandatory": [
+        9,
+        10
+      ]
+    },
+    "BCom": {
+      "charts": [
+        "D1"
+      ],
+      "houses": [
+        2,
+        5
+      ],
+      "links": [
+        [
+          2,
+          5
+        ]
+      ],
+      "planets": [
+        "Mercury"
+      ],
+      "main": 5,
+      "distinguish": 2,
+      "_source": "Row 2+5+9 with link 2-5. House 9 is not required here.",
+      "mandatory": [
+        2,
+        5
+      ]
+    },
+    "LLB": {
+      "charts": [
+        "D1"
+      ],
+      "houses": [
+        6,
+        7,
+        9
+      ],
+      "links": [
+        [
+          7,
+          9
+        ]
+      ],
+      "planets": [
+        "Jupiter"
+      ],
+      "main": 9,
+      "distinguish": 6,
+      "_source": "Row 6+7+9, link 7-9 used. Practice is kept separate in livelihood.",
+      "mandatory": [
+        6,
+        7
+      ]
+    },
     "Matric": {
+      "charts": [
+        "D1"
+      ],
       "houses": [
         4,
         5,
         11
       ],
+      "links": [
+        [
+          4,
+          5
+        ]
+      ],
       "planets": [
         "Mercury",
         "Jupiter"
+      ],
+      "main": 5,
+      "distinguish": 11,
+      "_source": "Level row 4+5+11.",
+      "mandatory": [
+        4,
+        5
       ]
     },
     "Intermediate": {
+      "charts": [
+        "D1"
+      ],
       "houses": [
         4,
         5,
         6,
         11
       ],
+      "links": [
+        [
+          4,
+          5
+        ]
+      ],
       "planets": [
         "Mercury",
         "Jupiter"
+      ],
+      "main": 5,
+      "distinguish": 6,
+      "_source": "Level row 4+5+6/11.",
+      "mandatory": [
+        4,
+        5
       ]
     },
     "Graduation": {
+      "charts": [
+        "D1"
+      ],
       "houses": [
         4,
         5,
         9,
         11
       ],
+      "links": [
+        [
+          5,
+          9
+        ]
+      ],
       "planets": [
         "Mercury",
         "Jupiter"
+      ],
+      "main": 5,
+      "distinguish": 9,
+      "_source": "Level row 4+5+9, 11.",
+      "mandatory": [
+        4,
+        5
       ]
     },
     "PG": {
+      "charts": [
+        "D1"
+      ],
       "houses": [
         5,
         9,
         11
       ],
+      "links": [
+        [
+          5,
+          9
+        ]
+      ],
       "planets": [
         "Mercury",
         "Jupiter"
+      ],
+      "main": 9,
+      "distinguish": 11,
+      "_source": "Level row 9+5+11.",
+      "mandatory": [
+        5,
+        9
       ]
     },
     "PhD": {
+      "charts": [
+        "D1"
+      ],
       "houses": [
         3,
         5,
@@ -55,18 +224,127 @@
         9,
         11
       ],
+      "links": [
+        [
+          5,
+          9
+        ]
+      ],
       "planets": [
         "Mercury",
         "Jupiter",
         "Saturn"
+      ],
+      "main": 5,
+      "distinguish": 8,
+      "_source": "Level row 5+8+9, 3 and 11.",
+      "mandatory": [
+        5,
+        9
       ]
     }
   },
   "livelihood": {
+    "private": {
+      "charts": [
+        "D1",
+        "Moon"
+      ],
+      "houses": [
+        6,
+        10
+      ],
+      "links": [
+        [
+          6,
+          10
+        ]
+      ],
+      "planets": [
+        "Saturn",
+        "Mercury"
+      ],
+      "karakas": [
+        "Saturn"
+      ],
+      "main": 10,
+      "distinguish": 6,
+      "mandatory": [
+        6,
+        10
+      ]
+    },
+    "practice": {
+      "charts": [
+        "D1",
+        "Moon"
+      ],
+      "houses": [
+        7,
+        10
+      ],
+      "links": [
+        [
+          7,
+          10
+        ]
+      ],
+      "planets": [
+        "Mercury"
+      ],
+      "karakas": [
+        "Saturn"
+      ],
+      "main": 10,
+      "distinguish": 7,
+      "mandatory": [
+        7,
+        10
+      ]
+    },
+    "commerce": {
+      "charts": [
+        "D1",
+        "Moon"
+      ],
+      "houses": [
+        6,
+        10
+      ],
+      "links": [
+        [
+          6,
+          10
+        ]
+      ],
+      "planets": [
+        "Mercury",
+        "Venus"
+      ],
+      "karakas": [
+        "Saturn"
+      ],
+      "main": 10,
+      "distinguish": 6,
+      "mandatory": [
+        6,
+        10
+      ]
+    },
     "government": {
+      "charts": [
+        "D1",
+        "Moon"
+      ],
       "houses": [
         10,
         6
+      ],
+      "links": [
+        [
+          6,
+          10
+        ]
       ],
       "planets": [
         "Sun",
@@ -74,154 +352,444 @@
       ],
       "karakas": [
         "Saturn"
+      ],
+      "main": 10,
+      "distinguish": 6,
+      "mandatory": [
+        10,
+        6
       ]
     },
     "army": {
+      "charts": [
+        "D1",
+        "Moon"
+      ],
       "houses": [
         10,
         6
+      ],
+      "links": [
+        [
+          6,
+          10
+        ]
       ],
       "planets": [
         "Mars"
       ],
       "karakas": [
         "Saturn"
-      ]
-    },
-    "commerce": {
-      "houses": [
+      ],
+      "main": 10,
+      "distinguish": 6,
+      "mandatory": [
         10,
         6
-      ],
-      "planets": [
-        "Mercury",
-        "Venus"
-      ],
-      "karakas": [
-        "Saturn"
       ]
     },
-    "teaching": {
+    "unemployed": {
+      "charts": [
+        "D1",
+        "Moon"
+      ],
       "houses": [
         10,
-        6
+        12
+      ],
+      "links": [
+        [
+          10,
+          12
+        ]
       ],
       "planets": [
-        "Jupiter",
-        "Mercury"
-      ],
-      "karakas": [
         "Saturn"
-      ]
-    },
-    "religious": {
-      "houses": [
+      ],
+      "main": 10,
+      "distinguish": 12,
+      "_source": "Work interruption. Needs positive evidence in timing.",
+      "mandatory": [
         10,
-        6
-      ],
-      "planets": [
-        "Jupiter",
-        "Ketu"
-      ],
-      "karakas": [
-        "Saturn"
+        12
       ]
     }
   },
   "residence": {
-    "birthplace": {
+    "parents": {
+      "charts": [
+        "D1",
+        "Moon"
+      ],
       "houses": [
         2,
-        4
+        4,
+        9
+      ],
+      "links": [
+        [
+          2,
+          4
+        ]
       ],
       "planets": [
-        "Moon"
+        "Moon",
+        "Sun"
+      ],
+      "main": 4,
+      "distinguish": 2,
+      "mandatory": [
+        2,
+        4
       ]
     },
-    "other_state": {
+    "wife": {
+      "charts": [
+        "D1",
+        "Moon"
+      ],
       "houses": [
         4,
-        9,
-        10
+        7,
+        2
+      ],
+      "links": [
+        [
+          4,
+          7
+        ]
       ],
       "planets": [
-        "Moon"
+        "Venus"
+      ],
+      "main": 4,
+      "distinguish": 7,
+      "mandatory": [
+        4,
+        7
       ]
     },
-    "abroad": {
+    "inlaws": {
+      "charts": [
+        "D1",
+        "Moon"
+      ],
+      "houses": [
+        4,
+        7,
+        8
+      ],
+      "links": [
+        [
+          4,
+          8
+        ]
+      ],
+      "planets": [
+        "Venus"
+      ],
+      "main": 4,
+      "distinguish": 8,
+      "mandatory": [
+        4,
+        8
+      ]
+    },
+    "alone_other_state": {
+      "charts": [
+        "D1",
+        "Moon"
+      ],
       "houses": [
         4,
         9,
         12
       ],
+      "links": [
+        [
+          4,
+          9
+        ]
+      ],
       "planets": [
         "Moon"
+      ],
+      "main": 4,
+      "distinguish": 9,
+      "mandatory": [
+        4,
+        9
       ]
     }
   },
-  "housing": {
-    "rented": {
-      "houses": [
-        4,
-        3,
-        7
+  "siblings": {
+    "elder": {
+      "charts": [
+        "D1",
+        "Moon"
       ],
+      "houses": [
+        11,
+        2
+      ],
+      "links": [],
       "planets": [
-        "Venus"
+        "Jupiter"
       ],
-      "_source": "Supplement section 9, finding a rented house is 4 + 3 + 7, rent expense 12. Corrected from 4 + 7 + 12, which is the row for renting out."
-    },
-    "own": {
-      "houses": [
-        4,
-        2,
+      "karakas": [
+        "Jupiter"
+      ],
+      "main": 11,
+      "distinguish": 2,
+      "mandatory": [
         11
-      ],
-      "planets": [
-        "Venus"
       ]
     },
-    "ancestral": {
+    "younger": {
+      "charts": [
+        "D1",
+        "Moon"
+      ],
       "houses": [
-        4,
-        2,
-        8
+        3,
+        2
+      ],
+      "links": [],
+      "planets": [
+        "Mars"
+      ],
+      "karakas": [
+        "Mars"
+      ],
+      "main": 3,
+      "distinguish": 2,
+      "mandatory": [
+        3
+      ]
+    }
+  },
+  "marriage": {
+    "love": {
+      "charts": [
+        "D1",
+        "D9"
+      ],
+      "houses": [
+        5,
+        7
+      ],
+      "links": [
+        [
+          5,
+          7
+        ]
       ],
       "planets": [
         "Venus"
+      ],
+      "main": 7,
+      "distinguish": 5,
+      "mandatory": [
+        5,
+        7
+      ]
+    },
+    "family": {
+      "charts": [
+        "D1",
+        "D9"
+      ],
+      "houses": [
+        2,
+        7,
+        9
+      ],
+      "links": [
+        [
+          2,
+          7
+        ]
+      ],
+      "planets": [
+        "Jupiter"
+      ],
+      "main": 7,
+      "distinguish": 2,
+      "mandatory": [
+        2,
+        7
+      ]
+    },
+    "community_difference": {
+      "charts": [
+        "D1",
+        "D9"
+      ],
+      "houses": [
+        7,
+        9
+      ],
+      "links": [
+        [
+          7,
+          9
+        ]
+      ],
+      "planets": [
+        "Rahu"
+      ],
+      "main": 9,
+      "distinguish": 7,
+      "mandatory": [
+        7,
+        9
       ]
     }
   },
   "event_2026": {
     "marriage": {
+      "charts": [
+        "D1",
+        "Moon"
+      ],
       "houses": [
         2,
         7,
         11
       ],
+      "links": [
+        [
+          2,
+          7
+        ]
+      ],
       "planets": [
         "Venus"
+      ],
+      "main": 7,
+      "distinguish": 11,
+      "mandatory": [
+        7
       ]
     },
     "pilgrimage": {
+      "charts": [
+        "D1",
+        "Moon"
+      ],
       "houses": [
         9,
         12,
         3
       ],
+      "links": [
+        [
+          9,
+          12
+        ]
+      ],
       "planets": [
         "Jupiter"
+      ],
+      "main": 9,
+      "distinguish": 12,
+      "mandatory": [
+        9,
+        12
       ]
     },
     "theft": {
+      "charts": [
+        "D1",
+        "Moon"
+      ],
       "houses": [
         2,
         8,
         12
       ],
+      "links": [
+        [
+          8,
+          12
+        ]
+      ],
       "planets": [
         "Saturn"
+      ],
+      "main": 8,
+      "distinguish": 2,
+      "mandatory": [
+        8,
+        12
       ]
+    }
+  },
+  "housing": {
+    "rented": {
+      "charts": [
+        "D1",
+        "Moon"
+      ],
+      "houses": [
+        4,
+        3,
+        7
+      ],
+      "links": [],
+      "planets": [
+        "Venus"
+      ],
+      "mandatory": [
+        4,
+        7
+      ],
+      "main": 4,
+      "distinguish": 7,
+      "_source": "Finding a rented house is 4+3+7 in the supplement."
+    },
+    "own": {
+      "charts": [
+        "D1",
+        "Moon"
+      ],
+      "houses": [
+        4,
+        2,
+        11
+      ],
+      "links": [],
+      "planets": [
+        "Venus"
+      ],
+      "mandatory": [
+        4
+      ],
+      "main": 4,
+      "distinguish": 11,
+      "_source": "Own earned house is 4 with 2 or 11."
+    },
+    "ancestral": {
+      "charts": [
+        "D1",
+        "Moon"
+      ],
+      "houses": [
+        4,
+        2,
+        8
+      ],
+      "links": [],
+      "planets": [
+        "Venus"
+      ],
+      "mandatory": [
+        4,
+        2
+      ],
+      "main": 4,
+      "distinguish": 8,
+      "_source": "Ancestral or inherited house is 4 with 2 and 8."
     }
   }
 }
