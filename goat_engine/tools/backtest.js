@@ -17,6 +17,11 @@ const path = require("path");
 const { run } = require("./goat");
 
 const CASES = path.join(__dirname, "..", "cases", "owner_cases.json");
+if (!fs.existsSync(CASES)) {
+  console.log("The owner case file is not in this copy of the repository, so the backtest cannot run here.");
+  console.log("It is kept on the development branch. Copy it into the cases folder of goat_engine to run the backtest.");
+  process.exit(0);
+}
 const cases = JSON.parse(fs.readFileSync(CASES, "utf8")).cases;
 
 const MARRIED_TRUTH = ["Married", "Divorced", "Widowed", "Widow", "Very happy", "Very unhappy", "Separated from husband", "Divorce in 2023"];
