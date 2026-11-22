@@ -395,7 +395,7 @@ function analyseTopic(ctx, topicKey, label) {
   const adverse = T.polarity === "adverse";
   const promiseYes = adverse ? P.net < 0 : P.net > 0;
   const windows = findWindows(ctx, S, targets);
-  const valid = bestWindow(windows);
+  const valid = bestWindow(windows).filter(w => !ctx.cfg.pastEvent || w.status !== "FUTURE");
   const best = valid.length ? valid[0] : null;
   const involved = best ? Array.from(new Set([best.md, best.ad, best.pd])) : [];
   const eventScore = involved.length ? round2(sum(involved.map(n => planetEventValue(ctx, n, topicKey, adverse)))) : 0;
@@ -778,6 +778,8 @@ function run(cfg) {
   ctx.asOf = asOf;
   ctx.from = parseDay(cfg.fromISO) || asOf;
   ctx.to = parseDay(cfg.toISO) || new Date(asOf.getTime() + horizon * 365.25 * DAY);
+  // Past event mode for quiz or past event questions with given options. Set asOf to the event date and fromISO and
+  // toISO to the event period. Windows that start after the event date are dropped. Excluded topics stay NOT DECIDED.
   const qualityMode = cfg.mode === "quality" || (cfg.options || []).some(o => o.state);
   if (qualityMode) {
     if (!TOPICS[cfg.topic]) throw new Error("Quality mode needs a topic key from data/topics.json");
