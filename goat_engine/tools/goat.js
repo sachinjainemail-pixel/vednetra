@@ -989,16 +989,25 @@ function siblingSide(r) { return r.decision === "SUPPORTED" ? "YES" : "UNKNOWN";
 function comboChoice(ctx, options) {
   const results = options.map(o => evaluateOption(ctx, o));
   const supported = results.filter(r => r.decision === "SUPPORTED").sort((a, b) => b.score - a.score);
-  let chosen = null, hi;
+  let chosen = null, hi, confidence = "HIGH", basis = "";
   if (supported.length === 1 || (supported.length > 1 && supported[0].score > supported[1].score)) {
     chosen = supported[0];
+    basis = "passes its checks and timing";
     hi = `${chosen.label} के पक्ष में ${chosen.passing.length} चार्ट और संयुक्त समय-खिड़की का समर्थन मिला, अतः निर्णय यही है।`;
   } else if (supported.length > 1) {
-    hi = "दो या अधिक विकल्प समान बल पर हैं, इसलिए निर्णय अनिर्णीत है।";
+    chosen = supported[0]; confidence = "MEDIUM"; basis = "tie among supported options, resolved by score";
+    hi = `${chosen.label} सबसे अधिक समर्थित है, पर अन्य विकल्प भी समर्थित हैं। निर्णय मध्यम विश्वास के साथ है।`;
   } else {
-    hi = "किसी विकल्प को पर्याप्त संयोजन और समय-खिड़की का समर्थन नहीं मिला, इसलिए निर्णय अनिर्णीत है।";
+    // No option passes. Select the option with the most partial evidence and label it LOW confidence.
+    const hasConds = r => !!(r.combo && r.combo.conditions && r.combo.conditions.length);
+    const partial = r => r.details ? Object.values(r.details).reduce((a, d) => a + d.activeN + (d.mandOk ? 1 : 0) + (d.linksOk ? 1 : 0) + (hasConds(r) && d.condOk ? 1 : 0), 0) : 0;
+    const ranked = results.map(r => ({ r, p: partial(r) })).sort((a, b) => b.p - a.p);
+    chosen = ranked[0].r; confidence = "LOW";
+    const tie = ranked.length > 1 && ranked[1].p === ranked[0].p;
+    basis = tie ? "no option passes its checks, tie on partial evidence, first in input order" : "no option passes its checks, most partial evidence";
+    hi = `${chosen.label} को आंशिक संयोजन-प्रमाण के आधार पर चुना गया है। विश्वास कम है। ${tie ? "कुछ विकल्पों में बराबर प्रमाण है।" : ""}`;
   }
-  return { results, chosen: chosen ? { label: chosen.label, decision: "SUPPORTED" } : null, decisionState: chosen ? "SUPPORTED" : "UNRESOLVED", hindi: hi };
+  return { results, chosen: chosen ? { label: chosen.label, decision: chosen.decision, confidence, basis } : null, decisionState: chosen ? "SELECTED" : "UNRESOLVED", hindi: hi };
 }
 function renderCombo(res) {
   const L = [];
@@ -1013,7 +1022,7 @@ function renderCombo(res) {
   });
   L.push("");
   L.push("DEFINITIVE FINAL ANSWER");
-  L.push(res.combo.chosen ? `SUPPORTED. Chosen option ${res.combo.chosen.label}.` : `UNRESOLVED. ${res.combo.hindi}`);
+  L.push(res.combo.chosen ? `SELECTED. Chosen option ${res.combo.chosen.label}. Confidence ${res.combo.chosen.confidence}. Basis: ${res.combo.chosen.basis}.` : `UNRESOLVED. ${res.combo.hindi}`);
   L.push("Hindi summary");
   L.push(res.combo.hindi);
   return plain(L.join("\n"));
