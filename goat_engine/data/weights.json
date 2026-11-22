@@ -35,13 +35,15 @@
     "event_min_dasha_count": 2,
     "event_min_age_years": 16,
     "activation_min_dasha_count": 2,
-    "activation_lookback_years": 5,
+    "activation_lookback_years": 0,
     "marker_weight": 2,
     "mild_percent": 15,
-    "severe_percent": 25,
-    "very_severe_percent": 35,
+    "severe_percent": 50,
+    "very_severe_percent": 60,
     "_note": "Life area quality. Severity points are the malefic points of the promise plus marker_weight for each affliction marker, as a percent of the full weight sum. Below mild_percent the outcome is positive. From severe_percent, with an active affliction dasha after the event, the outcome is separated. From very_severe_percent with an active affliction dasha, the outcome is severe, such as divorce. Otherwise challenged. These thresholds are provisional and the owner can set them.",
-    "presumed_event_note": "When the question states the event, for example that the native is married, set eventPresumed true in the config. The promise is then not tested, and the outcome comes from the afflictions and the activation only."
+    "presumed_event_note": "When the question states the event, for example that the native is married, set eventPresumed true in the config. The promise is then not tested, and the outcome comes from the afflictions and the activation only.",
+    "_activation_note": "Owner rule. Activation is read from the prevailing windows only, active on the as of date. The lookback is no longer used.",
+    "_threshold_note": "Owner delegated this call. Set to 50 and 60 percent so that separation and severe outcomes need strong afflictions active in the prevailing dasha. Only two owner cases are known, both challenged at 30 and 43 percent, so this is a conservative setting, to be rechecked as more cases come in."
   },
   "horizonYears": 10,
   "relatives": {

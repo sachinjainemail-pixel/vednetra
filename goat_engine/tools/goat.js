@@ -507,9 +507,8 @@ function qualityAnalysis(ctx, topicKey, options) {
   const event = presumed ? { presumed: true, start: null } : (promiseYes && eventWins.length ? eventWins[0] : null);
   // Prevailing activation. Validated windows in the lookback before as of, after the event, where at least
   // activation_min_dasha_count of the mahadasha, antardasha and pratyantardasha lords are afflicting planets.
-  const lookbackFrom = addYears(ctx.asOf, -q.activation_lookback_years);
-  const activeFrom = event && event.start > lookbackFrom ? event.start : lookbackFrom;
-  const active = event ? validatedA.filter(w => w.start >= activeFrom && w.start <= ctx.asOf && w.status !== "FUTURE" &&
+  // Owner rule. Activation is read from the prevailing windows only, the windows active on the as of date.
+  const active = event ? validatedA.filter(w => w.status === "NOW" &&
     [w.md, w.ad, w.pd].filter(l => aff.afflicters.indexOf(l) >= 0).length >= q.activation_min_dasha_count) : [];
   const outcome = classifyQuality(!!event, aff.pct, active.length, q);
   const tagged = options.filter(o => o.state);
@@ -580,7 +579,7 @@ function renderQuality(res) {
   L.push(`  Thresholds, mild below ${q.mild_percent} percent, severe from ${q.severe_percent} percent, very severe from ${q.very_severe_percent} percent.`);
   L.push("");
   L.push("STEP 4. Activation after the event. Validated windows where an afflicting planet is a dasha lord.");
-  L.push(`  Lookback ${q.activation_lookback_years} years before as of, at least ${q.activation_min_dasha_count} afflicting dasha lords. Windows found ${r.activeWindows.length}.`);
+  L.push(`  Prevailing windows only, active on the as of date, with at least ${q.activation_min_dasha_count} afflicting dasha lords. Windows found ${r.activeWindows.length}.`);
   if (r.activeWindows.length) {
     r.activeWindows.slice(0, 10).forEach((w, i) => L.push(`  ${i + 1}. ${fmtDate(w.start)} to ${fmtDate(w.end)}, dasha ${w.md} Mahadasha ${w.ad} Antardasha ${w.pd} Pratyantardasha, transit grade ${w.grade}, time ${w.status}.`));
     if (r.activeWindows.length > 10) L.push(`  And ${r.activeWindows.length - 10} more.`);
@@ -683,8 +682,11 @@ function ruleAnalysis(ctx, topicKey, options) {
     const kindScore = {};
     Object.keys(TYPES.occupationKinds).forEach(k => {
       const combo = TYPES.occupationKinds[k];
-      const ps = combo.planets;
-      const base = comboScore(ctx, combo);
+      const ps = combo.signifiers;
+      const cc = comboCount(ctx, combo);
+      const base = cc.total + 0.01 * signifierStrength(ctx, ps);
+      out.comboHits = out.comboHits || {};
+      out.comboHits[k] = cc.hitsBy;
       kindScore[k] = round2(base + (ps.some(p => activeLords.has(p)) ? 1 : 0) + (ps.some(p => pastLords.has(p)) ? 0.5 : 0));
     });
     const unemployedOpt = options.find(o => o.kind === "unemployed");
@@ -851,20 +853,40 @@ function analyseRelative(ctx, topicKey, label) {
     score: (yes ? 1000 : 0) + eventScore
   };
 }
-// Combination score. Planets of a kind, their strength, their placement in the combination houses and their
-// lordship of those houses. Used for occupation kinds, and for any life area once its combination is in data.
-function comboScore(ctx, combo) {
-  let s = 0;
-  combo.planets.forEach(name => {
-    const p = ctx.by[name];
-    s += pvAt(ctx, name, p.sign, false).v;
-    combo.houses.forEach(h => {
-      if (houseFrom(p.sign, ctx.lagna) === h) s += 1;
-      if (SIGN_LORD[signAtHouse(ctx.lagna, h)] === name) s += 1;
-    });
-  });
-  return round2(s / combo.planets.length);
+// ---- combinations in three charts. D1 from Lagna, Moon chart from Moon, D9 rotated from Lagna. ----
+// A combination is a signifier planet that is conjunct or in natal aspect with the lord of a combination house,
+// with a linked karaka, or that sits in a combination house. Each chart counts on its own.
+const CHARTS = ["D1", "Moon", "D9"];
+function chartPos(ctx, chart, name) { return chart === "D9" ? ctx.by[name].navamsaSign : ctx.by[name].sign; }
+function chartRef(ctx, chart) { return chart === "Moon" ? ctx.moon : ctx.lagna; }
+function chartLord(ctx, chart, h) { return SIGN_LORD[signAtHouse(chartRef(ctx, chart), h)]; }
+function chartRelation(ctx, chart, a, b) {
+  const pa = chartPos(ctx, chart, a), pb = chartPos(ctx, chart, b);
+  if (pa === pb) return true;
+  const aa = NATAL_ASPECTS[a] || [], ab = NATAL_ASPECTS[b] || [];
+  return aa.indexOf(houseFrom(pb, pa)) >= 0 || ab.indexOf(houseFrom(pa, pb)) >= 0;
 }
+// combo = { signifiers, houses, karakas }. Returns the count over the three charts and the hits per chart.
+function comboCount(ctx, combo) {
+  const hitsBy = {};
+  let total = 0;
+  CHARTS.forEach(ch => {
+    const hits = [];
+    combo.signifiers.forEach(sg => {
+      combo.houses.forEach(h => {
+        if (houseFrom(chartPos(ctx, ch, sg), chartRef(ctx, ch)) === h) hits.push(sg + " in house " + h);
+        const L = chartLord(ctx, ch, h);
+        if (L !== sg && chartRelation(ctx, ch, sg, L)) hits.push(sg + " with lord of " + h);
+      });
+      combo.karakas.forEach(k => { if (k !== sg && chartRelation(ctx, ch, sg, k)) hits.push(sg + " with karaka " + k); });
+    });
+    hitsBy[ch] = hits;
+    total += hits.length;
+  });
+  return { total, hitsBy };
+}
+// Strength of the signifiers, used only to break ties between kinds with the same count.
+function signifierStrength(ctx, names) { return sum(names.map(n => pvAt(ctx, n, ctx.by[n].sign, false).v)); }
 function renderRelativeResult(r, idx) {
   const L = [];
   L.push(`${idx === undefined ? "" : idx + 1 + ". "}Option ${r.label}`);
