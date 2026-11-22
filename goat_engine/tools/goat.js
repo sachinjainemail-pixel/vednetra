@@ -28,11 +28,12 @@
 "use strict";
 const fs = require("fs");
 const path = require("path");
-const { loadVedicCore } = require("../../suj_engine/tools/vednetra_loader");
+const { loadVedicCore } = require("./vednetra_loader");
 
 const DATA = path.join(__dirname, "..", "data");
 const W = JSON.parse(fs.readFileSync(path.join(DATA, "weights.json"), "utf8"));
 const TOPICS = JSON.parse(fs.readFileSync(path.join(DATA, "topics.json"), "utf8"));
+const TYPES = JSON.parse(fs.readFileSync(path.join(DATA, "types.json"), "utf8"));
 const DAY = 86400000;
 
 // ---- fixed astrological tables -------------------------------------------------------------------
@@ -369,6 +370,93 @@ function hindiLine(ctx, r) {
   return parts.join(", ") + "।";
 }
 
+// ---- ordinal, count and type rules --------------------------------------------------------------
+// Ordinal (education level). The more auspicious the promise, the higher the degree on the option list.
+// Count (siblings). The more auspicious the promise, the larger the total. The gender balance of the
+// planets forming the promise splits the total into brothers and sisters.
+// Type (property). The planet that is strongest in the promise decides the kind of thing.
+// The stream, the gender and the kind come from the planets, as the owner asked.
+const NUMBER_WORDS = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10 };
+function parseSiblings(label) {
+  const t = String(label).toLowerCase();
+  if (/only child|no sibling|none/.test(t)) return { brothers: 0, sisters: 0, total: 0 };
+  const num = s => (/^\d+$/.test(s) ? Number(s) : (NUMBER_WORDS[s] || 0));
+  const b = t.match(/(\d+|[a-z]+)\s+brothers?\b/);
+  const s = t.match(/(\d+|[a-z]+)\s+sisters?\b/);
+  const brothers = b ? num(b[1]) : 0;
+  const sisters = s ? num(s[1]) : 0;
+  return { brothers, sisters, total: brothers + sisters };
+}
+function ruleAnalysis(ctx, topicKey, options) {
+  const T = TOPICS[topicKey];
+  const P = evalPromise(ctx, T);
+  const strength = Math.max(-1, Math.min(1, P.net / W.rule.net_scale));
+  const pos = (strength + 1) / 2;
+  const sigSet = Array.from(new Set([P.lordName].concat(ctx.planets.filter(q => q.sign === P.sL).map(q => q.name), P.karakas)));
+  const pvOf = {};
+  ctx.planets.forEach(q => { pvOf[q.name] = pvAt(ctx, q.name, q.sign, false).v; });
+  const strongest = sigSet.slice().sort((a, b) => pvOf[b] - pvOf[a])[0];
+  const out = { rule: T.rule, topic: topicKey, hi: T.hi, net: P.net, strength: round2(strength), relevant: sigSet, pvOf, strongest, lines: [] };
+  if (T.rule === "ordinal") {
+    const n = options.length;
+    const idx = Math.round(pos * (n - 1));
+    out.chosen = { label: options[idx].label };
+    out.index = idx + 1;
+    out.of = n;
+    out.stream = TYPES.stream[strongest];
+    out.lines.push(`Strength ${fmt(strength)} on the scale puts the native at level ${idx + 1} of ${n} on the option list, where higher means a higher degree.`);
+    out.lines.push(`The strongest promise planet is ${strongest}, so the field of study points to ${out.stream}.`);
+  } else if (T.rule === "count") {
+    const parsed = options.map(o => Object.assign({ label: o.label }, parseSiblings(o.label)));
+    const maxT = Math.max(...parsed.map(p => p.total));
+    const total = Math.round(pos * maxT);
+    let male = 0, female = 0; const maleP = [], femaleP = [];
+    sigSet.forEach(n => {
+      const g = TYPES.gender[n];
+      if (g === "male") { male += pvOf[n]; maleP.push(n); }
+      if (g === "female") { female += pvOf[n]; femaleP.push(n); }
+    });
+    const ratio = (male - female) / ((Math.abs(male) + Math.abs(female)) || 1);
+    const tb = Math.round(total * ((ratio + 1) / 2));
+    const ts = total - tb;
+    const dist = p => Math.abs(p.brothers - tb) + Math.abs(p.sisters - ts);
+    const best = parsed.slice().sort((a, b) => (dist(a) - dist(b)) || (Math.abs(a.total - total) - Math.abs(b.total - total)))[0];
+    out.chosen = { label: best.label };
+    out.total = total; out.brothersTarget = tb; out.sistersTarget = ts; out.ratio = round2(ratio);
+    out.lines.push(`Strength ${fmt(strength)} gives a sibling total of ${total} on the option list.`);
+    out.lines.push(`Male promise planets ${maleP.join(", ") || "none"} and female promise planets ${femaleP.join(", ") || "none"} give a brothers share of ${(100 * (ratio + 1) / 2).toFixed(0)} percent, so about ${tb} brothers and ${ts} sisters.`);
+  } else if (T.rule === "type") {
+    const hit = options.find(o => o.planet === strongest);
+    const tagged = options.filter(o => o.planet).sort((a, b) => pvOf[b.planet] - pvOf[a.planet]);
+    out.chosen = { label: (hit || tagged[0] || options[0]).label };
+    out.propertyType = TYPES.propertyType[strongest];
+    out.lines.push(hit ? `The strongest promise planet ${strongest} matches option ${hit.label}.` : `No option is tagged with ${strongest}, so the option tagged with the strongest planet among the options is closest.`);
+    out.lines.push(`The strongest promise planet is ${strongest}, which points to ${out.propertyType}.`);
+  } else {
+    throw new Error("Topic " + topicKey + " has no ordinal, count or type rule");
+  }
+  return out;
+}
+function renderRule(res) {
+  const r = res.rule;
+  const L = [];
+  const hm = String(res.time).split(":");
+  L.push(`GOAT ENGINE REPORT for ${res.name}`);
+  L.push(`Gender ${res.gender}, born ${fmtDate(new Date(res.birth + "T00:00:00Z"))} at ${hm[0]}h${hm[1]} local time, ${res.place}.`);
+  L.push(`Lagna is sign index ${res.lagnaSign} and Moon sign index ${res.moonSign} in the VedNetra chart.`);
+  L.push(`Topic ${r.topic} with the ${r.rule} rule. Promise net ${fmt(r.net)}, strength ${fmt(r.strength)} on a scale from minus 1 to plus 1.`);
+  L.push("");
+  L.push("STEP 1 AND 2. Promise and relevant planets.");
+  L.push(`  Relevant planets are ${r.relevant.join(", ")}. The strongest is ${r.strongest}.`);
+  r.lines.forEach(l => L.push("  " + l));
+  L.push("");
+  L.push("FINAL ANSWER");
+  L.push(`Chosen option ${r.chosen.label}. This is the closest option by the rule, because the rule always selects one option from the list.`);
+  L.push("Hindi one liner.");
+  L.push(`${r.hi} के लिए वचन की प्रबलता ${r.strength >= 0 ? "अधिक" : "कम"} है और ग्रहों के आधार पर विकल्प ${r.chosen.label} चुना गया है।`);
+  return plain(L.join("\n"));
+}
+
 function run(cfg) {
   if (!cfg || !cfg.date || !cfg.time || cfg.tz === undefined || cfg.lat === undefined || cfg.lon === undefined) {
     throw new Error("Config needs date, time, tz, lat and lon");
@@ -379,6 +467,13 @@ function run(cfg) {
   ctx.asOf = asOf;
   ctx.from = parseDay(cfg.fromISO) || asOf;
   ctx.to = parseDay(cfg.toISO) || new Date(asOf.getTime() + horizon * 365.25 * DAY);
+  const T0 = TOPICS[cfg.topic];
+  if (T0 && T0.rule && T0.rule !== "yes_no") {
+    if (!cfg.options || !cfg.options.length) throw new Error("Topic " + cfg.topic + " needs an options list");
+    return { mode: "rule", name: cfg.name || "Native", gender: cfg.gender || "unspecified", place: cfg.place || "",
+      birth: cfg.date, time: cfg.time, asOf, from: ctx.from, to: ctx.to, lagnaSign: ctx.lagna, moonSign: ctx.moon,
+      rule: ruleAnalysis(ctx, cfg.topic, cfg.options) };
+  }
   const items = cfg.options && cfg.options.length ? cfg.options : [{ label: cfg.topic, topic: cfg.topic }];
   const results = items.map(it => analyseTopic(ctx, it.topic, it.label || it.topic));
   const sorted = results.slice().sort((a, b) => b.score - a.score);
@@ -425,6 +520,7 @@ function ctxOccNames(r) {
   return { lagna: f(lagna), d9: f(d9) };
 }
 function renderRun(res) {
+  if (res.mode === "rule") return renderRule(res);
   const L = [];
   L.push(`GOAT ENGINE REPORT for ${res.name}`);
   const hm = String(res.time).split(":");
@@ -440,18 +536,25 @@ function renderRun(res) {
   res.results.forEach((r, i) => { L.push(renderResult(r, res.mode === "options" ? i : undefined)); L.push(""); });
   const c = res.chosen;
   L.push("DEFINITIVE FINAL ANSWER");
-  L.push(res.mode === "options" ? `Chosen option ${c.label}. ${c.decision}.` : `${c.decision}.`);
+  if (res.mode === "options") {
+    const closest = c.decision === "NO" ? " No option is promised in the range, so this is the closest option." : "";
+    L.push(`Chosen option ${c.label}. ${c.decision}.${closest}`);
+  } else {
+    L.push(`${c.decision}.`);
+  }
   L.push(c.reason);
   return plain(L.join("\n"));
 }
 
-module.exports = { run, renderRun, plain, analyseTopic, makeContext, natureOf, houseFrom, signAtHouse, mod12, SIGN_LORD, placeD9, bestWindow, TOPICS, W };
+module.exports = { run, renderRun, renderRule, plain, analyseTopic, ruleAnalysis, parseSiblings, makeContext, natureOf, houseFrom, signAtHouse, mod12, SIGN_LORD, placeD9, bestWindow, TOPICS, W };
 
 if (require.main === module) {
   const argv = process.argv.slice(2);
   const cfg = JSON.parse(argv.find(a => !a.startsWith("--")) || "{}");
   const res = run(cfg);
-  if (argv.indexOf("--json") >= 0) {
+  if (argv.indexOf("--json") >= 0 && res.mode === "rule") {
+    process.stdout.write(JSON.stringify(res, (k, v) => (v instanceof Date ? v.toISOString() : v), 2) + "\n");
+  } else if (argv.indexOf("--json") >= 0) {
     const j = Object.assign({}, res, { results: res.results.map(r => Object.assign({}, r, { best: r.best ? Object.assign({}, r.best, { start: r.best.start.toISOString(), end: r.best.end.toISOString() }) : null, topWindows: r.topWindows.map(w => Object.assign({}, w, { start: w.start.toISOString(), end: w.end.toISOString() })) })) });
     j.chosen = j.results[0]; j.asOf = res.asOf.toISOString(); j.from = res.from.toISOString(); j.to = res.to.toISOString();
     process.stdout.write(JSON.stringify(j, null, 2) + "\n");

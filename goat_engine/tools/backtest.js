@@ -16,7 +16,7 @@ const fs = require("fs");
 const path = require("path");
 const { run } = require("./goat");
 
-const CASES = path.join(__dirname, "..", "..", "suj_engine", "cases", "cases.json");
+const CASES = path.join(__dirname, "..", "cases", "owner_cases.json");
 const cases = JSON.parse(fs.readFileSync(CASES, "utf8")).cases;
 
 const MARRIED_TRUTH = ["Married", "Divorced", "Widowed", "Widow", "Very happy", "Very unhappy", "Separated from husband", "Divorce in 2023"];
@@ -49,6 +49,12 @@ cases.forEach(c => {
       rows.push({ case: c.id, question: "event " + eventMatch[1], truth: q.truth, engine: pick.label + " " + pick.decision, net: pick.net,
         timing: pick.best ? "window " + pick.best.start.toISOString().slice(0, 10) + " to " + pick.best.end.toISOString().slice(0, 10) : "none",
         hit: pick.label === q.truth, scored: "option" });
+    } else if ((q.kind === "ordinal" && q.topic === "education") || (q.kind === "count" && q.topic === "siblings")) {
+      const topic = q.topic;
+      const res = run(Object.assign(baseCfg(c), { topic, options: q.options.map(o => ({ label: o })), asOf: c.asOf }));
+      const pick = res.rule.chosen.label;
+      rows.push({ case: c.id, question: topic + " " + q.kind, truth: q.truth, engine: pick, net: res.rule.net,
+        timing: "rule " + res.rule.rule, hit: pick === q.truth, scored: "rule" });
     } else {
       skipped.push(c.id + " Q" + q.n + " " + q.topic + " kind " + q.kind + " has no clean topic mapping");
     }
@@ -57,12 +63,14 @@ cases.forEach(c => {
 
 const promise = rows.filter(r => r.scored === "promise");
 const option = rows.filter(r => r.scored === "option");
+const rule = rows.filter(r => r.scored === "rule");
 console.log("GOAT ENGINE backtest on owner cases");
 console.log("");
 rows.forEach(r => console.log(`${r.case} | ${r.question} | truth ${r.truth} | engine ${r.engine} | net ${r.net.toFixed(2)} | ${r.timing} | ${r.hit ? "HIT" : "MISS"}`));
 console.log("");
 console.log(`Promise questions hit ${promise.filter(r => r.hit).length} of ${promise.length}.`);
 console.log(`Event option questions hit ${option.filter(r => r.hit).length} of ${option.length}.`);
+console.log(`Ordinal and count questions hit ${rule.filter(r => r.hit).length} of ${rule.length}.`);
 console.log("Skipped questions");
 skipped.forEach(s => console.log("  " + s));
 console.log("");

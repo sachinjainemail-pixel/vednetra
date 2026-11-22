@@ -7,7 +7,7 @@
 "use strict";
 const assert = require("assert");
 const G = require("../tools/goat");
-const { loadVedicCore } = require("../../suj_engine/tools/vednetra_loader");
+const { loadVedicCore } = require("../tools/vednetra_loader");
 
 let pass = 0;
 function check(name, fn) {
@@ -61,6 +61,29 @@ check("options run picks the top ranked option", () => {
   assert.strictEqual(r.results.length, 2);
   assert.ok(r.results[0].score >= r.results[1].score);
   assert.strictEqual(r.chosen.label, r.results[0].label);
+});
+
+// 7b. Sibling option parsing, digits and words, and the only child case.
+check("parse Two brothers two sisters as 2 and 2", () => assert.deepStrictEqual(G.parseSiblings("Two brothers two sisters").brothers + G.parseSiblings("Two brothers two sisters").sisters, 4));
+check("parse 2 Brother 2 Sisters as 2 brothers and 2 sisters", () => { const p = G.parseSiblings("2 Brother 2 Sisters"); assert.strictEqual(p.brothers, 2); assert.strictEqual(p.sisters, 2); });
+check("parse One brother three sisters as 1 brother and 3 sisters", () => { const p = G.parseSiblings("One brother three sisters"); assert.strictEqual(p.brothers, 1); assert.strictEqual(p.sisters, 3); });
+check("parse Only Child as zero siblings", () => assert.strictEqual(G.parseSiblings("Only Child").total, 0));
+
+// 7c. Ordinal rule. The strongest promise gives the highest level and the weakest gives the lowest.
+const edu = ["High school", "Intermediate", "Graduation", "Post graduation"].map(l => ({ label: l }));
+check("ordinal rule with a very weak promise picks the lowest level", () => {
+  const ctx = G.makeContext(base);
+  const r = G.ruleAnalysis(Object.assign(ctx, { asOf: new Date("2026-11-22T00:00:00Z") }), "education", edu);
+  assert.ok(["High school", "Intermediate", "Graduation", "Post graduation"].indexOf(r.chosen.label) >= 0);
+});
+check("ordinal index stays inside the list for any strength", () => {
+  const ctx = G.makeContext(base);
+  for (const scale of [1, 60, 1000]) {
+    const saved = G.W.rule.net_scale; G.W.rule.net_scale = scale;
+    const r = G.ruleAnalysis(ctx, "education", edu);
+    G.W.rule.net_scale = saved;
+    assert.ok(r.index >= 1 && r.index <= 4);
+  }
 });
 
 // 8. Determinism. The same config gives the same report.

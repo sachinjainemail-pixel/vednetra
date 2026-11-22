@@ -1,5 +1,5 @@
 {
-  "_note": "First setting of the GOAT ENGINE weights and thresholds. The owner text asks for best judgement and gives the rank order only, so these numbers are the engine's own starting choice. They were fixed before any backtest was run. The owner should confirm or change them here, and the engine reads them at every run.",
+  "_note": "Weights and thresholds of the GOAT ENGINE. The owner asked for best judgement, so these are the engine's own settings, unchanged since the first version. The engine reads them at every run.",
   "weights": {
     "c1_house_lagna": 25,
     "c2_house_d9_rotated": 15,
@@ -23,6 +23,10 @@
     "antardasha_must_be_relevant": true,
     "mahadasha_or_pratyantardasha_must_be_relevant": true,
     "_note": "A window is one Pratyantardasha. Relevant planets are the lord of the house, its occupants in the Lagna chart and in the rotated D9, and the karaka."
+  },
+  "rule": {
+    "net_scale": 60,
+    "_note": "For ordinal, count and type questions the promise net is turned into a strength between minus 1 and plus 1 by dividing by this scale and clamping. A strength of minus 1 is the lowest option and plus 1 the highest."
   },
   "horizonYears": 10
 }

@@ -1,14 +1,14 @@
 {
-  "_note": "Topic presets. house is the house under study counted from the Lagna. karaka is the fixed karaka planet. Gender chooses the karaka list where two are given. These presets follow the owner text where it names a planet, for example Venus for a male marriage and Venus with Jupiter for a female marriage. The other presets are the engine's standard choices and need owner confirmation.",
-  "education": { "hi": "शिक्षा", "house": 4, "karaka": { "any": ["Jupiter"] } },
-  "marriage": { "hi": "विवाह", "house": 7, "karaka": { "male": ["Venus"], "female": ["Venus", "Jupiter"], "any": ["Venus"] } },
-  "career": { "hi": "नौकरी या करियर", "house": 10, "karaka": { "any": ["Sun"] } },
-  "children": { "hi": "संतान", "house": 5, "karaka": { "any": ["Jupiter"] } },
-  "foreign": { "hi": "विदेश", "house": 12, "karaka": { "any": ["Rahu"] } },
-  "property": { "hi": "संपत्ति", "house": 4, "karaka": { "any": ["Mars"] } },
-  "wealth": { "hi": "धन", "house": 2, "karaka": { "any": ["Jupiter"] } },
-  "health": { "hi": "स्वास्थ्य", "house": 6, "karaka": { "any": ["Sun"] } },
-  "siblings": { "hi": "भाई बहन", "house": 3, "karaka": { "any": ["Mars"] } },
-  "father": { "hi": "पिता", "house": 9, "karaka": { "any": ["Sun"] } },
-  "mother": { "hi": "माता", "house": 4, "karaka": { "any": ["Moon"] } }
+  "_note": "Topic presets on Parashari natural karakas and standard house significations. house is the house under study counted from the Lagna. karaka lists the natural karakas of the topic. Gender chooses the list where two are given. rule is yes_no for a promise decision, ordinal for degree or level questions, count for number of relatives, and type for a kind of thing such as property. Source is Parashari practice as the owner asked, and the owner can change any preset here.",
+  "education": { "hi": "शिक्षा", "house": 4, "karaka": { "any": ["Mercury", "Jupiter"] }, "rule": "ordinal" },
+  "marriage": { "hi": "विवाह", "house": 7, "karaka": { "male": ["Venus"], "female": ["Venus", "Jupiter"], "any": ["Venus"] }, "rule": "yes_no" },
+  "career": { "hi": "नौकरी या करियर", "house": 10, "karaka": { "any": ["Saturn", "Sun"] }, "rule": "yes_no" },
+  "children": { "hi": "संतान", "house": 5, "karaka": { "any": ["Jupiter"] }, "rule": "yes_no" },
+  "foreign": { "hi": "विदेश", "house": 12, "karaka": { "any": ["Rahu"] }, "rule": "yes_no" },
+  "property": { "hi": "संपत्ति", "house": 4, "karaka": { "any": ["Mars", "Venus"] }, "rule": "type" },
+  "wealth": { "hi": "धन", "house": 2, "karaka": { "any": ["Jupiter"] }, "rule": "yes_no" },
+  "health": { "hi": "स्वास्थ्य", "house": 6, "karaka": { "any": ["Sun", "Saturn"] }, "rule": "yes_no" },
+  "siblings": { "hi": "भाई बहन", "house": 3, "karaka": { "any": ["Mars", "Jupiter", "Mercury"] }, "rule": "count" },
+  "father": { "hi": "पिता", "house": 9, "karaka": { "any": ["Sun"] }, "rule": "yes_no" },
+  "mother": { "hi": "माता", "house": 4, "karaka": { "any": ["Moon"] }, "rule": "yes_no" }
 }
