@@ -1,0 +1,226 @@
+{
+  "_note": "Owner supplied combinations, D1, Moon and rotated D9 only. Divisional charts and Jaimini points are not used. Each entry lists houses that must be active, planets that signify the event, and karakas. One house may serve several roles. Medical, death, pregnancy outcome and speculative outcomes are not in this file.",
+  "education": {
+    "Matric": {
+      "houses": [
+        4,
+        5,
+        11
+      ],
+      "planets": [
+        "Mercury",
+        "Jupiter"
+      ]
+    },
+    "Intermediate": {
+      "houses": [
+        4,
+        5,
+        6,
+        11
+      ],
+      "planets": [
+        "Mercury",
+        "Jupiter"
+      ]
+    },
+    "Graduation": {
+      "houses": [
+        4,
+        5,
+        9,
+        11
+      ],
+      "planets": [
+        "Mercury",
+        "Jupiter"
+      ]
+    },
+    "PG": {
+      "houses": [
+        5,
+        9,
+        11
+      ],
+      "planets": [
+        "Mercury",
+        "Jupiter"
+      ]
+    },
+    "PhD": {
+      "houses": [
+        3,
+        5,
+        8,
+        9,
+        11
+      ],
+      "planets": [
+        "Mercury",
+        "Jupiter",
+        "Saturn"
+      ]
+    }
+  },
+  "livelihood": {
+    "government": {
+      "houses": [
+        10,
+        6
+      ],
+      "planets": [
+        "Sun",
+        "Moon"
+      ],
+      "karakas": [
+        "Saturn"
+      ]
+    },
+    "army": {
+      "houses": [
+        10,
+        6
+      ],
+      "planets": [
+        "Mars"
+      ],
+      "karakas": [
+        "Saturn"
+      ]
+    },
+    "commerce": {
+      "houses": [
+        10,
+        6
+      ],
+      "planets": [
+        "Mercury",
+        "Venus"
+      ],
+      "karakas": [
+        "Saturn"
+      ]
+    },
+    "teaching": {
+      "houses": [
+        10,
+        6
+      ],
+      "planets": [
+        "Jupiter",
+        "Mercury"
+      ],
+      "karakas": [
+        "Saturn"
+      ]
+    },
+    "religious": {
+      "houses": [
+        10,
+        6
+      ],
+      "planets": [
+        "Jupiter",
+        "Ketu"
+      ],
+      "karakas": [
+        "Saturn"
+      ]
+    }
+  },
+  "residence": {
+    "birthplace": {
+      "houses": [
+        2,
+        4
+      ],
+      "planets": [
+        "Moon"
+      ]
+    },
+    "other_state": {
+      "houses": [
+        4,
+        9,
+        10
+      ],
+      "planets": [
+        "Moon"
+      ]
+    },
+    "abroad": {
+      "houses": [
+        4,
+        9,
+        12
+      ],
+      "planets": [
+        "Moon"
+      ]
+    }
+  },
+  "housing": {
+    "rented": {
+      "houses": [
+        4,
+        7,
+        12
+      ],
+      "planets": [
+        "Venus"
+      ]
+    },
+    "own": {
+      "houses": [
+        4,
+        2,
+        11
+      ],
+      "planets": [
+        "Venus"
+      ]
+    },
+    "ancestral": {
+      "houses": [
+        4,
+        2,
+        8
+      ],
+      "planets": [
+        "Venus"
+      ]
+    }
+  },
+  "event_2026": {
+    "marriage": {
+      "houses": [
+        2,
+        7,
+        11
+      ],
+      "planets": [
+        "Venus"
+      ]
+    },
+    "pilgrimage": {
+      "houses": [
+        9,
+        12,
+        3
+      ],
+      "planets": [
+        "Jupiter"
+      ]
+    },
+    "theft": {
+      "houses": [
+        2,
+        8,
+        12
+      ],
+      "planets": [
+        "Saturn"
+      ]
+    }
+  }
+}

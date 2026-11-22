@@ -35,6 +35,7 @@ const W = JSON.parse(fs.readFileSync(path.join(DATA, "weights.json"), "utf8"));
 const TOPICS = JSON.parse(fs.readFileSync(path.join(DATA, "topics.json"), "utf8"));
 const TYPES = JSON.parse(fs.readFileSync(path.join(DATA, "types.json"), "utf8"));
 const NAKS = JSON.parse(fs.readFileSync(path.join(DATA, "nakshatras.json"), "utf8"));
+const LIFE = JSON.parse(fs.readFileSync(path.join(DATA, "life_combos.json"), "utf8"));
 const DAY = 86400000;
 
 // ---- fixed astrological tables -------------------------------------------------------------------
@@ -780,6 +781,10 @@ function run(cfg) {
   ctx.to = parseDay(cfg.toISO) || new Date(asOf.getTime() + horizon * 365.25 * DAY);
   // Past event mode for quiz or past event questions with given options. Set asOf to the event date and fromISO and
   // toISO to the event period. Windows that start after the event date are dropped. Excluded topics stay NOT DECIDED.
+  if (cfg.mode === "combo" || (cfg.options || []).some(o => o.combo_key)) {
+    return { mode: "combo", name: cfg.name || "Native", place: cfg.place || "", birth: cfg.date, time: cfg.time, asOf,
+      lagnaSign: ctx.lagna, moonSign: ctx.moon, combo: comboChoice(ctx, cfg.options || []) };
+  }
   const qualityMode = cfg.mode === "quality" || (cfg.options || []).some(o => o.state);
   if (qualityMode) {
     if (!TOPICS[cfg.topic]) throw new Error("Quality mode needs a topic key from data/topics.json");
@@ -900,6 +905,61 @@ function comboCount(ctx, combo) {
 }
 // Strength of the signifiers, used only to break ties between kinds with the same count.
 function signifierStrength(ctx, names) { return sum(names.map(n => pvAt(ctx, n, ctx.by[n].sign, false).v)); }
+// ---- combination choice within one life area. Houses, planets and karakas in D1, Moon and rotated D9. ----
+function houseOfChart(ctx, c, s) { return houseFrom(chartPos(ctx, c, s), chartRef(ctx, c)); }
+// An option is supported in a chart when enough of its houses and its karaka link are active. A house is active
+// when a signifier sits in it or relates to its lord. The option counts when at least min_charts_agree charts support it.
+function comboSupport(ctx, combo) {
+  const perChart = {};
+  let charts = 0, total = 0;
+  const karakas = combo.karakas || [];
+  CHARTS.forEach(c => {
+    const hitsH = combo.houses.filter(h => {
+      const L = chartLord(ctx, c, h);
+      return combo.planets.some(sg => houseOfChart(ctx, c, sg) === h || (sg !== L && chartRelation(ctx, c, sg, L)));
+    });
+    const kar = karakas.length > 0 && karakas.some(k => combo.planets.some(sg => sg !== k && chartRelation(ctx, c, sg, k)));
+    const count = hitsH.length + (kar ? 1 : 0);
+    const need = Math.min(2, combo.houses.length + karakas.length);
+    perChart[c] = { count, houses: hitsH, karaka: kar };
+    if (count >= need) charts++;
+    total += count;
+  });
+  const score = charts >= W.combination.min_charts_agree ? total : 0;
+  return { score, charts, perChart };
+}
+function lifeCombo(key) {
+  const [area, opt] = String(key).split(".");
+  if (!LIFE[area] || !LIFE[area][opt]) throw new Error("Unknown combination " + key + ". See data life_combos.json");
+  return LIFE[area][opt];
+}
+function comboChoice(ctx, options) {
+  const results = options.map(o => {
+    const combo = o.combo_key ? lifeCombo(o.combo_key) : null;
+    const sup = combo ? comboSupport(ctx, combo) : { score: 0, charts: 0, perChart: {} };
+    return { label: o.label, key: o.combo_key || null, score: sup.score, charts: sup.charts, perChart: sup.perChart };
+  });
+  const sorted = results.slice().sort((a, b) => b.score - a.score);
+  const chosen = sorted[0] && sorted[0].score > 0 ? sorted[0] : null;
+  const hi = chosen ? `${chosen.label} के पक्ष में ${chosen.charts} चार्ट में समर्थन मिला, कुल स्कोर ${chosen.score}। अतः विकल्प ${chosen.label} चुना गया।` : "किसी विकल्प को दो चार्ट में पर्याप्त समर्थन नहीं मिला, इसलिए निर्णय नहीं हो सकता।";
+  return { results: sorted, chosen, hindi: hi };
+}
+function renderCombo(res) {
+  const L = [];
+  L.push(`GOAT ENGINE COMBINATION REPORT for ${res.name}`);
+  L.push(`Lagna is sign index ${res.lagnaSign} and Moon sign index ${res.moonSign}. Charts used D1, Moon and rotated D9 only.`);
+  L.push("");
+  res.combo.results.forEach((r, i) => {
+    const pc = CHARTS.map(c => `${c} ${r.perChart[c] ? r.perChart[c].count : 0}`).join(", ");
+    L.push(`${i + 1}. ${r.label}, score ${r.score}, supported in ${r.charts} charts, counts ${pc}.`);
+  });
+  L.push("");
+  L.push("DEFINITIVE FINAL ANSWER");
+  L.push(res.combo.chosen ? `Chosen option ${res.combo.chosen.label}.` : "NO ANSWER. No option has enough support in two charts.");
+  L.push("Hindi summary");
+  L.push(res.combo.hindi);
+  return plain(L.join("\n"));
+}
 function renderRelativeResult(r, idx) {
   const L = [];
   L.push(`${idx === undefined ? "" : idx + 1 + ". "}Option ${r.label}`);
@@ -966,6 +1026,8 @@ function hindiSummaryLines(res) {
   if (res.mode === "quality") {
     const r = res.quality;
     out.push(r.hindi);
+  } else if (res.mode === "combo") {
+    out.push(res.combo.hindi);
   } else if (res.mode === "rule") {
     out.push(res.rule.hindi);
   } else {
@@ -975,6 +1037,7 @@ function hindiSummaryLines(res) {
   return out;
 }
 function renderRun(res) {
+  if (res.mode === "combo") return renderCombo(res);
   if (res.mode === "rule") return renderRule(res);
   if (res.mode === "quality") return renderQuality(res);
   const L = [];
@@ -1005,7 +1068,7 @@ function renderRun(res) {
   return plain(L.join("\n"));
 }
 
-module.exports = { run, renderRun, renderRule, renderQuality, plain, analyseTopic, ruleAnalysis, qualityAnalysis, afflictionProfile, classifyQuality, parseSiblings, makeContext, natureOf, houseFrom, signAtHouse, mod12, SIGN_LORD, placeD9, bestWindow, TOPICS, W };
+module.exports = { run, renderCombo, comboSupport, renderRun, renderRule, renderQuality, plain, analyseTopic, ruleAnalysis, qualityAnalysis, afflictionProfile, classifyQuality, parseSiblings, makeContext, natureOf, houseFrom, signAtHouse, mod12, SIGN_LORD, placeD9, bestWindow, TOPICS, W };
 
 // Command line. Use --file for the config so that no shell quoting is needed on Windows, macOS, Linux or a
 // phone terminal. Use --out to write the report as UTF-8 so that Hindi text is kept intact on any console.
@@ -1034,7 +1097,8 @@ if (require.main === module) {
   try {
     const res = run(readConfig(argv));
     if (argv.indexOf("--json") >= 0) {
-      if (res.mode === "rule" || res.mode === "quality") { res.hindiSummary = hindiSummaryLines(res); text = toPlainJson(res); }
+      if (res.mode === "combo") text = toPlainJson(res);
+      else if (res.mode === "rule" || res.mode === "quality") { res.hindiSummary = hindiSummaryLines(res); text = toPlainJson(res); }
       else {
         const j = Object.assign({}, res, { results: res.results.map(r => Object.assign({}, r, { best: r.best ? Object.assign({}, r.best, { start: r.best.start.toISOString(), end: r.best.end.toISOString() }) : null, topWindows: r.topWindows.map(w => Object.assign({}, w, { start: w.start.toISOString(), end: w.end.toISOString() })) })) });
         j.chosen = j.results[0]; j.asOf = res.asOf.toISOString(); j.from = res.from.toISOString(); j.to = res.to.toISOString();
