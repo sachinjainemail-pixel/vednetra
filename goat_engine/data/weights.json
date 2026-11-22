@@ -16,13 +16,16 @@
     "samples_per_window": 5,
     "grade_A_min_double_samples": 3,
     "grade_B_min_double_samples": 2,
-    "validated_grades": ["A", "B"],
+    "validated_grades": [
+      "A",
+      "B"
+    ],
     "_note": "A double transit means Jupiter and Saturn both hit a target sign, by conjunction or by their full aspects, in the same sampled instant. The targets are the house, its lord and the karaka, all counted from the Lagna."
   },
   "dasha": {
-    "antardasha_must_be_relevant": true,
+    "antardasha_must_be_relevant": false,
     "mahadasha_or_pratyantardasha_must_be_relevant": true,
-    "_note": "A window is one Pratyantardasha. Relevant planets are the lord of the house, its occupants in the Lagna chart and in the rotated D9, and the karaka."
+    "_note": "Owner decision. The antardasha lord need not be relevant. A window counts when the mahadasha or the pratyantardasha lord is relevant. Relevant planets are the house lord, occupants in the Lagna chart and in the rotated D9, the karaka, and planets that aspect the house by natal aspect."
   },
   "rule": {
     "net_scale": 60,

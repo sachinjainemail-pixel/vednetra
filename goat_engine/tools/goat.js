@@ -164,6 +164,10 @@ function aspectsOn(ctx, s) {
   });
   return { score: round2(sum(list.map(x => x.v))), list };
 }
+// Planets that aspect a house by their natal aspects. They count as linked to the house for timing.
+function aspectersOn(ctx, s) {
+  return ctx.planets.filter(q => { const asp = NATAL_ASPECTS[q.name]; return asp && q.sign !== s && asp.indexOf(houseFrom(s, q.sign)) >= 0; }).map(q => q.name);
+}
 function kartari(ctx, s) {
   const left = ctx.planets.filter(q => q.sign === mod12(s - 1));
   const right = ctx.planets.filter(q => q.sign === mod12(s + 1));
@@ -307,8 +311,8 @@ function findWindows(ctx, S, targets) {
         if (pd.end <= from || pd.start >= to) continue;
         const pdIn = S.has(pd.lord);
         if (W.dasha.mahadasha_or_pratyantardasha_must_be_relevant && !(mdIn || pdIn)) continue;
-        const a0 = Math.max(pd.start.getTime(), from.getTime());
-        const b0 = Math.min(pd.end.getTime(), to.getTime());
+        const a0 = pd.start.getTime();   // transit is sampled across the whole pratyantardasha, not the search range
+        const b0 = pd.end.getTime();
         const tr = transitCheck(ctx, a0, b0, targets);
         const status = pd.end < asOf ? "PAST" : (pd.start > asOf ? "FUTURE" : "NOW");
         out.push({ md: md.lord, ad: ad.lord, pd: pd.lord, start: pd.start, end: pd.end, dashaCount: [mdIn, adIn, pdIn].filter(Boolean).length, status, ...tr });
@@ -332,7 +336,7 @@ function analyseTopic(ctx, topicKey, label) {
   const lordP = ctx.by[P.lordName];
   const occH = ctx.planets.filter(q => q.sign === P.sL).map(q => q.name);
   const occD9 = ctx.planets.filter(q => q.navamsaSign === P.sL).map(q => q.name);
-  const S = new Set([P.lordName].concat(occH, occD9, P.karakas));
+  const S = new Set([P.lordName].concat(occH, occD9, P.karakas, aspectersOn(ctx, P.sL)));
   const targets = [P.sL, lordP.sign].concat(P.karakas.map(k => ctx.by[k].sign));
   // Adverse events, such as illness or job loss, are promised by affliction, so the test is inverted.
   const adverse = T.polarity === "adverse";
@@ -441,7 +445,7 @@ function qualityAnalysis(ctx, topicKey, options) {
   const lordP = ctx.by[P.lordName];
   const occH = ctx.planets.filter(x => x.sign === P.sL).map(x => x.name);
   const occD9 = ctx.planets.filter(x => x.navamsaSign === P.sL).map(x => x.name);
-  const S = new Set([P.lordName].concat(occH, occD9, P.karakas));
+  const S = new Set([P.lordName].concat(occH, occD9, P.karakas, aspectersOn(ctx, P.sL)));
   const targets = [P.sL, lordP.sign].concat(P.karakas.map(k => ctx.by[k].sign));
   const aff = afflictionProfile(ctx, P);
   const windows = findWindows(ctx, S, targets);
