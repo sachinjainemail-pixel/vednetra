@@ -163,12 +163,13 @@
     "rented": {
       "houses": [
         4,
-        7,
-        12
+        3,
+        7
       ],
       "planets": [
         "Venus"
-      ]
+      ],
+      "_source": "Supplement section 9, finding a rented house is 4 + 3 + 7, rent expense 12. Corrected from 4 + 7 + 12, which is the row for renting out."
     },
     "own": {
       "houses": [
