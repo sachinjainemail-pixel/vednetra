@@ -165,12 +165,12 @@ function aspectsOn(ctx, s) {
   return { score: round2(sum(list.map(x => x.v))), list };
 }
 // Timing set. Dasha lords that count for a house are checked from two charts, the Lagna chart (D1 from Lagna)
-// and the Moon chart (house counted from the Moon). In each chart the set takes the house lord, its occupants,
-// and the planets that aspect the house. The karakas of the topic are added once.
+// Moon chart (house counted from the Moon) and the D9 chart rotated from the Lagna. In each chart the set takes the
+// house lord, its occupants and the planets that aspect the house. The karakas of the topic are added once.
 function timingSet(ctx, P, occH, occD9) {
   const occM = ctx.planets.filter(q => q.sign === P.sM).map(q => q.name);
   const lordM = SIGN_LORD[P.sM];
-  return new Set([P.lordName, lordM].concat(occH, occD9, occM, P.karakas, aspectersOn(ctx, P.sL), aspectersOn(ctx, P.sM)));
+  return new Set([P.lordName, lordM].concat(occH, occD9, occM, P.karakas, aspectersOn(ctx, P.sL), aspectersOn(ctx, P.sM), aspectersOnD9(ctx, P.sL)));
 }
 // Planets that aspect a house by their natal aspects. They count as linked to the house for timing.
 function aspectersOn(ctx, s) {
@@ -284,6 +284,17 @@ function evalPromise(ctx, T) {
 }
 
 // ---- timing: pratyantardasha windows and transit validation --------------------------------------
+// Transit targets in two frames. D1 targets are the house, the house counted from the Moon, the house lord and
+// the karakas. D9 targets are the rotated D9 house (the D1 Lagna sign), the lord and the karakas in D9.
+function targetsOf(ctx, P, lordSign) {
+  const d1 = [P.sL, P.sM, lordSign, ctx.by[SIGN_LORD[P.sM]].sign].concat(P.karakas.map(k => ctx.by[k].sign));
+  const d9 = [P.sL, ctx.by[P.lordName].navamsaSign].concat(P.karakas.map(k => ctx.by[k].navamsaSign));
+  return { d1, d9 };
+}
+// Planets that aspect the rotated D9 house by natal aspect, counted in the D9 chart.
+function aspectersOnD9(ctx, sL) {
+  return ctx.planets.filter(q => { const asp = NATAL_ASPECTS[q.name]; return asp && q.navamsaSign !== sL && asp.indexOf(houseFrom(sL, q.navamsaSign)) >= 0; }).map(q => q.name);
+}
 function hitsTargets(ref, name, targets) {
   return targets.some(t => { const d = houseFrom(t, ref.sign); return d === 1 || TRANSIT_ASPECTS[name].indexOf(d) >= 0; });
 }
@@ -293,11 +304,16 @@ function transitCheck(ctx, a0, b0, targets) {
   for (let i = 0; i < N; i++) {
     const t = N === 1 ? a0 : a0 + ((b0 - a0) * i) / (N - 1);
     const tc = ctx.VC.buildChart(new Date(t), Number(ctx.cfg.lat), Number(ctx.cfg.lon), Number(ctx.cfg.tz), { ayanamshaKey: "lahiri" });
-    const jh = hitsTargets(tc.planetsByName.Jupiter, "Jupiter", targets);
-    const sh = hitsTargets(tc.planetsByName.Saturn, "Saturn", targets);
+    // Double transit in the D1 chart (house, Moon house, lord, karakas) or in the D9 chart rotated from the Lagna.
+    const tc9 = ctx.VC.makeVargaChart(tc, 9);
+    const jh1 = hitsTargets(tc.planetsByName.Jupiter, "Jupiter", targets.d1);
+    const sh1 = hitsTargets(tc.planetsByName.Saturn, "Saturn", targets.d1);
+    const jh9 = hitsTargets(tc9.planetsByName.Jupiter, "Jupiter", targets.d9);
+    const sh9 = hitsTargets(tc9.planetsByName.Saturn, "Saturn", targets.d9);
+    const jh = jh1 || jh9, sh = sh1 || sh9;
     if (jh) jup++;
     if (sh) sat++;
-    if (jh && sh) dbl++;
+    if ((jh1 && sh1) || (jh9 && sh9)) dbl++;
   }
   let grade = "D";                                   // no double transit at all
   if (dbl >= W.transit.grade_A_min_double_samples) grade = "A";
@@ -345,7 +361,7 @@ function analyseTopic(ctx, topicKey, label) {
   const occH = ctx.planets.filter(q => q.sign === P.sL).map(q => q.name);
   const occD9 = ctx.planets.filter(q => q.navamsaSign === P.sL).map(q => q.name);
   const S = timingSet(ctx, P, occH, occD9);
-  const targets = [P.sL, P.sM, lordP.sign, ctx.by[SIGN_LORD[P.sM]].sign].concat(P.karakas.map(k => ctx.by[k].sign));
+  const targets = targetsOf(ctx, P, lordP.sign);
   // Adverse events, such as illness or job loss, are promised by affliction, so the test is inverted.
   const adverse = T.polarity === "adverse";
   const promiseYes = adverse ? P.net < 0 : P.net > 0;
@@ -362,7 +378,7 @@ function analyseTopic(ctx, topicKey, label) {
     label, topic: topicKey, hi: T.hi, house: P.H, lagnaSign: P.sL, moonHouseSign: P.sM, karakas: P.karakas, lord: P.lordName,
     nthHouse: P.x4, kalpurushaHouseSign: P.sK, kalpurushaLord: P.lordK, net: P.net, promiseYes,
     components: P.comps, benefic: pos, malefic: neg, detail: P.detail,
-    relevantPlanets: Array.from(S), transitTargetSigns: targets,
+    relevantPlanets: Array.from(S), transitTargetSigns: targets.d1, transitTargetSigns9: targets.d9,
     windowsFound: windows.length, validatedWindows: valid.length, topWindows: valid.slice(0, 5),
     best, yes, decision, reason, asOf: ctx.asOf, from: ctx.from, to: ctx.to,
     adverse, hindi: null
@@ -454,7 +470,7 @@ function qualityAnalysis(ctx, topicKey, options) {
   const occH = ctx.planets.filter(x => x.sign === P.sL).map(x => x.name);
   const occD9 = ctx.planets.filter(x => x.navamsaSign === P.sL).map(x => x.name);
   const S = timingSet(ctx, P, occH, occD9);
-  const targets = [P.sL, P.sM, lordP.sign, ctx.by[SIGN_LORD[P.sM]].sign].concat(P.karakas.map(k => ctx.by[k].sign));
+  const targets = targetsOf(ctx, P, lordP.sign);
   const aff = afflictionProfile(ctx, P);
   const windows = findWindows(ctx, S, targets);
   const validated = windows.filter(w => w.validated).sort((a, b) => a.start - b.start);
@@ -632,7 +648,7 @@ function ruleAnalysis(ctx, topicKey, options) {
     // Each option kind scores by the natal condition of its planets, plus the planets that are active in the
     // current dasha. When no career dasha is active and the 10th house promise is negative, the unemployed
     // option is chosen. The kinds and the rule are in data/types.json and are provisional.
-    const targets = [P.sL, P.sM, ctx.by[P.lordName].sign, ctx.by[SIGN_LORD[P.sM]].sign].concat(P.karakas.map(k => ctx.by[k].sign));
+    const targets = targetsOf(ctx, P, ctx.by[P.lordName].sign);
     const winsC = findWindows(ctx, new Set(sigSet), targets);
     const validC = winsC.filter(w => w.validated && w.dashaCount >= W.quality.event_min_dasha_count);
     const careerNow = validC.filter(w => w.status === "NOW");

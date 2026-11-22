@@ -20,7 +20,7 @@
       "A",
       "B"
     ],
-    "_note": "A double transit means Jupiter and Saturn both hit a target sign, by conjunction or by their full aspects, in the same sampled instant. The targets are the house, its lord and the karaka, all counted from the Lagna, and the house counted from the Moon, owner decision."
+    "_note": "A double transit means Jupiter and Saturn both hit a target sign, by conjunction or by their full aspects, in the same sampled instant. It is checked in the D1 chart against the house, the house counted from the Moon, the house lord and the karakas, and in the D9 chart rotated from the Lagna against the rotated house, the D9 lord and the D9 karakas. Owner decision."
   },
   "dasha": {
     "antardasha_must_be_relevant": false,
