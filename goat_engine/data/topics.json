@@ -157,5 +157,52 @@
       ]
     },
     "rule": "occupation"
-  }
+  },
+  "rel_partner": {
+    "hi": "भाई का व्यापार साझेदार",
+    "anchor": 3,
+    "house": 7,
+    "karaka": {
+      "any": [
+        "Venus"
+      ]
+    },
+    "rule": "yes_no"
+  },
+  "rel_death": {
+    "hi": "भाई की मृत्यु",
+    "anchor": 3,
+    "house": 8,
+    "karaka": {
+      "any": [
+        "Saturn"
+      ]
+    },
+    "rule": "yes_no",
+    "polarity": "adverse"
+  },
+  "rel_service": {
+    "hi": "भाई का सरकारी या सैन्य पद",
+    "anchor": 3,
+    "house": 10,
+    "karaka": {
+      "any": [
+        "Sun",
+        "Mars"
+      ]
+    },
+    "rule": "yes_no"
+  },
+  "rel_abroad": {
+    "hi": "भाई का विदेश में होना",
+    "anchor": 3,
+    "house": 12,
+    "karaka": {
+      "any": [
+        "Rahu"
+      ]
+    },
+    "rule": "yes_no"
+  },
+  "_relative_note": "Relative presets. anchor is the native house of the relative, here 3 for a brother. house is the house counted in the D1 chart rotated so that the anchor house becomes the Lagna. Only D1 is used, and only the prevailing windows, as the owner ruled."
 }

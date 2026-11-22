@@ -306,11 +306,12 @@ function transitCheck(ctx, a0, b0, targets) {
     const t = N === 1 ? a0 : a0 + ((b0 - a0) * i) / (N - 1);
     const tc = ctx.VC.buildChart(new Date(t), Number(ctx.cfg.lat), Number(ctx.cfg.lon), Number(ctx.cfg.tz), { ayanamshaKey: "lahiri" });
     // Double transit in the D1 chart (house, Moon house, lord, karakas) or in the D9 chart rotated from the Lagna.
-    const tc9 = ctx.VC.makeVargaChart(tc, 9);
+    const useD9 = Array.isArray(targets.d9);
+    const tc9 = useD9 ? ctx.VC.makeVargaChart(tc, 9) : null;
     const jh1 = hitsTargets(tc.planetsByName.Jupiter, "Jupiter", targets.d1);
     const sh1 = hitsTargets(tc.planetsByName.Saturn, "Saturn", targets.d1);
-    const jh9 = hitsTargets(tc9.planetsByName.Jupiter, "Jupiter", targets.d9);
-    const sh9 = hitsTargets(tc9.planetsByName.Saturn, "Saturn", targets.d9);
+    const jh9 = useD9 && hitsTargets(tc9.planetsByName.Jupiter, "Jupiter", targets.d9);
+    const sh9 = useD9 && hitsTargets(tc9.planetsByName.Saturn, "Saturn", targets.d9);
     const jh = jh1 || jh9, sh = sh1 || sh9;
     if (jh) jup++;
     if (sh) sat++;
@@ -372,6 +373,7 @@ function planetEventValue(ctx, name, topicKey, adverse) {
 }
 function analyseTopic(ctx, topicKey, label) {
   const T = TOPICS[topicKey];
+  if (T && T.anchor) return analyseRelative(ctx, topicKey, label);
   if (!T) throw new Error("Unknown topic " + topicKey + ". Known topics are " + Object.keys(TOPICS).filter(k => k[0] !== "_").join(", "));
   const P = evalPromise(ctx, T);
   const lordP = ctx.by[P.lordName];
@@ -787,7 +789,90 @@ function run(cfg) {
 // ---- report text. Plain sentences only, no colon, bracket, slash, hyphen, hash, asterisk or tilde ----
 const SAFE = { "(": "", ")": "", "!": "", ";": ".", ":": "", "—": ", ", "“": "", "”": "", "/": " or ", "‘": "'", "’": "'", "-": " ", "#": "", "*": "", "~": "" };
 function plain(s) { return String(s).replace(/[()!;:—“”\/‘’\-#*~]/g, ch => SAFE[ch] === undefined ? "" : SAFE[ch]); }
+// ---- relatives. The D1 chart rotated to the relative's anchor house. Rule kept in weights.json under relatives ----
+// Only the D1 chart is used. The D9 chart and the Moon chart are not used for any relative. Only the prevailing
+// windows, validated and active on the as of date, decide the answer. The rotated house r is the native house
+// anchor plus r minus 2, wrapped to 1 to 12, so the anchor house is rotated 1.
+function relNativeHouse(anchor, r) { return ((anchor + r - 2) % 12) + 1; }
+function relCtx(ctx, anchor) { return Object.assign(Object.create(ctx), { lagna: signAtHouse(ctx.lagna, anchor) }); }
+function relPromise(rctx, T) {
+  const H = T.house;
+  const sH = signAtHouse(rctx.lagna, H);
+  const lordName = SIGN_LORD[sH];
+  const karakas = T.karaka.any;
+  const c1 = evalD1House(rctx, sH);
+  const c4 = evalPlanetFromHouse(rctx, lordName, sH);
+  const kEval = karakas.map(k => evalPlanetFromHouse(rctx, k, sH));
+  const x4 = ((H + H - 2) % 12) + 1;
+  const s4 = signAtHouse(rctx.lagna, x4);
+  const c8 = round2(evalD1House(rctx, s4).total + evalPlanetFromHouse(rctx, SIGN_LORD[s4], s4).total);
+  const sK = mod12(H - 1);
+  const c9 = round2(evalD1House(rctx, sK).total + evalPlanetFromHouse(rctx, SIGN_LORD[sK], sK).total);
+  const avg = a => (a.length ? sum(a) / a.length : 0);
+  const raw = { c1_house_lagna: c1.total, c4_lord_lagna: c4.total, c6_karaka_lagna: round2(avg(kEval.map(x => x.total))), c8_nth_house: c8, c9_kalpurusha_house: c9 };
+  const comps = Object.keys(raw).map(id => { const w = W.weights[id]; return { id, weight: w, raw: round2(raw[id]), contribution: round2(w * Math.tanh(raw[id] / 2)) }; });
+  const net = round2(sum(comps.map(c => c.contribution)));
+  return { H, sH, lordName, karakas, comps, net, detail: { c1_house_lagna: c1, c4_lord_lagna: c4, c6_karaka_lagna: kEval, x4, s4, sK } };
+}
+function analyseRelative(ctx, topicKey, label) {
+  const T = TOPICS[topicKey];
+  const anchor = T.anchor;
+  const rctx = relCtx(ctx, anchor);
+  const P = relPromise(rctx, T);
+  const adverse = T.polarity === "adverse";
+  const promiseYes = adverse ? P.net < 0 : P.net > 0;
+  const occH = ctx.planets.filter(q => q.sign === P.sH).map(q => q.name);
+  const S = new Set([P.lordName].concat(occH, P.karakas, aspectersOn(rctx, P.sH)));
+  const targets = { d1: [P.sH, ctx.by[P.lordName].sign].concat(P.karakas.map(k => ctx.by[k].sign)), d9: null };
+  const windows = findWindows(rctx, S, targets);
+  const now = windows.filter(w => w.validated && w.status === "NOW" && w.dashaCount >= W.quality.event_min_dasha_count).sort((a, b) => b.dashaCount - a.dashaCount || (a.start - b.start));
+  const best = now.length ? now[0] : null;
+  const yes = promiseYes && !!best;
+  const involved = best ? Array.from(new Set([best.md, best.ad, best.pd])) : [];
+  const eventScore = involved.length ? round2(sum(involved.map(n => planetEventValue(rctx, n, topicKey, adverse)))) : 0;
+  const decision = yes ? "YES" : "NO";
+  const reason = !promiseYes
+    ? (adverse ? "The affliction promise in the rotated chart is not there, net " + fmt(P.net) + "." : "The promise in the rotated chart is not there, net " + fmt(P.net) + ".")
+    : (best ? "The promise is there and a prevailing window with at least " + W.quality.event_min_dasha_count + " relevant dasha lords is validated by a double transit of Jupiter and Saturn." : "The promise is there but no prevailing window with the required dasha count is validated by a double transit.");
+  const hi = (x) => hiP(x);
+  const dashaTxt = best ? `${hi(best.md)} महादशा, ${hi(best.ad)} अंतरदशा और ${hi(best.pd)} प्रत्यंतरदशा` : "";
+  const hindi = `${T.hi} के लिए भाई का भाव ${anchor} लग्न माना गया, घुमाया गया भाव ${P.H} का स्वामी ${hi(P.lordName)}, कारक ${P.karakas.map(hi).join(" और ")}। ${adverse ? "पाप वचन" : "शुभ वचन"} का बल ${signTxt(P.net)}, ${promiseYes ? "वचन मौजूद है" : "वचन अनुपस्थित है"}। ${best ? `अभी की दशा ${dashaTxt} में गोचर का दोहरा समर्थन है` : "अभी की दशा में गोचर का दोहरा समर्थन नहीं है"}। अतः निर्णय ${yes ? "हाँ" : "नहीं"} है।`;
+  return {
+    label, topic: topicKey, hi: T.hi, relative: true, anchor, house: P.H, nativeHouse: relNativeHouse(anchor, P.H),
+    lagnaSign: rctx.lagna, lord: P.lordName, karakas: P.karakas, net: P.net, promiseYes, adverse,
+    components: P.comps, detail: P.detail, usesD9: false, usesMoon: false,
+    relevantPlanets: Array.from(S), transitTargetSigns: targets.d1, windowsFound: windows.length,
+    validatedWindows: now.length, topWindows: now.slice(0, 5), best, yes, decision, reason,
+    involved, eventScore, asOf: ctx.asOf, from: ctx.from, to: ctx.to, hindi,
+    score: (yes ? 1000 : 0) + eventScore
+  };
+}
+function renderRelativeResult(r, idx) {
+  const L = [];
+  L.push(`${idx === undefined ? "" : idx + 1 + ". "}Option ${r.label}`);
+  L.push(`Relative brother. Native chart rotated to anchor house ${r.anchor}, so rotated house ${r.house} is native house ${r.nativeHouse}. Rotated lord ${r.lord}, karakas ${r.karakas.join(" and ")}.`);
+  L.push("");
+  L.push("STEP 1. Promise in the rotated D1 chart only. The D9 chart and the Moon chart are not used.");
+  r.components.forEach(c => L.push(`  ${c.id} weight ${c.weight} gives ${fmt(c.contribution)}.`));
+  L.push(`  Promise net ${fmt(r.net)}, so the promise is ${r.promiseYes ? "PRESENT" : "ABSENT"}.`);
+  L.push("");
+  L.push("STEP 2. Prevailing windows only. Validated windows active on the as of date.");
+  if (r.best) {
+    const b = r.best;
+    L.push(`  Prevailing ${fmtDate(b.start)} to ${fmtDate(b.end)}, dasha ${b.md} Mahadasha ${b.ad} Antardasha ${b.pd} Pratyantardasha, dasha count ${b.dashaCount} of 3, transit grade ${b.grade}, double transit in ${b.double} of 5 samples.`);
+  } else {
+    L.push("  No prevailing window is validated by a double transit.");
+  }
+  L.push("");
+  L.push("STEP 3. Final answer for this option.");
+  L.push(`  ${r.decision}. ${r.reason}`);
+  L.push("");
+  L.push("Hindi one liner.");
+  L.push(r.hindi);
+  return L.join("\n");
+}
 function renderResult(r, idx) {
+  if (r.relative) return renderRelativeResult(r, idx);
   const L = [];
   const occ = ctxOccNames(r);
   L.push(`${idx === undefined ? "" : idx + 1 + ". "}Option ${r.label}`);

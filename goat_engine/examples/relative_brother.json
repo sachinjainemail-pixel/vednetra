@@ -1,0 +1,17 @@
+{
+  "name": "Vishal",
+  "gender": "male",
+  "date": "1982-08-21",
+  "time": "16:11:00",
+  "tz": 5.5,
+  "lat": 28.6139,
+  "lon": 77.209,
+  "place": "New Delhi",
+  "asOf": "2026-11-22",
+  "options": [
+    { "label": "Vyapar sajhedaar", "topic": "rel_partner" },
+    { "label": "Mrityu ho chuki", "topic": "rel_death" },
+    { "label": "Army mein afsar", "topic": "rel_service" },
+    { "label": "Videsh mein", "topic": "rel_abroad" }
+  ]
+}

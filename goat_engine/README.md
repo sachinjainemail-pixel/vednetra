@@ -228,3 +228,22 @@ Run it with `mode` set to quality and options that carry `state`, for example:
 The thresholds, the lookback and the minimum age are in `data/weights.json` under `quality`. They are
 provisional. They were set by the engine and not yet checked against owner reported cases, so the owner should
 set them. The quality mode has not been validated on any reported case.
+
+## Relatives. D1 chart rotated, prevailing windows only (owner rule)
+
+All relatives are read from the native's chart by rotating the D1 chart to the relative's anchor house, which
+becomes the Lagna of that relative. A brother is anchored to house 3. The rotated house r is native house
+anchor plus r minus 2, wrapped to 1 to 12.
+
+The rule is fixed in data/weights.json under relatives, and it is applied in code:
+1. Only the D1 chart is used. The D9 chart and the Moon chart are never used for a relative.
+2. Only prevailing windows count, meaning validated windows active on the as of date, with at least
+   event_min_dasha_count relevant dasha lords.
+3. The promise uses the D1 house components only, from the rotated Lagna. The D9 and Moon components are left out.
+
+Relative presets in data/topics.json: rel_partner (rotated 7, business partner), rel_death (rotated 8, adverse),
+rel_service (rotated 10, government or army post) and rel_abroad (rotated 12, abroad).
+Example: `node goat_engine/tools/goat.js --file goat_engine/examples/relative_brother.json`
+
+Limit. The nakshatra event match does not apply to relatives, because the nakshatra event lists have no
+relative groups yet.

@@ -147,4 +147,19 @@ check("occupation rule returns one of the options", () => {
   assert.ok(r.rule.hindi && r.rule.hindi.length > 0);
 });
 
+// 13. Relatives. Owner rule. D1 chart rotated to the anchor house only. D9 and Moon chart never used.
+check("relative result uses D1 only and prevailing windows only", () => {
+  const r = G.run(Object.assign({}, base, { asOf: "2026-11-22", options: [{ label: "Brother death", topic: "rel_death" }, { label: "Brother partner", topic: "rel_partner" }] }));
+  r.results.forEach(x => {
+    assert.strictEqual(x.relative, true);
+    assert.strictEqual(x.usesD9, false);
+    assert.strictEqual(x.usesMoon, false);
+    if (x.best) assert.strictEqual(x.best.status, "NOW");
+  });
+});
+check("relatives rule is marked in weights", () => {
+  assert.strictEqual(G.W.relatives.uses_D9, false);
+  assert.strictEqual(G.W.relatives.uses_moon_chart, false);
+});
+
 console.log("\n" + pass + " checks passed" + (process.exitCode ? ", some failed" : ""));
