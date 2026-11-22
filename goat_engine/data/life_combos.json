@@ -1,11 +1,15 @@
 {
-  "_note": "Schema per option. charts: references used. houses: all must be active. links: pairs of houses whose lords must connect. planets: signifiers. karakas: karaka links. main and distinguish: houses for timing. Divisional charts are not used. Transcribed from the owner's supplement, approximations flagged in _source where a row was read loosely. Chandra Lagna is the Moon reference. mandatory lists the houses that must be active. A chart needs all mandatory houses, at least two distinct active houses from the houses list when it has two or more, all links, and all karaka links.",
+  "_note": "Schema per option. charts: references used. houses: candidate houses. mandatory: houses that must be active. conditions: planet and link tests in D1 unless an option lists other charts. links: link pairs that must hold. karakas: karaka links. requires_supplied: an independently supplied fact is needed, so the engine cannot decide it. main and distinguish: houses for timing. Divisional charts are not used.",
   "education": {
     "BSc": {
       "charts": [
         "D1"
       ],
       "houses": [
+        5,
+        9
+      ],
+      "mandatory": [
         5,
         9
       ],
@@ -18,39 +22,70 @@
       "planets": [
         "Mercury"
       ],
+      "conditions": [
+        {
+          "type": "planet_to_any",
+          "planet": "Mercury",
+          "houses": [
+            5,
+            9,
+            8,
+            3
+          ]
+        }
+      ],
       "main": 5,
       "distinguish": 9,
-      "_source": "Supplement row 5+9+(8 or 3), Mercury mandatory. The 8 or 3 alternative is not required here.",
-      "mandatory": [
-        5,
-        9
-      ]
+      "_source": "Mandatory 5 and 9 with link 5 to 9. Mercury links to 5, 9, 8 or 3 as optional evidence. Proposed rule."
     },
     "BTech": {
       "charts": [
         "D1"
       ],
       "houses": [
+        5,
         9,
         10
       ],
-      "links": [
-        [
-          9,
-          10
-        ]
+      "mandatory": [
+        5,
+        9,
+        10
       ],
+      "links": [],
       "planets": [
         "Mars",
         "Mercury"
       ],
+      "conditions": [
+        {
+          "type": "planet_to_any",
+          "planet": "Mercury",
+          "houses": [
+            5,
+            9,
+            10
+          ]
+        },
+        {
+          "type": "planet_to_all",
+          "planet": "Mars",
+          "houses": [
+            10
+          ]
+        },
+        {
+          "type": "planet_to_any",
+          "planet": "Mars",
+          "houses": [
+            5,
+            9
+          ]
+        }
+      ],
       "main": 9,
       "distinguish": 10,
-      "_source": "Row 5+9+10 with Mars linked to 5 or 9. Link 5-9 is not in this encoding, see review.",
-      "mandatory": [
-        9,
-        10
-      ]
+      "_source": "Owner flagged rule. Mandatory 5, 9, 10. Mercury links to one of them. Mars links to 10 and to 5 or 9. Optional 3, 4, 6 and Saturn not in the mandatory set."
     },
     "BCom": {
       "charts": [
@@ -86,22 +121,53 @@
         7,
         9
       ],
-      "links": [
-        [
-          7,
-          9
-        ]
+      "mandatory": [
+        6,
+        7,
+        9
       ],
+      "links": [],
       "planets": [
-        "Jupiter"
+        "Jupiter",
+        "Mercury",
+        "Saturn"
+      ],
+      "conditions": [
+        {
+          "type": "link_any",
+          "pairs": [
+            [
+              6,
+              7
+            ],
+            [
+              7,
+              9
+            ]
+          ]
+        },
+        {
+          "type": "planet_to_all",
+          "planet": "Jupiter",
+          "houses": [
+            9
+          ]
+        },
+        {
+          "type": "planets_to_any",
+          "planets": [
+            "Mercury",
+            "Saturn"
+          ],
+          "houses": [
+            6,
+            7
+          ]
+        }
       ],
       "main": 9,
       "distinguish": 6,
-      "_source": "Row 6+7+9, link 7-9 used. Practice is kept separate in livelihood.",
-      "mandatory": [
-        6,
-        7
-      ]
+      "_source": "Owner flagged rule. Mandatory 6, 7, 9. Link 6 to 7 or 7 to 9. Jupiter links to 9. Mercury or Saturn links to 6 or 7. Optional 3 and 10 not mandatory. Practice is a livelihood result, not here."
     },
     "Matric": {
       "charts": [
@@ -644,6 +710,24 @@
         7,
         9
       ]
+    },
+    "inter_caste": {
+      "charts": [
+        "D1",
+        "D9"
+      ],
+      "requires_supplied": true,
+      "subtype": "inter_caste",
+      "_source": "Subtype is scored only from an independently supplied fact. The shared community rule does not separate caste from religion."
+    },
+    "inter_religion": {
+      "charts": [
+        "D1",
+        "D9"
+      ],
+      "requires_supplied": true,
+      "subtype": "inter_religion",
+      "_source": "Subtype is scored only from an independently supplied fact. The shared community rule does not separate caste from religion."
     }
   },
   "event_2026": {
@@ -790,6 +874,30 @@
       "main": 4,
       "distinguish": 8,
       "_source": "Ancestral or inherited house is 4 with 2 and 8."
+    }
+  },
+  "children": {
+    "birth_window": {
+      "charts": [
+        "D1",
+        "Moon"
+      ],
+      "houses": [
+        5,
+        2,
+        11
+      ],
+      "mandatory": [
+        5
+      ],
+      "links": [],
+      "planets": [
+        "Jupiter"
+      ],
+      "requires_supplied": true,
+      "main": 5,
+      "distinguish": 2,
+      "_source": "Shows a supported birth window only. It does not establish a count, a sex or twins. Reference only."
     }
   }
 }
