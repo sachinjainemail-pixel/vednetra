@@ -10,9 +10,29 @@
   "topic": "occupation",
   "asOf": "2026-11-22",
   "options": [
-    { "label": "Sarkari school mein shikshak", "kind": "teaching" },
-    { "label": "Mandir mein pujari", "kind": "religious" },
-    { "label": "Marketing", "kind": "commerce" },
-    { "label": "Berojgar", "kind": "unemployed" }
+    {
+      "label": "Sarkari school mein shikshak",
+      "kind": "teaching"
+    },
+    {
+      "label": "Mandir mein pujari",
+      "kind": "religious"
+    },
+    {
+      "label": "Marketing",
+      "kind": "commerce"
+    },
+    {
+      "label": "Sarkari afsar",
+      "kind": "government"
+    },
+    {
+      "label": "Army afsar",
+      "kind": "army"
+    },
+    {
+      "label": "Berojgar",
+      "kind": "unemployed"
+    }
   ]
 }

@@ -40,7 +40,8 @@
     "mild_percent": 15,
     "severe_percent": 25,
     "very_severe_percent": 35,
-    "_note": "Life area quality. Severity points are the malefic points of the promise plus marker_weight for each affliction marker, as a percent of the full weight sum. Below mild_percent the outcome is positive. From severe_percent, with an active affliction dasha after the event, the outcome is separated. From very_severe_percent with an active affliction dasha, the outcome is severe, such as divorce. Otherwise challenged. These thresholds are provisional and the owner can set them."
+    "_note": "Life area quality. Severity points are the malefic points of the promise plus marker_weight for each affliction marker, as a percent of the full weight sum. Below mild_percent the outcome is positive. From severe_percent, with an active affliction dasha after the event, the outcome is separated. From very_severe_percent with an active affliction dasha, the outcome is severe, such as divorce. Otherwise challenged. These thresholds are provisional and the owner can set them.",
+    "presumed_event_note": "When the question states the event, for example that the native is married, set eventPresumed true in the config. The promise is then not tested, and the outcome comes from the afflictions and the activation only."
   },
   "horizonYears": 10,
   "relatives": {
@@ -51,6 +52,8 @@
     "windows": "prevailing only, status NOW",
     "anchor_house": {
       "brother": 3
-    }
+    },
+    "min_dasha_count": 1,
+    "_min_dasha_note": "Owner decision. A relative's prevailing window needs one relevant dasha lord."
   }
 }

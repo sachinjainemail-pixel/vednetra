@@ -34,28 +34,61 @@
     "Ketu": "remote or hidden property"
   },
   "occupationKinds": {
-    "teaching": [
-      "Jupiter",
-      "Mercury"
-    ],
-    "religious": [
-      "Jupiter",
-      "Ketu"
-    ],
-    "commerce": [
-      "Mercury",
-      "Venus"
-    ],
-    "service": [
-      "Sun",
-      "Saturn"
-    ]
+    "government": {
+      "planets": [
+        "Sun"
+      ],
+      "houses": [
+        10,
+        6
+      ]
+    },
+    "army": {
+      "planets": [
+        "Mars"
+      ],
+      "houses": [
+        10,
+        6
+      ]
+    },
+    "teaching": {
+      "planets": [
+        "Jupiter",
+        "Mercury"
+      ],
+      "houses": [
+        10,
+        6
+      ]
+    },
+    "commerce": {
+      "planets": [
+        "Mercury",
+        "Venus"
+      ],
+      "houses": [
+        10,
+        6
+      ]
+    },
+    "religious": {
+      "planets": [
+        "Jupiter",
+        "Ketu"
+      ],
+      "houses": [
+        10,
+        6
+      ]
+    }
   },
   "occupationKindHi": {
+    "government": "सरकारी सेवा",
+    "army": "सेना",
     "teaching": "शिक्षण",
-    "religious": "धार्मिक कार्य और पुजारी",
     "commerce": "व्यापार और मार्केटिंग",
-    "service": "सरकारी सेवा"
+    "religious": "धार्मिक कार्य और पुजारी"
   },
-  "_occupation_note": "Occupation kinds map each kind of work to the planets that signify it. An option carries a kind tag. The option tagged unemployed is chosen when no career dasha is active now and the 10th house promise is negative. Provisional, the owner can change these."
+  "_occupation_note": "Each occupation kind is a combination. planets are the significators, and houses are the 10th and 6th houses from Lagna, where the job and service are read. Army is read through Mars prominence. Government is read through the Sun, which is the son of authority. The score counts planet strength, placement in the houses, and lordship of the houses. Provisional, the owner can change these."
 }

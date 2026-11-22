@@ -503,7 +503,8 @@ function qualityAnalysis(ctx, topicKey, options) {
   const promiseYes = P.net > 0;
   const minEvent = addYears(parseDay(ctx.cfg.date), q.event_min_age_years);
   const eventWins = validated.filter(w => w.status !== "FUTURE" && w.start >= minEvent && w.dashaCount >= q.event_min_dasha_count);
-  const event = promiseYes && eventWins.length ? eventWins[0] : null;
+  const presumed = !!(ctx.cfg && ctx.cfg.eventPresumed);
+  const event = presumed ? { presumed: true, start: null } : (promiseYes && eventWins.length ? eventWins[0] : null);
   // Prevailing activation. Validated windows in the lookback before as of, after the event, where at least
   // activation_min_dasha_count of the mahadasha, antardasha and pratyantardasha lords are afflicting planets.
   const lookbackFrom = addYears(ctx.asOf, -q.activation_lookback_years);
@@ -535,7 +536,7 @@ function qualityAnalysis(ctx, topicKey, options) {
   const parts = [];
   parts.push(`${T.hi} का भाव ${P.H}, उसका स्वामी ${hiP(P.lordName)}, कारक ${P.karakas.map(hiP).join(" और ")}`);
   parts.push(`${promiseYes ? "शुभ वचन मौजूद है" : "शुभ वचन अनुपस्थित है"}, भाव पर पाप प्रभाव ${affTxt}, कष्ट ${aff.pct} प्रतिशत`);
-  parts.push(event
+  parts.push(event && event.presumed ? "विवाह का तथ्य प्रश्न में दिया गया है, इसलिए वचन की जाँच नहीं होती" : event
     ? `${hiP(event.md)} महादशा, ${hiP(event.ad)} अंतरदशा और ${hiP(event.pd)} प्रत्यंतरदशा में ${fmtDate(event.start)} से घटना के संकेत मिलते हैं`
     : "दशा और गोचर में घटना के संकेत नहीं मिलते");
   parts.push(`${q.activation_lookback_years} वर्ष में पाप ग्रह की सक्रिय दशा ${active.length}`);
@@ -561,7 +562,9 @@ function renderQuality(res) {
   L.push(`  Promise net ${fmt(r.net)}, so the promise is ${r.promiseYes ? "PRESENT" : "ABSENT"}.`);
   L.push("");
   L.push(`STEP 2. Event evidence. A validated window in the past or now, with at least ${q.event_min_dasha_count} relevant dasha lords.`);
-  if (r.event) {
+  if (r.event && r.event.presumed) {
+    L.push("  Event presumed by the question, so the promise is not tested.");
+  } else if (r.event) {
     const e = r.event;
     L.push(`  Event indicated from ${fmtDate(e.start)} to ${fmtDate(e.end)}, dasha ${e.md} Mahadasha ${e.ad} Antardasha ${e.pd} Pratyantardasha, dasha count ${e.dashaCount} of 3, transit grade ${e.grade}, time ${e.status}.`);
   } else {
@@ -679,8 +682,9 @@ function ruleAnalysis(ctx, topicKey, options) {
     const pastLords = new Set(careerPast.reduce((a, w) => a.concat([w.md, w.ad, w.pd]), []));
     const kindScore = {};
     Object.keys(TYPES.occupationKinds).forEach(k => {
-      const ps = TYPES.occupationKinds[k];
-      const base = sum(ps.map(p => pvOf[p] || 0)) / ps.length;
+      const combo = TYPES.occupationKinds[k];
+      const ps = combo.planets;
+      const base = comboScore(ctx, combo);
       kindScore[k] = round2(base + (ps.some(p => activeLords.has(p)) ? 1 : 0) + (ps.some(p => pastLords.has(p)) ? 0.5 : 0));
     });
     const unemployedOpt = options.find(o => o.kind === "unemployed");
@@ -825,7 +829,7 @@ function analyseRelative(ctx, topicKey, label) {
   const S = new Set([P.lordName].concat(occH, P.karakas, aspectersOn(rctx, P.sH)));
   const targets = { d1: [P.sH, ctx.by[P.lordName].sign].concat(P.karakas.map(k => ctx.by[k].sign)), d9: null };
   const windows = findWindows(rctx, S, targets);
-  const now = windows.filter(w => w.validated && w.status === "NOW" && w.dashaCount >= W.quality.event_min_dasha_count).sort((a, b) => b.dashaCount - a.dashaCount || (a.start - b.start));
+  const now = windows.filter(w => w.validated && w.status === "NOW" && w.dashaCount >= W.relatives.min_dasha_count).sort((a, b) => b.dashaCount - a.dashaCount || (a.start - b.start));
   const best = now.length ? now[0] : null;
   const yes = promiseYes && !!best;
   const involved = best ? Array.from(new Set([best.md, best.ad, best.pd])) : [];
@@ -833,7 +837,7 @@ function analyseRelative(ctx, topicKey, label) {
   const decision = yes ? "YES" : "NO";
   const reason = !promiseYes
     ? (adverse ? "The affliction promise in the rotated chart is not there, net " + fmt(P.net) + "." : "The promise in the rotated chart is not there, net " + fmt(P.net) + ".")
-    : (best ? "The promise is there and a prevailing window with at least " + W.quality.event_min_dasha_count + " relevant dasha lords is validated by a double transit of Jupiter and Saturn." : "The promise is there but no prevailing window with the required dasha count is validated by a double transit.");
+    : (best ? "The promise is there and a prevailing window with at least " + W.relatives.min_dasha_count + " relevant dasha lords is validated by a double transit of Jupiter and Saturn." : "The promise is there but no prevailing window with the required dasha count is validated by a double transit.");
   const hi = (x) => hiP(x);
   const dashaTxt = best ? `${hi(best.md)} महादशा, ${hi(best.ad)} अंतरदशा और ${hi(best.pd)} प्रत्यंतरदशा` : "";
   const hindi = `${T.hi} के लिए भाई का भाव ${anchor} लग्न माना गया, घुमाया गया भाव ${P.H} का स्वामी ${hi(P.lordName)}, कारक ${P.karakas.map(hi).join(" और ")}। ${adverse ? "पाप वचन" : "शुभ वचन"} का बल ${signTxt(P.net)}, ${promiseYes ? "वचन मौजूद है" : "वचन अनुपस्थित है"}। ${best ? `अभी की दशा ${dashaTxt} में गोचर का दोहरा समर्थन है` : "अभी की दशा में गोचर का दोहरा समर्थन नहीं है"}। अतः निर्णय ${yes ? "हाँ" : "नहीं"} है।`;
@@ -846,6 +850,20 @@ function analyseRelative(ctx, topicKey, label) {
     involved, eventScore, asOf: ctx.asOf, from: ctx.from, to: ctx.to, hindi,
     score: (yes ? 1000 : 0) + eventScore
   };
+}
+// Combination score. Planets of a kind, their strength, their placement in the combination houses and their
+// lordship of those houses. Used for occupation kinds, and for any life area once its combination is in data.
+function comboScore(ctx, combo) {
+  let s = 0;
+  combo.planets.forEach(name => {
+    const p = ctx.by[name];
+    s += pvAt(ctx, name, p.sign, false).v;
+    combo.houses.forEach(h => {
+      if (houseFrom(p.sign, ctx.lagna) === h) s += 1;
+      if (SIGN_LORD[signAtHouse(ctx.lagna, h)] === name) s += 1;
+    });
+  });
+  return round2(s / combo.planets.length);
 }
 function renderRelativeResult(r, idx) {
   const L = [];
