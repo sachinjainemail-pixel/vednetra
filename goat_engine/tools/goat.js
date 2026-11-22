@@ -409,6 +409,7 @@ function analyseTopic(ctx, topicKey, label) {
 // Hindi names of planets for the astrological text. Anything not in the table is left as written.
 const hiP = p => HI_PLANET[p] || p;
 const absTxt = x => Math.abs(x).toFixed(2);
+const signTxt = x => (x < 0 ? "minus " : "") + Math.abs(x).toFixed(2);
 // Astrological Hindi sentence. House, lord, karakas, planets in the house, the dasha of the window and the
 // transit support all come from the chart, so the sentence states the reason for the answer.
 function hindiLine(ctx, r) {
@@ -697,7 +698,7 @@ function ruleAnalysis(ctx, topicKey, options) {
     out.careerNow = careerNow.length;
     out.careerPast = careerPast.length;
     out.lines.push(`Career dasha windows now ${careerNow.length}, in the past ${careerPast.length}, with at least ${W.quality.event_min_dasha_count} career lords.`);
-    out.lines.push(`Kind scores ${Object.keys(kindScore).map(k => k + " " + kindScore[k]).join(", ")}.`);
+    out.lines.push(`Kind scores ${Object.keys(kindScore).map(k => k + " " + (kindScore[k] < 0 ? "minus " : "") + Math.abs(kindScore[k]).toFixed(2)).join(", ")}.`);
     out.lines.push(`Rule. ${out.occupationReason}.`);
   } else {
     throw new Error("Topic " + topicKey + " has no ordinal, count, type or occupation rule");
@@ -720,7 +721,7 @@ function ruleHindi(ctx, r, P, pvOf, strongest, sigSet) {
   }
   // occupation
   const now = r.careerNow > 0 ? `वर्तमान में ${r.careerNow} कर्म दशा सक्रिय है` : "वर्तमान में कोई कर्म दशा सक्रिय नहीं है";
-  const sc = Object.keys(r.kindScore).map(k => `${TYPES.occupationKindHi[k] || k} ${absTxt(r.kindScore[k])}`).join(", ");
+  const sc = Object.keys(r.kindScore).map(k => `${TYPES.occupationKindHi[k] || k} ${signTxt(r.kindScore[k])}`).join(", ");
   const why = r.chosen.kind === "unemployed"
     ? "कोई कर्म दशा सक्रिय न होने और दसवें भाव के नकारात्मक वचन के कारण बेरोजगारी का योग बनता है, भले ही कुछ कर्म ग्रहों का स्कोर अधिक हो"
     : "सबसे अधिक स्कोर वाले कर्म के ग्रहों के बल और सक्रिय कर्म दशा के कारण";
