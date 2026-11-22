@@ -103,4 +103,20 @@ check("report has no NaN or undefined", () => {
   assert.ok(text.indexOf("NaN") < 0 && text.indexOf("undefined") < 0);
 });
 
+// 10. Life area quality. Outcome classes follow the owner rule, from the afflictions and the active dasha.
+const QW = G.W.quality;
+check("no event shown gives NOT SHOWN", () => assert.strictEqual(G.classifyQuality(false, 50, 5, QW), "NOT SHOWN"));
+check("light afflictions give positive", () => assert.strictEqual(G.classifyQuality(true, 5, 0, QW), "positive"));
+check("moderate afflictions with no active dasha give challenged", () => assert.strictEqual(G.classifyQuality(true, 30, 0, QW), "challenged"));
+check("strong afflictions active in dasha give separated", () => assert.strictEqual(G.classifyQuality(true, 30, 2, QW), "separated"));
+check("very strong afflictions active in dasha give severe", () => assert.strictEqual(G.classifyQuality(true, 40, 2, QW), "severe"));
+check("very strong afflictions without active dasha give challenged, not severe", () => assert.strictEqual(G.classifyQuality(true, 40, 0, QW), "challenged"));
+check("quality report has no forbidden characters and no NaN", () => {
+  const cfg = Object.assign({}, base, { mode: "quality", topic: "marriage", asOf: "2026-11-22", options: [
+    { label: "Happy", state: "positive" }, { label: "Divorce case", state: "severe" } ] });
+  const text = G.renderRun(G.run(cfg));
+  ["(", ")", "!", ";", ":", "—", "“", "”", "/", "‘", "’", "-", "#", "*", "~"].forEach(ch => assert.strictEqual(text.indexOf(ch), -1, "found " + JSON.stringify(ch)));
+  assert.ok(text.indexOf("NaN") < 0 && text.indexOf("undefined") < 0);
+});
+
 console.log("\n" + pass + " checks passed" + (process.exitCode ? ", some failed" : ""));

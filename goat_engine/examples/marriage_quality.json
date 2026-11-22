@@ -1,0 +1,19 @@
+{
+  "name": "Kundali 858",
+  "gender": "male",
+  "date": "1988-05-14",
+  "time": "05:40:00",
+  "tz": 5.5,
+  "lat": 23.544,
+  "lon": 74.4389,
+  "place": "Banswara, Rajasthan",
+  "mode": "quality",
+  "topic": "marriage",
+  "asOf": "2026-11-22",
+  "options": [
+    { "label": "Sukhi hai (happy)", "state": "positive" },
+    { "label": "Talaq ka case chal raha hai (divorce case)", "state": "severe" },
+    { "label": "Talaq nahi hua par alag rehte hain (living apart)", "state": "separated" },
+    { "label": "Tanavpurn hai par saath rehte hain (stressful but together)", "state": "challenged" }
+  ]
+}

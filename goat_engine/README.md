@@ -198,3 +198,33 @@ separate good windows from bad ones. You asked to keep the transit rule as descr
 - Transit samples are five per window, evenly spaced across the window.
 - The stream and property kind follow the strongest planet of the relevant set. The set covers the house,
   its lord, its occupants and the karaka.
+
+## Life area quality (any topic)
+
+Added in the third version. It answers the quality of a life area, such as the state of a marriage, a job,
+health or children, using the owner's rule.
+
+1. Promise. The ten promise components, as before. The promise must be present.
+2. Event evidence. A validated window in the past or now, where at least `event_min_dasha_count` of the
+   relevant dasha lords are active, and the window starts after the native is `event_min_age_years` old.
+   This shows that the event has happened. The earliest such window is the event date.
+3. Afflictions. The malefic points of the promise, plus a marker for each affliction. Markers are a Rahu or
+   Ketu occupant, a malefic aspect on the house, Paap kartari, the lord in 6, 8 or 12 from the house, a
+   debilitated or combust lord, a weak lord in D9 and an afflicted karaka. Severity is the points as a percent
+   of the full weight sum.
+4. Activation. Validated windows after the event, inside the last `activation_lookback_years` before as of,
+   where at least `activation_min_dasha_count` of the dasha lords are afflicting planets. Afflicting planets
+   are the malefic occupants, the malefic aspects and the malefic lord or karakas.
+5. Outcome. Below `mild_percent` the outcome is positive. At or above `severe_percent` with activation, it is
+   separation. At or above `very_severe_percent` with activation, it is severe, such as divorce. Otherwise it is
+   challenged. With no event shown the outcome is NOT SHOWN and no option is chosen.
+
+Options carry a state tag: positive, challenged, separated or severe. The engine chooses the option with the
+outcome state. If none has it, the closest state is chosen and the report says so.
+
+Run it with `mode` set to quality and options that carry `state`, for example:
+`node goat_engine/tools/goat.js --file goat_engine/examples/marriage_quality.json`
+
+The thresholds, the lookback and the minimum age are in `data/weights.json` under `quality`. They are
+provisional. They were set by the engine and not yet checked against owner reported cases, so the owner should
+set them. The quality mode has not been validated on any reported case.

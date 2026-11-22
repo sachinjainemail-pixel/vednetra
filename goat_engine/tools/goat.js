@@ -370,6 +370,173 @@ function hindiLine(ctx, r) {
   return parts.join(", ") + "।";
 }
 
+// ---- life area quality. Afflictions, event evidence and outcome, for any topic --------------------
+// The owner's rule. When the promise is present and past or present dasha and transit windows show that
+// the event has happened, the afflictions of the house decide the quality of the outcome.
+//   positive    light afflictions, the situation is happy and stable
+//   challenged  real afflictions, the situation holds but is stressful
+//   separated   strong afflictions, and they are active in the dasha of the afflicting planets
+//   severe      very strong afflictions, active in the dasha, that end the situation, such as divorce
+// Afflictions are the malefic points of the promise plus markers from the house, the lord and the karakas.
+// Activation counts validated windows after the event date whose dasha lords are afflicting planets.
+// The thresholds live in data/weights.json under quality and are provisional until the owner sets them.
+const STATE_ORDER = ["positive", "challenged", "separated", "severe"];
+const STATE_TEXT = {
+  positive: "The afflictions are light, so the state is positive and stable.",
+  challenged: "The afflictions are real but the situation holds, so the state is challenged.",
+  separated: "Strong afflictions are active in the dasha of the afflicting planets, so the state is separation.",
+  severe: "Very strong afflictions are active in the dasha of the afflicting planets, so the state is severe and ends the situation."
+};
+function addYears(d, n) { return new Date(Date.UTC(d.getUTCFullYear() + n, d.getUTCMonth(), d.getUTCDate())); }
+function afflictionProfile(ctx, P) {
+  const q = W.quality;
+  const d1 = P.detail.c1_house_lagna;
+  const lord = P.detail.c4_lord_lagna;
+  const afflicters = new Set();
+  const markers = [];
+  d1.occ.forEach(o => {
+    if (natureOf(ctx, o.name) < 0) afflicters.add(o.name);
+    if (o.name === "Rahu" || o.name === "Ketu") markers.push(o.name + " sits in house " + P.H);
+  });
+  (P.detail.c2_house_d9_rotated || []).forEach(o => { if (o.v < 0) afflicters.add(o.name); });
+  // Malefic aspects and malefic occupants of the house in the Moon chart also afflict it.
+  d1.asp.list.forEach(a => { if (a.v < 0) { afflicters.add(a.name); markers.push(a.name + " aspects house " + P.H); } });
+  const m3 = P.detail.c3_house_moon;
+  m3.occ.forEach(o => { if (o.v < 0) afflicters.add(o.name); });
+  m3.asp.list.forEach(a => { if (a.v < 0) afflicters.add(a.name); });
+  if (d1.kar.score < 0) markers.push(d1.kar.kind + " on house " + P.H);
+  if (DUSTHANA.indexOf(lord.d) >= 0) markers.push("lord " + lord.name + " is in house " + lord.d + " from house " + P.H);
+  if (lord.cond.dignity === "debilitated") markers.push("lord " + lord.name + " is debilitated");
+  if (ctx.by[lord.name].combust) markers.push("lord " + lord.name + " is combust");
+  if (lord.total < 0) afflicters.add(lord.name);
+  if (P.detail.c5_lord_d9_rotated.total < 0) markers.push("lord " + lord.name + " is weak in D9");
+  P.detail.c6_karaka_lagna.forEach(k => {
+    if (k.total < 0) { markers.push("karaka " + k.name + " is afflicted"); afflicters.add(k.name); }
+  });
+  const A = round2(-sum(P.comps.filter(c => c.contribution < 0).map(c => c.contribution)));
+  const points = round2(A + q.marker_weight * markers.length);
+  const pct = round2(100 * points / P.weightSum);
+  return { A, markers, afflicters: Array.from(afflicters), points, pct };
+}
+function classifyQuality(happened, pct, activated, q) {
+  if (!happened) return "NOT SHOWN";
+  if (pct < q.mild_percent) return "positive";
+  if (activated >= 1 && pct >= q.very_severe_percent) return "severe";
+  if (activated >= 1 && pct >= q.severe_percent) return "separated";
+  return "challenged";
+}
+function qualityAnalysis(ctx, topicKey, options) {
+  const T = TOPICS[topicKey];
+  if (!T) throw new Error("Unknown topic " + topicKey + ". Known topics are " + Object.keys(TOPICS).filter(k => k[0] !== "_").join(", "));
+  const q = W.quality;
+  const P = evalPromise(ctx, T);
+  const lordP = ctx.by[P.lordName];
+  const occH = ctx.planets.filter(x => x.sign === P.sL).map(x => x.name);
+  const occD9 = ctx.planets.filter(x => x.navamsaSign === P.sL).map(x => x.name);
+  const S = new Set([P.lordName].concat(occH, occD9, P.karakas));
+  const targets = [P.sL, lordP.sign].concat(P.karakas.map(k => ctx.by[k].sign));
+  const aff = afflictionProfile(ctx, P);
+  const windows = findWindows(ctx, S, targets);
+  const validated = windows.filter(w => w.validated).sort((a, b) => a.start - b.start);
+  // Activation looks at the afflicting planets too, which may lie outside the promise set.
+  const Sa = new Set(Array.from(S).concat(aff.afflicters));
+  const windowsA = findWindows(ctx, Sa, targets);
+  const validatedA = windowsA.filter(w => w.validated).sort((a, b) => a.start - b.start);
+  const promiseYes = P.net > 0;
+  const minEvent = addYears(parseDay(ctx.cfg.date), q.event_min_age_years);
+  const eventWins = validated.filter(w => w.status !== "FUTURE" && w.start >= minEvent && w.dashaCount >= q.event_min_dasha_count);
+  const event = promiseYes && eventWins.length ? eventWins[0] : null;
+  // Prevailing activation. Validated windows in the lookback before as of, after the event, where at least
+  // activation_min_dasha_count of the mahadasha, antardasha and pratyantardasha lords are afflicting planets.
+  const lookbackFrom = addYears(ctx.asOf, -q.activation_lookback_years);
+  const activeFrom = event && event.start > lookbackFrom ? event.start : lookbackFrom;
+  const active = event ? validatedA.filter(w => w.start >= activeFrom && w.start <= ctx.asOf && w.status !== "FUTURE" &&
+    [w.md, w.ad, w.pd].filter(l => aff.afflicters.indexOf(l) >= 0).length >= q.activation_min_dasha_count) : [];
+  const outcome = classifyQuality(!!event, aff.pct, active.length, q);
+  const tagged = options.filter(o => o.state);
+  let chosen = null, closestUsed = false;
+  if (outcome !== "NOT SHOWN" && tagged.length) {
+    chosen = tagged.find(o => o.state === outcome) || null;
+    if (!chosen) {
+      const target = STATE_ORDER.indexOf(outcome);
+      chosen = tagged.slice().sort((a, b) => Math.abs(STATE_ORDER.indexOf(a.state) - target) - Math.abs(STATE_ORDER.indexOf(b.state) - target))[0];
+      closestUsed = true;
+    }
+  }
+  const benefic = P.comps.filter(c => c.contribution > 0).sort((a, b) => b.contribution - a.contribution);
+  const malefic = P.comps.filter(c => c.contribution < 0).sort((a, b) => a.contribution - b.contribution);
+  const res = {
+    topic: topicKey, hi: T.hi, house: P.H, lord: P.lordName, karakas: P.karakas, net: P.net, promiseYes,
+    components: P.comps, benefic, malefic, detail: P.detail,
+    relevantPlanets: Array.from(S), windowsFound: windows.length, validatedWindows: validated.length,
+    event, activeWindows: active, affliction: aff, outcome, outcomeText: STATE_TEXT[outcome] || null,
+    options: tagged.map(o => ({ label: o.label, state: o.state })), chosen, closestUsed,
+    thresholds: { mild_percent: q.mild_percent, severe_percent: q.severe_percent, very_severe_percent: q.very_severe_percent }
+  };
+  const parts = [`${T.hi} के लिए वचन ${promiseYes ? "मौजूद है" : "नहीं है"}`];
+  parts.push(event ? `घटना के संकेत ${fmtDate(event.start)} से दिखते हैं` : "घटना के संकेत दशा और गोचर में नहीं मिलते");
+  parts.push(`कष्ट का स्तर ${aff.pct} प्रतिशत है और सक्रिय दशा अवधि ${active.length}`);
+  parts.push(outcome === "NOT SHOWN" ? "अतः गुणवत्ता का निर्णय नहीं हो सकता" : `अतः स्थिति ${outcome} है`);
+  res.hindi = parts.join(", ") + "।";
+  return res;
+}
+function renderQuality(res) {
+  const r = res.quality;
+  const q = W.quality;
+  const L = [];
+  const hm = String(res.time).split(":");
+  L.push(`GOAT ENGINE QUALITY REPORT for ${res.name}`);
+  L.push(`Gender ${res.gender}, born ${fmtDate(new Date(res.birth + "T00:00:00Z"))} at ${hm[0]}h${hm[1]} local time, ${res.place}.`);
+  L.push(`Lagna is sign index ${res.lagnaSign} and Moon sign index ${res.moonSign} in the VedNetra chart.`);
+  L.push(`As of ${fmtDate(res.asOf)}. History scan from ${fmtDate(res.from)} to ${fmtDate(res.to)}.`);
+  L.push("");
+  L.push(`Topic ${r.topic}, house ${r.house} from Lagna, lord ${r.lord}, karakas ${r.karakas.join(" and ")}.`);
+  L.push("");
+  L.push("STEP 1. Promise. Benefic points first, then malefic points.");
+  r.benefic.forEach(c => L.push(`  Benefic ${c.id} weight ${c.weight} gives ${fmt(c.contribution)}.`));
+  r.malefic.forEach(c => L.push(`  Malefic ${c.id} weight ${c.weight} gives ${fmt(c.contribution)}.`));
+  L.push(`  Promise net ${fmt(r.net)}, so the promise is ${r.promiseYes ? "PRESENT" : "ABSENT"}.`);
+  L.push("");
+  L.push(`STEP 2. Event evidence. A validated window in the past or now, with at least ${q.event_min_dasha_count} relevant dasha lords.`);
+  if (r.event) {
+    const e = r.event;
+    L.push(`  Event indicated from ${fmtDate(e.start)} to ${fmtDate(e.end)}, dasha ${e.md} Mahadasha ${e.ad} Antardasha ${e.pd} Pratyantardasha, dasha count ${e.dashaCount} of 3, transit grade ${e.grade}, time ${e.status}.`);
+  } else {
+    L.push("  No validated past or present window with the required dasha count. The event is not shown.");
+  }
+  L.push("");
+  L.push("STEP 3. Afflictions of the house, the lord and the karakas.");
+  L.push(`  Malefic points total ${r.affliction.A}.`);
+  if (r.affliction.markers.length) r.affliction.markers.forEach(m => L.push("  Marker " + m + "."));
+  else L.push("  No affliction marker.");
+  L.push(`  Afflicting planets ${r.affliction.afflicters.join(", ") || "none"}.`);
+  L.push(`  Severity points ${r.affliction.points}, which is ${r.affliction.pct} percent of the full weight.`);
+  L.push(`  Thresholds, mild below ${q.mild_percent} percent, severe from ${q.severe_percent} percent, very severe from ${q.very_severe_percent} percent.`);
+  L.push("");
+  L.push("STEP 4. Activation after the event. Validated windows where an afflicting planet is a dasha lord.");
+  L.push(`  Lookback ${q.activation_lookback_years} years before as of, at least ${q.activation_min_dasha_count} afflicting dasha lords. Windows found ${r.activeWindows.length}.`);
+  if (r.activeWindows.length) {
+    r.activeWindows.slice(0, 10).forEach((w, i) => L.push(`  ${i + 1}. ${fmtDate(w.start)} to ${fmtDate(w.end)}, dasha ${w.md} Mahadasha ${w.ad} Antardasha ${w.pd} Pratyantardasha, transit grade ${w.grade}, time ${w.status}.`));
+    if (r.activeWindows.length > 10) L.push(`  And ${r.activeWindows.length - 10} more.`);
+  } else {
+    L.push("  None.");
+  }
+  L.push("");
+  L.push("STEP 5. Outcome.");
+  L.push(`  Outcome ${r.outcome}. ${r.outcomeText || "The event is not shown, so no quality outcome is given."}`);
+  L.push(`  Event search starts only after the native is ${q.event_min_age_years} years old.`);
+  L.push("");
+  L.push("DEFINITIVE FINAL ANSWER");
+  if (r.chosen) {
+    L.push(`Chosen option ${r.chosen.label}, state ${r.chosen.state}.${r.closestUsed ? " No option carries the outcome state, so the closest state is chosen." : ""}`);
+  } else {
+    L.push("NO ANSWER. The event is not shown, so no option is chosen.");
+  }
+  L.push("Hindi one liner.");
+  L.push(r.hindi);
+  return plain(L.join("\n"));
+}
+
 // ---- ordinal, count and type rules --------------------------------------------------------------
 // Ordinal (education level). The more auspicious the promise, the higher the degree on the option list.
 // Count (siblings). The more auspicious the promise, the larger the total. The gender balance of the
@@ -467,6 +634,15 @@ function run(cfg) {
   ctx.asOf = asOf;
   ctx.from = parseDay(cfg.fromISO) || asOf;
   ctx.to = parseDay(cfg.toISO) || new Date(asOf.getTime() + horizon * 365.25 * DAY);
+  const qualityMode = cfg.mode === "quality" || (cfg.options || []).some(o => o.state);
+  if (qualityMode) {
+    if (!TOPICS[cfg.topic]) throw new Error("Quality mode needs a topic key from data/topics.json");
+    if (!cfg.options || !cfg.options.length) throw new Error("Quality mode needs an options list with state tags");
+    ctx.from = parseDay(cfg.historyFromISO) || parseDay(cfg.date);
+    return { mode: "quality", name: cfg.name || "Native", gender: cfg.gender || "unspecified", place: cfg.place || "",
+      birth: cfg.date, time: cfg.time, asOf, from: ctx.from, to: ctx.to, lagnaSign: ctx.lagna, moonSign: ctx.moon,
+      quality: qualityAnalysis(ctx, cfg.topic, cfg.options) };
+  }
   const T0 = TOPICS[cfg.topic];
   if (T0 && T0.rule && T0.rule !== "yes_no") {
     if (!cfg.options || !cfg.options.length) throw new Error("Topic " + cfg.topic + " needs an options list");
@@ -521,6 +697,7 @@ function ctxOccNames(r) {
 }
 function renderRun(res) {
   if (res.mode === "rule") return renderRule(res);
+  if (res.mode === "quality") return renderQuality(res);
   const L = [];
   L.push(`GOAT ENGINE REPORT for ${res.name}`);
   const hm = String(res.time).split(":");
@@ -546,7 +723,7 @@ function renderRun(res) {
   return plain(L.join("\n"));
 }
 
-module.exports = { run, renderRun, renderRule, plain, analyseTopic, ruleAnalysis, parseSiblings, makeContext, natureOf, houseFrom, signAtHouse, mod12, SIGN_LORD, placeD9, bestWindow, TOPICS, W };
+module.exports = { run, renderRun, renderRule, renderQuality, plain, analyseTopic, ruleAnalysis, qualityAnalysis, afflictionProfile, classifyQuality, parseSiblings, makeContext, natureOf, houseFrom, signAtHouse, mod12, SIGN_LORD, placeD9, bestWindow, TOPICS, W };
 
 // Command line. Use --file for the config so that no shell quoting is needed on Windows, macOS, Linux or a
 // phone terminal. Use --out to write the report as UTF-8 so that Hindi text is kept intact on any console.
@@ -575,7 +752,7 @@ if (require.main === module) {
   try {
     const res = run(readConfig(argv));
     if (argv.indexOf("--json") >= 0) {
-      if (res.mode === "rule") text = toPlainJson(res);
+      if (res.mode === "rule" || res.mode === "quality") text = toPlainJson(res);
       else {
         const j = Object.assign({}, res, { results: res.results.map(r => Object.assign({}, r, { best: r.best ? Object.assign({}, r.best, { start: r.best.start.toISOString(), end: r.best.end.toISOString() }) : null, topWindows: r.topWindows.map(w => Object.assign({}, w, { start: w.start.toISOString(), end: w.end.toISOString() })) })) });
         j.chosen = j.results[0]; j.asOf = res.asOf.toISOString(); j.from = res.from.toISOString(); j.to = res.to.toISOString();

@@ -28,5 +28,16 @@
     "net_scale": 60,
     "_note": "For ordinal, count and type questions the promise net is turned into a strength between minus 1 and plus 1 by dividing by this scale and clamping. A strength of minus 1 is the lowest option and plus 1 the highest."
   },
+  "quality": {
+    "event_min_dasha_count": 2,
+    "event_min_age_years": 16,
+    "activation_min_dasha_count": 2,
+    "activation_lookback_years": 5,
+    "marker_weight": 2,
+    "mild_percent": 15,
+    "severe_percent": 25,
+    "very_severe_percent": 35,
+    "_note": "Life area quality. Severity points are the malefic points of the promise plus marker_weight for each affliction marker, as a percent of the full weight sum. Below mild_percent the outcome is positive. From severe_percent, with an active affliction dasha after the event, the outcome is separated. From very_severe_percent with an active affliction dasha, the outcome is severe, such as divorce. Otherwise challenged. These thresholds are provisional and the owner can set them."
+  },
   "horizonYears": 10
 }
