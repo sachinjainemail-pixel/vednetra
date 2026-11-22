@@ -1,0 +1,59 @@
+{
+  "_note": "Owner reported answers. Used for the backtest. Engine output shown for each question as run on 22 Nov 2026 with the rules in the commit that added relatives.",
+  "cases": [
+    {
+      "name": "Vishal",
+      "gender": "male",
+      "date": "1982-08-21",
+      "time": "16:11:00",
+      "tz": 5.5,
+      "lat": 28.6139,
+      "lon": 77.209,
+      "place": "New Delhi",
+      "questions": [
+        {
+          "id": "Q1",
+          "topic": "occupation",
+          "question": "Janaat ka kya pesha hai",
+          "options": [
+            "Food products ka vyapar",
+            "Gym trainer",
+            "Sarkari afsar",
+            "Army afsar"
+          ],
+          "truth": "Sarkari afsar",
+          "engine": "Food products ka vyapar",
+          "correct": false
+        },
+        {
+          "id": "Q2",
+          "topic": "marriage quality",
+          "question": "Vaivahik jeevan kaisa raha",
+          "options": [
+            "Kalah purn",
+            "Behad sukhi",
+            "Talaqshuda",
+            "Inmein se koi nahi"
+          ],
+          "truth": "Kalah purn",
+          "engine": "NOT SHOWN, no option",
+          "correct": false
+        },
+        {
+          "id": "Q3",
+          "topic": "rel_death",
+          "question": "Bhai ke sambandh mein kaunsi baat satya hai",
+          "options": [
+            "Vyapar sajhedaar",
+            "Mrityu ho chuki",
+            "Army mein afsar",
+            "Videsh mein"
+          ],
+          "truth": "Mrityu ho chuki",
+          "engine": "all NO, closest Vyapar sajhedaar",
+          "correct": false
+        }
+      ]
+    }
+  ]
+}
