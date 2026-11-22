@@ -162,4 +162,14 @@ check("relatives rule is marked in weights", () => {
   assert.strictEqual(G.W.relatives.uses_moon_chart, false);
 });
 
+// 14. Owner rules. Excluded outcomes are not decided. Combinations need two charts to agree.
+check("excluded outcome is not decided", () => {
+  const r = G.run(Object.assign({}, base, { asOf: "2026-11-22", options: [{ label: "Medical", topic: "medical" }] }));
+  assert.strictEqual(r.chosen.decision, "NOT DECIDED");
+});
+check("combination rule needs at least two charts", () => {
+  assert.strictEqual(G.W.combination.min_charts_agree, 2);
+  assert.deepStrictEqual(G.W.combination.charts, ["D1", "Moon", "D9"]);
+});
+
 console.log("\n" + pass + " checks passed" + (process.exitCode ? ", some failed" : ""));

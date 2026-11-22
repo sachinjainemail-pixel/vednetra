@@ -371,8 +371,18 @@ function planetEventValue(ctx, name, topicKey, adverse) {
   const match = nak.events.indexOf(eventGroup(topicKey)) >= 0 ? 1 : 0;
   return round2(power * planetFit + 0.5 * lordFit + ganaFit + match);
 }
+function notDecided(topicKey, label) {
+  const T = TOPICS[topicKey] || {};
+  const reason = "The engine does not decide this outcome, by owner rule. Medical outcomes, death, pregnancy outcome and speculative gain are excluded.";
+  return { label, topic: topicKey, hi: T.hi || topicKey, relative: false, notDecided: true, house: null, lord: null, karakas: [],
+    net: 0, promiseYes: false, adverse: false, components: [], benefic: [], malefic: [], detail: { c1_house_lagna: { occ: [] }, c2_house_d9_rotated: [] },
+    relevantPlanets: [], transitTargetSigns: [], windowsFound: 0, validatedWindows: 0, topWindows: [], best: null, yes: false,
+    decision: "NOT DECIDED", reason, involved: [], eventScore: 0, nthHouse: null, kalpurushaHouseSign: null, kalpurushaLord: null,
+    asOf: null, from: null, to: null, score: -1e9, hindi: `${T.hi || topicKey} का परिणाम इंजन तय नहीं करता, यह नियम से बाहर है।` };
+}
 function analyseTopic(ctx, topicKey, label) {
   const T = TOPICS[topicKey];
+  if (W.excluded_outcomes.topics.indexOf(topicKey) >= 0) return notDecided(topicKey, label);
   if (T && T.anchor) return analyseRelative(ctx, topicKey, label);
   if (!T) throw new Error("Unknown topic " + topicKey + ". Known topics are " + Object.keys(TOPICS).filter(k => k[0] !== "_").join(", "));
   const P = evalPromise(ctx, T);
@@ -684,7 +694,7 @@ function ruleAnalysis(ctx, topicKey, options) {
       const combo = TYPES.occupationKinds[k];
       const ps = combo.signifiers;
       const cc = comboCount(ctx, combo);
-      const base = cc.total + 0.01 * signifierStrength(ctx, ps);
+      const base = cc.chartsHit >= W.combination.min_charts_agree ? cc.total + 0.01 * signifierStrength(ctx, ps) : 0;
       out.comboHits = out.comboHits || {};
       out.comboHits[k] = cc.hitsBy;
       kindScore[k] = round2(base + (ps.some(p => activeLords.has(p)) ? 1 : 0) + (ps.some(p => pastLords.has(p)) ? 0.5 : 0));
@@ -883,7 +893,8 @@ function comboCount(ctx, combo) {
     hitsBy[ch] = hits;
     total += hits.length;
   });
-  return { total, hitsBy };
+  const chartsHit = CHARTS.filter(ch => hitsBy[ch].length > 0).length;
+  return { total, hitsBy, chartsHit };
 }
 // Strength of the signifiers, used only to break ties between kinds with the same count.
 function signifierStrength(ctx, names) { return sum(names.map(n => pvAt(ctx, n, ctx.by[n].sign, false).v)); }

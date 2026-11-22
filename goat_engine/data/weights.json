@@ -57,5 +57,23 @@
     },
     "min_dasha_count": 1,
     "_min_dasha_note": "Owner decision. A relative's prevailing window needs one relevant dasha lord."
+  },
+  "combination": {
+    "charts": [
+      "D1",
+      "Moon",
+      "D9"
+    ],
+    "min_charts_agree": 2,
+    "_note": "Owner rule. A combination supports an event only when its links appear in at least two of the three charts. Divisional charts beyond D9 and Jaimini points are not used."
+  },
+  "excluded_outcomes": {
+    "topics": [
+      "medical",
+      "death",
+      "pregnancy",
+      "speculative"
+    ],
+    "_note": "Owner rule. The engine does not decide medical outcomes, death, pregnancy outcome or speculative gain. The supplement received from the owner is reference text only."
   }
 }
