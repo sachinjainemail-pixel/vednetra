@@ -1,0 +1,28 @@
+{
+  "_note": "First setting of the GOAT ENGINE weights and thresholds. The owner text asks for best judgement and gives the rank order only, so these numbers are the engine's own starting choice. They were fixed before any backtest was run. The owner should confirm or change them here, and the engine reads them at every run.",
+  "weights": {
+    "c1_house_lagna": 25,
+    "c2_house_d9_rotated": 15,
+    "c3_house_moon": 5,
+    "c4_lord_lagna": 12,
+    "c5_lord_d9_rotated": 8,
+    "c6_karaka_lagna": 12,
+    "c7_karaka_d9_rotated": 6,
+    "c8_nth_house": 6,
+    "c9_kalpurusha_house": 4,
+    "c10_lagna_moon_agreement": 8
+  },
+  "transit": {
+    "samples_per_window": 5,
+    "grade_A_min_double_samples": 3,
+    "grade_B_min_double_samples": 2,
+    "validated_grades": ["A", "B"],
+    "_note": "A double transit means Jupiter and Saturn both hit a target sign, by conjunction or by their full aspects, in the same sampled instant. The targets are the house, its lord and the karaka, all counted from the Lagna."
+  },
+  "dasha": {
+    "antardasha_must_be_relevant": true,
+    "mahadasha_or_pratyantardasha_must_be_relevant": true,
+    "_note": "A window is one Pratyantardasha. Relevant planets are the lord of the house, its occupants in the Lagna chart and in the rotated D9, and the karaka."
+  },
+  "horizonYears": 10
+}

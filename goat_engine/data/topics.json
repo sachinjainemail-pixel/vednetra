@@ -1,0 +1,14 @@
+{
+  "_note": "Topic presets. house is the house under study counted from the Lagna. karaka is the fixed karaka planet. Gender chooses the karaka list where two are given. These presets follow the owner text where it names a planet, for example Venus for a male marriage and Venus with Jupiter for a female marriage. The other presets are the engine's standard choices and need owner confirmation.",
+  "education": { "hi": "शिक्षा", "house": 4, "karaka": { "any": ["Jupiter"] } },
+  "marriage": { "hi": "विवाह", "house": 7, "karaka": { "male": ["Venus"], "female": ["Venus", "Jupiter"], "any": ["Venus"] } },
+  "career": { "hi": "नौकरी या करियर", "house": 10, "karaka": { "any": ["Sun"] } },
+  "children": { "hi": "संतान", "house": 5, "karaka": { "any": ["Jupiter"] } },
+  "foreign": { "hi": "विदेश", "house": 12, "karaka": { "any": ["Rahu"] } },
+  "property": { "hi": "संपत्ति", "house": 4, "karaka": { "any": ["Mars"] } },
+  "wealth": { "hi": "धन", "house": 2, "karaka": { "any": ["Jupiter"] } },
+  "health": { "hi": "स्वास्थ्य", "house": 6, "karaka": { "any": ["Sun"] } },
+  "siblings": { "hi": "भाई बहन", "house": 3, "karaka": { "any": ["Mars"] } },
+  "father": { "hi": "पिता", "house": 9, "karaka": { "any": ["Sun"] } },
+  "mother": { "hi": "माता", "house": 4, "karaka": { "any": ["Moon"] } }
+}
