@@ -1,0 +1,306 @@
+{
+  "_note": "DRAFT for owner confirmation. The 27 nakshatras with their Vimshottari lord, gana nature and the events each nakshatra relates to by its significations. The gana nature gives Deva benefic, Manushya neutral and Rakshasa malefic. The event lists are a working draft from classical significations and must be confirmed or changed by the owner. Used by the ranking of options.",
+  "gana_nature": {
+    "Deva": 0.5,
+    "Manushya": 0,
+    "Rakshasa": -0.5
+  },
+  "groups": {
+    "health": "illness",
+    "job_loss": "career",
+    "occupation": "career"
+  },
+  "nakshatras": [
+    {
+      "no": 1,
+      "name": "Ashwini",
+      "lord": "Ketu",
+      "gana": "Deva",
+      "events": [
+        "illness",
+        "travel"
+      ]
+    },
+    {
+      "no": 2,
+      "name": "Bharani",
+      "lord": "Venus",
+      "gana": "Manushya",
+      "events": [
+        "marriage",
+        "career"
+      ]
+    },
+    {
+      "no": 3,
+      "name": "Krittika",
+      "lord": "Sun",
+      "gana": "Rakshasa",
+      "events": [
+        "illness",
+        "career"
+      ]
+    },
+    {
+      "no": 4,
+      "name": "Rohini",
+      "lord": "Moon",
+      "gana": "Manushya",
+      "events": [
+        "marriage",
+        "children",
+        "wealth",
+        "property"
+      ]
+    },
+    {
+      "no": 5,
+      "name": "Mrigashira",
+      "lord": "Mars",
+      "gana": "Deva",
+      "events": [
+        "marriage",
+        "education",
+        "travel"
+      ]
+    },
+    {
+      "no": 6,
+      "name": "Ardra",
+      "lord": "Rahu",
+      "gana": "Manushya",
+      "events": [
+        "illness",
+        "career"
+      ]
+    },
+    {
+      "no": 7,
+      "name": "Punarvasu",
+      "lord": "Jupiter",
+      "gana": "Deva",
+      "events": [
+        "marriage",
+        "children",
+        "foreign"
+      ]
+    },
+    {
+      "no": 8,
+      "name": "Pushya",
+      "lord": "Saturn",
+      "gana": "Deva",
+      "events": [
+        "children",
+        "education",
+        "career",
+        "property"
+      ]
+    },
+    {
+      "no": 9,
+      "name": "Ashlesha",
+      "lord": "Mercury",
+      "gana": "Rakshasa",
+      "events": [
+        "illness",
+        "marriage"
+      ]
+    },
+    {
+      "no": 10,
+      "name": "Magha",
+      "lord": "Ketu",
+      "gana": "Rakshasa",
+      "events": [
+        "father",
+        "property",
+        "illness"
+      ]
+    },
+    {
+      "no": 11,
+      "name": "Purva Phalguni",
+      "lord": "Venus",
+      "gana": "Manushya",
+      "events": [
+        "marriage",
+        "children"
+      ]
+    },
+    {
+      "no": 12,
+      "name": "Uttara Phalguni",
+      "lord": "Sun",
+      "gana": "Manushya",
+      "events": [
+        "marriage",
+        "career",
+        "children"
+      ]
+    },
+    {
+      "no": 13,
+      "name": "Hasta",
+      "lord": "Moon",
+      "gana": "Deva",
+      "events": [
+        "career",
+        "education",
+        "wealth",
+        "illness"
+      ]
+    },
+    {
+      "no": 14,
+      "name": "Chitra",
+      "lord": "Mars",
+      "gana": "Rakshasa",
+      "events": [
+        "property",
+        "marriage",
+        "career"
+      ]
+    },
+    {
+      "no": 15,
+      "name": "Swati",
+      "lord": "Rahu",
+      "gana": "Deva",
+      "events": [
+        "foreign",
+        "career",
+        "marriage"
+      ]
+    },
+    {
+      "no": 16,
+      "name": "Vishakha",
+      "lord": "Jupiter",
+      "gana": "Rakshasa",
+      "events": [
+        "career",
+        "wealth"
+      ]
+    },
+    {
+      "no": 17,
+      "name": "Anuradha",
+      "lord": "Saturn",
+      "gana": "Deva",
+      "events": [
+        "marriage",
+        "foreign"
+      ]
+    },
+    {
+      "no": 18,
+      "name": "Jyeshtha",
+      "lord": "Mercury",
+      "gana": "Rakshasa",
+      "events": [
+        "illness",
+        "father",
+        "career"
+      ]
+    },
+    {
+      "no": 19,
+      "name": "Mula",
+      "lord": "Ketu",
+      "gana": "Rakshasa",
+      "events": [
+        "illness",
+        "father",
+        "foreign"
+      ]
+    },
+    {
+      "no": 20,
+      "name": "Purva Ashadha",
+      "lord": "Venus",
+      "gana": "Manushya",
+      "events": [
+        "marriage",
+        "wealth",
+        "foreign"
+      ]
+    },
+    {
+      "no": 21,
+      "name": "Uttara Ashadha",
+      "lord": "Sun",
+      "gana": "Manushya",
+      "events": [
+        "career",
+        "father",
+        "wealth"
+      ]
+    },
+    {
+      "no": 22,
+      "name": "Shravana",
+      "lord": "Moon",
+      "gana": "Deva",
+      "events": [
+        "education",
+        "career",
+        "mother",
+        "foreign"
+      ]
+    },
+    {
+      "no": 23,
+      "name": "Dhanishta",
+      "lord": "Mars",
+      "gana": "Rakshasa",
+      "events": [
+        "wealth",
+        "property",
+        "children"
+      ]
+    },
+    {
+      "no": 24,
+      "name": "Shatabhisha",
+      "lord": "Rahu",
+      "gana": "Rakshasa",
+      "events": [
+        "illness",
+        "foreign"
+      ]
+    },
+    {
+      "no": 25,
+      "name": "Purva Bhadrapada",
+      "lord": "Jupiter",
+      "gana": "Manushya",
+      "events": [
+        "illness"
+      ]
+    },
+    {
+      "no": 26,
+      "name": "Uttara Bhadrapada",
+      "lord": "Saturn",
+      "gana": "Manushya",
+      "events": [
+        "wealth",
+        "children",
+        "property"
+      ]
+    },
+    {
+      "no": 27,
+      "name": "Revati",
+      "lord": "Mercury",
+      "gana": "Deva",
+      "events": [
+        "marriage",
+        "children",
+        "education",
+        "travel"
+      ]
+    }
+  ]
+}

@@ -34,6 +34,7 @@ const DATA = path.join(__dirname, "..", "data");
 const W = JSON.parse(fs.readFileSync(path.join(DATA, "weights.json"), "utf8"));
 const TOPICS = JSON.parse(fs.readFileSync(path.join(DATA, "topics.json"), "utf8"));
 const TYPES = JSON.parse(fs.readFileSync(path.join(DATA, "types.json"), "utf8"));
+const NAKS = JSON.parse(fs.readFileSync(path.join(DATA, "nakshatras.json"), "utf8"));
 const DAY = 86400000;
 
 // ---- fixed astrological tables -------------------------------------------------------------------
@@ -353,6 +354,22 @@ function bestWindow(windows) {
 }
 
 // ---- one topic, one full run ----------------------------------------------------------------------
+// Ranking score of one planet for an event. The owner rule. The strength of the planet is its power and it
+// enforces its result. Its nature, the nature of its nakshatra lord and the gana nature of its nakshatra decide
+// the sign of that result for the event, positive for a positive event and reversed for an adverse event.
+// A nakshatra that relates to the event by its significations adds one.
+function eventGroup(topicKey) { return NAKS.groups[topicKey] || topicKey; }
+function planetEventValue(ctx, name, topicKey, adverse) {
+  const p = ctx.by[name];
+  const pol = adverse ? -1 : 1;
+  const power = Math.abs(pvAt(ctx, name, p.sign, false).v);
+  const nak = NAKS.nakshatras[Math.floor(modDeg(p.lon) / (360 / 27))];
+  const planetFit = natureOf(ctx, name) * pol;
+  const lordFit = natureOf(ctx, p.nakLord) * pol;
+  const ganaFit = NAKS.gana_nature[nak.gana] * pol;
+  const match = nak.events.indexOf(eventGroup(topicKey)) >= 0 ? 1 : 0;
+  return round2(power * planetFit + 0.5 * lordFit + ganaFit + match);
+}
 function analyseTopic(ctx, topicKey, label) {
   const T = TOPICS[topicKey];
   if (!T) throw new Error("Unknown topic " + topicKey + ". Known topics are " + Object.keys(TOPICS).filter(k => k[0] !== "_").join(", "));
@@ -368,6 +385,8 @@ function analyseTopic(ctx, topicKey, label) {
   const windows = findWindows(ctx, S, targets);
   const valid = bestWindow(windows);
   const best = valid.length ? valid[0] : null;
+  const involved = best ? Array.from(new Set([best.md, best.ad, best.pd])) : [];
+  const eventScore = involved.length ? round2(sum(involved.map(n => planetEventValue(ctx, n, topicKey, adverse)))) : 0;
   let decision, yes, reason;
   if (!promiseYes) { yes = false; decision = "NO"; reason = adverse ? "The affliction promise is not there, net " + fmt(P.net) + "." : "The natal promise is not there, net " + fmt(P.net) + "."; }
   else if (!best) { yes = false; decision = "NO"; reason = "The promise is there but no dasha window in the search range is validated by a double transit of Jupiter and Saturn."; }
@@ -381,10 +400,10 @@ function analyseTopic(ctx, topicKey, label) {
     relevantPlanets: Array.from(S), transitTargetSigns: targets.d1, transitTargetSigns9: targets.d9,
     windowsFound: windows.length, validatedWindows: valid.length, topWindows: valid.slice(0, 5),
     best, yes, decision, reason, asOf: ctx.asOf, from: ctx.from, to: ctx.to,
-    adverse, hindi: null
+    adverse, involved, eventScore, hindi: null
   };
   result.hindi = hindiLine(ctx, result);
-  result.score = (yes ? 1000 : 0) + (best ? GRADE_RANK[best.grade] * 10 : 0) + (adverse ? -P.net : P.net);
+  result.score = (yes ? 1000 : 0) + eventScore;
   return result;
 }
 // Hindi names of planets for the astrological text. Anything not in the table is left as written.
@@ -828,7 +847,7 @@ function renderRun(res) {
   L.push("");
   if (res.mode === "options") {
     L.push("Options ranked by the engine. The top option is the definitive answer.");
-    res.results.forEach((r, i) => L.push(`  ${i + 1}. ${r.label}, decision ${r.decision}, net ${fmt(r.net)}, best window ${r.best ? fmtDate(r.best.start) + " to " + fmtDate(r.best.end) : "none"}.`));
+    res.results.forEach((r, i) => L.push(`  ${i + 1}. ${r.label}, decision ${r.decision}, event score ${fmt(r.eventScore)}, involved ${r.involved.join(" ")}, best window ${r.best ? fmtDate(r.best.start) + " to " + fmtDate(r.best.end) : "none"}.`));
     L.push("");
   }
   res.results.forEach((r, i) => { L.push(renderResult(r, res.mode === "options" ? i : undefined)); L.push(""); });
