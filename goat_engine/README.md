@@ -29,8 +29,9 @@ never has to be typed on the command line, which quoting breaks on Windows. Use 
 as UTF-8, so that the Hindi one liner keeps its characters on any console.
 
 Phone, in the Claude Code app or on the web: open a new session on this repository and the GOAT branch.
-Claude runs the same commands in its own container, so nothing needs installing on the phone. Ask it, for
-example, to run the GOAT ENGINE on `goat_engine/examples/education_ordinal.json`.
+Claude runs the same commands in its own container, so nothing needs installing on the phone. The engine is
+triggered only by the word GOAT. Put GOAT in the message, for example, GOAT, run the education example, or
+GOAT, run the education ordinal example file. A message without the word GOAT does not run this engine.
 
 Your own question, on any device: copy one of the files in `examples` and change `name`, `gender`, `date`
 (YYYY-MM-DD), `time` (HH:MM:SS), `tz` (hours from UTC), `lat`, `lon` and `place`. Then set `topic`, or give an
