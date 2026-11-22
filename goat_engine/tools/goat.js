@@ -164,6 +164,14 @@ function aspectsOn(ctx, s) {
   });
   return { score: round2(sum(list.map(x => x.v))), list };
 }
+// Timing set. Dasha lords that count for a house are checked from two charts, the Lagna chart (D1 from Lagna)
+// and the Moon chart (house counted from the Moon). In each chart the set takes the house lord, its occupants,
+// and the planets that aspect the house. The karakas of the topic are added once.
+function timingSet(ctx, P, occH, occD9) {
+  const occM = ctx.planets.filter(q => q.sign === P.sM).map(q => q.name);
+  const lordM = SIGN_LORD[P.sM];
+  return new Set([P.lordName, lordM].concat(occH, occD9, occM, P.karakas, aspectersOn(ctx, P.sL), aspectersOn(ctx, P.sM)));
+}
 // Planets that aspect a house by their natal aspects. They count as linked to the house for timing.
 function aspectersOn(ctx, s) {
   return ctx.planets.filter(q => { const asp = NATAL_ASPECTS[q.name]; return asp && q.sign !== s && asp.indexOf(houseFrom(s, q.sign)) >= 0; }).map(q => q.name);
@@ -336,8 +344,8 @@ function analyseTopic(ctx, topicKey, label) {
   const lordP = ctx.by[P.lordName];
   const occH = ctx.planets.filter(q => q.sign === P.sL).map(q => q.name);
   const occD9 = ctx.planets.filter(q => q.navamsaSign === P.sL).map(q => q.name);
-  const S = new Set([P.lordName].concat(occH, occD9, P.karakas, aspectersOn(ctx, P.sL)));
-  const targets = [P.sL, P.sM, lordP.sign].concat(P.karakas.map(k => ctx.by[k].sign));
+  const S = timingSet(ctx, P, occH, occD9);
+  const targets = [P.sL, P.sM, lordP.sign, ctx.by[SIGN_LORD[P.sM]].sign].concat(P.karakas.map(k => ctx.by[k].sign));
   // Adverse events, such as illness or job loss, are promised by affliction, so the test is inverted.
   const adverse = T.polarity === "adverse";
   const promiseYes = adverse ? P.net < 0 : P.net > 0;
@@ -445,8 +453,8 @@ function qualityAnalysis(ctx, topicKey, options) {
   const lordP = ctx.by[P.lordName];
   const occH = ctx.planets.filter(x => x.sign === P.sL).map(x => x.name);
   const occD9 = ctx.planets.filter(x => x.navamsaSign === P.sL).map(x => x.name);
-  const S = new Set([P.lordName].concat(occH, occD9, P.karakas, aspectersOn(ctx, P.sL)));
-  const targets = [P.sL, P.sM, lordP.sign].concat(P.karakas.map(k => ctx.by[k].sign));
+  const S = timingSet(ctx, P, occH, occD9);
+  const targets = [P.sL, P.sM, lordP.sign, ctx.by[SIGN_LORD[P.sM]].sign].concat(P.karakas.map(k => ctx.by[k].sign));
   const aff = afflictionProfile(ctx, P);
   const windows = findWindows(ctx, S, targets);
   const validated = windows.filter(w => w.validated).sort((a, b) => a.start - b.start);
@@ -624,7 +632,7 @@ function ruleAnalysis(ctx, topicKey, options) {
     // Each option kind scores by the natal condition of its planets, plus the planets that are active in the
     // current dasha. When no career dasha is active and the 10th house promise is negative, the unemployed
     // option is chosen. The kinds and the rule are in data/types.json and are provisional.
-    const targets = [P.sL, P.sM, ctx.by[P.lordName].sign].concat(P.karakas.map(k => ctx.by[k].sign));
+    const targets = [P.sL, P.sM, ctx.by[P.lordName].sign, ctx.by[SIGN_LORD[P.sM]].sign].concat(P.karakas.map(k => ctx.by[k].sign));
     const winsC = findWindows(ctx, new Set(sigSet), targets);
     const validC = winsC.filter(w => w.validated && w.dashaCount >= W.quality.event_min_dasha_count);
     const careerNow = validC.filter(w => w.status === "NOW");
