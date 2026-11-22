@@ -10,6 +10,42 @@ the Vimshottari tree and the Jupiter and Saturn transits all come from the VedNe
 Status. Second version. It runs end to end and passes its self test. It does not yet separate the owner's
 reported answers, so treat its output as a draft until the open items below are settled.
 
+## Run it in a new session, on a laptop or on a phone
+
+Nothing needs installing. The engine uses only Node built in modules, and the VedNetra core it loads is
+in this repository. Tested on Node 22.23.5. Older Node versions are untested.
+
+Laptop, from the repository folder:
+
+```
+node goat_engine/tests/goat_selftest.js
+node goat_engine/tools/goat.js --file goat_engine/examples/marriage_female.json
+node goat_engine/tools/goat.js --file goat_engine/examples/marriage_female.json --out goat_engine/examples/marriage_report.txt
+node goat_engine/tools/backtest.js
+```
+
+The same commands work in Windows PowerShell, macOS Terminal and Linux. Use `--file` so that the JSON
+never has to be typed on the command line, which quoting breaks on Windows. Use `--out` to save the report
+as UTF-8, so that the Hindi one liner keeps its characters on any console.
+
+Phone, in the Claude Code app or on the web: open a new session on this repository and the GOAT branch.
+Claude runs the same commands in its own container, so nothing needs installing on the phone. Ask it, for
+example, to run the GOAT ENGINE on `goat_engine/examples/education_ordinal.json`.
+
+Your own question, on any device: copy one of the files in `examples` and change `name`, `gender`, `date`
+(YYYY-MM-DD), `time` (HH:MM:SS), `tz` (hours from UTC), `lat`, `lon` and `place`. Then set `topic`, or give an
+`options` list. Ordinal and count options go in ascending order. Type options carry a `planet` tag.
+
+Example files in `examples`:
+
+| File | Question |
+|---|---|
+| `marriage_female.json` | Yes or no marriage promise and timing |
+| `education_ordinal.json` | Education level on the option list, with the stream from the planets |
+| `siblings_count.json` | Number of brothers and sisters, with the gender split from the planets |
+| `career_options.json` | Several options, each with its own topic, ranked to pick one |
+| `property_type.json` | Kind of property, picked from the planet tags on the options |
+
 ## Files
 
 | File | Purpose |

@@ -1,0 +1,17 @@
+{
+  "name": "Sample native",
+  "gender": "male",
+  "date": "2000-11-12",
+  "time": "13:13:00",
+  "tz": 5.5,
+  "lat": 22.7196,
+  "lon": 75.8577,
+  "place": "Sample place",
+  "fromISO": "2026-01-01",
+  "toISO": "2030-12-31",
+  "options": [
+    { "label": "Government job", "topic": "career" },
+    { "label": "Own business", "topic": "wealth" },
+    { "label": "Foreign settlement", "topic": "foreign" }
+  ]
+}

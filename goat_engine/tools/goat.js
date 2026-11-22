@@ -548,17 +548,52 @@ function renderRun(res) {
 
 module.exports = { run, renderRun, renderRule, plain, analyseTopic, ruleAnalysis, parseSiblings, makeContext, natureOf, houseFrom, signAtHouse, mod12, SIGN_LORD, placeD9, bestWindow, TOPICS, W };
 
+// Command line. Use --file for the config so that no shell quoting is needed on Windows, macOS, Linux or a
+// phone terminal. Use --out to write the report as UTF-8 so that Hindi text is kept intact on any console.
+//   node goat_engine/tools/goat.js --file goat_engine/examples/marriage_female.json [--json] [--out report.txt]
+function readConfig(argv) {
+  const fi = argv.indexOf("--file");
+  if (fi >= 0) {
+    const file = path.resolve(process.cwd(), argv[fi + 1] || "");
+    if (!argv[fi + 1] || !fs.existsSync(file)) throw new Error("Config file not found, give the path after --file");
+    return JSON.parse(fs.readFileSync(file, "utf8").replace(/^﻿/, ""));
+  }
+  const inline = argv.find(a => a.trim().startsWith("{"));
+  if (inline) return JSON.parse(inline);
+  throw new Error("Give a config with --file path or as a JSON string. See goat_engine/README.md");
+}
+function toPlainJson(obj) {
+  return JSON.stringify(obj, (k, v) => (v instanceof Date ? v.toISOString() : v), 2) + "\n";
+}
 if (require.main === module) {
   const argv = process.argv.slice(2);
-  const cfg = JSON.parse(argv.find(a => !a.startsWith("--")) || "{}");
-  const res = run(cfg);
-  if (argv.indexOf("--json") >= 0 && res.mode === "rule") {
-    process.stdout.write(JSON.stringify(res, (k, v) => (v instanceof Date ? v.toISOString() : v), 2) + "\n");
-  } else if (argv.indexOf("--json") >= 0) {
-    const j = Object.assign({}, res, { results: res.results.map(r => Object.assign({}, r, { best: r.best ? Object.assign({}, r.best, { start: r.best.start.toISOString(), end: r.best.end.toISOString() }) : null, topWindows: r.topWindows.map(w => Object.assign({}, w, { start: w.start.toISOString(), end: w.end.toISOString() })) })) });
-    j.chosen = j.results[0]; j.asOf = res.asOf.toISOString(); j.from = res.from.toISOString(); j.to = res.to.toISOString();
-    process.stdout.write(JSON.stringify(j, null, 2) + "\n");
+  if (argv.indexOf("--help") >= 0 || argv.length === 0) {
+    process.stdout.write("GOAT ENGINE. Usage: node goat_engine/tools/goat.js --file <config.json> [--json] [--out <file>]\n");
+    process.exit(0);
+  }
+  let text;
+  try {
+    const res = run(readConfig(argv));
+    if (argv.indexOf("--json") >= 0) {
+      if (res.mode === "rule") text = toPlainJson(res);
+      else {
+        const j = Object.assign({}, res, { results: res.results.map(r => Object.assign({}, r, { best: r.best ? Object.assign({}, r.best, { start: r.best.start.toISOString(), end: r.best.end.toISOString() }) : null, topWindows: r.topWindows.map(w => Object.assign({}, w, { start: w.start.toISOString(), end: w.end.toISOString() })) })) });
+        j.chosen = j.results[0]; j.asOf = res.asOf.toISOString(); j.from = res.from.toISOString(); j.to = res.to.toISOString();
+        text = JSON.stringify(j, null, 2) + "\n";
+      }
+    } else {
+      text = renderRun(res) + "\n";
+    }
+  } catch (e) {
+    process.stderr.write("GOAT ENGINE error. " + e.message + "\n");
+    process.exit(2);
+  }
+  const oi = argv.indexOf("--out");
+  if (oi >= 0 && argv[oi + 1]) {
+    const outFile = path.resolve(process.cwd(), argv[oi + 1]);
+    fs.writeFileSync(outFile, text, "utf8");
+    process.stdout.write("Report written to " + outFile + "\n");
   } else {
-    process.stdout.write(renderRun(res) + "\n");
+    process.stdout.write(text);
   }
 }

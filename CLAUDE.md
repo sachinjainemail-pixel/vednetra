@@ -91,6 +91,15 @@ Non negotiable points
 - Rule library: suj_engine/rules/rules_index.json (1,561 rules from Komilla Sutton The Nakshatras and Umesh
   Puri Laghu Parashari).
 
+## GOAT ENGINE
+
+If the user says "GOAT ENGINE" or "GOAT", it is goat_engine in this repository. It is a separate engine from SUJ
+and SARVA. A request that names GOAT is not handled by the SUJ rules above. Read goat_engine/README.md first.
+Run it with node goat_engine/tools/goat.js --file goat_engine/examples/<file>.json, or give the same fields for a
+new native in a copy of an example file. It needs no install. Charts come from the VedNetra core in this
+repository, through goat_engine/tools/vednetra_loader.js. Its weights and topic presets are in goat_engine/data,
+and the owner can change them there. Do not change the GOAT weights to fit a backtest without the owner's go-ahead.
+
 ## What the engine needs from the owner for a reading
 
 Native name, gender, date of birth, time of birth, place of birth (the latitude, longitude and time zone can be

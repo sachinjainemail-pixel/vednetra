@@ -2,7 +2,7 @@
 /*
  * GOAT ENGINE backtest against the owner's own reported charts.
  *
- * Reads the owner case file in suj_engine/cases/cases.json (read only) and runs the GOAT engine on the
+ * Reads the owner case copy in goat_engine/cases/owner_cases.json and runs the GOAT engine on the
  * questions whose answers map cleanly onto a topic. Two kinds are scored.
  *   Status questions on marriage. The engine promise is compared with the reported status.
  *   Event questions with a date. The engine picks among mapped options with the search range set to one

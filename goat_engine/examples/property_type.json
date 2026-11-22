@@ -1,0 +1,16 @@
+{
+  "name": "Sample native",
+  "gender": "female",
+  "date": "1993-01-06",
+  "time": "07:10:00",
+  "tz": 5.5,
+  "lat": 27.1333,
+  "lon": 81.9667,
+  "place": "Sample place",
+  "topic": "property",
+  "options": [
+    { "label": "Land or plot", "planet": "Mars" },
+    { "label": "Vehicle", "planet": "Venus" },
+    { "label": "Residential house", "planet": "Moon" }
+  ]
+}
