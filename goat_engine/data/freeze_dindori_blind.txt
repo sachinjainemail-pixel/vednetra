@@ -1,0 +1,21 @@
+DINDORI BLIND RECORD. Not VERIFIED. No official answer key found. Quiz date not supplied, so present-state timing is incomplete.
+Coordinates 22.944 N, 81.080 E. Station and town points are 22.94 N, 81.08 E. Equivalent for this purpose.
+
+Q1 livelihood, as-of 2026-11-22.
+  Niji company        NOT_SUPPORTED, natal check failed, timing TIMING_NOT_RUN.
+  Clerk, education    NOT_SUPPORTED, natal check failed, timing TIMING_NOT_RUN.
+  Department store    NOT_SUPPORTED, natal check failed, timing TIMING_NOT_RUN.
+  Berojgar            NOT_SUPPORTED, natal check failed, timing TIMING_NOT_RUN.
+  Question verdict    UNRESOLVED.
+
+Q2 marital state, as-of 2026-11-22.
+  Marriage promise    NATAL_STRESS_INDICATOR, net minus 24.65. Not evidence that the native is unmarried.
+  If married         CHALLENGED, from the quality rule with the marriage presumed. Prevailing affliction windows 0 in the last five years.
+  Question verdict    UNRESOLVED. Conditional: IF_MARRIED gives CHALLENGED. This was the engine's view, not a verified answer.
+
+Q3 event, 29 December 2022, window 2022-12-01 to 2022-12-31.
+  Marriage            NOT_SUPPORTED, natal check failed, timing TIMING_NOT_RUN.
+  Pilgrimage          NOT_SUPPORTED, natal check failed, timing TIMING_NOT_RUN.
+  Father retirement   NOT_SUPPORTED, natal check failed, timing TIMING_NOT_RUN. Row added this run, D1 9+6+5 with link 6-5.
+  New business        NOT_SUPPORTED, natal check failed, timing TIMING_NOT_RUN.
+  Question verdict    UNRESOLVED, OPTION_COVERAGE_INCOMPLETE for the father row until its D1 checks are reviewed.

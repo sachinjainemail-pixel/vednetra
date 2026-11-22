@@ -479,6 +479,154 @@
         10,
         12
       ]
+    },
+    "private_company": {
+      "charts": [
+        "D1",
+        "Moon"
+      ],
+      "houses": [
+        6,
+        10,
+        2,
+        11
+      ],
+      "mandatory": [
+        6,
+        10
+      ],
+      "links": [
+        [
+          6,
+          10
+        ]
+      ],
+      "planets": [
+        "Saturn",
+        "Mercury"
+      ],
+      "karakas": [
+        "Saturn"
+      ],
+      "main": 10,
+      "distinguish": 6,
+      "_source": "Private employer. Mandatory 6 and 10 with link 6-10. 2 or 11 supports income. Employer identity needs external fact."
+    },
+    "government_clerk": {
+      "charts": [
+        "D1",
+        "Moon"
+      ],
+      "houses": [
+        6,
+        10,
+        3
+      ],
+      "mandatory": [
+        6,
+        10
+      ],
+      "links": [
+        [
+          6,
+          10
+        ]
+      ],
+      "planets": [
+        "Saturn",
+        "Mercury"
+      ],
+      "karakas": [
+        "Saturn"
+      ],
+      "conditions": [
+        {
+          "type": "planet_to_any",
+          "planet": "Mercury",
+          "houses": [
+            3
+          ]
+        }
+      ],
+      "main": 10,
+      "distinguish": 6,
+      "_source": "Service base 6 and 10. Mercury links to 3 for records and clerical work. Department identity needs external fact."
+    },
+    "store_staff": {
+      "charts": [
+        "D1",
+        "Moon"
+      ],
+      "houses": [
+        6,
+        10,
+        2,
+        7
+      ],
+      "mandatory": [
+        6,
+        10
+      ],
+      "links": [
+        [
+          6,
+          10
+        ]
+      ],
+      "planets": [
+        "Mercury",
+        "Venus"
+      ],
+      "karakas": [
+        "Saturn"
+      ],
+      "conditions": [
+        {
+          "type": "planets_to_any",
+          "planets": [
+            "Mercury",
+            "Venus"
+          ],
+          "houses": [
+            2,
+            7
+          ]
+        }
+      ],
+      "main": 10,
+      "distinguish": 7,
+      "_source": "Employee in a store. Service base 6 and 10. Customer or sales link with 2 or 7. Owner branch is store_owner."
+    },
+    "store_owner": {
+      "charts": [
+        "D1",
+        "Moon"
+      ],
+      "houses": [
+        7,
+        10,
+        2,
+        11
+      ],
+      "mandatory": [
+        7,
+        10
+      ],
+      "links": [
+        [
+          7,
+          10
+        ]
+      ],
+      "planets": [
+        "Mercury"
+      ],
+      "karakas": [
+        "Saturn"
+      ],
+      "main": 10,
+      "distinguish": 7,
+      "_source": "Owner branch. Mandatory 7 and 10, with 2 or 11 for income."
     }
   },
   "residence": {
@@ -898,6 +1046,39 @@
       "main": 5,
       "distinguish": 2,
       "_source": "Shows a supported birth window only. It does not establish a count, a sex or twins. Reference only."
+    }
+  },
+  "father": {
+    "retirement": {
+      "charts": [
+        "D1",
+        "Moon"
+      ],
+      "houses": [
+        9,
+        6,
+        5
+      ],
+      "mandatory": [
+        9,
+        6,
+        5
+      ],
+      "links": [
+        [
+          6,
+          5
+        ]
+      ],
+      "planets": [
+        "Sun"
+      ],
+      "karakas": [
+        "Saturn"
+      ],
+      "main": 6,
+      "distinguish": 5,
+      "_source": "Father's career 6 derived from 9 by base plus k minus 2 rule. Exit is father's 12th, which is the derived 5 from 6. Mandatory D1 9, 6 and 5, with link 6-5. Moon reference confirms 6 and 5. Father's service is an external fact to confirm."
     }
   }
 }
