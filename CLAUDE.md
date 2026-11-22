@@ -91,6 +91,18 @@ Non negotiable points
 - Rule library: suj_engine/rules/rules_index.json (1,561 rules from Komilla Sutton The Nakshatras and Umesh
   Puri Laghu Parashari).
 
+## GOAT ENGINE
+
+The only trigger for the GOAT ENGINE is the word GOAT. When a message contains GOAT as a whole word, in any letter
+case, it means goat_engine in this repository. No other word or phrase triggers it. A whole word means GOAT on its
+own, not goat inside another word. A message without the word GOAT is never run by the GOAT ENGINE, even when it is an
+astrology question. Such a message follows the SUJ rules above, as before. The GOAT ENGINE is a separate engine from
+SUJ and SARVA, and a request that names GOAT is not handled by the SUJ rules above. Read goat_engine/README.md first.
+Run it with node goat_engine/tools/goat.js --file goat_engine/examples/<file>.json, or give the same fields for a
+new native in a copy of an example file. It needs no install. Charts come from the VedNetra core in this
+repository, through goat_engine/tools/vednetra_loader.js. Its weights and topic presets are in goat_engine/data,
+and the owner can change them there. Do not change the GOAT weights to fit a backtest without the owner's go-ahead.
+
 ## What the engine needs from the owner for a reading
 
 Native name, gender, date of birth, time of birth, place of birth (the latitude, longitude and time zone can be

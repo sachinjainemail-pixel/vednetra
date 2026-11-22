@@ -1,0 +1,26 @@
+{
+  "_note": "Planet tables for the ordinal, count and type rules. gender follows Parashari practice, where Sun Mars and Jupiter are male, Moon and Venus are female, and Mercury Saturn Rahu and Ketu are neuter. stream gives the field of study a planet points to. propertyType gives the kind of property a planet points to. These follow the natural significations used in the engine and the owner can change them.",
+  "gender": { "Sun": "male", "Mars": "male", "Jupiter": "male", "Moon": "female", "Venus": "female", "Mercury": "neuter", "Saturn": "neuter", "Rahu": "neuter", "Ketu": "neuter" },
+  "stream": {
+    "Sun": "administration, government service, medicine and leadership",
+    "Moon": "nursing, psychology, hospitality and public service",
+    "Mars": "engineering, surgery, defence and sports",
+    "Mercury": "commerce, accounts, computers and communication",
+    "Jupiter": "law, teaching, finance and philosophy",
+    "Venus": "arts, design, fashion and music",
+    "Saturn": "technical trades, labour and structured service",
+    "Rahu": "technology, aviation, foreign studies and research",
+    "Ketu": "spiritual studies, research and hidden sciences"
+  },
+  "propertyType": {
+    "Sun": "government linked or authority property",
+    "Moon": "residential house or farm land near water",
+    "Mars": "land, plots and building property",
+    "Mercury": "commercial premises and office space",
+    "Jupiter": "religious or inherited property with wealth",
+    "Venus": "vehicles, luxury items and furnished homes",
+    "Saturn": "old or inherited property and industrial premises",
+    "Rahu": "foreign or unconventional property",
+    "Ketu": "remote or hidden property"
+  }
+}

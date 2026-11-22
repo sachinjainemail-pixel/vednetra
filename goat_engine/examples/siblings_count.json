@@ -1,0 +1,17 @@
+{
+  "name": "Sample male native",
+  "gender": "male",
+  "date": "2006-02-14",
+  "time": "05:27:00",
+  "tz": 5.5,
+  "lat": 31.326,
+  "lon": 75.576,
+  "place": "Sample place",
+  "topic": "siblings",
+  "options": [
+    { "label": "2 Brothers 1 Sister" },
+    { "label": "Only Child" },
+    { "label": "2 Brother 2 Sisters" },
+    { "label": "1 Brother 1 Sister" }
+  ]
+}
